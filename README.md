@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/Dexter9313/VIRUP-mirror.svg?branch=master)](https://travis-ci.org/Dexter9313/VIRUP-mirror)
-[![Build status](https://ci.appveyor.com/api/projects/status/pn4oq8es0rcg7468/branch/master?svg=true)](https://ci.appveyor.com/project/Dexter9313/virup-mirror/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/f1djey7fu7ibh31u/branch/master?svg=true)](https://ci.appveyor.com/project/Dexter9313/virup/branch/master)
 
 # VIRUP
 
