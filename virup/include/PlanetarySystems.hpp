@@ -43,6 +43,8 @@ class PlanetarySystems : public UniverseElement
 	                    ToneMappingModel const* tmm) override;
 	~PlanetarySystems();
 
+	bool useVRCamposForClosest = true;
+
   private:
 	bool doRender          = false;
 	unsigned int closestId = 0;

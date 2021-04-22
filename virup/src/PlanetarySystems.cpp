@@ -89,7 +89,7 @@ PlanetarySystems::PlanetarySystems()
 			vertices.push_back(0.0);
 			vertices.push_back(0.0);
 			vertices.push_back(0.0);
-			positions.push_back(Vector3());
+			positions.emplace_back();
 			systems.push_back(orbitalSystem);
 			directories.push_back(dir);
 			qDebug() << dir;
@@ -110,11 +110,15 @@ void PlanetarySystems::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
 
+	QVector3D pos = useVRCamposForClosest ? campos
+	                                      : getRelToAbsTransform().inverted()
+	                                            * Utils::toQt(camera.position);
+
 	double dist(DBL_MAX);
 	unsigned int oldClosestId(closestId);
 	for(unsigned int i(0); i < positions.size(); ++i)
 	{
-		double d((positions[i] - Utils::fromQt(campos)).length());
+		double d((positions[i] - Utils::fromQt(pos)).length());
 		if(d < dist)
 		{
 			dist      = d;

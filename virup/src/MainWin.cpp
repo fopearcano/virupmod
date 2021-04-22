@@ -663,24 +663,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		cam.updateTargetFPS();
 
 		planetSystems->update(cam);
-
-		/*float distPeriod = 60.f, anglePeriod = 10.f;
-		integralDt += dt;
-		if(integralDt
-		   < 500000.0f * distPeriod) // if we are within a semi-period
-		{
-		    camera->distance
-		        = 1.001
-		          + 1 * cos(6.28 * integralDt / (1000000.0f * distPeriod));
-		    camera->distance
-		        = (camera->distance < 0.001) ? 0.001 : camera->distance;
-		    anglePeriod = 20.f / camera->distance;
-		    camera->angle += 6.28f * (dt / 1000000.0f) / anglePeriod;
-		    camera->update();
-		    // empirical
-		    method->setAlpha((-28.0f / 1999.0f) * camera->distance
-		                     + ((3 + ((2000 * 28) / 1999.0f)) / 1000.0f));
-		}*/
+		planetSystems->useVRCamposForClosest
+		    = PythonQtHandler::getVariable("id").toInt() == -1;
 
 		Vector3 camPosData(cam.worldToDataPosition(Utils::fromQt(
 		    cam.hmdScaledSpaceToWorldTransform() * QVector3D(0.f, 0.f, 0.f))));
