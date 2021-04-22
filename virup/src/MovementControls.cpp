@@ -121,10 +121,11 @@ void MovementControls::wheelEvent(QWheelEvent* e)
 }
 
 void MovementControls::vrEvent(VRHandler::Event const& e,
-                               QMatrix4x4 const& trackedSpaceToWorldTransform)
+                               QMatrix4x4 const& trackedSpaceToWorldTransform,
+                               bool renderPlanetarySystem)
 {
 	vrEventCube(e, trackedSpaceToWorldTransform);
-	if(OctreeLOD::renderPlanetarySystem)
+	if(renderPlanetarySystem)
 	{
 		vrEventOrbitalSystem(e);
 	}
@@ -339,10 +340,10 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 	}
 }
 
-void MovementControls::update(double frameTiming)
+void MovementControls::update(double frameTiming, bool renderPlanetarySystem)
 {
 	updateCube(frameTiming);
-	if(OctreeLOD::renderPlanetarySystem)
+	if(renderPlanetarySystem)
 	{
 		updateOrbitalSystem(frameTiming);
 	}

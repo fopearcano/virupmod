@@ -16,6 +16,7 @@
 #include "CosmologicalSimulation.hpp"
 #include "Grid.hpp"
 #include "MovementControls.hpp"
+#include "PlanetarySystems.hpp"
 
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"
@@ -243,7 +244,7 @@ class MainWin : public AbstractMainWin
 	 */
 	bool isPlanetarySystemLoaded() const
 	{
-		return OctreeLOD::renderPlanetarySystem;
+		return planetSystems->renderSystem();
 	};
 	/**
 	 * @getter{planetTarget}
@@ -451,7 +452,6 @@ class MainWin : public AbstractMainWin
 	};
 
   private:
-	void loadSolarSystem();
 	void loadNewSystem();
 	void printPositionInDataSpace(Side controller = Side::NONE) const;
 	static std::vector<float> generateVertices(unsigned int number,
@@ -461,6 +461,7 @@ class MainWin : public AbstractMainWin
 	CosmologicalSimulation* cosmologicalSim = nullptr;
 	CSVObjects* hyg                         = nullptr;
 	CSVObjects* sdss                        = nullptr;
+	PlanetarySystems* planetSystems         = nullptr;
 
 	Grid* grid    = nullptr;
 	bool showGrid = QSettings().value("misc/showgrid").toBool();
@@ -487,10 +488,6 @@ class MainWin : public AbstractMainWin
 	float timeSinceTextUpdate = FLT_MAX;
 
 	// in kpc
-	/*
-	Vector3 milkyWayDataPos    = Vector3(0.0, 0.0, 0.0);
-	Vector3 m31DataPos = Vector3(382.92994334, -617.94616647, 288.2071201);
-	*/
 	Vector3 solarSystemDataPos = Vector3();
 	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
 

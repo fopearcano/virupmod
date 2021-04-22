@@ -42,10 +42,6 @@ class OctreeLOD : public Octree
 	static int64_t getUsedMem() { return usedMem(); };
 	static int64_t getMemLimit() { return memLimit(); };
 
-	static bool renderPlanetarySystem;
-	static Vector3& planetarySysInitData();
-	static Vector3& solarSystemDataPos();
-
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,
 	          Octree::CommonData& commonData, unsigned int lvl = 0);

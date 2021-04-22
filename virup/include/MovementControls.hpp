@@ -46,8 +46,9 @@ class MovementControls
 	void actionEvent(BaseInputManager::Action a, bool pressed);
 	void wheelEvent(QWheelEvent* e);
 	void vrEvent(VRHandler::Event const& e,
-	             QMatrix4x4 const& trackedSpaceToWorldTransform);
-	void update(double frameTiming);
+	             QMatrix4x4 const& trackedSpaceToWorldTransform,
+	             bool renderPlanetarySystem);
+	void update(double frameTiming, bool renderPlanetarySystem);
 	void renderGuides();
 
   private:

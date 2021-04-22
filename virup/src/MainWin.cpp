@@ -3,187 +3,14 @@
 MainWin::MainWin()
 {
 	srand(time(nullptr));
-	OctreeLOD::solarSystemDataPos() = Vector3(8.29995608, 0.0, -0.027);
-}
-
-void MainWin::loadSolarSystem()
-{
-	QString solarsystemdir(
-	    QSettings().value("simulation/solarsystemdir").toString());
-
-	QFile jsonFile(solarsystemdir + "/definition.json");
-
-	if(jsonFile.exists())
-	{
-		PlanetRenderer::currentSystemDir = solarsystemdir;
-		CSVOrbit::currentSystemDir       = solarsystemdir;
-
-		jsonFile.open(QIODevice::ReadOnly);
-		QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll());
-		QString name(QFileInfo(jsonFile).dir().dirName());
-		solarSystem = new OrbitalSystem(name.toStdString(), jsonDoc.object());
-		if(!solarSystem->isValid())
-		{
-			std::cerr << solarSystem->getName() << " is invalid... ";
-			delete solarSystem;
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		QMessageBox::critical(nullptr, tr("Invalid data directory"),
-		                      tr("The solar system root directory doesn't "
-		                         "contain any definition.json file."));
-		exit(EXIT_FAILURE);
-	}
-
-	auto barycenters = solarSystem->getAllBinariesNames();
-	auto stars       = solarSystem->getAllStarsNames();
-	auto fcPlanets   = solarSystem->getAllFirstClassPlanetsNames();
-	auto satellites  = solarSystem->getAllSatellitePlanetsNames();
-
-	std::cout << "-=-=- SYSTEM " << solarSystem->getName() << " -=-=-"
-	          << std::endl;
-	std::cout << "Barycenters : " << barycenters.size() << std::endl;
-	for(auto const& name : barycenters)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Stars : " << stars.size() << std::endl;
-	for(auto const& name : stars)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Main Planets : " << fcPlanets.size() << std::endl;
-	for(auto const& name : fcPlanets)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Satellites : " << satellites.size() << std::endl;
-	for(auto const& name : satellites)
-	{
-		std::cout << name << "(" << (*solarSystem)[name]->getParent()->getName()
-		          << ")" << std::endl;
-	}
-	std::cout << std::endl;
-
-	if(camPlanet == nullptr)
-	{
-		camPlanet
-		    = new OrbitalSystemCamera(*vrHandler, toneMappingModel->exposure,
-		                              toneMappingModel->dynamicrange);
-		camPlanet->seatedVROrigin = false;
-		camPlanet->setPerspectiveProj(renderer.getVerticalFOV(),
-		                              renderer.getAspectRatioFromFOV());
-	}
-	camPlanet->target           = solarSystem->getMainCelestialBody();
-	camPlanet->relativePosition = Vector3(
-	    camPlanet->target->getCelestialBodyParameters().radius * 2.0, 0.0, 0.0);
-	solarSystemRenderer = new OrbitalSystemRenderer(solarSystem);
-
-	CelestialBodyRenderer::overridenScale = 1.0;
 }
 
 void MainWin::loadNewSystem()
 {
-	if(orbitalSystem != nullptr && orbitalSystem != solarSystem)
-	{
-		delete systemRenderer;
-		delete orbitalSystem;
-	}
+	delete systemRenderer;
 
-	if(((Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-	                   * Utils::toQt(OctreeLOD::planetarySysInitData()))
-	     - solarSystemDataPos)
-	            .length()
-	        < 1e-6
-	    && planetarySystemName == "")
-	   || planetarySystemName == "Solar System")
-	{
-		orbitalSystem  = solarSystem;
-		systemRenderer = solarSystemRenderer;
-		QString solarsystemdir(
-		    QSettings().value("simulation/solarsystemdir").toString());
-		PlanetRenderer::currentSystemDir = solarsystemdir;
-		CSVOrbit::currentSystemDir       = solarsystemdir;
-	}
-	else
-	{
-		QString planetsystemdir(
-		    QSettings().value("simulation/planetsystemdir").toString());
-
-		unsigned int tries(3);
-
-		while(tries > 0)
-		{
-			tries--;
-			QFile jsonFile;
-			QStringList files;
-			QDirIterator it(planetsystemdir, QStringList() << "*.json",
-			                QDir::Files, QDirIterator::Subdirectories);
-			while(it.hasNext())
-			{
-				files << it.next();
-			}
-
-			if(tries == 2 && planetarySystemName != "")
-			{
-				jsonFile.setFileName(planetsystemdir + planetarySystemName
-				                     + "/definition.json");
-			}
-			else
-			{
-				jsonFile.setFileName(files[rand() % files.size()]);
-			}
-
-			if(jsonFile.exists())
-			{
-				PlanetRenderer::currentSystemDir = planetsystemdir;
-				CSVOrbit::currentSystemDir       = planetsystemdir;
-
-				jsonFile.open(QIODevice::ReadOnly);
-				QJsonDocument jsonDoc
-				    = QJsonDocument::fromJson(jsonFile.readAll());
-				QString name(QFileInfo(jsonFile).dir().dirName());
-				orbitalSystem
-				    = new OrbitalSystem(name.toStdString(), jsonDoc.object());
-				if(!orbitalSystem->isValid())
-				{
-					std::cerr << orbitalSystem->getName() << " is invalid... ";
-					delete orbitalSystem;
-					if(tries > 0)
-					{
-						std::cerr << "Trying another one..." << std::endl;
-					}
-					else
-					{
-						std::cerr << "All tries done. Shuting down..."
-						          << std::endl;
-						exit(EXIT_FAILURE);
-					}
-				}
-				else
-				{
-					tries = 0;
-				}
-			}
-			else if(tries == 0)
-			{
-				QMessageBox::critical(
-				    nullptr, tr("Invalid data directory"),
-				    tr("The planetary system root directory doesn't "
-				       "contain any definition.json file."));
-				exit(EXIT_FAILURE);
-			}
-		}
-		systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
-	}
+	orbitalSystem  = planetSystems->getClosestSystem();
+	systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
 
 	debugText->setText(QString(orbitalSystem->getName().c_str()));
 	lastTargetName      = orbitalSystem->getMainCelestialBody()->getName();
@@ -664,8 +491,8 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 		}
 
 		movementControls->vrEvent(
-		    e,
-		    renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform());
+		    e, renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform(),
+		    planetSystems->renderSystem());
 	}
 	AbstractMainWin::vrEvent(e);
 }
@@ -700,7 +527,7 @@ void MainWin::initScene()
 	        : "");
 	cosmologicalSim->referenceFrame = UniverseElement::ReferenceFrame::GALACTIC;
 	cosmologicalSim->unit           = 1.0;
-	cosmologicalSim->solarsystemPosition = Vector3(8.29995608, 0.0, -0.027);
+	cosmologicalSim->solarsystemPosition = Vector3(-8.29995608, 0.0, 0.027);
 
 	hyg       = new CSVObjects(QSettings().value("data/hyg").toString(),
                          QSettings().value("data/hygcon").toString());
@@ -710,13 +537,16 @@ void MainWin::initScene()
 	sdss->unit                 = 1000.0;
 	sdss->brightnessMultiplier = 1e9;
 
+	planetSystems = new PlanetarySystems;
+
 	// PLANETS LOADING
 	debugText = new Text3D(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
 	debugText->setColor(QColor(255, 0, 0));
 
-	loadSolarSystem();
 	loadNewSystem();
+	orbitalSystem  = planetSystems->getClosestSystem();
+	systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
 
 	debugText->setText("");
 
@@ -757,7 +587,7 @@ void MainWin::initScene()
 				                fields[3].toDouble());
 
 				dataPos = Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-				                        * Utils::toQt(dataPos));
+				                        * Utils::toQt(-1.0 * dataPos));
 
 				auto labelText = new LabelRenderer(label, QColor(255, 0, 0));
 				cosmoLabels.emplace_back(dataPos, labelText);
@@ -791,8 +621,12 @@ void MainWin::initScene()
 		                      "4:Saturn Moons",
 		                      "5:Rhea",
 		                      "6:Solar System",
-		                      "7:Milky Way",
-		                      "8:SDSS"};
+		                      "7:Kepler-11",
+		                      "8:51 Peg",
+		                      "9:TRAPPIST-1",
+		                      ":SWEEPS-11",
+		                      ":Milky Way",
+		                      ":SDSS"};
 		for(int i(0); i < scenes.size(); ++i)
 		{
 			auto button = new QPushButton(scenes[i]);
@@ -827,6 +661,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		auto& cam(dynamic_cast<Camera&>(camera));
 		cam.currentFrameTiming = frameTiming;
 		cam.updateTargetFPS();
+
+		planetSystems->update(cam);
 
 		/*float distPeriod = 60.f, anglePeriod = 10.f;
 		integralDt += dt;
@@ -866,7 +702,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			model.rotate(pitch * 180.f / M_PI + 90.f, 1.0, 0.0, 0.0);
 			cosmoLabel.second->updateModel(model);
 		}
-		movementControls->update(frameTiming);
+		movementControls->update(frameTiming, planetSystems->renderSystem());
 
 		if(networkManager->isServer())
 		{
@@ -928,13 +764,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 
 		timeSinceTextUpdate += frameTiming;
-		if(!OctreeLOD::renderPlanetarySystem)
+		if(!planetSystems->renderSystem())
 		{
 			return;
 		}
-		if(lastData
-		   != Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-		                    * Utils::toQt(OctreeLOD::planetarySysInitData())))
+		if(lastData != planetSystems->getClosestSystemPosition())
 		{
 			planetarySystemName = "";
 			loadNewSystem();
@@ -944,9 +778,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			loadNewSystem();
 		}
 
-		lastData
-		    = Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-		                    * Utils::toQt(OctreeLOD::planetarySysInitData()));
+		lastData   = planetSystems->getClosestSystemPosition();
 		sysInWorld = cosmoCam.dataToWorldPosition(lastData);
 
 		CelestialBodyRenderer::overridenScale = mtokpc * cosmoCam.scale;
@@ -986,7 +818,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 
 	if(pathId == "planet")
 	{
-		if(!OctreeLOD::renderPlanetarySystem)
+		if(!planetSystems->renderSystem())
 		{
 			if(timeSinceTextUpdate < 5.f)
 			{
@@ -1026,7 +858,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		return;
 	}
 
-	if(!OctreeLOD::renderPlanetarySystem)
+	if(!planetSystems->renderSystem())
 	{
 		renderer.renderVRControls();
 	}
@@ -1039,6 +871,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	hyg->constellationsAlpha  = CelestialBodyRenderer::renderLabels;
 	hyg->render(cam, toneMappingModel);
 	sdss->render(cam, toneMappingModel);
+	planetSystems->render(cam, toneMappingModel);
 	cosmologicalSim->render(cam, toneMappingModel);
 
 	// TODO(florian) better than this
@@ -1047,8 +880,8 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		for(auto cosmoLabel : cosmoLabels)
 		{
 			if(cosmoLabel.first == solarSystemDataPos
-			   && OctreeLOD::renderPlanetarySystem
-			   && orbitalSystem == solarSystem)
+			   && planetSystems->renderSystem()
+			   && orbitalSystem->getName() == "Solar System")
 			{
 				continue;
 			}
@@ -1173,9 +1006,9 @@ MainWin::~MainWin()
 		delete cosmoLabel.second;
 	}
 	delete systemRenderer;
-	delete orbitalSystem;
 	delete debugText;
 	delete movementControls;
+	delete planetSystems;
 	delete sdss;
 	delete hyg;
 	delete cosmologicalSim;

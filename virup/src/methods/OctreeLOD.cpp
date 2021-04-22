@@ -14,19 +14,6 @@ const int64_t& OctreeLOD::memLimit()
 	return memLimit;
 }
 
-bool OctreeLOD::renderPlanetarySystem = false;
-Vector3& OctreeLOD::planetarySysInitData()
-{
-	static Vector3 planetarySysInitData = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
-	return planetarySysInitData;
-}
-
-Vector3& OctreeLOD::solarSystemDataPos()
-{
-	static Vector3 solarSystemDataPos = Vector3();
-	return solarSystemDataPos;
-}
-
 // TODO just draw nothing if vertices.size() == 0 (prevents nullptr tests when
 // drawing)
 
@@ -97,25 +84,6 @@ void OctreeLOD::readOwnData(std::istream& in)
 				data[i + j] *= localScale;
 			}
 		}
-	}
-
-	if(isLeaf() && solarSystemDataPos()[0] > bbox.minx
-	   && solarSystemDataPos()[0] < bbox.maxx
-	   && solarSystemDataPos()[1] > bbox.miny
-	   && solarSystemDataPos()[1] < bbox.maxy
-	   && solarSystemDataPos()[2] > bbox.minz
-	   && solarSystemDataPos()[2] < bbox.maxz)
-	{
-		// put in normalized coordinates
-		Vector3 correctedSSDataPos(solarSystemDataPos());
-		for(unsigned int j(0); j < 3; ++j)
-		{
-			correctedSSDataPos[j] -= localTranslation[j];
-		}
-
-		data.push_back(correctedSSDataPos[0]);
-		data.push_back(correctedSSDataPos[1]);
-		data.push_back(correctedSSDataPos[2]);
 	}
 }
 
@@ -292,10 +260,8 @@ unsigned int OctreeLOD::renderAboveTanAngle(
 				closest = closestBackup;
 			}
 			localTranslation = closest;
-			bool switchedPoint(false);
 			if(closest != closestBackup)
 			{
-				switchedPoint = true;
 				closestBackup = closest;
 
 				std::vector<float> vertexData(absoluteData);
@@ -326,20 +292,6 @@ unsigned int OctreeLOD::renderAboveTanAngle(
 						closestNeighbor = x;
 						neighborDist    = x.length();
 					}
-				}
-			}
-
-			if(isStarField)
-			{
-				if(camera.scale * neighborDist > 2
-				   && (!renderPlanetarySystem || switchedPoint))
-				{
-					planetarySysInitData() = closest;
-					renderPlanetarySystem  = true;
-				}
-				else if(camera.scale * neighborDist <= 2)
-				{
-					renderPlanetarySystem = false;
 				}
 			}
 		}

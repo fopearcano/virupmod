@@ -176,11 +176,23 @@ scenes = [
     # Solar System dynamics
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
           TemporalData(10000000.0), UI(0.167, True, True)),
+    # Kepler-11 dynamics
+    Scene(SpatialData(Vector3(0.20798, -0.209748, 0.537371), 1.65181e+11, 'Kepler-11', 'Kepler-11'),
+          TemporalData(10000.0), UI(0.167, True, True)),
+    # 51 Peg dynamics
+    Scene(SpatialData(Vector3(0.0132362, -0.00132559, 0.00625585), 1.65181e+10, '51 Peg', '51 Peg'),
+          TemporalData(10000.0), UI(0.167, True, True)),
+    # TRAPPIST-1 dynamics
+    Scene(SpatialData(Vector3(0.0120457, -0.00306368, 0.000137469), 1.65181e+10, 'TRAPPIST-1', 'TRAPPIST-1'),
+          TemporalData(10000.0), UI(0.167, True, True)),
+    # SWEEPS-1 dynamics
+    Scene(SpatialData(Vector3(-0.0313282, -8.45706, -0.852723), 1.65181e+10, 'SWEEPS-11', 'SWEEPS-11'),
+          TemporalData(10000.0), UI(0.167, True, True)),
     # Milky Way
-    Scene(SpatialData(Vector3(0.43, 8.24, 0.81), 6.171e+20),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
            TemporalData(), UI(20*0.0181)),
     # Whole cube
-    Scene(SpatialData(Vector3(0.43, 8.24, 0.81), 1.2e+25),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 1.2e+25),
            TemporalData(), UI(1015.0, False, False, True)),
 ]
 
