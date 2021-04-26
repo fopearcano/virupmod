@@ -13,21 +13,7 @@ TreeMethodLOD::TreeMethodLOD(std::string const& shadersCommonName)
 TreeMethodLOD::TreeMethodLOD(std::string const& vertexShaderPath,
                              std::string const& fragmentShaderPath)
     : Method(vertexShaderPath, fragmentShaderPath)
-    , currentTanAngle(1.0f)
 {
-	timer.start();
-	// init chrono
-	// gettimeofday(&t0, NULL);
-
-	// setting PID controller
-	ctrl.Kp = -0.000001f;
-	ctrl.Ki = -0.0000001f;
-	ctrl.Kd = 0.00001f;
-
-	ctrl.controlVariable = &currentTanAngle;
-
-	ctrl.tol = 500;
-
 	showdm = true;
 
 	GLHandler::setPointSize(1);
@@ -194,37 +180,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	{
 		GLHandler::setPointSize(1);
 	}
-	/*struct timeval tf;
-	gettimeofday(&tf, NULL);
-	uint64_t dt = (tf.tv_sec * 1000000) + tf.tv_usec - t0.tv_usec
-	              - (t0.tv_sec * 1000000);
-	gettimeofday(&t0, NULL);
-
-	float dtf = dt;
-	if(camera.currentFrameTiming != 0)*/
-	float dtf = camera.currentFrameTiming * 1000000.f;
-	/*ctrl.targetMeasure = &dtf;
-	ctrl.setPoint          = 1000000.0f / camera.targetFPS;
-	ctrl.update(dt);
-
-	// we don't want points to discard others on depth test, because with
-	// transparency they should all be drawn; but we still want to be occluded
-	// by solid materials (like controllers for example) so depth test is still
-	// enabled*/
-
-	// old way
-	float coeff((dtf - 1000000.0f / camera.targetFPS) / 5000000.0f);
-	coeff = coeff > 1.f / 90.f ? 1.f / 90.f : coeff;
-	currentTanAngle += coeff;
-	currentTanAngle = currentTanAngle > 1.2f ? 1.2f : currentTanAngle;
-	currentTanAngle = currentTanAngle < 0.05f ? 0.05f : currentTanAngle;
-
-	// if something very bad happened regarding last frame rendering
-	if(timer.restart() > 200)
-	{
-		currentTanAngle = 1.2f;
-	}
-
+	OctreeLOD::updateTanAngleLimit(camera);
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color", std::vector<float>{1.0f, 1.0f, 1.0f}}});
@@ -250,9 +206,8 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		{
 			setShaderColor(QSettings().value("data/gazcolor").value<QColor>());
 		}
-		rendered += gasTree->renderAboveTanAngle(currentTanAngle, camera, model,
-		                                         campos, 100000000, false,
-		                                         getAlpha(), dustTransform);
+		gasTree->renderAboveTanAngle(camera, model, campos, false, getAlpha(),
+		                             dustTransform);
 	}
 	if(starsTree != nullptr)
 	{
@@ -262,9 +217,8 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/starscolor").value<QColor>());
 		}
-		rendered += starsTree->renderAboveTanAngle(
-		    currentTanAngle, camera, model, campos, 100000000, true, getAlpha(),
-		    dustTransform);
+		starsTree->renderAboveTanAngle(camera, model, campos, true, getAlpha(),
+		                               dustTransform);
 	}
 	if(darkMatterTree != nullptr && showdm)
 	{
@@ -274,9 +228,8 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/darkmattercolor").value<QColor>());
 		}
-		rendered += darkMatterTree->renderAboveTanAngle(
-		    currentTanAngle, camera, model, campos, 100000000, false,
-		    getAlpha(), dustTransform);
+		darkMatterTree->renderAboveTanAngle(camera, model, campos, false,
+		                                    getAlpha(), dustTransform);
 	}
 	GLHandler::endTransparent();
 	if(hiiModel != nullptr)

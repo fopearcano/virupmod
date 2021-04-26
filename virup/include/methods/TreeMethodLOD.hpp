@@ -40,10 +40,6 @@ class TreeMethodLOD : public Method
 	OctreeLOD* darkMatterTree  = nullptr;
 	VolumetricModel* hiiModel  = nullptr;
 
-	// struct timeval t0;
-	float currentTanAngle;
-	PIDController ctrl;
-
 	// ugly fix for pointSize problems
 	bool setPointSize = true;
 
@@ -52,9 +48,6 @@ class TreeMethodLOD : public Method
 	                               GLShaderProgram const& shaderProgram);
 	static void initOctree(OctreeLOD* octree, std::istream* in);
 	void setShaderColor(QColor const& color);
-
-	// used to detect too long frames
-	QElapsedTimer timer;
 };
 
 #endif // TREEMETHOD_H

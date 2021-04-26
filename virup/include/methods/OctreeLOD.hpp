@@ -31,13 +31,13 @@ class OctreeLOD : public Octree
 	void setFile(std::istream* file);
 	std::istream* getFile() { return file; };
 	bool preloadLevel(unsigned int lvlToLoad);
-	unsigned int renderAboveTanAngle(float tanAngle, Camera const& camera,
-	                                 QMatrix4x4 const& globalModel,
-	                                 QVector3D const& globalCampos,
-	                                 unsigned int maxPoints, bool isStarField,
-	                                 float alpha,
-	                                 QMatrix4x4 const& globalDustModel);
+	void renderAboveTanAngle(Camera const& camera,
+	                         QMatrix4x4 const& globalModel,
+	                         QVector3D const& globalCampos, bool isStarField,
+	                         float alpha, QMatrix4x4 const& globalDustModel);
 	~OctreeLOD();
+
+	static void updateTanAngleLimit(Camera const& camera);
 
 	static int64_t getUsedMem() { return usedMem(); };
 	static int64_t getMemLimit() { return memLimit(); };
@@ -72,6 +72,16 @@ class OctreeLOD : public Octree
 
 	/* PERFORMANCE */
 	Vector3 closestBackup = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
+
+	/* LOD DETERMINATION */
+
+	// struct timeval t0;
+	static float& tanAngleLimit();
+	// PIDController ctrl;
+
+	// used to detect too long frames
+	static bool& timerStarted();
+	static QElapsedTimer& timer();
 };
 
 #endif // OCTREELOD_H

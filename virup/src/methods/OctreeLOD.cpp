@@ -14,6 +14,24 @@ const int64_t& OctreeLOD::memLimit()
 	return memLimit;
 }
 
+float& OctreeLOD::tanAngleLimit()
+{
+	static float tanAngleLimit(1.2f);
+	return tanAngleLimit;
+}
+
+bool& OctreeLOD::timerStarted()
+{
+	static bool timerStarted(false);
+	return timerStarted;
+}
+
+QElapsedTimer& OctreeLOD::timer()
+{
+	static QElapsedTimer timer;
+	return timer;
+}
+
 // TODO just draw nothing if vertices.size() == 0 (prevents nullptr tests when
 // drawing)
 
@@ -164,10 +182,11 @@ bool OctreeLOD::preloadLevel(unsigned int lvlToLoad)
 	return true;
 }
 
-unsigned int OctreeLOD::renderAboveTanAngle(
-    float tanAngle, Camera const& camera, QMatrix4x4 const& globalModel,
-    QVector3D const& globalCampos, unsigned int maxPoints, bool isStarField,
-    float alpha, QMatrix4x4 const& globalDustModel)
+void OctreeLOD::renderAboveTanAngle(Camera const& camera,
+                                    QMatrix4x4 const& globalModel,
+                                    QVector3D const& globalCampos,
+                                    bool isStarField, float alpha,
+                                    QMatrix4x4 const& globalDustModel)
 {
 	if(camera.shouldBeCulled(bbox, globalModel, true) && lvl > 0)
 	{
@@ -175,7 +194,7 @@ unsigned int OctreeLOD::renderAboveTanAngle(
 		{
 			unload();
 		}
-		return 0;
+		return;
 	}
 
 	if(!isLoaded)
@@ -191,20 +210,19 @@ unsigned int OctreeLOD::renderAboveTanAngle(
 		}*/
 	}
 
-	if(currentTanAngle(globalCampos) > tanAngle && !isLeaf())
+	if(currentTanAngle(globalCampos) > tanAngleLimit() && !isLeaf())
 	{
-		unsigned int remaining = maxPoints;
 		// RENDER SUBTREES
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
 			{
-				remaining -= dynamic_cast<OctreeLOD*>(oct)->renderAboveTanAngle(
-				    tanAngle, camera, globalModel, globalCampos, remaining,
-				    isStarField, alpha, globalDustModel);
+				dynamic_cast<OctreeLOD*>(oct)->renderAboveTanAngle(
+				    camera, globalModel, globalCampos, isStarField, alpha,
+				    globalDustModel);
 			}
 		}
-		return maxPoints - remaining;
+		return;
 	}
 
 	if(!isLeaf() && usedMem() > (memLimit() * 80) / 100)
@@ -304,19 +322,14 @@ unsigned int OctreeLOD::renderAboveTanAngle(
 		}
 	}
 
-	if(dataSize / commonData.dimPerVertex <= maxPoints)
-	{
-		QMatrix4x4 model;
-		model.translate(Utils::toQt(localTranslation));
+	QMatrix4x4 model;
+	model.translate(Utils::toQt(localTranslation));
 
-		shaderProgram->setUniform("alpha", alpha * totalDataSize / dataSize);
-		shaderProgram->setUniform("campos", model.inverted() * globalCampos);
-		shaderProgram->setUniform("dusttransform", globalDustModel * model);
-		GLHandler::setUpRender(*shaderProgram, globalModel * model);
-		mesh->render();
-		return dataSize / commonData.dimPerVertex;
-	}
-	return 0;
+	shaderProgram->setUniform("alpha", alpha * totalDataSize / dataSize);
+	shaderProgram->setUniform("campos", model.inverted() * globalCampos);
+	shaderProgram->setUniform("dusttransform", globalDustModel * model);
+	GLHandler::setUpRender(*shaderProgram, globalModel * model);
+	mesh->render();
 }
 
 void OctreeLOD::computeBBox()
@@ -386,4 +399,56 @@ Octree* OctreeLOD::newChild() const
 OctreeLOD::~OctreeLOD()
 {
 	unload();
+}
+
+void OctreeLOD::updateTanAngleLimit(Camera const& camera)
+{
+	if(!timerStarted())
+	{
+		timer().start();
+		// init chrono
+		// gettimeofday(&t0, NULL);
+
+		// setting PID controller
+		/*ctrl.Kp = -0.000001f;
+		ctrl.Ki = -0.0000001f;
+		ctrl.Kd = 0.00001f;
+
+		ctrl.controlVariable = &tanAngleLimit;
+
+		ctrl.tol = 500;*/
+		timerStarted() = true;
+		return;
+	}
+
+	/*struct timeval tf;
+	gettimeofday(&tf, NULL);
+	uint64_t dt = (tf.tv_sec * 1000000) + tf.tv_usec - t0.tv_usec
+	              - (t0.tv_sec * 1000000);
+	gettimeofday(&t0, NULL);
+
+	float dtf = dt;
+	if(camera.currentFrameTiming != 0)*/
+	float dtf = camera.currentFrameTiming * 1000000.f;
+	/*ctrl.targetMeasure = &dtf;
+	ctrl.setPoint          = 1000000.0f / camera.targetFPS;
+	ctrl.update(dt);
+
+	// we don't want points to discard others on depth test, because with
+	// transparency they should all be drawn; but we still want to be occluded
+	// by solid materials (like controllers for example) so depth test is still
+	// enabled*/
+
+	// old way
+	float coeff((dtf - 1000000.0f / camera.targetFPS) / 5000000.0f);
+	coeff = coeff > 1.f / 90.f ? 1.f / 90.f : coeff;
+	tanAngleLimit() += coeff;
+	tanAngleLimit() = tanAngleLimit() > 1.2f ? 1.2f : tanAngleLimit();
+	tanAngleLimit() = tanAngleLimit() < 0.05f ? 0.05f : tanAngleLimit();
+
+	// if something very bad happened regarding last frame rendering
+	if(timer().restart() > 200)
+	{
+		tanAngleLimit() = 1.2f;
+	}
 }
