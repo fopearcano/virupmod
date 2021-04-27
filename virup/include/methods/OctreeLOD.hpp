@@ -31,10 +31,10 @@ class OctreeLOD : public Octree
 	void setFile(std::istream* file);
 	std::istream* getFile() { return file; };
 	bool preloadLevel(unsigned int lvlToLoad);
-	void renderAboveTanAngle(Camera const& camera,
-	                         QMatrix4x4 const& globalModel,
-	                         QVector3D const& globalCampos, bool isStarField,
-	                         float alpha, QMatrix4x4 const& globalDustModel);
+	void update(Camera const& camera, QMatrix4x4 const& globalModel,
+	            QVector3D const& globalCampos, float alpha);
+	void render(QMatrix4x4 const& globalModel, QVector3D const& globalCampos,
+	            float alpha, QMatrix4x4 const& globalDustModel);
 	~OctreeLOD();
 
 	static void updateTanAngleLimit(Camera const& camera);
@@ -47,6 +47,17 @@ class OctreeLOD : public Octree
 	          Octree::CommonData& commonData, unsigned int lvl = 0);
 	virtual Octree* newChild() const override;
 
+	// in Octree space
+	virtual void closestChanged(Vector3 /*closest*/){};
+	virtual void update(){};
+	virtual void renderNode(QMatrix4x4 const& localToWorld,
+	                        QVector3D const& localCamPos,
+	                        float compensatedAlpha,
+	                        QMatrix4x4 const& localDustModel);
+
+	GLMesh* mesh = nullptr;
+	GLShaderProgram const* shaderProgram;
+
   private:
 	unsigned int lvl = 0;
 	BBox bbox;
@@ -57,9 +68,6 @@ class OctreeLOD : public Octree
 	// total used memory across all instances
 	static int64_t& usedMem();
 	static const int64_t& memLimit();
-
-	GLMesh* mesh = nullptr;
-	GLShaderProgram const* shaderProgram;
 
 	void computeBBox();
 	float currentTanAngle(QVector3D const& campos) const;
@@ -82,6 +90,9 @@ class OctreeLOD : public Octree
 	// used to detect too long frames
 	static bool& timerStarted();
 	static QElapsedTimer& timer();
+
+	bool doRender = false;
+	bool recurse  = false;
 };
 
 #endif // OCTREELOD_H

@@ -43,8 +43,8 @@ OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram)
 OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram,
                      Octree::CommonData& commonData, unsigned int lvl)
     : Octree(commonData)
-    , lvl(lvl)
     , shaderProgram(&shaderProgram)
+    , lvl(lvl)
 {
 }
 
@@ -182,18 +182,18 @@ bool OctreeLOD::preloadLevel(unsigned int lvlToLoad)
 	return true;
 }
 
-void OctreeLOD::renderAboveTanAngle(Camera const& camera,
-                                    QMatrix4x4 const& globalModel,
-                                    QVector3D const& globalCampos,
-                                    bool isStarField, float alpha,
-                                    QMatrix4x4 const& globalDustModel)
+void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
+                       QVector3D const& globalCampos, float alpha)
 {
+	doRender = true;
+	recurse  = false;
 	if(camera.shouldBeCulled(bbox, globalModel, true) && lvl > 0)
 	{
 		if(usedMem() > (memLimit() * 80) / 100)
 		{
 			unload();
 		}
+		doRender = false;
 		return;
 	}
 
@@ -206,22 +206,23 @@ void OctreeLOD::renderAboveTanAngle(Camera const& camera,
 		/*}
 		else
 		{
-		    return 0;
+		    doRender = false;
+		    return;
 		}*/
 	}
 
 	if(currentTanAngle(globalCampos) > tanAngleLimit() && !isLeaf())
 	{
-		// RENDER SUBTREES
+		// UPDATE SUBTREES
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->renderAboveTanAngle(
-				    camera, globalModel, globalCampos, isStarField, alpha,
-				    globalDustModel);
+				dynamic_cast<OctreeLOD*>(oct)->update(camera, globalModel,
+				                                      globalCampos, alpha);
 			}
 		}
+		recurse = true;
 		return;
 	}
 
@@ -280,7 +281,11 @@ void OctreeLOD::renderAboveTanAngle(Camera const& camera,
 			localTranslation = closest;
 			if(closest != closestBackup)
 			{
+				closestChanged(closest);
 				closestBackup = closest;
+
+				Vector3 closestNeighbor(DBL_MAX, DBL_MAX, DBL_MAX);
+				neighborDist = DBL_MAX;
 
 				std::vector<float> vertexData(absoluteData);
 				for(unsigned int i(0); i < vertexData.size();
@@ -289,14 +294,6 @@ void OctreeLOD::renderAboveTanAngle(Camera const& camera,
 					vertexData[i] -= closest[0];
 					vertexData[i + 1] -= closest[1];
 					vertexData[i + 2] -= closest[2];
-				}
-				mesh->setVertices(vertexData);
-
-				Vector3 closestNeighbor(DBL_MAX, DBL_MAX, DBL_MAX);
-				neighborDist = DBL_MAX;
-				for(unsigned int i(0); i < vertexData.size();
-				    i += commonData.dimPerVertex)
-				{
 					Vector3 x(vertexData[i], vertexData[i + 1],
 					          vertexData[i + 2]);
 					// it's closest itself !
@@ -311,6 +308,7 @@ void OctreeLOD::renderAboveTanAngle(Camera const& camera,
 						neighborDist    = x.length();
 					}
 				}
+				mesh->setVertices(vertexData);
 			}
 		}
 		else
@@ -321,14 +319,49 @@ void OctreeLOD::renderAboveTanAngle(Camera const& camera,
 			neighborDist  = 0.0;
 		}
 	}
+	update();
+}
+
+void OctreeLOD::render(QMatrix4x4 const& globalModel,
+                       QVector3D const& globalCampos, float alpha,
+                       QMatrix4x4 const& globalDustModel)
+{
+	if(!doRender)
+	{
+		return;
+	}
+
+	if(recurse)
+	{
+		// RENDER SUBTREES
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr)
+			{
+				dynamic_cast<OctreeLOD*>(oct)->render(globalModel, globalCampos,
+				                                      alpha, globalDustModel);
+			}
+		}
+		return;
+	}
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
+	renderNode(globalModel * model, model.inverted() * globalCampos,
+	           alpha * totalDataSize / dataSize, globalDustModel * model);
+}
 
-	shaderProgram->setUniform("alpha", alpha * totalDataSize / dataSize);
-	shaderProgram->setUniform("campos", model.inverted() * globalCampos);
-	shaderProgram->setUniform("dusttransform", globalDustModel * model);
-	GLHandler::setUpRender(*shaderProgram, globalModel * model);
+void OctreeLOD::renderNode(QMatrix4x4 const& localToWorld,
+                           QVector3D const& localCamPos, float compensatedAlpha,
+                           QMatrix4x4 const& localDustModel)
+{
+	QMatrix4x4 model;
+	model.translate(Utils::toQt(localTranslation));
+
+	shaderProgram->setUniform("alpha", compensatedAlpha);
+	shaderProgram->setUniform("campos", localCamPos);
+	shaderProgram->setUniform("dusttransform", localDustModel);
+	GLHandler::setUpRender(*shaderProgram, localToWorld);
 	mesh->render();
 }
 

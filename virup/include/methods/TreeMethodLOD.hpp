@@ -27,6 +27,9 @@ class TreeMethodLOD : public Method
 	virtual void init(std::string const& gasPath, std::string const& starsPath,
 	                  std::string const& darkMatterPath) override;
 	virtual BBox getDataBoundingBox() const override;
+	void update(Camera const& camera);
+	void update(Camera const& camera, QMatrix4x4 const& model,
+	            QVector3D const& campos);
 	virtual void render(Camera const& camera) override;
 	void render(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos);

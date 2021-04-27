@@ -30,13 +30,16 @@ BBox CosmologicalSimulation::getBoundingBox() const
 	return trees.getDataBoundingBox();
 }
 
+void CosmologicalSimulation::update(Camera const& camera)
+{
+	getModelAndCampos(camera, model, campos);
+
+	trees.update(camera, model, campos);
+}
+
 void CosmologicalSimulation::render(Camera const& camera,
                                     ToneMappingModel const* /*tmm*/)
 {
-	QMatrix4x4 model;
-	QVector3D campos;
-	getModelAndCampos(camera, model, campos);
-
 	trees.setAlpha(brightnessMultiplier);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
 	trees.render(camera, model, campos);

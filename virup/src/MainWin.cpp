@@ -662,6 +662,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		cam.currentFrameTiming = frameTiming;
 		cam.updateTargetFPS();
 
+		cosmologicalSim->update(cam);
+
 		planetSystems->update(cam);
 		planetSystems->useVRCamposForClosest
 		    = PythonQtHandler::getVariable("id").toInt() == -1;

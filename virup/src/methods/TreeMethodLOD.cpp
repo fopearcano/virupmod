@@ -149,22 +149,32 @@ BBox TreeMethodLOD::getDataBoundingBox() const
 	return globalBBox(bboxes);
 }
 
-std::pair<float, std::string> humanReadable(int64_t bytes)
+void TreeMethodLOD::update(Camera const& camera)
 {
-	float fbytes(bytes);
-	if(bytes < 1024)
+	update(camera, camera.dataToWorldTransform(),
+	       Utils::toQt(camera.getTruePosition()));
+}
+
+void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
+                           QVector3D const& campos)
+{
+	OctreeLOD::updateTanAngleLimit(camera);
+	if(gasTree != nullptr)
 	{
-		return std::pair<float, std::string>(fbytes, " bytes");
+		gasTree->update(camera, model, campos, getAlpha());
 	}
-	if(bytes < 1024 * 1024)
+	if(starsTree != nullptr)
 	{
-		return std::pair<float, std::string>(fbytes / 1024, " Kib");
+		starsTree->update(camera, model, campos, getAlpha());
 	}
-	if(bytes < 1024 * 1024 * 1024)
+	if(darkMatterTree != nullptr && showdm)
 	{
-		return std::pair<float, std::string>(fbytes / (1024 * 1024), " Mib");
+		darkMatterTree->update(camera, model, campos, getAlpha());
 	}
-	return std::pair<float, std::string>(fbytes / (1024 * 1024 * 1024), " Gib");
+	if(hiiModel != nullptr)
+	{
+		hiiModel->render(camera, model, campos, dustModel);
+	}
 }
 
 void TreeMethodLOD::render(Camera const& camera)
@@ -180,7 +190,6 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	{
 		GLHandler::setPointSize(1);
 	}
-	OctreeLOD::updateTanAngleLimit(camera);
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color", std::vector<float>{1.0f, 1.0f, 1.0f}}});
@@ -198,7 +207,6 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		dustTransform = dustModel->getPosToTexCoord();
 	}
 
-	unsigned int rendered = 0;
 	if(gasTree != nullptr)
 	{
 		if((gasTree->getFlags() & Octree::Flags::STORE_COLOR)
@@ -206,8 +214,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		{
 			setShaderColor(QSettings().value("data/gazcolor").value<QColor>());
 		}
-		gasTree->renderAboveTanAngle(camera, model, campos, false, getAlpha(),
-		                             dustTransform);
+		gasTree->render(model, campos, getAlpha(), dustTransform);
 	}
 	if(starsTree != nullptr)
 	{
@@ -217,8 +224,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/starscolor").value<QColor>());
 		}
-		starsTree->renderAboveTanAngle(camera, model, campos, true, getAlpha(),
-		                               dustTransform);
+		starsTree->render(model, campos, getAlpha(), dustTransform);
 	}
 	if(darkMatterTree != nullptr && showdm)
 	{
@@ -228,22 +234,13 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/darkmattercolor").value<QColor>());
 		}
-		darkMatterTree->renderAboveTanAngle(camera, model, campos, false,
-		                                    getAlpha(), dustTransform);
+		darkMatterTree->render(model, campos, getAlpha(), dustTransform);
 	}
 	GLHandler::endTransparent();
 	if(hiiModel != nullptr)
 	{
 		hiiModel->render(camera, model, campos, dustModel);
 	}
-
-	(void) rendered;
-
-	/*std::pair<float, std::string> h(humanReadable(OctreeLOD::getUsedMem()));
-	std::cout.precision(4);
-	std::cout << "VRAM : " << h.first << h.second << " used... " << rendered
-	          << " points rendered..."
-	          << "\r" << std::fflush(stdout);*/
 }
 
 void TreeMethodLOD::cleanUp()

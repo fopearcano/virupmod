@@ -29,12 +29,16 @@ class CosmologicalSimulation : public UniverseElement
 	                       std::string const& starsOctreePath,
 	                       std::string const& darkMatterOctreePath);
 	virtual BBox getBoundingBox() const override;
+	virtual void update(Camera const& camera);
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const* tmm) override;
 	~CosmologicalSimulation() = default;
 
   public:
 	TreeMethodLOD trees;
+
+	QMatrix4x4 model;
+	QVector3D campos;
 };
 
 #endif // COSMOLOGICALSIMULATION_HPP
