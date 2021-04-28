@@ -233,7 +233,7 @@ def setSceneId(newid):
         currentscene = scenes[id]
     else:
         currentscene=Scene(SpatialData(VIRUP.cosmoPosition - getCosmoShift(), 1.0 / VIRUP.scale, VIRUP.planetTarget, VIRUP.planetarySystemName),
-           TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), UI(VIRUP.cosmolum, VIRUP.orbitsEnabled, VIRUP.labelsEnabled, VIRUP.darkmatterEnabled, VIRUP.gridEnabled))
+           TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), UI(ToneMappingModel.exposure, VIRUP.orbitsEnabled, VIRUP.labelsEnabled, VIRUP.darkmatterEnabled, VIRUP.gridEnabled))
         if scenes[id].spatialData.systemName == currentscene.spatialData.systemName and (scenes[id].spatialData.cosmoPos - currentscene.spatialData.cosmoPos).length() > 0.1:
             currentscene.spatialData.systemName = ""
 
@@ -321,7 +321,6 @@ def updateScene():
             VIRUP.simulationTime = temporalData.simulationTime
 
     ui = scene.ui
-    VIRUP.cosmolum = 0.167 * 1e7#ui.luminosity * 3.7e6
     VIRUP.orbitsEnabled = ui.orbits
     VIRUP.labelsEnabled = ui.labels
     VIRUP.darkmatterEnabled = ui.darkmatter

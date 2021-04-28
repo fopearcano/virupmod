@@ -149,7 +149,7 @@ void PlanetarySystems::update(Camera const& camera)
 }
 
 void PlanetarySystems::render(Camera const& /*camera*/,
-                              ToneMappingModel const* /*tmm*/)
+                              ToneMappingModel const& /*tmm*/)
 {
 	GLHandler::setUpRender(shader, model);
 	mesh.render();

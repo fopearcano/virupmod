@@ -36,16 +36,16 @@ class Method : public QObject
 	void resetAlpha();
 	void setAlpha(float alpha);
 	float getAlpha() const { return alpha; };
-	void setDarkMatterEnabled(bool enabled) { showdm = enabled; };
-	bool isDarkMatterEnabled() const { return showdm; };
-	void toggleDarkMatter() { showdm = !showdm; };
+	static void setDarkMatterEnabled(bool enabled) { showdm() = enabled; };
+	static bool isDarkMatterEnabled() { return showdm(); };
+	static void toggleDarkMatter() { showdm() = !showdm(); };
 	virtual void cleanUp(){};
 
   protected:
 	static BBox globalBBox(std::vector<BBox> const& bboxes);
 
 	float alpha = 0.011;
-	bool showdm = false;
+	static bool& showdm();
 };
 
 #endif // DEFINE_H

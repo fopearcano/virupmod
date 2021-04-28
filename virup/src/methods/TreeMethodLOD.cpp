@@ -14,7 +14,7 @@ TreeMethodLOD::TreeMethodLOD(std::string const& vertexShaderPath,
                              std::string const& fragmentShaderPath)
     : Method(vertexShaderPath, fragmentShaderPath)
 {
-	showdm = true;
+	showdm() = true;
 
 	GLHandler::setPointSize(1);
 }
@@ -167,7 +167,7 @@ void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
 	{
 		starsTree->update(camera, model, campos, getAlpha());
 	}
-	if(darkMatterTree != nullptr && showdm)
+	if(darkMatterTree != nullptr && showdm())
 	{
 		darkMatterTree->update(camera, model, campos, getAlpha());
 	}
@@ -226,7 +226,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		}
 		starsTree->render(model, campos, getAlpha(), dustTransform);
 	}
-	if(darkMatterTree != nullptr && showdm)
+	if(darkMatterTree != nullptr && showdm())
 	{
 		if((darkMatterTree->getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)

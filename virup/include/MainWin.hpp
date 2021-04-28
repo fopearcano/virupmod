@@ -12,11 +12,9 @@
 #include "AbstractMainWin.hpp"
 #include "Text3D.hpp"
 
-#include "CSVObjects.hpp"
-#include "CosmologicalSimulation.hpp"
 #include "Grid.hpp"
 #include "MovementControls.hpp"
-#include "PlanetarySystems.hpp"
+#include "Universe.hpp"
 
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"
@@ -45,12 +43,6 @@ class MainWin : public AbstractMainWin
 	 * @accessors getTimeCoeff(), setTimeCoeff()
 	 */
 	Q_PROPERTY(float timeCoeff READ getTimeCoeff WRITE setTimeCoeff)
-	/**
-	 * @brief The current luminosity of the cosmological data.
-	 *
-	 * @accessors getCosmoLum(), setCosmoLum()
-	 */
-	Q_PROPERTY(float cosmolum READ getCosmoLum WRITE setCosmoLum)
 	/**
 	 * @brief The current global scale of the visualization.
 	 * Ratio 1 real meter / 1 visualized meter. For example, if scale == 1/1000,
@@ -84,7 +76,9 @@ class MainWin : public AbstractMainWin
 	 * name isn't "Solar System", then the system must reside in a directory
 	 * named after it, within the exoplanetary systems directory.
 	 */
-	Q_PROPERTY(QString planetarySystemName MEMBER planetarySystemName)
+	Q_PROPERTY(QString planetarySystemName READ getPSN WRITE setPSN)
+	QString getPSN() const { return universe->planetarySystemName; }
+	void setPSN(QString const& psn) { universe->planetarySystemName = psn; }
 	/**
 	 * @brief Name of the planetary system camera target.
 	 *
@@ -158,7 +152,6 @@ class MainWin : public AbstractMainWin
 			stream >> renderLabels;
 			stream >> renderOrbits;
 			stream >> planetarySystemName;
-			stream >> cosmoLum;
 			stream >> compass;
 			compassState.readFromDataStream(stream);
 			stream >> stereoMultiplier;
@@ -173,7 +166,6 @@ class MainWin : public AbstractMainWin
 			stream << renderLabels;
 			stream << renderOrbits;
 			stream << planetarySystemName;
-			stream << cosmoLum;
 			stream << compass;
 			compassState.writeInDataStream(stream);
 			stream << stereoMultiplier;
@@ -186,7 +178,6 @@ class MainWin : public AbstractMainWin
 		float renderLabels;
 		float renderOrbits;
 		QString planetarySystemName;
-		float cosmoLum;
 		bool compass = false;
 		CalibrationCompass::State compassState;
 		double stereoMultiplier = 1.0;
@@ -212,14 +203,6 @@ class MainWin : public AbstractMainWin
 	 * @setter{timeCoeff, timeCoeff}
 	 */
 	void setTimeCoeff(float timeCoeff) { clock.setTimeCoeff(timeCoeff); };
-	/**
-	 * @getter{cosmoLum}
-	 */
-	float getCosmoLum() const;
-	/**
-	 * @setter{cosmoLum, cosmoLum}
-	 */
-	void setCosmoLum(float cosmoLum);
 
 	// SPACE
 
@@ -244,7 +227,7 @@ class MainWin : public AbstractMainWin
 	 */
 	bool isPlanetarySystemLoaded() const
 	{
-		return planetSystems->renderSystem();
+		return universe->isPlanetarySystemRendered();
 	};
 	/**
 	 * @getter{planetTarget}
@@ -290,16 +273,13 @@ class MainWin : public AbstractMainWin
 	/**
 	 * @getter{darkmatterEnabled}
 	 */
-	bool darkmatterEnabled() const
-	{
-		return cosmologicalSim->trees.isDarkMatterEnabled();
-	};
+	bool darkmatterEnabled() const { return Method::isDarkMatterEnabled(); };
 	/**
 	 * @setter{darkmatterEnabled, darkmatterEnabled}
 	 */
 	void setDarkmatterEnabled(bool enabled)
 	{
-		cosmologicalSim->trees.setDarkMatterEnabled(enabled);
+		Method::setDarkMatterEnabled(enabled);
 	};
 	/**
 	 * @getter{gridEnabled}
@@ -333,8 +313,6 @@ class MainWin : public AbstractMainWin
 	void setCamYaw(float yaw);
 
 	~MainWin();
-
-	QString planetarySystemName = "";
 
   public slots:
 	/**
@@ -422,8 +400,7 @@ class MainWin : public AbstractMainWin
 		clock.setCurrentUt(state.ut);
 		CelestialBodyRenderer::renderLabels = state.renderLabels;
 		CelestialBodyRenderer::renderOrbits = state.renderOrbits;
-		planetarySystemName                 = state.planetarySystemName;
-		setCosmoLum(state.cosmoLum);
+		universe->planetarySystemName       = state.planetarySystemName;
 		renderer.setCalibrationCompass(state.compass);
 		CalibrationCompass::readState(state.compassState);
 		vrHandler->setStereoMultiplier(state.stereoMultiplier);
@@ -444,27 +421,21 @@ class MainWin : public AbstractMainWin
 		state.ut                  = clock.getCurrentUt();
 		state.renderLabels        = CelestialBodyRenderer::renderLabels;
 		state.renderOrbits        = CelestialBodyRenderer::renderOrbits;
-		state.planetarySystemName = planetarySystemName;
-		state.cosmoLum            = getCosmoLum();
+		state.planetarySystemName = universe->planetarySystemName;
 		state.compass             = renderer.getCalibrationCompass();
 		CalibrationCompass::writeState(state.compassState);
 		state.stereoMultiplier = vrHandler->getStereoMultiplier();
 	};
 
   private:
-	void loadNewSystem();
 	void printPositionInDataSpace(Side controller = Side::NONE) const;
 	static std::vector<float> generateVertices(unsigned int number,
 	                                           unsigned int seed);
 
-	bool loaded                             = false;
-	CosmologicalSimulation* cosmologicalSim = nullptr;
-	CSVObjects* hyg                         = nullptr;
-	CSVObjects* sdss                        = nullptr;
-	PlanetarySystems* planetSystems         = nullptr;
-
-	Grid* grid    = nullptr;
-	bool showGrid = QSettings().value("misc/showgrid").toBool();
+	bool loaded        = false;
+	Universe* universe = nullptr;
+	Grid* grid         = nullptr;
+	bool showGrid      = QSettings().value("misc/showgrid").toBool();
 
 	bool moveView = false;
 	QPoint cursorPosBackup;
@@ -474,33 +445,18 @@ class MainWin : public AbstractMainWin
 	// 1 m = 3.24078e-20 kpc
 	const double mtokpc = 3.24078e-20;
 
-	OrbitalSystem* solarSystem                 = nullptr;
-	OrbitalSystemRenderer* solarSystemRenderer = nullptr;
-
-	OrbitalSystemCamera* camPlanet        = nullptr;
-	OrbitalSystem* orbitalSystem          = nullptr;
-	OrbitalSystemRenderer* systemRenderer = nullptr;
-	SimulationTime clock                  = SimulationTime(
-        QSettings().value("simulation/starttime").value<QDateTime>());
+	SimulationTime clock = SimulationTime(
+	    QSettings().value("simulation/starttime").value<QDateTime>());
 
 	/* TEXT */
 	Text3D* debugText         = nullptr;
 	float timeSinceTextUpdate = FLT_MAX;
 
-	// in kpc
-	Vector3 solarSystemDataPos = Vector3();
-	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
-
 	// TEMP
 	const int textWidth  = 225;
 	const int textHeight = 145;
 
-	Vector3 lastData   = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
-	Vector3 sysInWorld = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
-
 	std::string lastTargetName = std::string("");
-
-	bool forceUpdateFromCosmo = true;
 
 	// LENSING
 	GLTexture* lenseDistortionMap = nullptr;

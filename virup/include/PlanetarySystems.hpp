@@ -40,7 +40,7 @@ class PlanetarySystems : public UniverseElement
 	OrbitalSystem* getClosestSystem() { return systems[closestId]; };
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
-	                    ToneMappingModel const* tmm) override;
+	                    ToneMappingModel const& tmm) override;
 	~PlanetarySystems();
 
 	bool useVRCamposForClosest = true;

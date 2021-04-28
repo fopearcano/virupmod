@@ -1,5 +1,11 @@
 #include "methods/Method.hpp"
 
+bool& Method::showdm()
+{
+	static bool showdm = false;
+	return showdm;
+}
+
 Method::Method(std::string const& shadersCommonName)
     : Method(shadersCommonName, shadersCommonName)
 {

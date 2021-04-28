@@ -5,73 +5,6 @@ MainWin::MainWin()
 	srand(time(nullptr));
 }
 
-void MainWin::loadNewSystem()
-{
-	delete systemRenderer;
-
-	orbitalSystem  = planetSystems->getClosestSystem();
-	systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
-
-	debugText->setText(QString(orbitalSystem->getName().c_str()));
-	lastTargetName      = orbitalSystem->getMainCelestialBody()->getName();
-	timeSinceTextUpdate = 0.f;
-
-	auto barycenters = orbitalSystem->getAllBinariesNames();
-	auto stars       = orbitalSystem->getAllStarsNames();
-	auto fcPlanets   = orbitalSystem->getAllFirstClassPlanetsNames();
-	auto satellites  = orbitalSystem->getAllSatellitePlanetsNames();
-
-	std::cout << "-=-=- SYSTEM " << orbitalSystem->getName() << " -=-=-"
-	          << std::endl;
-	std::cout << "Barycenters : " << barycenters.size() << std::endl;
-	for(auto const& name : barycenters)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Stars : " << stars.size() << std::endl;
-	for(auto const& name : stars)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Main Planets : " << fcPlanets.size() << std::endl;
-	for(auto const& name : fcPlanets)
-	{
-		std::cout << name << std::endl;
-	}
-	std::cout << std::endl;
-
-	std::cout << "Satellites : " << satellites.size() << std::endl;
-	for(auto const& name : satellites)
-	{
-		std::cout << name << "("
-		          << (*orbitalSystem)[name]->getParent()->getName() << ")"
-		          << std::endl;
-	}
-	std::cout << std::endl;
-
-	if(camPlanet == nullptr)
-	{
-		camPlanet
-		    = new OrbitalSystemCamera(*vrHandler, toneMappingModel->exposure,
-		                              toneMappingModel->dynamicrange);
-		camPlanet->seatedVROrigin = false;
-		camPlanet->setPerspectiveProj(renderer.getVerticalFOV(),
-		                              renderer.getAspectRatioFromFOV());
-	}
-	camPlanet->target           = orbitalSystem->getMainCelestialBody();
-	camPlanet->relativePosition = Vector3(
-	    camPlanet->target->getCelestialBodyParameters().radius * 2.0, 0.0, 0.0);
-
-	CelestialBodyRenderer::overridenScale = 1.0;
-	forceUpdateFromCosmo                  = true;
-
-	planetarySystemName = orbitalSystem->getName().c_str();
-}
-
 QDateTime MainWin::getSimulationTime() const
 {
 	return SimulationTime::utToDateTime(clock.getCurrentUt());
@@ -80,16 +13,6 @@ QDateTime MainWin::getSimulationTime() const
 void MainWin::setSimulationTime(QDateTime const& simulationTime)
 {
 	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
-}
-
-float MainWin::getCosmoLum() const
-{
-	return cosmologicalSim->brightnessMultiplier;
-}
-
-void MainWin::setCosmoLum(float cosmoLum)
-{
-	cosmologicalSim->brightnessMultiplier = cosmoLum;
 }
 
 double MainWin::getScale() const
@@ -120,21 +43,12 @@ void MainWin::setCosmoPosition(Vector3 cosmoPosition)
 
 QString MainWin::getPlanetTarget() const
 {
-	return renderer.getCamera<OrbitalSystemCamera>("planet")
-	    .target->getName()
-	    .c_str();
+	return universe->getPlanetTarget();
 }
 
 void MainWin::setPlanetTarget(QString const& name)
 {
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
-	{
-		if(QString(ptr->getName().c_str()) == name)
-		{
-			renderer.getCamera<OrbitalSystemCamera>("planet").target = ptr;
-		}
-	}
+	universe->setPlanetTarget(name);
 }
 
 Vector3 MainWin::getPlanetPosition() const
@@ -167,62 +81,15 @@ void MainWin::setCamYaw(float yaw)
 QString MainWin::getClosestCommonAncestorName(
     QString const& celestialBodyName0, QString const& celestialBodyName1) const
 {
-	Orbitable const* orb0(nullptr);
-	Orbitable const* orb1(nullptr);
-
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
-	{
-		if(QString(ptr->getName().c_str()) == celestialBodyName0)
-		{
-			orb0 = ptr;
-		}
-		if(QString(ptr->getName().c_str()) == celestialBodyName1)
-		{
-			orb1 = ptr;
-		}
-	}
-	if(orb0 == nullptr || orb1 == nullptr)
-	{
-		return "";
-	}
-	auto result(Orbitable::getCommonAncestor(orb0, orb1));
-	if(result == nullptr)
-	{
-		return "";
-	}
-	return result->getName().c_str();
+	return universe->getClosestCommonAncestorName(celestialBodyName0,
+	                                              celestialBodyName1);
 }
 
 Vector3 MainWin::getCelestialBodyPosition(QString const& bodyName,
                                           QString const& referenceBodyName,
                                           QDateTime const& dt) const
 {
-	Orbitable const* orb(nullptr);
-	Orbitable const* orbRef(nullptr);
-
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
-	{
-		if(QString(ptr->getName().c_str()) == bodyName)
-		{
-			orb = ptr;
-		}
-		if(QString(ptr->getName().c_str()) == referenceBodyName)
-		{
-			orbRef = ptr;
-		}
-	}
-	if(orb == nullptr || orbRef == nullptr)
-	{
-		return {};
-	}
-	if(dt.isValid())
-	{
-		return Orbitable::getRelativePositionAtUt(
-		    orbRef, orb, SimulationTime::dateTimeToUT(dt));
-	}
-	return Orbitable::getRelativePositionAtUt(orbRef, orb,
+	return universe->getCelestialBodyPosition(bodyName, referenceBodyName, dt,
 	                                          clock.getCurrentUt());
 }
 
@@ -230,37 +97,8 @@ Vector3 MainWin::interpolateCoordinates(QString const& celestialBodyName0,
                                         QString const& celestialBodyName1,
                                         float t) const
 {
-	Orbitable const* orb0(nullptr);
-	Orbitable const* orb1(nullptr);
-
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
-	{
-		if(QString(ptr->getName().c_str()) == celestialBodyName0)
-		{
-			orb0 = ptr;
-		}
-		if(QString(ptr->getName().c_str()) == celestialBodyName1)
-		{
-			orb1 = ptr;
-		}
-	}
-	if(orb0 == nullptr || orb1 == nullptr)
-	{
-		return {};
-	}
-	auto ancestor(Orbitable::getCommonAncestor(orb0, orb1));
-	if(ancestor == nullptr)
-	{
-		return {};
-	}
-
-	return (Orbitable::getRelativePositionAtUt(ancestor, orb0,
-	                                           clock.getCurrentUt())
-	        * (1 - t))
-	       + (Orbitable::getRelativePositionAtUt(ancestor, orb1,
-	                                             clock.getCurrentUt())
-	          * t);
+	return universe->interpolateCoordinates(
+	    celestialBodyName0, celestialBodyName1, t, clock.getCurrentUt());
 }
 
 void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
@@ -269,15 +107,7 @@ void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 	{
 		if(pressed)
 		{
-			if(a.id == "alphaup")
-			{
-				setCosmoLum(getCosmoLum() * 10 / 8);
-			}
-			else if(a.id == "alphadown")
-			{
-				setCosmoLum(getCosmoLum() * 8 / 10);
-			}
-			else if(a.id == "resetvrpos")
+			if(a.id == "resetvrpos")
 			{
 				// integralDt    = 0;
 				if(vrHandler->isEnabled())
@@ -297,7 +127,7 @@ void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 			}
 			else if(a.id == "toggledm")
 			{
-				cosmologicalSim->trees.toggleDarkMatter();
+				Method::toggleDarkMatter();
 			}
 			else if(a.id == "togglegrid")
 			{
@@ -427,11 +257,11 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 							{
 								if(padCoords[0] < 0.0f) // LEFT
 								{
-									setCosmoLum(getCosmoLum() * 8 / 10);
+									toneMappingModel->exposure *= 8.0 / 10.0;
 								}
 								else // RIGHT
 								{
-									setCosmoLum(getCosmoLum() * 10 / 8);
+									toneMappingModel->exposure *= 10.0 / 8.0;
 								}
 							}
 							else // UP OR DOWN
@@ -492,7 +322,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 
 		movementControls->vrEvent(
 		    e, renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform(),
-		    planetSystems->renderSystem());
+		    universe->isPlanetarySystemRendered());
 	}
 	AbstractMainWin::vrEvent(e);
 }
@@ -518,42 +348,23 @@ void MainWin::initScene()
 	cam->setPerspectiveProj(renderer.getVerticalFOV(),
 	                        renderer.getAspectRatioFromFOV());
 
+	auto camPlanet = new OrbitalSystemCamera(
+	    *vrHandler, toneMappingModel->exposure, toneMappingModel->dynamicrange);
+	camPlanet->seatedVROrigin = false;
+	camPlanet->setPerspectiveProj(renderer.getVerticalFOV(),
+	                              renderer.getAspectRatioFromFOV());
+
 	// COSMO LOADING
-	cosmologicalSim = new CosmologicalSimulation(
-	    QSettings().value("data/gazfile").toString().toStdString(),
-	    QSettings().value("data/starsfile").toString().toStdString(),
-	    QSettings().value("data/loaddarkmatter").toBool()
-	        ? QSettings().value("data/darkmatterfile").toString().toStdString()
-	        : "");
-	cosmologicalSim->referenceFrame = UniverseElement::ReferenceFrame::GALACTIC;
-	cosmologicalSim->unit           = 1.0;
-	cosmologicalSim->solarsystemPosition = Vector3(-8.29995608, 0.0, 0.027);
-
-	hyg       = new CSVObjects(QSettings().value("data/hyg").toString(),
-                         QSettings().value("data/hygcon").toString());
-	hyg->unit = 0.001;
-
-	sdss = new CSVObjects(QSettings().value("data/sdss").toString(), true);
-	sdss->unit                 = 1000.0;
-	sdss->brightnessMultiplier = 1e9;
-
-	planetSystems = new PlanetarySystems;
+	universe = new Universe(*camPlanet);
 
 	// PLANETS LOADING
 	debugText = new Text3D(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
 	debugText->setColor(QColor(255, 0, 0));
-
-	loadNewSystem();
-	orbitalSystem  = planetSystems->getClosestSystem();
-	systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
-
 	debugText->setText("");
 
 	movementControls = new MovementControls(
-	    *vrHandler, cosmologicalSim->getBoundingBox(), cam, camPlanet);
-
-	setCosmoLum(getCosmoLum() / (cam->scale * cam->scale));
+	    *vrHandler, universe->getBoundingBox(), cam, camPlanet);
 
 	renderer.removeSceneRenderPath("default");
 
@@ -564,36 +375,6 @@ void MainWin::initScene()
 	renderer.pathIdRenderingControllers = "";
 
 	loaded = true;
-
-	// LABELS
-	QString labelspath(QSettings().value("data/cosmolabelsfile").toString());
-	if(labelspath != "")
-	{
-		QFile f(labelspath);
-		if(!f.open(QFile::ReadOnly | QFile::Text))
-		{
-			std::cerr << "Invalid cosmological labels file path : "
-			          << labelspath.toStdString() << std::endl;
-		}
-		else
-		{
-			QTextStream in(&f);
-			while(!in.atEnd())
-			{
-				QString line       = in.readLine();
-				QStringList fields = line.split(",");
-				QString label(fields[0]);
-				Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
-				                fields[3].toDouble());
-
-				dataPos = Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-				                        * Utils::toQt(-1.0 * dataPos));
-
-				auto labelText = new LabelRenderer(label, QColor(255, 0, 0));
-				cosmoLabels.emplace_back(dataPos, labelText);
-			}
-		}
-	}
 
 	// LENSING
 	lenseDistortionMap
@@ -662,33 +443,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		cam.currentFrameTiming = frameTiming;
 		cam.updateTargetFPS();
 
-		cosmologicalSim->update(cam);
+		universe->updateCosmo(cam);
 
-		planetSystems->update(cam);
-		planetSystems->useVRCamposForClosest
-		    = PythonQtHandler::getVariable("id").toInt() == -1;
-
-		Vector3 camPosData(cam.worldToDataPosition(Utils::fromQt(
-		    cam.hmdScaledSpaceToWorldTransform() * QVector3D(0.f, 0.f, 0.f))));
-
-		for(auto cosmoLabel : cosmoLabels)
-		{
-			Vector3 pos(cam.dataToWorldPosition(cosmoLabel.first));
-			Vector3 camRelPos(camPosData - cosmoLabel.first);
-			Vector3 unitRelPos(camRelPos.getUnitForm());
-
-			float yaw(atan2(unitRelPos[1], unitRelPos[0]));
-			float pitch(-1.0 * asin(unitRelPos[2]));
-			double rescale(pos.length() <= 8000.0 ? 1.0
-			                                      : 8000.0 / pos.length());
-			QMatrix4x4 model;
-			model.translate(Utils::toQt(pos * rescale));
-			model.scale(rescale * camRelPos.length() * cam.scale / 3.0);
-			model.rotate(yaw * 180.f / M_PI + 90.f, 0.0, 0.0, 1.0);
-			model.rotate(pitch * 180.f / M_PI + 90.f, 1.0, 0.0, 0.0);
-			cosmoLabel.second->updateModel(model);
-		}
-		movementControls->update(frameTiming, planetSystems->renderSystem());
+		movementControls->update(frameTiming,
+		                         universe->isPlanetarySystemRendered());
 
 		if(networkManager->isServer())
 		{
@@ -748,42 +506,20 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			    2 * static_cast<float>(textWidth) / width(),
 			    2 * static_cast<float>(textWidth) / height());
 		}
-
-		timeSinceTextUpdate += frameTiming;
-		if(!planetSystems->renderSystem())
-		{
-			return;
-		}
-		if(lastData != planetSystems->getClosestSystemPosition())
-		{
-			planetarySystemName = "";
-			loadNewSystem();
-		}
-		else if(planetarySystemName != orbitalSystem->getName().c_str())
-		{
-			loadNewSystem();
-		}
-
-		lastData   = planetSystems->getClosestSystemPosition();
-		sysInWorld = cosmoCam.dataToWorldPosition(lastData);
-
-		CelestialBodyRenderer::overridenScale = mtokpc * cosmoCam.scale;
-
-		if((cam.target == orbitalSystem->getMainCelestialBody()
-		    && CelestialBodyRenderer::overridenScale < 1e-12)
-		   || forceUpdateFromCosmo)
-		{
-			cam.relativePosition = -1 * sysInWorld / (mtokpc * cosmoCam.scale);
-			forceUpdateFromCosmo = false;
-		}
-
-		sysInWorld = cosmoCam.dataToWorldPosition(lastData);
-
+		debugText->getShader().setUniform("exposure",
+		                                  toneMappingModel->exposure);
+		debugText->getShader().setUniform("dynamicrange",
+		                                  toneMappingModel->dynamicrange);
 		clock.update();
 		cam.updateUT(clock.getCurrentUt());
 
-		systemRenderer->updateMesh(clock.getCurrentUt(), cam);
+		if(!universe->planetSystems->renderSystem())
+		{
+			return;
+		}
+		universe->updatePlanetarySystem(cosmoCam, clock.getCurrentUt());
 
+		timeSinceTextUpdate += frameTiming;
 		std::string targetName(cam.target->getName());
 		if(targetName != lastTargetName)
 		{
@@ -804,7 +540,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 
 	if(pathId == "planet")
 	{
-		if(!planetSystems->renderSystem())
+		if(!universe->isPlanetarySystemRendered())
 		{
 			if(timeSinceTextUpdate < 5.f)
 			{
@@ -813,9 +549,9 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		}
 		else
 		{
-			systemRenderer->render(camera);
+			universe->renderPlanetarySystem();
 			renderer.renderVRControls();
-			systemRenderer->renderTransparent(camera);
+			universe->renderPlanetarySystemTransparent();
 			if(timeSinceTextUpdate < 5.f)
 			{
 				// debugText->render();
@@ -844,39 +580,13 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		return;
 	}
 
-	if(!planetSystems->renderSystem())
+	if(!universe->isPlanetarySystemRendered())
 	{
 		renderer.renderVRControls();
 	}
 	auto& cam(dynamic_cast<Camera const&>(camera));
 
-	GLHandler::glf().glDepthFunc(GL_LEQUAL);
-	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
-	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	hyg->constellationsLabels = CelestialBodyRenderer::renderLabels;
-	hyg->constellationsAlpha  = CelestialBodyRenderer::renderLabels;
-	hyg->render(cam, toneMappingModel);
-	sdss->render(cam, toneMappingModel);
-	planetSystems->render(cam, toneMappingModel);
-	cosmologicalSim->render(cam, toneMappingModel);
-
-	// TODO(florian) better than this
-	if(CelestialBodyRenderer::renderLabels > 0.f)
-	{
-		for(auto cosmoLabel : cosmoLabels)
-		{
-			if(cosmoLabel.first == solarSystemDataPos
-			   && planetSystems->renderSystem()
-			   && orbitalSystem->getName() == "Solar System")
-			{
-				continue;
-			}
-			cosmoLabel.second->render(toneMappingModel->exposure,
-			                          toneMappingModel->dynamicrange);
-		}
-	}
-	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
-	GLHandler::glf().glDisable(GL_DEPTH_CLAMP);
+	universe->renderCosmo(cam, *toneMappingModel);
 
 	// update here because depends on eye
 	QVector3D pos(
@@ -987,16 +697,8 @@ MainWin::~MainWin()
 {
 	delete dialog;
 	delete lenseDistortionMap;
-	for(auto cosmoLabel : cosmoLabels)
-	{
-		delete cosmoLabel.second;
-	}
-	delete systemRenderer;
 	delete debugText;
 	delete movementControls;
-	delete planetSystems;
-	delete sdss;
-	delete hyg;
-	delete cosmologicalSim;
+	delete universe;
 	delete grid;
 }

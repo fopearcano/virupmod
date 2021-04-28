@@ -64,7 +64,7 @@ class CSVObjects : public UniverseElement
 	CSVObjects(QString const& csvFile, QString const& constellationsFile);
 	virtual BBox getBoundingBox() const override;
 	virtual void render(Camera const& camera,
-	                    ToneMappingModel const* tmm) override;
+	                    ToneMappingModel const& tmm) override;
 	virtual ~CSVObjects();
 
 	float colormix = 0.0f;

@@ -186,7 +186,7 @@ BBox CSVObjects::getBoundingBox() const
 	return {};
 }
 
-void CSVObjects::render(Camera const& camera, ToneMappingModel const* tmm)
+void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 {
 	QMatrix4x4 model;
 	QVector3D campos;
@@ -206,8 +206,8 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const* tmm)
 	}
 	else
 	{
-		shader.setUniform("camexp", tmm->exposure);
-		shader.setUniform("camdynrange", tmm->dynamicrange);
+		shader.setUniform("camexp", tmm.exposure);
+		shader.setUniform("camdynrange", tmm.dynamicrange);
 	}
 	GLHandler::useTextures({galaxies ? galTex() : starTex()});
 	GLHandler::setUpRender(shader, model);
@@ -227,8 +227,8 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const* tmm)
 		GLHandler::glf().glPrimitiveRestartIndex(0xFFFF);
 
 		conShader.setUniform("alpha", constellationsAlpha);
-		conShader.setUniform("exposure", tmm->exposure);
-		conShader.setUniform("dynamicrange", tmm->dynamicrange);
+		conShader.setUniform("exposure", tmm.exposure);
+		conShader.setUniform("dynamicrange", tmm.dynamicrange);
 
 		GLHandler::setUpRender(conShader, model);
 		conMesh.render(PrimitiveType::LINE_STRIP);
@@ -261,7 +261,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const* tmm)
 				conLabel.second->updateModel(model * model2);
 
 				conLabel.second->setAlpha(constellationsLabels);
-				conLabel.second->render(tmm->exposure, tmm->dynamicrange);
+				conLabel.second->render(tmm.exposure, tmm.dynamicrange);
 			}
 		}
 		GLHandler::glf().glDisable(GL_MULTISAMPLE);

@@ -20,8 +20,6 @@
 
 InputManager::InputManager()
 {
-	addAction(Qt::Key_PageUp, {"alphaup", "Cosmo Luminosity Up"});
-	addAction(Qt::Key_PageDown, {"alphadown", "Cosmo Luminosity Down"});
 	addAction(Qt::Key_Home, {"resetvrpos", "Reset VR origin"});
 	addAction(Qt::Key_M, {"toggledm", "Toggle Dark Matter"});
 	addAction(Qt::Key_L, {"togglelabels", "Toggle Labels"});

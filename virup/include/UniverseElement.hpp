@@ -37,7 +37,7 @@ class UniverseElement
 	virtual BBox getBoundingBox() const = 0;
 	QMatrix4x4 getRelToAbsTransform() const;
 	virtual void update(Camera const& /*camera*/){};
-	virtual void render(Camera const& camera, ToneMappingModel const* tmm) = 0;
+	virtual void render(Camera const& camera, ToneMappingModel const& tmm) = 0;
 	virtual ~UniverseElement() = default;
 
 	float brightnessMultiplier = 1.f;
