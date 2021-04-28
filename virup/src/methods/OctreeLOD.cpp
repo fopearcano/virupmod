@@ -319,7 +319,10 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 			neighborDist  = 0.0;
 		}
 	}
-	update();
+
+	QMatrix4x4 model;
+	model.translate(Utils::toQt(localTranslation));
+	update(globalModel * model, model.inverted() * globalCampos);
 }
 
 void OctreeLOD::render(QMatrix4x4 const& globalModel,
@@ -355,9 +358,6 @@ void OctreeLOD::renderNode(QMatrix4x4 const& localToWorld,
                            QVector3D const& localCamPos, float compensatedAlpha,
                            QMatrix4x4 const& localDustModel)
 {
-	QMatrix4x4 model;
-	model.translate(Utils::toQt(localTranslation));
-
 	shaderProgram->setUniform("alpha", compensatedAlpha);
 	shaderProgram->setUniform("campos", localCamPos);
 	shaderProgram->setUniform("dusttransform", localDustModel);

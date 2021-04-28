@@ -49,7 +49,8 @@ class OctreeLOD : public Octree
 
 	// in Octree space
 	virtual void closestChanged(Vector3 /*closest*/){};
-	virtual void update(){};
+	virtual void update(QMatrix4x4 const& /*localToWorld*/,
+	                    QVector3D const& /*localCamPos*/){};
 	virtual void renderNode(QMatrix4x4 const& localToWorld,
 	                        QVector3D const& localCamPos,
 	                        float compensatedAlpha,
