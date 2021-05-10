@@ -103,7 +103,7 @@ def interpolateSpatialData(s0, s1, t, simTime0, simTime1):
         end=VIRUP.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
 
         dist = (end-start).length()
-        maxscale = 1.0 / (dist)
+        maxscale = min(s1.scale, 1.0 / (dist))
         if t <= 0.25:
             scale = 1.0 / interpolateLog(s0.scale, maxscale, 4*t)
             planetpos = start
