@@ -33,8 +33,9 @@ class OctreeLOD : public Octree
 	bool preloadLevel(unsigned int lvlToLoad);
 	void update(Camera const& camera, QMatrix4x4 const& globalModel,
 	            QVector3D const& globalCampos, float alpha);
-	void render(QMatrix4x4 const& globalModel, QVector3D const& globalCampos,
-	            float alpha, QMatrix4x4 const& globalDustModel);
+	void render(Camera const& camera, QMatrix4x4 const& globalModel,
+	            QVector3D const& globalCampos, float alpha,
+	            QMatrix4x4 const& globalDustModel);
 	~OctreeLOD();
 
 	static void updateTanAngleLimit(Camera const& camera);
@@ -49,9 +50,11 @@ class OctreeLOD : public Octree
 
 	// in Octree space
 	virtual void closestChanged(Vector3 /*closest*/){};
-	virtual void update(QMatrix4x4 const& /*localToWorld*/,
+	virtual void update(Camera const& /*camera*/,
+	                    QMatrix4x4 const& /*localToWorld*/,
 	                    QVector3D const& /*localCamPos*/){};
-	virtual void renderNode(QMatrix4x4 const& localToWorld,
+	virtual void renderNode(Camera const& camera,
+	                        QMatrix4x4 const& localToWorld,
 	                        QVector3D const& localCamPos,
 	                        float compensatedAlpha,
 	                        QMatrix4x4 const& localDustModel);

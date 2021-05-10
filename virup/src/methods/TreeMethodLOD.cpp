@@ -214,7 +214,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		{
 			setShaderColor(QSettings().value("data/gazcolor").value<QColor>());
 		}
-		gasTree->render(model, campos, getAlpha(), dustTransform);
+		gasTree->render(camera, model, campos, getAlpha(), dustTransform);
 	}
 	if(starsTree != nullptr)
 	{
@@ -224,7 +224,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/starscolor").value<QColor>());
 		}
-		starsTree->render(model, campos, getAlpha(), dustTransform);
+		starsTree->render(camera, model, campos, getAlpha(), dustTransform);
 	}
 	if(darkMatterTree != nullptr && showdm())
 	{
@@ -234,7 +234,8 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			setShaderColor(
 			    QSettings().value("data/darkmattercolor").value<QColor>());
 		}
-		darkMatterTree->render(model, campos, getAlpha(), dustTransform);
+		darkMatterTree->render(camera, model, campos, getAlpha(),
+		                       dustTransform);
 	}
 	GLHandler::endTransparent();
 	if(hiiModel != nullptr)

@@ -322,10 +322,10 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
-	update(globalModel * model, model.inverted() * globalCampos);
+	update(camera, globalModel * model, model.inverted() * globalCampos);
 }
 
-void OctreeLOD::render(QMatrix4x4 const& globalModel,
+void OctreeLOD::render(Camera const& camera, QMatrix4x4 const& globalModel,
                        QVector3D const& globalCampos, float alpha,
                        QMatrix4x4 const& globalDustModel)
 {
@@ -341,8 +341,8 @@ void OctreeLOD::render(QMatrix4x4 const& globalModel,
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->render(globalModel, globalCampos,
-				                                      alpha, globalDustModel);
+				dynamic_cast<OctreeLOD*>(oct)->render(
+				    camera, globalModel, globalCampos, alpha, globalDustModel);
 			}
 		}
 		return;
@@ -350,11 +350,12 @@ void OctreeLOD::render(QMatrix4x4 const& globalModel,
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
-	renderNode(globalModel * model, model.inverted() * globalCampos,
+	renderNode(camera, globalModel * model, model.inverted() * globalCampos,
 	           alpha * totalDataSize / dataSize, globalDustModel * model);
 }
 
-void OctreeLOD::renderNode(QMatrix4x4 const& localToWorld,
+void OctreeLOD::renderNode(Camera const& /*camera*/,
+                           QMatrix4x4 const& localToWorld,
                            QVector3D const& localCamPos, float compensatedAlpha,
                            QMatrix4x4 const& localDustModel)
 {
