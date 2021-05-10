@@ -140,6 +140,10 @@ class AbstractMainWin : public QWindow
 	 * @brief Gamma value to use for gamma correction.
 	 */
 	Q_PROPERTY(float gamma MEMBER gamma)
+	/**
+	 * @brief Toggles video rendering mode.
+	 */
+	Q_PROPERTY(bool videomode MEMBER videomode)
 
   public:
 	/**

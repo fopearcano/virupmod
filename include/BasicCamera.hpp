@@ -104,6 +104,13 @@ class BasicCamera : public QObject
 	Q_PROPERTY(QMatrix4x4 hmdscaledspacetoworldtransform READ
 	               hmdScaledSpaceToWorldTransform)
 	/**
+	 * @brief Transformation matrix from skybox space to world space.
+	 *
+	 * @accessors skyboxSpaceToWorldTransform()
+	 */
+	Q_PROPERTY(
+	    QMatrix4x4 skyboxspacetoworldtransform READ skyboxSpaceToWorldTransform)
+	/**
 	 * @brief Transformation matrix from screen space (or clip space) to world
 	 * space.
 	 *
@@ -116,7 +123,7 @@ class BasicCamera : public QObject
 	 *
 	 * @accessors pixelSolidAngle()
 	 */
-	Q_PROPERTY(float pixelSolideAngle READ pixelSolidAngle)
+	Q_PROPERTY(float pixelSolidAngle READ pixelSolidAngle)
 	/**
 	 * @brief If true, VR origin is in seated coordinates. If false in standing
 	 * coordinates.
@@ -154,6 +161,9 @@ class BasicCamera : public QObject
 	 * It is mostly used to get VR transformations.
 	 */
 	explicit BasicCamera(VRHandler const& vrHandler);
+	/** @brief Returns the @ref VRHandler used by this camera.
+	 */
+	VRHandler const& getVRHandler() { return vrHandler; };
 	/**
 	 * @getter{viewmatrix}
 	 */
@@ -206,6 +216,10 @@ class BasicCamera : public QObject
 	 * @getter{hmdscaledspacetoworldtransform}
 	 */
 	QMatrix4x4 hmdScaledSpaceToWorldTransform() const;
+	/**
+	 * @getter{skyboxspacetoworldtransform}
+	 */
+	QMatrix4x4 skyboxSpaceToWorldTransform() const;
 	/**
 	 * @getter{screentoworldtransform}
 	 */
@@ -311,6 +325,13 @@ class BasicCamera : public QObject
 	 * transformation matrices in vertex shaders.
 	 */
 	void uploadMatrices() const;
+	/**
+	 * @brief Applies noTrans on a copy of a matrix.
+	 *
+	 * The three first components of the fourth column of a copy of @p matrix
+	 * will be set to zero then returned.
+	 */
+	static QMatrix4x4 noTrans(QMatrix4x4 const& matrix);
 
   protected:
 	/**
@@ -337,13 +358,6 @@ class BasicCamera : public QObject
 	 */
 	static QMatrix4x4 eyeDist(QMatrix4x4 const& matrix,
 	                          float eyeDistanceFactor);
-	/**
-	 * @brief Applies noTrans on a copy of a matrix.
-	 *
-	 * The three first components of the fourth column of a copy of @p matrix
-	 * will be set to zero then returned.
-	 */
-	static QMatrix4x4 noTrans(QMatrix4x4 const& matrix);
 	/**
 	 * @brief Direct access to the @ref viewmatrix property.
 	 */

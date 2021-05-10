@@ -207,6 +207,12 @@ QMatrix4x4 BasicCamera::hmdScaledSpaceToWorldTransform() const
 	return view.inverted();
 }
 
+QMatrix4x4 BasicCamera::skyboxSpaceToWorldTransform() const
+{
+	// see TRANSFORMS
+	return fullTransform.inverted() * fullSkyboxSpaceTransform;
+}
+
 QMatrix4x4 BasicCamera::screenToWorldTransform() const
 {
 	return view.inverted() * proj.inverted();
