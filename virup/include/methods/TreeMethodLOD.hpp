@@ -32,7 +32,7 @@ class TreeMethodLOD : public Method
 	            QVector3D const& campos);
 	virtual void render(Camera const& camera) override;
 	void render(Camera const& camera, QMatrix4x4 const& model,
-	            QVector3D const& campos);
+	            QVector3D const& campos, float unitInKpc);
 	virtual void cleanUp() override;
 	virtual ~TreeMethodLOD();
 

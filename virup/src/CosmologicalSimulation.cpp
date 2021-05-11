@@ -42,6 +42,6 @@ void CosmologicalSimulation::render(Camera const& camera,
 {
 	trees.setAlpha(brightnessMultiplier);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	trees.render(camera, model, campos);
+	trees.render(camera, model, campos, unit);
 	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 }

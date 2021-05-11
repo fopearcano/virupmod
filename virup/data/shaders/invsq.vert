@@ -7,6 +7,7 @@ uniform mat4 camera;
 uniform float alpha;
 uniform vec3 campos;
 uniform float pixelSolidAngle;
+uniform float unitInKpc = 1.0;
 
 uniform mat4 dusttransform;
 uniform float useDust = 0.0;
@@ -41,7 +42,7 @@ void main()
 	gl_Position        = pos;
 	gl_ClipDistance[0] = (pos.z / pos.w) - 0.1;
 
-	float camdist = length(position - campos);
+	float camdist = length(position - campos) * unitInKpc; // in kpc
 	vec3 absmag = 4.83 - 2.5 * log10_3(max(vec3(1.0e-30),color) ); // color is in Solar Luminosity ;
 	                                           // sun is 4.83 abs mag
 	vec3 apparentmag = absmag + 5.0 * (log10(camdist) + 2.0);

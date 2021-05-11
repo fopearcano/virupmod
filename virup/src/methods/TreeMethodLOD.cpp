@@ -180,11 +180,11 @@ void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
 void TreeMethodLOD::render(Camera const& camera)
 {
 	render(camera, camera.dataToWorldTransform(),
-	       Utils::toQt(camera.getTruePosition()));
+	       Utils::toQt(camera.getTruePosition()), 1.f);
 }
 
 void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
-                           QVector3D const& campos)
+                           QVector3D const& campos, float unitInKpc)
 {
 	if(setPointSize)
 	{
@@ -200,6 +200,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	}
 	GLHandler::setUpRender(shaderProgram, model);
 	shaderProgram.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
+	shaderProgram.setUniform("unitInKpc", unitInKpc);
 	shaderProgram.setUniform("useDust", 1.f);
 	QMatrix4x4 dustTransform;
 	if(dustModel != nullptr)
