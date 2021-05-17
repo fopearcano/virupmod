@@ -156,6 +156,27 @@ void SettingsWidget::editGroup(QString const& name)
 	currentForm->addRow(PROJECT_NAME, new QWidget());
 }
 
+void SettingsWidget::addCustomGroup(QString const& name, QString const& label,
+                                    QWidget* w)
+{
+	currentGroup = name;
+
+	QTabWidget::addTab(w, label);
+
+	orderedGroups.append(name);
+}
+
+void SettingsWidget::insertCustomGroup(QString const& name,
+                                       QString const& label, int index,
+                                       QWidget* w)
+{
+	currentGroup = name;
+
+	QTabWidget::insertTab(index, w, label);
+
+	orderedGroups.insert(index, name);
+}
+
 void SettingsWidget::addBoolSetting(QString const& name, bool defaultVal,
                                     QString const& label)
 {

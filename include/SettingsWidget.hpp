@@ -57,6 +57,9 @@ class SettingsWidget : public QTabWidget
 	void addGroup(QString const& name, QString const& label);
 	void insertGroup(QString const& name, QString const& label, int index);
 	void editGroup(QString const& name);
+	void addCustomGroup(QString const& name, QString const& label, QWidget* w);
+	void insertCustomGroup(QString const& name, QString const& label, int index,
+	                       QWidget* w);
 	void addBoolSetting(QString const& name, bool defaultVal,
 	                    QString const& label);
 	void addUIntSetting(QString const& name, unsigned int defaultVal,

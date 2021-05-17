@@ -163,7 +163,7 @@ class BasicCamera : public QObject
 	explicit BasicCamera(VRHandler const& vrHandler);
 	/** @brief Returns the @ref VRHandler used by this camera.
 	 */
-	VRHandler const& getVRHandler() { return vrHandler; };
+	VRHandler const& getVRHandler() const { return vrHandler; };
 	/**
 	 * @getter{viewmatrix}
 	 */
