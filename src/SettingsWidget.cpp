@@ -432,32 +432,20 @@ void SettingsWidget::addColorSetting(QString const& name,
 
 	QColor stored(settings.value(fullName).value<QColor>());
 
-	auto button = new QPushButton(this);
+	auto colorSelector = new ColorSelector(this, label);
 
-	button->setStyleSheet("QPushButton{ \
+	colorSelector->setStyleSheet("QPushButton{ \
     background-color: " + stored.name()
-	                      + ";        \
+	                             + ";        \
     border-style: inset;                     \
     }");
 
-	connect(button, &QPushButton::clicked, this,
-	        [this, fullName, button, label](bool) {
-		        QColor result(QColorDialog::getColor(
-		            settings.value(fullName).value<QColor>(), this, label));
-		        if(!result.isValid())
-		        {
-			        return;
-		        }
-
-		        button->setStyleSheet("QPushButton{ \
-    background-color: " + result.name()
-		                              + ";        \
-    border-style: inset;                     \
-    }");
-		        updateValue(fullName, result);
+	connect(colorSelector, &ColorSelector::colorChanged, this,
+	        [this, fullName](QColor const& color) {
+		        updateValue(fullName, color);
 	        });
 
-	currentForm->addRow(label + " :", button);
+	currentForm->addRow(label + " :", colorSelector);
 }
 
 void SettingsWidget::addDateTimeSetting(QString const& name,

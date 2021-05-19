@@ -45,6 +45,7 @@
 #include <array>
 
 #include "InputManager.hpp"
+#include "gui/ColorSelector.hpp"
 
 class SettingsWidget : public QTabWidget
 {
