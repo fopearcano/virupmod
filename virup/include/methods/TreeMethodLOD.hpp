@@ -27,6 +27,8 @@ class TreeMethodLOD : public Method
 	virtual void init(std::string const& gasPath, std::string const& starsPath,
 	                  std::string const& darkMatterPath) override;
 	virtual BBox getDataBoundingBox() const override;
+	uint64_t getOctreesTotalDataSize() const;
+	bool preloadOctreesLevel(unsigned int level, QProgressDialog& progress);
 	void update(Camera const& camera);
 	void update(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos);

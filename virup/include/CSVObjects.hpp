@@ -60,9 +60,13 @@ class CSVObjects : public UniverseElement
 		std::vector<StarName> names;
 	};
 
-	CSVObjects(QString const& csvFile, bool galaxies = false);
-	CSVObjects(QString const& csvFile, QString const& constellationsFile);
+	CSVObjects(QJsonObject const& json, bool galaxies = false);
 	virtual BBox getBoundingBox() const override;
+	virtual void update(Camera const& /*camera*/) override
+	{
+		constellationsLabels = visibility;
+		constellationsAlpha  = visibility;
+	}
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
 	virtual ~CSVObjects();
@@ -72,7 +76,15 @@ class CSVObjects : public UniverseElement
 	float constellationsLabels = 0.f;
 	float constellationsAlpha  = 0.f;
 
+	static QList<QPair<QString, QWidget*>>
+	    getStarsLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	static QList<QPair<QString, QWidget*>>
+	    getGalaxiesLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+
   private:
+	void init(QString const& csvFile, QString const& atlasFile);
+	void initWithConstellations(QString const& csvFile,
+	                            QString const& constellationsFile);
 	static float clamp(float x, float lo, float hi)
 	{
 		return (x < lo) ? lo : ((x > hi) ? hi : x);

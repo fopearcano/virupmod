@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "CSVObjects.hpp"
+#include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
 #include "PlanetarySystems.hpp"
 
@@ -59,25 +60,18 @@ class Universe
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);
-
-  public:
 	void loadClosestSystem();
 
-  private:
 	BBox boundingBox
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
-	CosmologicalSimulation* cosmologicalSim = nullptr;
-	CSVObjects* hyg                         = nullptr;
-	CSVObjects* sdss                        = nullptr;
+
+	QList<UniverseElement*> elements;
+	QList<CosmologicalSimulation*> cosmoSims;
 
   public:
 	PlanetarySystems* planetSystems = nullptr;
 
   private:
-	// in kpc
-	Vector3 solarSystemDataPos = Vector3();
-	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
-
 	// planets
 	OrbitalSystemCamera& camPlanet;
 	OrbitalSystem* orbitalSystem          = nullptr;

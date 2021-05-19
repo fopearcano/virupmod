@@ -19,8 +19,14 @@
 #ifndef UNIVERSEELEMENT_HPP
 #define UNIVERSEELEMENT_HPP
 
+#include <QComboBox>
+#include <QLabel>
+
 #include "Camera.hpp"
 #include "ToneMappingModel.hpp"
+#include "gui/ColorSelector.hpp"
+#include "gui/PathSelector.hpp"
+#include "gui/SciDoubleSpinBox.hpp"
 #include "math/Vector3.hpp"
 
 class UniverseElement
@@ -41,6 +47,7 @@ class UniverseElement
 	virtual ~UniverseElement() = default;
 
 	float brightnessMultiplier = 1.f;
+	float visibility           = 1.f;
 
 	double unit                   = 1.0;                    // in kpc
 	Vector3 solarsystemPosition   = Vector3(0.0, 0.0, 0.0); // in unit
@@ -49,6 +56,9 @@ class UniverseElement
 	static QMatrix4x4 const& equatorialToEcliptic();
 	static QMatrix4x4 const& galacticToEcliptic();
 	static QMatrix4x4 transform(ReferenceFrame from, ReferenceFrame to);
+
+	static QList<QPair<QString, QWidget*>>
+	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
   protected:
 	void getModelAndCampos(Camera const& camera, QMatrix4x4& model,

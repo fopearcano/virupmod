@@ -31,6 +31,7 @@ class VolumetricModel
 {
   public:
 	VolumetricModel(QString const& datFile);
+	void setColor(QColor const& color) { this->color = color; };
 	void initMesh();
 	Vector3 getMinPos() const { return minPos; };
 	Vector3 getMaxPos() const { return maxPos; };
@@ -50,6 +51,8 @@ class VolumetricModel
 	GLTexture* tex = nullptr;
 
 	bool renderable = false;
+
+	QColor color;
 
 	QMatrix4x4 dataModel;
 	GLShaderProgram shader;

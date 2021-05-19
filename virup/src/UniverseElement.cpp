@@ -73,6 +73,87 @@ QMatrix4x4 UniverseElement::transform(ReferenceFrame from, ReferenceFrame to)
 	       * transform(ReferenceFrame::ECLIPTIC, to);
 }
 
+QList<QPair<QString, QWidget*>>
+    UniverseElement::getLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+{
+	QList<QPair<QString, QWidget*>> result;
+
+	auto sbox = new SciDoubleSpinBox(parent);
+	QObject::connect(sbox,
+	                 static_cast<void (QDoubleSpinBox::*)(double)>(
+	                     &QDoubleSpinBox::valueChanged),
+	                 [jsonObj](double v) { (*jsonObj)["unit"] = v; });
+	sbox->setValue((*jsonObj)["unit"].toDouble(1.0));
+
+	result.append({QObject::tr("Data unit (in kpc):"), sbox});
+
+	auto cbox = new QComboBox(parent);
+	QStringList entries({QObject::tr("Equatorial"), QObject::tr("Galactic"),
+	                     QObject::tr("Ecliptic")});
+	QStringList entriesIds({"equatorial", "galactic", "ecliptic"});
+	for(auto const& entry : entries)
+	{
+		cbox->addItem(entry);
+	}
+	QObject::connect(cbox, &QComboBox::currentTextChanged,
+	                 [jsonObj, entries, entriesIds](QString const& text) {
+		                 (*jsonObj)["referenceframe"]
+		                     = entriesIds[entries.indexOf(text)];
+	                 });
+	if(jsonObj->keys().indexOf("referenceframe") >= 0)
+	{
+		cbox->setCurrentText(entries[entriesIds.indexOf(
+		    (*jsonObj)["referenceframe"].toString())]);
+	}
+	else
+	{
+		(*jsonObj)["referenceframe"] = entriesIds[0];
+	}
+
+	result.append({QObject::tr("Reference frame:"), cbox});
+
+	Vector3 stored((*jsonObj)["solarsyslocalpos"].toObject());
+	auto w                                  = new QWidget(parent);
+	auto layout                             = new QHBoxLayout(w);
+	std::array<SciDoubleSpinBox*, 3> sboxes = {{nullptr, nullptr, nullptr}};
+	std::array<QString, 3> componentLabels
+	    = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};
+	unsigned int i(0);
+	for(auto& sbox : sboxes)
+	{
+		sbox = new SciDoubleSpinBox(parent);
+	}
+	for(auto& sbox : sboxes)
+	{
+		QObject::connect(sbox,
+		                 static_cast<void (QDoubleSpinBox::*)(double)>(
+		                     &QDoubleSpinBox::valueChanged),
+		                 [jsonObj, sboxes](double) {
+			                 (*jsonObj)["solarsyslocalpos"]
+			                     = Vector3(sboxes[0]->value(),
+			                               sboxes[1]->value(),
+			                               sboxes[2]->value())
+			                           .getJSONRepresentation();
+		                 });
+		sbox->setValue(stored[i]);
+		layout->addWidget(new QLabel(componentLabels.at(i) + " :", parent));
+		layout->addWidget(sbox);
+		++i;
+	}
+
+	result.append({QObject::tr("Solar System local position:"), w});
+
+	sbox = new SciDoubleSpinBox(parent);
+	QObject::connect(sbox,
+	                 static_cast<void (QDoubleSpinBox::*)(double)>(
+	                     &QDoubleSpinBox::valueChanged),
+	                 [jsonObj](double v) { (*jsonObj)["brightnessmul"] = v; });
+	sbox->setValue((*jsonObj)["brightnessmul"].toDouble(1.0));
+
+	result.append({QObject::tr("Brightness multiplier:"), sbox});
+	return result;
+}
+
 void UniverseElement::getModelAndCampos(Camera const& camera, QMatrix4x4& model,
                                         QVector3D& campos)
 {

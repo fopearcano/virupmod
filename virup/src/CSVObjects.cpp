@@ -30,10 +30,23 @@ GLTexture*& CSVObjects::galTex()
 	return galTex;
 }
 
-CSVObjects::CSVObjects(QString const& csvFile, bool galaxies)
+CSVObjects::CSVObjects(QJsonObject const& json, bool galaxies)
     : shader(galaxies ? "galaxies" : "stars")
     , galaxies(galaxies)
     , conShader("default")
+{
+	if(!galaxies && QFile::exists(json["confile"].toString()))
+	{
+		initWithConstellations(json["file"].toString(),
+		                       json["confile"].toString());
+	}
+	else
+	{
+		init(json["file"].toString(), json["atlasfile"].toString());
+	}
+}
+
+void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 {
 	if(starTex() == nullptr)
 	{
@@ -41,10 +54,9 @@ CSVObjects::CSVObjects(QString const& csvFile, bool galaxies)
 		    getAbsoluteDataPath("images/star.png").toLatin1().data());
 		starTex()->generateMipmap();
 	}
-	if(galTex() == nullptr)
+	if(galTex() == nullptr && !atlasFile.isEmpty())
 	{
-		galTex() = new GLTexture(
-		    QSettings().value("data/sdssatlas").toString().toLatin1().data());
+		galTex() = new GLTexture(atlasFile.toLatin1().data());
 		galTex()->generateMipmap();
 	}
 	QFile file(csvFile);
@@ -99,10 +111,10 @@ CSVObjects::CSVObjects(QString const& csvFile, bool galaxies)
 	mesh.setVertices(vertices);
 }
 
-CSVObjects::CSVObjects(QString const& csvFile,
-                       QString const& constellationsFile)
-    : CSVObjects(csvFile)
+void CSVObjects::initWithConstellations(QString const& csvFile,
+                                        QString const& constellationsFile)
 {
+	init(csvFile, "");
 	containsConstellations = true;
 	conShader.setUniform("color", QColor(255, 0, 0));
 
@@ -397,6 +409,54 @@ CSVObjects::~CSVObjects()
 			delete conLabel.second;
 		}
 	}
+}
+
+QList<QPair<QString, QWidget*>>
+    CSVObjects::getStarsLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+{
+	QList<QPair<QString, QWidget*>> result;
+
+	auto pathSelector = new PathSelector(parent, QObject::tr("CSV path"));
+	QObject::connect(
+	    pathSelector, &PathSelector::pathChanged,
+	    [jsonObj](QString const& path) { (*jsonObj)["file"] = path; });
+	pathSelector->setPath((*jsonObj)["file"].toString());
+
+	result.append({QObject::tr("CSV Path:"), pathSelector});
+
+	pathSelector = new PathSelector(parent, QObject::tr("Constellations path"));
+	QObject::connect(
+	    pathSelector, &PathSelector::pathChanged,
+	    [jsonObj](QString const& path) { (*jsonObj)["confile"] = path; });
+	pathSelector->setPath((*jsonObj)["confile"].toString());
+
+	result.append({QObject::tr("Consellations Path:"), pathSelector});
+
+	return result;
+}
+
+QList<QPair<QString, QWidget*>>
+    CSVObjects::getGalaxiesLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+{
+	QList<QPair<QString, QWidget*>> result;
+
+	auto pathSelector = new PathSelector(parent, QObject::tr("CSV path"));
+	QObject::connect(
+	    pathSelector, &PathSelector::pathChanged,
+	    [jsonObj](QString const& path) { (*jsonObj)["file"] = path; });
+	pathSelector->setPath((*jsonObj)["file"].toString());
+
+	result.append({QObject::tr("CSV Path:"), pathSelector});
+
+	pathSelector = new PathSelector(parent, QObject::tr("Atlas path"));
+	QObject::connect(
+	    pathSelector, &PathSelector::pathChanged,
+	    [jsonObj](QString const& path) { (*jsonObj)["atlasfile"] = path; });
+	pathSelector->setPath((*jsonObj)["atlasfile"].toString());
+
+	result.append({QObject::tr("Atlas Path:"), pathSelector});
+
+	return result;
 }
 
 QString CSVObjects::desigToStr(Designation desig)

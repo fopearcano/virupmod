@@ -16,37 +16,32 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef COSMOLOGICALSIMULATION_HPP
-#define COSMOLOGICALSIMULATION_HPP
-
-#include <QCheckBox>
+#ifndef COSMOLOGICALLABELS_HPP
+#define COSMOLOGICALLABELS_HPP
 
 #include "UniverseElement.hpp"
-#include "methods/TreeMethodLOD.hpp"
+#include "graphics/renderers/LabelRenderer.hpp"
 
-class CosmologicalSimulation : public UniverseElement
+class CosmologicalLabels : public UniverseElement
 {
   public:
-	CosmologicalSimulation(QJsonObject const& json);
-	CosmologicalSimulation(std::string const& gazOctreePath,
-	                       std::string const& starsOctreePath,
-	                       std::string const& darkMatterOctreePath);
-	virtual BBox getBoundingBox() const override;
-	uint64_t getOctreesTotalDataSize() const;
-	bool preloadOctreesLevel(unsigned int level, QProgressDialog& progress);
+	CosmologicalLabels(QJsonObject const& json);
+	virtual BBox getBoundingBox() const override { return {}; };
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	~CosmologicalSimulation() = default;
+	~CosmologicalLabels();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
-  public:
-	TreeMethodLOD trees;
+  private:
+	// in kpc
+	Vector3 solarSystemDataPos = Vector3();
+	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
 
 	QMatrix4x4 model;
 	QVector3D campos;
 };
 
-#endif // COSMOLOGICALSIMULATION_HPP
+#endif // COSMOLOGICALLABELS_HPP

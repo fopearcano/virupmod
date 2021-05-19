@@ -92,8 +92,7 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
 {
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	GLHandler::setBackfaceCulling(true, GL_FRONT);
-	shader.setUniform(
-	    "color", QSettings().value("data/darkmattercolor").value<QColor>());
+	shader.setUniform("color", color);
 	shader.setUniform("campos", dataModel.inverted() * campos);
 
 	std::vector<GLTexture const*> texs({tex});

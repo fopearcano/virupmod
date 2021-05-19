@@ -36,6 +36,14 @@ class Method : public QObject
 	void resetAlpha();
 	void setAlpha(float alpha);
 	float getAlpha() const { return alpha; };
+	virtual void setColors(QColor const& gasColor, QColor const& starsColor,
+	                       QColor const& darkMatterColor)
+	{
+		this->gasColor        = gasColor;
+		this->starsColor      = starsColor;
+		this->darkMatterColor = darkMatterColor;
+	};
+
 	static void setDarkMatterEnabled(bool enabled) { showdm() = enabled; };
 	static bool isDarkMatterEnabled() { return showdm(); };
 	static void toggleDarkMatter() { showdm() = !showdm(); };
@@ -46,6 +54,10 @@ class Method : public QObject
 
 	float alpha = 0.011;
 	static bool& showdm();
+
+	QColor gasColor;
+	QColor starsColor;
+	QColor darkMatterColor;
 };
 
 #endif // DEFINE_H

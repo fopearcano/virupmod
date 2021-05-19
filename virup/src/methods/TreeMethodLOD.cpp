@@ -71,63 +71,8 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		{
 			hiiModel = new VolumetricModel(darkMatterPath.c_str());
 			hiiModel->initMesh();
+			hiiModel->setColor(darkMatterColor);
 		}
-	}
-	// preload data to fill VRAM giving priority to top levels
-	uint64_t max(OctreeLOD::getMemLimit());
-
-	uint64_t wholeData(0);
-	if(gasTree != nullptr)
-	{
-		wholeData += gasTree->getTotalDataSize();
-	}
-	if(starsTree != nullptr)
-	{
-		wholeData += starsTree->getTotalDataSize();
-	}
-	if(darkMatterTree != nullptr)
-	{
-		wholeData += darkMatterTree->getTotalDataSize();
-	}
-
-	wholeData *= sizeof(float);
-
-	QProgressDialog progress(tr("Preloading trees data..."), QString(), 0,
-	                         max < wholeData ? max : wholeData);
-	progress.setMinimumDuration(0);
-	progress.setValue(0);
-
-	unsigned int lvlToLoad(0);
-	while(lvlToLoad < 10)
-	{
-		if(gasTree != nullptr)
-		{
-			if(!gasTree->preloadLevel(lvlToLoad))
-			{
-				break;
-			}
-			QCoreApplication::processEvents();
-			progress.setValue(OctreeLOD::getUsedMem());
-		}
-		if(starsTree != nullptr)
-		{
-			if(!starsTree->preloadLevel(lvlToLoad))
-			{
-				break;
-			}
-			QCoreApplication::processEvents();
-			progress.setValue(OctreeLOD::getUsedMem());
-		}
-		if(darkMatterTree != nullptr)
-		{
-			if(!darkMatterTree->preloadLevel(lvlToLoad))
-			{
-				break;
-			}
-			QCoreApplication::processEvents();
-			progress.setValue(OctreeLOD::getUsedMem());
-		}
-		++lvlToLoad;
 	}
 }
 
@@ -149,6 +94,57 @@ BBox TreeMethodLOD::getDataBoundingBox() const
 	return globalBBox(bboxes);
 }
 
+uint64_t TreeMethodLOD::getOctreesTotalDataSize() const
+{
+	uint64_t result(0);
+	if(gasTree != nullptr)
+	{
+		result += gasTree->getTotalDataSize();
+	}
+	if(starsTree != nullptr)
+	{
+		result += starsTree->getTotalDataSize();
+	}
+	if(darkMatterTree != nullptr)
+	{
+		result += darkMatterTree->getTotalDataSize();
+	}
+	return result;
+}
+
+bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
+                                        QProgressDialog& progress)
+{
+	if(gasTree != nullptr)
+	{
+		if(!gasTree->preloadLevel(level))
+		{
+			return false;
+		}
+		QCoreApplication::processEvents();
+		progress.setValue(OctreeLOD::getUsedMem());
+	}
+	if(starsTree != nullptr)
+	{
+		if(!starsTree->preloadLevel(level))
+		{
+			return false;
+		}
+		QCoreApplication::processEvents();
+		progress.setValue(OctreeLOD::getUsedMem());
+	}
+	if(darkMatterTree != nullptr)
+	{
+		if(!darkMatterTree->preloadLevel(level))
+		{
+			return false;
+		}
+		QCoreApplication::processEvents();
+		progress.setValue(OctreeLOD::getUsedMem());
+	}
+	return true;
+}
+
 void TreeMethodLOD::update(Camera const& camera)
 {
 	update(camera, camera.dataToWorldTransform(),
@@ -158,7 +154,6 @@ void TreeMethodLOD::update(Camera const& camera)
 void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
                            QVector3D const& campos)
 {
-	OctreeLOD::updateTanAngleLimit(camera);
 	if(gasTree != nullptr)
 	{
 		gasTree->update(camera, model, campos, getAlpha());
@@ -213,7 +208,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		if((gasTree->getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)
 		{
-			setShaderColor(QSettings().value("data/gazcolor").value<QColor>());
+			setShaderColor(gasColor);
 		}
 		gasTree->render(camera, model, campos, getAlpha(), dustTransform);
 	}
@@ -222,8 +217,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		if((starsTree->getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)
 		{
-			setShaderColor(
-			    QSettings().value("data/starscolor").value<QColor>());
+			setShaderColor(starsColor);
 		}
 		starsTree->render(camera, model, campos, getAlpha(), dustTransform);
 	}
@@ -232,8 +226,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		if((darkMatterTree->getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)
 		{
-			setShaderColor(
-			    QSettings().value("data/darkmattercolor").value<QColor>());
+			setShaderColor(darkMatterColor);
 		}
 		darkMatterTree->render(camera, model, campos, getAlpha(),
 		                       dustTransform);

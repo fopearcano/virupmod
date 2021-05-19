@@ -21,61 +21,92 @@
 Universe::Universe(OrbitalSystemCamera& camPlanet)
     : camPlanet(camPlanet)
 {
-	cosmologicalSim = new CosmologicalSimulation(
-	    QSettings().value("data/gazfile").toString().toStdString(),
-	    QSettings().value("data/starsfile").toString().toStdString(),
-	    QSettings().value("data/loaddarkmatter").toBool()
-	        ? QSettings().value("data/darkmatterfile").toString().toStdString()
-	        : "");
-	cosmologicalSim->referenceFrame = UniverseElement::ReferenceFrame::GALACTIC;
-	cosmologicalSim->unit           = 1.0;
-	cosmologicalSim->solarsystemPosition  = Vector3(-8.29995608, 0.0, 0.027);
-	cosmologicalSim->brightnessMultiplier = 1e7;
-	updateBoundingBox(cosmologicalSim->getBoundingBox());
-
-	hyg       = new CSVObjects(QSettings().value("data/hyg").toString(),
-                         QSettings().value("data/hygcon").toString());
-	hyg->unit = 0.001;
-	updateBoundingBox(hyg->getBoundingBox());
-
-	sdss = new CSVObjects(QSettings().value("data/sdss").toString(), true);
-	sdss->unit                 = 1000.0;
-	sdss->brightnessMultiplier = 1e9;
-	updateBoundingBox(sdss->getBoundingBox());
+	QJsonDocument jsondoc(QJsonDocument::fromJson(
+	    QSettings().value("data/json").toString().toLatin1()));
+	QJsonObject dataJsonRepresentation = jsondoc.object();
+	if(dataJsonRepresentation.keys().indexOf("entries") == -1)
+	{
+		dataJsonRepresentation["entries"] = QJsonArray();
+	}
+	for(auto entry : dataJsonRepresentation["entries"].toArray())
+	{
+		auto entryObj(entry.toObject());
+		UniverseElement* newElem = nullptr;
+		if(entryObj["type"] == "cosmolabels")
+		{
+			newElem = new CosmologicalLabels(entryObj);
+		}
+		else if(entryObj["type"] == "csvstars")
+		{
+			newElem = new CSVObjects(entryObj, false);
+		}
+		else if(entryObj["type"] == "csvgalaxies")
+		{
+			newElem = new CSVObjects(entryObj, true);
+		}
+		else if(entryObj["type"] == "cosmosim")
+		{
+			auto cs = new CosmologicalSimulation(entryObj);
+			newElem = cs;
+			cosmoSims.append(cs);
+		}
+		else
+		{
+			qWarning()
+			    << "Entry JSON Object is not valid. (See following warning)";
+			qWarning() << entryObj;
+			continue;
+		}
+		newElem->unit          = entryObj["unit"].toDouble(1.0);
+		QString referenceFrame = entryObj["referenceframe"].toString();
+		if(referenceFrame == "equatorial")
+		{
+			newElem->referenceFrame
+			    = UniverseElement::ReferenceFrame::EQUATORIAL;
+		}
+		else if(referenceFrame == "galactic")
+		{
+			newElem->referenceFrame = UniverseElement::ReferenceFrame::GALACTIC;
+		}
+		else if(referenceFrame == "ecliptic")
+		{
+			newElem->referenceFrame = UniverseElement::ReferenceFrame::ECLIPTIC;
+		}
+		newElem->solarsystemPosition
+		    = Vector3(entryObj["solarsyslocalpos"].toObject());
+		newElem->brightnessMultiplier = entryObj["brightnessmul"].toDouble(1.0);
+		updateBoundingBox(newElem->getBoundingBox());
+		elements.append(newElem);
+	}
 
 	planetSystems = new PlanetarySystems;
 	updateBoundingBox(planetSystems->getBoundingBox());
 
-	// LABELS
-	QString labelspath(QSettings().value("data/cosmolabelsfile").toString());
-	if(labelspath != "")
+	loadClosestSystem();
+
+	// preload octrees data to fill VRAM giving priority to top levels
+	uint64_t max(OctreeLOD::getMemLimit());
+
+	uint64_t wholeData(0);
+	for(auto cosmoSim : cosmoSims)
 	{
-		QFile f(labelspath);
-		if(!f.open(QFile::ReadOnly | QFile::Text))
-		{
-			std::cerr << "Invalid cosmological labels file path : "
-			          << labelspath.toStdString() << std::endl;
-		}
-		else
-		{
-			QTextStream in(&f);
-			while(!in.atEnd())
-			{
-				QString line       = in.readLine();
-				QStringList fields = line.split(",");
-				QString label(fields[0]);
-				Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
-				                fields[3].toDouble());
+		wholeData += cosmoSim->getOctreesTotalDataSize();
+	}
+	wholeData *= sizeof(float);
 
-				dataPos = Utils::fromQt(cosmologicalSim->getRelToAbsTransform()
-				                        * Utils::toQt(-1.0 * dataPos));
+	QProgressDialog progress(QObject::tr("Preloading trees data..."), QString(),
+	                         0, max < wholeData ? max : wholeData);
+	progress.setMinimumDuration(0);
+	progress.setValue(0);
 
-				auto labelText = new LabelRenderer(label, QColor(255, 0, 0));
-				cosmoLabels.emplace_back(dataPos, labelText);
-			}
+	bool cont(true);
+	for(unsigned int lvlToLoad(0); cont && lvlToLoad < 10; ++lvlToLoad)
+	{
+		for(int i(0); cont && i < cosmoSims.size(); ++i)
+		{
+			cont = cosmoSims[i]->preloadOctreesLevel(lvlToLoad, progress);
 		}
 	}
-	loadClosestSystem();
 }
 
 QString Universe::getPlanetTarget() const
@@ -195,30 +226,14 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 
 void Universe::updateCosmo(Camera const& cam)
 {
-	cosmologicalSim->update(cam);
+	OctreeLOD::updateTanAngleLimit(cam);
+	for(auto elem : elements)
+	{
+		elem->update(cam);
+	}
 	planetSystems->update(cam);
 	planetSystems->useVRCamposForClosest
 	    = PythonQtHandler::getVariable("id").toInt() == -1;
-
-	Vector3 camPosData(cam.worldToDataPosition(Utils::fromQt(
-	    cam.hmdScaledSpaceToWorldTransform() * QVector3D(0.f, 0.f, 0.f))));
-
-	for(auto cosmoLabel : cosmoLabels)
-	{
-		Vector3 pos(cam.dataToWorldPosition(cosmoLabel.first));
-		Vector3 camRelPos(camPosData - cosmoLabel.first);
-		Vector3 unitRelPos(camRelPos.getUnitForm());
-
-		float yaw(atan2(unitRelPos[1], unitRelPos[0]));
-		float pitch(-1.0 * asin(unitRelPos[2]));
-		double rescale(pos.length() <= 8000.0 ? 1.0 : 8000.0 / pos.length());
-		QMatrix4x4 model;
-		model.translate(Utils::toQt(pos * rescale));
-		model.scale(rescale * camRelPos.length() * cam.scale / 3.0);
-		model.rotate(yaw * 180.f / M_PI + 90.f, 0.0, 0.0, 1.0);
-		model.rotate(pitch * 180.f / M_PI + 90.f, 1.0, 0.0, 0.0);
-		cosmoLabel.second->updateModel(model);
-	}
 }
 
 void Universe::updatePlanetarySystem(Camera const& cam,
@@ -257,29 +272,15 @@ void Universe::renderCosmo(Camera const& cam,
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
 	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	hyg->constellationsLabels = CelestialBodyRenderer::renderLabels;
-	hyg->constellationsAlpha  = CelestialBodyRenderer::renderLabels;
-	hyg->render(cam, toneMappingModel);
-	sdss->render(cam, toneMappingModel);
-	planetSystems->render(cam, toneMappingModel);
-	cosmologicalSim->render(cam, toneMappingModel);
-
-	// TODO(florian) better than this
-	if(CelestialBodyRenderer::renderLabels > 0.f)
+	for(auto elem : elements)
 	{
-		for(auto cosmoLabel : cosmoLabels)
-		{
-			if(cosmoLabel.first == solarSystemDataPos
-			   && planetSystems->renderSystem()
-			   && planetSystems->getClosestSystem()->getName()
-			          == "Solar System")
-			{
-				continue;
-			}
-			cosmoLabel.second->render(toneMappingModel.exposure,
-			                          toneMappingModel.dynamicrange);
-		}
+		// only used by CosmologicalLabels for now
+		elem->visibility = CelestialBodyRenderer::renderLabels;
+		elem->render(cam, toneMappingModel);
 	}
+
+	planetSystems->render(cam, toneMappingModel);
+
 	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 	GLHandler::glf().glDisable(GL_DEPTH_CLAMP);
 }
@@ -376,12 +377,9 @@ void Universe::loadClosestSystem()
 Universe::~Universe()
 {
 	delete systemRenderer;
-	for(auto cosmoLabel : cosmoLabels)
-	{
-		delete cosmoLabel.second;
-	}
 	delete planetSystems;
-	delete sdss;
-	delete hyg;
-	delete cosmologicalSim;
+	for(auto elem : elements)
+	{
+		delete elem;
+	}
 }

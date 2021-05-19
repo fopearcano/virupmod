@@ -108,17 +108,14 @@ void BaseLineMethod::render(Camera const& camera)
 	    "view", camera.hmdScaledSpaceToWorldTransform().inverted() * model);
 	GLHandler::beginTransparent(GL_SRC_ALPHA, GL_ONE);
 	GLHandler::setUpRender(shaderProgram, model);
-	shaderProgram.setUniform(
-	    "color", QSettings().value("data/gazcolor").value<QColor>());
+	shaderProgram.setUniform("color", gasColor);
 	shaderProgram.setUnusedAttributesValues({{"luminosity", {1.f}}});
 	gazMesh.render();
-	shaderProgram.setUniform(
-	    "color", QSettings().value("data/starscolor").value<QColor>());
+	shaderProgram.setUniform("color", starsColor);
 	shaderProgram.setUnusedAttributesValues(
 	    {{"radius", {1.f}}, {"luminosity", {1.f}}});
 	starsMesh.render();
-	shaderProgram.setUniform(
-	    "color", QSettings().value("data/darkmattercolor").value<QColor>());
+	shaderProgram.setUniform("color", darkMatterColor);
 	shaderProgram.setUnusedAttributesValues(
 	    {{"radius", {1.f}}, {"luminosity", {1.f}}});
 	darkMatterMesh.render();
