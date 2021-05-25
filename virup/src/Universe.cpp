@@ -265,6 +265,7 @@ void Universe::updatePlanetarySystem(Camera const& cam,
 		forceUpdateFromCosmo       = false;
 	}
 	sysInWorld = cam.dataToWorldPosition(lastData);
+	planetSystems->getClosestSystem()->update(currentUt);
 	systemRenderer->updateMesh(currentUt, camPlanet);
 }
 
