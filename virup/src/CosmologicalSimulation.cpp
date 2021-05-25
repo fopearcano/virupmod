@@ -20,20 +20,87 @@
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 {
-	trees.setColors(json["gascolor"].toString(), json["starscolor"].toString(),
-	                json["darkmattercolor"].toString());
-	trees.init(json["gasfile"].toString().toStdString(),
-	           json["starsfile"].toString().toStdString(),
-	           json["loaddarkmatter"].toBool()
-	               ? json["darkmatterfile"].toString().toStdString()
-	               : "");
+	init(json["gasfile"].toString().toStdString(),
+	     json["starsfile"].toString().toStdString(),
+	     json["loaddarkmatter"].toBool()
+	         ? json["darkmatterfile"].toString().toStdString()
+	         : "",
+	     json["gascolor"].toString(), json["starscolor"].toString(),
+	     json["darkmattercolor"].toString());
 }
 
 CosmologicalSimulation::CosmologicalSimulation(
-    std::string const& gazOctreePath, std::string const& starsOctreePath,
-    std::string const& darkMatterOctreePath)
+    std::string const& gasOctreePath, std::string const& starsOctreePath,
+    std::string const& darkMatterOctreePath, bool loadDarkMatter,
+    QColor const& gasColor, QColor const& starsColor,
+    QColor const& darkMatterColor)
 {
-	trees.init(gazOctreePath, starsOctreePath, darkMatterOctreePath);
+	init(gasOctreePath, starsOctreePath,
+	     loadDarkMatter ? darkMatterOctreePath : "", gasColor, starsColor,
+	     darkMatterColor);
+}
+
+void CosmologicalSimulation::init(std::string const& gasOctreePath,
+                                  std::string const& starsOctreePath,
+                                  std::string const& darkMatterOctreePath,
+                                  QColor const& gasColor,
+                                  QColor const& starsColor,
+                                  QColor const& darkMatterColor)
+{
+	QRegularExpression rxNumber("[0-9]+");
+	QString dirPathGas = gasOctreePath.c_str();
+	QDir gasDir(dirPathGas);
+	for(auto const& path :
+	    gasDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+	{
+		unsigned int index(rxNumber.match(path).captured().toInt());
+		cosmoFilesGas[index] = dirPathGas + "/" + path;
+	}
+
+	QString dirPathStars = starsOctreePath.c_str();
+	QDir starsDir(dirPathStars);
+	for(auto const& path :
+	    starsDir.entryList({"*.octree"}, QDir::Files, QDir::Name))
+	{
+		unsigned int index(rxNumber.match(path).captured().toInt());
+		cosmoFilesStars[index] = dirPathStars + "/" + path;
+	}
+
+	QString dirPathDM = darkMatterOctreePath.c_str();
+	QDir dmDir(dirPathDM);
+	for(auto const& path :
+	    dmDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+	{
+		unsigned int index(rxNumber.match(path).captured().toInt());
+		cosmoFilesDM[index] = dirPathDM + "/" + path;
+	}
+
+	if(cosmoFilesGas.empty())
+	{
+		cosmoFilesGas[0] = gasOctreePath.c_str();
+	}
+	if(cosmoFilesStars.empty())
+	{
+		cosmoFilesStars[0] = starsOctreePath.c_str();
+	}
+	if(cosmoFilesDM.empty())
+	{
+		cosmoFilesDM[0] = darkMatterOctreePath.c_str();
+	}
+
+	maxIndex = cosmoFilesGas.end()->first;
+	maxIndex = cosmoFilesStars.end()->first > maxIndex
+	               ? cosmoFilesStars.end()->first
+	               : maxIndex;
+	maxIndex = cosmoFilesDM.end()->first > maxIndex ? cosmoFilesDM.end()->first
+	                                                : maxIndex;
+
+	this->gasColor        = gasColor;
+	this->starsColor      = starsColor;
+	this->darkMatterColor = darkMatterColor;
+	trees.init(cosmoFilesGas[0].toStdString(), cosmoFilesStars[0].toStdString(),
+	           cosmoFilesDM[0].toStdString());
+	trees.setColors(gasColor, starsColor, darkMatterColor);
 }
 
 BBox CosmologicalSimulation::getBoundingBox() const
@@ -55,6 +122,21 @@ bool CosmologicalSimulation::preloadOctreesLevel(unsigned int level,
 void CosmologicalSimulation::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
+
+	if(cosmoFilesGas.size() > 1 || cosmoFilesStars.size() > 1
+	   || cosmoFilesDM.size() > 1)
+	{
+		++currentIndex;
+		if(currentIndex > maxIndex)
+		{
+			currentIndex = 0;
+		}
+		trees.cleanUp();
+		trees.init(cosmoFilesGas[currentIndex].toStdString(),
+		           cosmoFilesStars[currentIndex].toStdString(),
+		           cosmoFilesDM[currentIndex].toStdString());
+		trees.setColors(gasColor, starsColor, darkMatterColor);
+	}
 
 	trees.update(camera, model, campos);
 }

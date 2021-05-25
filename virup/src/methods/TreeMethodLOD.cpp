@@ -240,6 +240,10 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 
 void TreeMethodLOD::cleanUp()
 {
+	delete dustModel;
+	dustModel = nullptr;
+	delete hiiModel;
+	hiiModel = nullptr;
 	if(gasTree != nullptr)
 	{
 		if(gasTree->getFile() != nullptr)
@@ -332,35 +336,5 @@ void TreeMethodLOD::setShaderColor(QColor const& color)
 
 TreeMethodLOD::~TreeMethodLOD()
 {
-	delete dustModel;
-	dustModel = nullptr;
-	delete hiiModel;
-	hiiModel = nullptr;
-	if(gasTree != nullptr)
-	{
-		if(gasTree->getFile() != nullptr)
-		{
-			delete gasTree->getFile();
-		}
-		delete gasTree;
-	}
-	gasTree = nullptr;
-	if(starsTree != nullptr)
-	{
-		if(starsTree->getFile() != nullptr)
-		{
-			delete starsTree->getFile();
-		}
-		delete starsTree;
-	}
-	starsTree = nullptr;
-	if(darkMatterTree != nullptr)
-	{
-		if(darkMatterTree->getFile() != nullptr)
-		{
-			delete darkMatterTree->getFile();
-		}
-		delete darkMatterTree;
-	}
-	darkMatterTree = nullptr;
+	cleanUp();
 }

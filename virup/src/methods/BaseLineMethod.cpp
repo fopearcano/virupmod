@@ -19,7 +19,7 @@ void BaseLineMethod::init(std::vector<float>& gazVertices,
                           std::vector<float>& starsVertices,
                           std::vector<float>& darkMatterVertices)
 {
-	cleanUp();
+	// cleanUp();
 	size_t totalSize(0);
 	gazMesh.setVertexShaderMapping(shaderProgram,
 	                               {{"position", 3}, {"radius", 1}});
@@ -44,7 +44,7 @@ void BaseLineMethod::init(std::string const& gazPath,
                           std::string const& starsPath,
                           std::string const& darkMatterPath)
 {
-	cleanUp();
+	// cleanUp();
 	size_t totalSize(0);
 	std::vector<BBox> bboxes;
 	if(!gazPath.empty())

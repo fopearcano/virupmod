@@ -20,6 +20,8 @@
 #define COSMOLOGICALSIMULATION_HPP
 
 #include <QCheckBox>
+#include <map>
+#include <set>
 
 #include "UniverseElement.hpp"
 #include "methods/TreeMethodLOD.hpp"
@@ -28,9 +30,12 @@ class CosmologicalSimulation : public UniverseElement
 {
   public:
 	CosmologicalSimulation(QJsonObject const& json);
-	CosmologicalSimulation(std::string const& gazOctreePath,
+	CosmologicalSimulation(std::string const& gasOctreePath,
 	                       std::string const& starsOctreePath,
-	                       std::string const& darkMatterOctreePath);
+	                       std::string const& darkMatterOctreePath,
+	                       bool loadDarkMatter, QColor const& gasColor,
+	                       QColor const& starsColor,
+	                       QColor const& darkMatterColor);
 	virtual BBox getBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
 	bool preloadOctreesLevel(unsigned int level, QProgressDialog& progress);
@@ -43,10 +48,24 @@ class CosmologicalSimulation : public UniverseElement
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
   public:
+	void init(std::string const& gasOctreePath,
+	          std::string const& starsOctreePath,
+	          std::string const& darkMatterOctreePath, QColor const& gasColor,
+	          QColor const& starsColor, QColor const& darkMatterColor);
 	TreeMethodLOD trees;
 
 	QMatrix4x4 model;
 	QVector3D campos;
+
+	std::map<unsigned int, QString> cosmoFilesGas;
+	std::map<unsigned int, QString> cosmoFilesStars;
+	std::map<unsigned int, QString> cosmoFilesDM;
+	unsigned int currentIndex = 0;
+	unsigned int maxIndex     = 0;
+
+	QColor gasColor;
+	QColor starsColor;
+	QColor darkMatterColor;
 };
 
 #endif // COSMOLOGICALSIMULATION_HPP

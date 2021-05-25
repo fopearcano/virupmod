@@ -47,7 +47,7 @@ class Method : public QObject
 	static void setDarkMatterEnabled(bool enabled) { showdm() = enabled; };
 	static bool isDarkMatterEnabled() { return showdm(); };
 	static void toggleDarkMatter() { showdm() = !showdm(); };
-	virtual void cleanUp(){};
+	// virtual void cleanUp() = 0;
 
   protected:
 	static BBox globalBBox(std::vector<BBox> const& bboxes);
