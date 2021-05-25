@@ -101,6 +101,8 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	trees.init(cosmoFilesGas[0].toStdString(), cosmoFilesStars[0].toStdString(),
 	           cosmoFilesDM[0].toStdString());
 	trees.setColors(gasColor, starsColor, darkMatterColor);
+
+	trees.silent = true;
 }
 
 BBox CosmologicalSimulation::getBoundingBox() const
@@ -114,7 +116,7 @@ uint64_t CosmologicalSimulation::getOctreesTotalDataSize() const
 }
 
 bool CosmologicalSimulation::preloadOctreesLevel(unsigned int level,
-                                                 QProgressDialog& progress)
+                                                 QProgressDialog* progress)
 {
 	return trees.preloadOctreesLevel(level, progress);
 }

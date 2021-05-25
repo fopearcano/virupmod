@@ -48,7 +48,7 @@ void TreeMethodLOD::init(std::string const& gasPath,
 	{
 		if(gasPath.find(".dat") == std::string::npos && gasTree == nullptr)
 		{
-			loadOctreeFromFile(gasPath, &gasTree, "Gas", shaderProgram);
+			loadOctreeFromFile(gasPath, &gasTree, "Gas", shaderProgram, silent);
 		}
 		else
 		{
@@ -57,7 +57,8 @@ void TreeMethodLOD::init(std::string const& gasPath,
 	}
 	if(!starsPath.empty() && starsTree == nullptr)
 	{
-		loadOctreeFromFile(starsPath, &starsTree, "Stars", shaderProgram);
+		loadOctreeFromFile(starsPath, &starsTree, "Stars", shaderProgram,
+		                   silent);
 	}
 	if(!darkMatterPath.empty())
 	{
@@ -65,7 +66,7 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		   && darkMatterTree == nullptr)
 		{
 			loadOctreeFromFile(darkMatterPath, &darkMatterTree, "Dark matter",
-			                   shaderProgram);
+			                   shaderProgram, silent);
 		}
 		else
 		{
@@ -113,7 +114,7 @@ uint64_t TreeMethodLOD::getOctreesTotalDataSize() const
 }
 
 bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
-                                        QProgressDialog& progress)
+                                        QProgressDialog* progress)
 {
 	if(gasTree != nullptr)
 	{
@@ -122,7 +123,10 @@ bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
 			return false;
 		}
 		QCoreApplication::processEvents();
-		progress.setValue(OctreeLOD::getUsedMem());
+		if(progress != nullptr)
+		{
+			progress->setValue(OctreeLOD::getUsedMem());
+		}
 	}
 	if(starsTree != nullptr)
 	{
@@ -131,7 +135,10 @@ bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
 			return false;
 		}
 		QCoreApplication::processEvents();
-		progress.setValue(OctreeLOD::getUsedMem());
+		if(progress != nullptr)
+		{
+			progress->setValue(OctreeLOD::getUsedMem());
+		}
 	}
 	if(darkMatterTree != nullptr)
 	{
@@ -140,7 +147,10 @@ bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
 			return false;
 		}
 		QCoreApplication::processEvents();
-		progress.setValue(OctreeLOD::getUsedMem());
+		if(progress != nullptr)
+		{
+			progress->setValue(OctreeLOD::getUsedMem());
+		}
 	}
 	return true;
 }
@@ -276,9 +286,13 @@ void TreeMethodLOD::cleanUp()
 void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
                                        OctreeLOD** octree,
                                        std::string const& name,
-                                       GLShaderProgram const& shaderProgram)
+                                       GLShaderProgram const& shaderProgram,
+                                       bool silent)
 {
-	std::cout << "Loading " + name + " octree..." << std::endl;
+	if(!silent)
+	{
+		qDebug() << "Loading " + QString(name.c_str()) + " octree...";
+	}
 	auto file = new std::ifstream();
 	file->open(path, std::fstream::in | std::fstream::binary);
 	*octree = new OctreeLOD(shaderProgram);
@@ -290,15 +304,23 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	file->seekg(cursor);
 	size *= -1;
 
-	QProgressDialog progress(tr("Loading %1 tree structure").arg(name.c_str()),
-	                         QString(), 0, size);
-	progress.setMinimumDuration(0);
-	progress.setValue(0);
+	QProgressDialog* progress(nullptr);
+	if(!silent)
+	{
+		progress = new QProgressDialog(
+		    tr("Loading %1 tree structure").arg(name.c_str()), QString(), 0,
+		    size);
+		progress->setMinimumDuration(0);
+		progress->setValue(0);
+	}
 
 	auto future = std::async(std::launch::async, &initOctree, *octree, file);
 
 	float p(0.f);
-	Octree::showProgress(p);
+	if(!silent)
+	{
+		Octree::showProgress(p);
+	}
 	while(future.wait_for(std::chrono::duration<int, std::milli>(100))
 	      != std::future_status::ready)
 	{
@@ -306,20 +328,39 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 		p = static_cast<float>(file->tellg()) / size;
 		if(0.f <= p && p <= 1.f)
 		{
-			progress.setValue(file->tellg());
-			Octree::showProgress(p);
+			if(progress != nullptr)
+			{
+				progress->setValue(file->tellg());
+			}
+			if(!silent)
+			{
+				Octree::showProgress(p);
+			}
 		}
 	}
-	Octree::showProgress(1.f);
+	if(!silent)
+	{
+		Octree::showProgress(1.f);
+	}
 
 	(*octree)->setFile(file);
 	// update bbox
-	progress.setLabelText(
-	    tr("Loading %1 tree bounding boxes...").arg(name.c_str()));
+	if(progress != nullptr)
+	{
+		progress->setLabelText(
+		    tr("Loading %1 tree bounding boxes...").arg(name.c_str()));
+	}
 	QCoreApplication::processEvents();
 	(*octree)->readBBoxes(*file);
 	// (*octree)->readData(*file);
-	std::cout << name << " loaded..." << std::endl;
+	if(!silent)
+	{
+		qDebug() << QString(name.c_str()) + " loaded...";
+	}
+	if(!silent)
+	{
+		delete progress;
+	}
 }
 
 void TreeMethodLOD::initOctree(OctreeLOD* octree, std::istream* in)

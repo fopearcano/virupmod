@@ -104,7 +104,7 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 	{
 		for(int i(0); cont && i < cosmoSims.size(); ++i)
 		{
-			cont = cosmoSims[i]->preloadOctreesLevel(lvlToLoad, progress);
+			cont = cosmoSims[i]->preloadOctreesLevel(lvlToLoad, &progress);
 		}
 	}
 

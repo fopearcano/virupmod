@@ -28,7 +28,8 @@ class TreeMethodLOD : public Method
 	                  std::string const& darkMatterPath) override;
 	virtual BBox getDataBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
-	bool preloadOctreesLevel(unsigned int level, QProgressDialog& progress);
+	bool preloadOctreesLevel(unsigned int level,
+	                         QProgressDialog* progress = nullptr);
 	void update(Camera const& camera);
 	void update(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos);
@@ -37,6 +38,8 @@ class TreeMethodLOD : public Method
 	            QVector3D const& campos, float unitInKpc);
 	void cleanUp();
 	virtual ~TreeMethodLOD();
+
+	bool silent = false;
 
   protected:
 	VolumetricModel* dustModel = nullptr;
@@ -50,7 +53,8 @@ class TreeMethodLOD : public Method
 
 	static void loadOctreeFromFile(std::string const& path, OctreeLOD** octree,
 	                               std::string const& name,
-	                               GLShaderProgram const& shaderProgram);
+	                               GLShaderProgram const& shaderProgram,
+	                               bool silent);
 	static void initOctree(OctreeLOD* octree, std::istream* in);
 	void setShaderColor(QColor const& color);
 };

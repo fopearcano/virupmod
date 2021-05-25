@@ -38,7 +38,8 @@ class CosmologicalSimulation : public UniverseElement
 	                       QColor const& darkMatterColor);
 	virtual BBox getBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
-	bool preloadOctreesLevel(unsigned int level, QProgressDialog& progress);
+	bool preloadOctreesLevel(unsigned int level,
+	                         QProgressDialog* progress = nullptr);
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
