@@ -19,6 +19,7 @@
 #ifndef UNIVERSE_HPP
 #define UNIVERSE_HPP
 
+#include <map>
 #include <vector>
 
 #include "CSVObjects.hpp"
@@ -26,8 +27,9 @@
 #include "CosmologicalSimulation.hpp"
 #include "PlanetarySystems.hpp"
 
-class Universe
+class Universe : public QObject
 {
+	Q_OBJECT
   public:
 	Universe(OrbitalSystemCamera& camPlanet);
 	BBox getBoundingBox() const { return boundingBox; };
@@ -65,7 +67,7 @@ class Universe
 	BBox boundingBox
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
-	QList<UniverseElement*> elements;
+	std::map<QString, UniverseElement*> elements;
 	QList<CosmologicalSimulation*> cosmoSims;
 
   public:

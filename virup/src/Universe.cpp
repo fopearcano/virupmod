@@ -76,7 +76,7 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 		    = Vector3(entryObj["solarsyslocalpos"].toObject());
 		newElem->brightnessMultiplier = entryObj["brightnessmul"].toDouble(1.0);
 		updateBoundingBox(newElem->getBoundingBox());
-		elements.append(newElem);
+		elements[entryObj["name"].toString()] = newElem;
 	}
 
 	planetSystems = new PlanetarySystems;
@@ -107,6 +107,8 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 			cont = cosmoSims[i]->preloadOctreesLevel(lvlToLoad, progress);
 		}
 	}
+
+	PythonQtHandler::addObject("Universe", this);
 }
 
 QString Universe::getPlanetTarget() const
@@ -227,9 +229,9 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 void Universe::updateCosmo(Camera const& cam)
 {
 	OctreeLOD::updateTanAngleLimit(cam);
-	for(auto elem : elements)
+	for(auto pair : elements)
 	{
-		elem->update(cam);
+		pair.second->update(cam);
 	}
 	planetSystems->update(cam);
 	planetSystems->useVRCamposForClosest
@@ -272,11 +274,11 @@ void Universe::renderCosmo(Camera const& cam,
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
 	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	for(auto elem : elements)
+	for(auto pair : elements)
 	{
 		// only used by CosmologicalLabels for now
-		elem->visibility = CelestialBodyRenderer::renderLabels;
-		elem->render(cam, toneMappingModel);
+		pair.second->visibility = CelestialBodyRenderer::renderLabels;
+		pair.second->render(cam, toneMappingModel);
 	}
 
 	planetSystems->render(cam, toneMappingModel);
@@ -378,8 +380,8 @@ Universe::~Universe()
 {
 	delete systemRenderer;
 	delete planetSystems;
-	for(auto elem : elements)
+	for(auto const& pair : elements)
 	{
-		delete elem;
+		delete pair.second;
 	}
 }
