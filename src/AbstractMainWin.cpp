@@ -569,7 +569,14 @@ void AbstractMainWin::paintGL()
 		initializeGL();
 	}
 
-	frameTiming_ = frameTimer.nsecsElapsed() * 1.e-9f;
+	if(!videomode)
+	{
+		frameTiming_ = frameTimer.nsecsElapsed() * 1.e-9f;
+	}
+	else
+	{
+		frameTiming_ = 1.f / QSettings().value("window/videofps").toUInt();
+	}
 	frameTimer.restart();
 
 	setTitle(QString(PROJECT_NAME) + " - "
@@ -671,9 +678,15 @@ void AbstractMainWin::paintGL()
 			             + subdir);
 			projdir.mkdir(res);
 		}
+		if(QSettings().value("window/maxframe").toUInt() > 0
+		   && currentVideoFrame > QSettings().value("window/maxframe").toUInt())
+		{
+			close();
+		}
 
 		QString framePath(QSettings().value("window/viddir").toString() + "/"
 		                  + subdir + "/" + res + "/frame" + number + ".png");
+		qDebug() << "Writing " + framePath + "...";
 		QThreadPool::globalInstance()->start(new ImageWriter(framePath, frame));
 
 		currentVideoFrame++;

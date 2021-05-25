@@ -443,7 +443,7 @@ class AbstractMainWin : public QWindow
 	float gamma = 2.2f;
 
 	// OFFSCREEN RENDERING
-	bool videomode                 = false;
+	bool videomode = QSettings().value("window/videomode").toBool();
 	unsigned int currentVideoFrame = 0;
 
 	// Postprocessing

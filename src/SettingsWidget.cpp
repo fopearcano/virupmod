@@ -33,6 +33,10 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addScreenNameSetting();
 	addBoolSetting("domemaster", false, tr("Use Domemaster projection"));
 	addLanguageSetting();
+	addBoolSetting("videomode", false, tr("Start with video mode enabled"));
+	addUIntSetting("maxframe", 0,
+	               tr("Quit after this number of frames rendered"), 0, 1000000);
+	addUIntSetting("videofps", 60, tr("Video target FPS"), 0, 500);
 	addDirPathSetting(
 	    "viddir",
 	    QFileInfo(QSettings().fileName()).absoluteDir().absolutePath()
