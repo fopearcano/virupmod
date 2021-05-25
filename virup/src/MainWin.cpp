@@ -512,7 +512,14 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		                                  toneMappingModel->exposure);
 		debugText->getShader().setUniform("dynamicrange",
 		                                  toneMappingModel->dynamicrange);
-		clock.update();
+		if(videomode)
+		{
+			clock.update(frameTiming);
+		}
+		else
+		{
+			clock.update();
+		}
 		cam.updateUT(clock.getCurrentUt());
 
 		if(!universe->planetSystems->renderSystem())
