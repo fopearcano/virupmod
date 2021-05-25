@@ -42,6 +42,7 @@ class OctreeLOD : public Octree
 
 	static int64_t getUsedMem() { return usedMem(); };
 	static int64_t getMemLimit() { return memLimit(); };
+	static bool& forceMaxQuality();
 
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,

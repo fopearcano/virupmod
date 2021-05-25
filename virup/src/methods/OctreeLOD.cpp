@@ -14,6 +14,12 @@ const int64_t& OctreeLOD::memLimit()
 	return memLimit;
 }
 
+bool& OctreeLOD::forceMaxQuality()
+{
+	static bool forceMaxQuality(false);
+	return forceMaxQuality;
+}
+
 float& OctreeLOD::tanAngleLimit()
 {
 	static float tanAngleLimit(1.2f);
@@ -211,7 +217,8 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 		}*/
 	}
 
-	if(currentTanAngle(globalCampos) > tanAngleLimit() && !isLeaf())
+	if((forceMaxQuality() || currentTanAngle(globalCampos) > tanAngleLimit())
+	   && !isLeaf())
 	{
 		// UPDATE SUBTREES
 		for(Octree* oct : children)

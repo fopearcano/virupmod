@@ -443,6 +443,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		cam.currentFrameTiming = frameTiming;
 		cam.updateTargetFPS();
 
+		OctreeLOD::forceMaxQuality() = videomode;
+
 		universe->updateCosmo(cam);
 
 		movementControls->update(frameTiming,
