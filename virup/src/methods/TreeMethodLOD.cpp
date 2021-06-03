@@ -206,7 +206,6 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	GLHandler::setUpRender(shaderProgram, model);
 	shaderProgram.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
 	shaderProgram.setUniform("unitInKpc", unitInKpc);
-	shaderProgram.setUniform("useDust", 1.f);
 	QMatrix4x4 dustTransform;
 	if(dustModel != nullptr)
 	{
