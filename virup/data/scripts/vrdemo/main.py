@@ -243,6 +243,7 @@ def toggleAnimations():
 
 def keyPressEvent(e):
     global disableanimations
+    global id
 
     # if spacebar pressed, start animation
     numpad_mod = int(e.modifiers()) == Qt.KeypadModifier
@@ -270,6 +271,8 @@ def keyPressEvent(e):
         toggleAnimations()
     elif e.key() == Qt.Key_Space:
         setSceneId(-1)
+    elif e.key() == Qt.Key_Enter:
+        setSceneId((id+1) % len(scenes))
     else:
         return
 
