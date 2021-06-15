@@ -235,6 +235,7 @@ class AbstractMainWin : public QWindow
 
   public slots:
 	void reloadPythonEngine();
+	void sendPythonScript(unsigned int toClientId, QString const& script) const;
 	/**
 	 * @toggle{fullscreen}
 	 */

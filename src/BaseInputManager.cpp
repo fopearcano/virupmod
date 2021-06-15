@@ -23,6 +23,8 @@ BaseInputManager::BaseInputManager()
 	addAction(Qt::Key_F1, {"toggledbgcam", tr("Toggle Debug Camera")}, true);
 	addAction(Qt::Key_F2, {"togglewireframe", tr("Toggle Wireframe Mode")},
 	          true);
+	addAction(Qt::Key_F6, {"reloadpythonengine", tr("Reload Python Engine")},
+	          true);
 	addAction(Qt::Key_F8, {"togglepyconsole", tr("Toggle Python Console")},
 	          true);
 	addAction(Qt::Key_F10, {"screenshot", tr("Take Screenshot")}, true);

@@ -360,6 +360,13 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 			mainRenderTarget->postProcessingTargets
 			    .at(postProcessingPipeline_.size() % 2)
 			    .showOnScreen(0, 0, window.width() / 2, window.height());
+			if(vrHandler.getStereoMultiplier() == 0.0)
+			{
+				mainRenderTarget->postProcessingTargets
+				    .at(postProcessingPipeline_.size() % 2)
+				    .showOnScreen(window.width() / 2, 0, window.width(),
+				                  window.height());
+			}
 		}
 		else
 		{
@@ -389,7 +396,8 @@ void Renderer::renderFrame()
 			vrRender(Side::LEFT, debug, debugInHeadset,
 			         !thirdRender && (!debug || debugInHeadset));
 		}
-		if(!vrHandler.forceLeft || vrHandler.forceRight)
+		if((!vrHandler.forceLeft || vrHandler.forceRight)
+		   && vrHandler.getStereoMultiplier() != 0.0)
 		{
 			vrRender(Side::RIGHT, debug, debugInHeadset,
 			         !thirdRender && (!debug || debugInHeadset));

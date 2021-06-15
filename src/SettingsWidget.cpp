@@ -26,6 +26,7 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addUIntSetting("width", 1500, tr("Window Width"), 0, 17000);
 	addUIntSetting("height", 800, tr("Window Height"), 0, 17000);
 	addBoolSetting("fullscreen", false, tr("Window Fullscreen"));
+	addBoolSetting("vsync", false, tr("Enable VSYNC"));
 	addBoolSetting("forcerenderresolution", false,
 	               tr("Force Rendering Resolution"));
 	addUIntSetting("forcewidth", 1500, tr("Forced Rendering Width"), 0, 17000);
@@ -89,8 +90,10 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 
 	addGroup("network", tr("Network"));
 	addBoolSetting("server", true, tr("Server"));
+	addUIntSetting("clientid", 0, tr("Client ID"));
 	addStringSetting("ip", "127.0.0.1", tr("IP address of server (if client)"));
-	addUIntSetting("port", 5000, tr("IP port"), 1025, 49999);
+	addUIntSetting("port", 5000, tr("UDP port"), 1025, 49999);
+	addUIntSetting("tcpport", 5001, tr("TCP port"), 1025, 49999);
 	addDoubleSetting("angleshift", 0.0,
 	                 tr("Horizontal angle shift compared to server (degrees)"),
 	                 -180.0, 180.0);

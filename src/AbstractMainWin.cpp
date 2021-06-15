@@ -9,7 +9,8 @@ AbstractMainWin::AbstractMainWin()
 	format.setDepthBufferSize(24);
 	format.setStencilBufferSize(8);
 	format.setVersion(4, 2);
-	format.setSwapInterval(0);
+	format.setSwapInterval(QSettings().value("window/vsync").toBool() ? 1 : 0);
+	format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
 	setFormat(format);
 
 	m_context.setFormat(format);
@@ -108,6 +109,12 @@ void AbstractMainWin::reloadPythonEngine()
 {
 	reloadPy = true;
 	PythonQtHandler::closeConsole();
+}
+
+void AbstractMainWin::sendPythonScript(unsigned int toClientId,
+                                       QString const& script) const
+{
+	networkManager->sendPythonScript(toClientId, script);
 }
 
 void AbstractMainWin::toggleFullscreen()
@@ -314,6 +321,10 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 	else if(a.id == "togglewireframe")
 	{
 		toggleWireframe();
+	}
+	else if(a.id == "reloadpythonengine")
+	{
+		reloadPythonEngine();
 	}
 	else if(a.id == "togglepyconsole")
 	{
