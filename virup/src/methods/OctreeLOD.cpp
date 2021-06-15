@@ -20,6 +20,12 @@ bool& OctreeLOD::forceMaxQuality()
 	return forceMaxQuality;
 }
 
+int& OctreeLOD::forceQuality()
+{
+	static int forceQuality(-1);
+	return forceQuality;
+}
+
 float& OctreeLOD::tanAngleLimit()
 {
 	static float tanAngleLimit(1.2f);
@@ -217,8 +223,23 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 		}*/
 	}
 
-	if((forceMaxQuality() || currentTanAngle(globalCampos) > tanAngleLimit())
-	   && !isLeaf())
+	if(!isLeaf())
+	{
+		if(forceQuality() >= 0)
+		{
+			if(static_cast<int>(lvl) <= forceQuality())
+			{
+				recurse = true;
+			}
+		}
+		else if(forceMaxQuality()
+		        || currentTanAngle(globalCampos) > tanAngleLimit())
+		{
+			recurse = true;
+		}
+	}
+
+	if(recurse)
 	{
 		// UPDATE SUBTREES
 		for(Octree* oct : children)
@@ -229,7 +250,6 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 				                                      globalCampos, alpha);
 			}
 		}
-		recurse = true;
 		return;
 	}
 
