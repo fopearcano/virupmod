@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 
+#include "AbstractState.hpp"
 #include "CSVObjects.hpp"
 #include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
@@ -31,6 +32,58 @@ class Universe : public QObject
 {
 	Q_OBJECT
   public:
+	class State : public AbstractState
+	{
+	  public:
+		State()                   = default;
+		State(State const& other) = default;
+		State(State&& other)      = default;
+		virtual void readFromDataStream(QDataStream& stream) override
+		{
+			visibilities.clear();
+			double foo;
+			for(unsigned int i(0); i < elementsSize; ++i)
+			{
+				stream >> foo;
+				visibilities.push_back(foo);
+			}
+		};
+		virtual void writeInDataStream(QDataStream& stream) override
+		{
+			for(unsigned int i(0); i < visibilities.size(); ++i)
+			{
+				stream << visibilities[i];
+			}
+		};
+
+		std::vector<double> visibilities;
+		static unsigned int elementsSize;
+	};
+
+	void readState(AbstractState const& s)
+	{
+		auto const& state = dynamic_cast<State const&>(s);
+		if(state.visibilities.size() != elements.size())
+		{
+			return;
+		}
+		unsigned int i(0);
+		for(auto& pair : elements)
+		{
+			pair.second->visibility = state.visibilities[i];
+			++i;
+		}
+	};
+	void writeState(AbstractState& s) const
+	{
+		auto& state = dynamic_cast<State&>(s);
+		state.visibilities.clear();
+		for(auto& pair : elements)
+		{
+			state.visibilities.push_back(pair.second->visibility);
+		}
+	};
+
 	Universe(OrbitalSystemCamera& camPlanet);
 	BBox getBoundingBox() const { return boundingBox; };
 	bool isPlanetarySystemRendered() const
@@ -59,6 +112,9 @@ class Universe : public QObject
 	~Universe();
 
 	QString planetarySystemName = "";
+
+  public slots:
+	void setVisibility(QString const& name, double visibility);
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);

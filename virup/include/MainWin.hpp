@@ -155,6 +155,7 @@ class MainWin : public AbstractMainWin
 			stream >> compass;
 			compassState.readFromDataStream(stream);
 			stream >> stereoMultiplier;
+			universeState.readFromDataStream(stream);
 		};
 		virtual void writeInDataStream(QDataStream& stream) override
 		{
@@ -169,6 +170,7 @@ class MainWin : public AbstractMainWin
 			stream << compass;
 			compassState.writeInDataStream(stream);
 			stream << stereoMultiplier;
+			universeState.writeInDataStream(stream);
 		};
 
 		ToneMappingModel::State toneMappingState;
@@ -181,6 +183,7 @@ class MainWin : public AbstractMainWin
 		bool compass = false;
 		CalibrationCompass::State compassState;
 		double stereoMultiplier = 1.0;
+		Universe::State universeState;
 	};
 
 	MainWin();
@@ -404,6 +407,7 @@ class MainWin : public AbstractMainWin
 		renderer.setCalibrationCompass(state.compass);
 		CalibrationCompass::readState(state.compassState);
 		vrHandler->setStereoMultiplier(state.stereoMultiplier);
+		universe->readState(state.universeState);
 	};
 	virtual void writeState(AbstractState& s) const override
 	{
@@ -425,6 +429,7 @@ class MainWin : public AbstractMainWin
 		state.compass             = renderer.getCalibrationCompass();
 		CalibrationCompass::writeState(state.compassState);
 		state.stereoMultiplier = vrHandler->getStereoMultiplier();
+		universe->writeState(state.universeState);
 	};
 
   private:

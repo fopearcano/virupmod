@@ -209,7 +209,8 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 	GLHandler::glf().glEnable(GL_PROGRAM_POINT_SIZE);
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	shader.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
-	shader.setUniform("brightnessMultiplier", brightnessMultiplier);
+	shader.setUniform("brightnessMultiplier",
+	                  visibility * brightnessMultiplier);
 	shader.setUniform("campos", campos);
 	if(galaxies)
 	{

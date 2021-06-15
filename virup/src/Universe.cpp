@@ -18,6 +18,8 @@
 
 #include "Universe.hpp"
 
+unsigned int Universe::State::elementsSize = 0;
+
 Universe::Universe(OrbitalSystemCamera& camPlanet)
     : camPlanet(camPlanet)
 {
@@ -107,6 +109,8 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 			cont = cosmoSims[i]->preloadOctreesLevel(lvlToLoad, &progress);
 		}
 	}
+
+	State::elementsSize = elements.size();
 
 	PythonQtHandler::addObject("Universe", this);
 }
@@ -226,6 +230,11 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 	          * t);
 }
 
+void Universe::setVisibility(QString const& name, double visibility)
+{
+	elements[name]->visibility = visibility;
+}
+
 void Universe::updateCosmo(Camera const& cam)
 {
 	OctreeLOD::updateTanAngleLimit(cam);
@@ -278,7 +287,11 @@ void Universe::renderCosmo(Camera const& cam,
 	for(auto pair : elements)
 	{
 		// only used by CosmologicalLabels for now
-		pair.second->visibility = CelestialBodyRenderer::renderLabels;
+		// pair.second->visibility = CelestialBodyRenderer::renderLabels;
+		if(pair.second->visibility < 0.001)
+		{
+			continue;
+		}
 		pair.second->render(cam, toneMappingModel);
 	}
 
