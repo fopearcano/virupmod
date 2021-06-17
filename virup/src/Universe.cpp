@@ -40,11 +40,15 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 		}
 		else if(entryObj["type"] == "csvstars")
 		{
-			newElem = new CSVObjects(entryObj, false);
+			auto csv = new CSVObjects(entryObj, false);
+			newElem  = csv;
+			csvObjs.append(csv);
 		}
 		else if(entryObj["type"] == "csvgalaxies")
 		{
-			newElem = new CSVObjects(entryObj, true);
+			auto csv = new CSVObjects(entryObj, true);
+			newElem  = csv;
+			csvObjs.append(csv);
 		}
 		else if(entryObj["type"] == "cosmosim")
 		{
@@ -232,6 +236,21 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 
 void Universe::setVisibility(QString const& name, double visibility)
 {
+	if(name == "Exoplanets")
+	{
+		planetSystems->visibility = visibility;
+		return;
+	}
+	if(name == "Constellations")
+	{
+		for(auto csv : csvObjs)
+		{
+			csv->constellationsAlpha  = visibility;
+			csv->constellationsLabels = visibility;
+		}
+		return;
+	}
+
 	elements[name]->visibility = visibility;
 }
 

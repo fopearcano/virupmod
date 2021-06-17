@@ -125,6 +125,7 @@ class Universe : public QObject
 
 	std::map<QString, UniverseElement*> elements;
 	QList<CosmologicalSimulation*> cosmoSims;
+	QList<CSVObjects*> csvObjs;
 
   public:
 	PlanetarySystems* planetSystems = nullptr;

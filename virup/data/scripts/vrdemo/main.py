@@ -197,7 +197,7 @@ scenes = [
           TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # Solar System dynamics Constellations
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
-          TemporalData(10000000.0), UI(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0)),
+          TemporalData(10000000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
     # Kepler-11 dynamics
     Scene(SpatialData(Vector3(0.20798, -0.209748, 0.537371), 1.65181e+11, 'Kepler-11', 'Kepler-11'),
           TemporalData(10000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
