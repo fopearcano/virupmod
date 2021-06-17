@@ -230,7 +230,8 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 	GLHandler::glf().glDisable(GL_POINT_SPRITE);
 	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 
-	if(containsConstellations)
+	if(containsConstellations
+	   && (constellationsAlpha > 0.f || constellationsLabels > 0.f))
 	{
 		GLHandler::glf().glEnable(GL_MULTISAMPLE);
 		GLHandler::beginTransparent(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
