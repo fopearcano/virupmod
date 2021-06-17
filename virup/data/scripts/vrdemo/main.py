@@ -24,12 +24,16 @@ class TemporalData:
         self.simulationTime = simulationTime
 
 class UI:
-    def __init__(self, luminosity=110000008.0, orbits=False, labels=False, darkmatter=False, grid=False):
-        self.luminosity = luminosity
+    def __init__(self, sdsslum=0.0, gaialum=0.0, illustrislum=0.0, agoralum=0.0, hyg=0.0, exoplanets=0.0, constellations=0.0, orbits=0.0, labels=0.0):
+        self.sdsslum = sdsslum 
+        self.gaialum = gaialum 
+        self.illustrislum = illustrislum 
+        self.agoralum = agoralum
+        self.hyg=hyg
+        self.exoplanets = exoplanets
+        self.constellations = constellations
         self.orbits = orbits
         self.labels = labels
-        self.darkmatter = darkmatter
-        self.grid = grid
 
 class Scene:
     def __init__(self, spatialData, temporalData = TemporalData(), ui = UI()):
@@ -75,7 +79,7 @@ def interpolateSpatialData(s0, s1, t, simTime0, simTime1):
     global longanimation
 
     longanimation = False
-    planetpos = Vector3()
+    planetpos = interpolateLinear(s0.planetPos, s1.planetPos, t)
 
     scale=1.0 / interpolateLog(s0.scale, s1.scale, t)
 
@@ -103,7 +107,17 @@ def interpolateSpatialData(s0, s1, t, simTime0, simTime1):
         end=VIRUP.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
 
         dist = (end-start).length()
-        maxscale = min(s1.scale, 1.0 / (dist))
+        if dist == 0:
+            print("DIST == 0")
+            print(s0.bodyName)
+            print(start)
+            print(s1.bodyName)
+            print(end)
+            print(bn)
+            maxscale = s1.scale
+        else:
+            maxscale = min(s1.scale, 1.0 / (dist))
+
         if t <= 0.25:
             scale = 1.0 / interpolateLog(s0.scale, maxscale, 4*t)
             planetpos = start
@@ -136,11 +150,15 @@ def interpolateTemporalData(t0, t1, t):
 
 def interpolateUI(ui0, ui1, t):
     return UI(
-        interpolateLog(ui0.luminosity, ui1.luminosity, t),
-        interpolateBool(ui0.orbits, ui1.orbits, t),
-        interpolateBool(ui0.labels, ui1.labels, t),
-        interpolateBool(ui0.darkmatter, ui1.darkmatter, t),
-        interpolateBool(ui0.grid, ui1.grid, t)
+        interpolateLinear(ui0.sdsslum, ui1.sdsslum, t),
+        interpolateLinear(ui0.gaialum, ui1.gaialum, t),
+        interpolateLinear(ui0.illustrislum, ui1.illustrislum, t),
+        interpolateLinear(ui0.agoralum, ui1.agoralum, t),
+        interpolateLinear(ui0.hyg, ui1.hyg, t),
+        interpolateLinear(ui0.exoplanets, ui1.exoplanets, t),
+        interpolateLinear(ui0.constellations, ui1.constellations, t),
+        interpolateLinear(ui0.orbits, ui1.orbits, t),
+        interpolateLinear(ui0.labels, ui1.labels, t),
     )
 
 def interpolateScene(sc0, sc1, t):
@@ -152,53 +170,67 @@ def interpolateScene(sc0, sc1, t):
         interpolateUI(sc0.ui, sc1.ui, t)
     )
 
-solareclipsedt = QDateTime(QDate(2020, 5, 13), QTime(20, 00, 46))
+solareclipsedt = QDateTime(QDate(2021, 6, 16), QTime(11, 20, 00))
 
+#sdsslum, gaialum, illustrislum, agoralum, hyg, exoplanets, constellations, orbits, labels):
 scenes = [
+    # International Space Station Real scale
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # International Space Station
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 100, 'ISS', 'Solar System'),
-          TemporalData(1.0), UI(0.167)),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 100, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # Earth-Moon dynamics
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
-          TemporalData(1.0, solareclipsedt), UI(0.167)),
+          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # Earth-Moon dynamics
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 350000000, 'Earth', 'Solar System'),
-          TemporalData(1.0, solareclipsedt), UI(0.167)),
+          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # Phobos
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
-          TemporalData(500.0), UI(0.167)),
+          TemporalData(500.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
     # Saturn moons dynamics
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 2000000000, 'Saturn', 'Solar System'),
-          TemporalData(100000.0), UI(0.167, True, True)),
+          TemporalData(100000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 1.0, 1.0)),
     # Enceladus
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 3000000, 'Rhea',  'Solar System'),
-          TemporalData(1.0), UI(0.167)),
-    # Solar System dynamics
+          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
+    # Solar System dynamics Constellations
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
-          TemporalData(10000000.0), UI(0.167, True, True)),
+          TemporalData(10000000.0), UI(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0)),
     # Kepler-11 dynamics
     Scene(SpatialData(Vector3(0.20798, -0.209748, 0.537371), 1.65181e+11, 'Kepler-11', 'Kepler-11'),
-          TemporalData(10000.0), UI(0.167, True, True)),
+          TemporalData(10000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
     # 51 Peg dynamics
     Scene(SpatialData(Vector3(0.0132362, -0.00132559, 0.00625585), 1.65181e+10, '51 Peg', '51 Peg'),
-          TemporalData(10000.0), UI(0.167, True, True)),
-    # TRAPPIST-1 dynamics
-    Scene(SpatialData(Vector3(0.0120457, -0.00306368, 0.000137469), 1.65181e+10, 'TRAPPIST-1', 'TRAPPIST-1'),
-          TemporalData(10000.0), UI(0.167, True, True)),
-    # SWEEPS-1 dynamics
-    Scene(SpatialData(Vector3(-0.0313282, -8.45706, -0.852723), 1.65181e+10, 'SWEEPS-11', 'SWEEPS-11'),
-          TemporalData(10000.0), UI(0.167, True, True)),
+          TemporalData(10000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
     # Milky Way
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-           TemporalData(), UI(20*0.0181)),
-    # Whole cube
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 1.2e+25),
-           TemporalData(), UI(1015.0, False, False, True)),
+           TemporalData(), UI(0.0, 0.0, 0.01, 1.0, 0.0, 0.1, 0.0, 0.0, 0.0)),
+    # Illustris
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
+           TemporalData(), UI(0.0, 0.0, 1.0, 0.0, 0.0, 0.0)),
+    # SDSS close
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.0e+25),
+           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+    # SDSS distant
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+27),
+           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+    # Gaia In
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+13),
+          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
+    # Gaia Mid
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4.0e+19),
+          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
+    # Gaia Out
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1.7e+22),
+          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
 ]
 
 id = 0
 disableanimations = False
 personheight=1.5
+ToneMappingModel.exposure=0.3
 
 def getCosmoShift():
     try:
@@ -227,13 +259,17 @@ def setSceneId(newid):
     global id
     global currentscene
 
+    oldid = id
     id = newid
     timer.restart()
     if disableanimations:
         currentscene = scenes[id]
     else:
-        currentscene=Scene(SpatialData(VIRUP.cosmoPosition - getCosmoShift(), 1.0 / VIRUP.scale, VIRUP.planetTarget, VIRUP.planetarySystemName),
-           TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), UI(ToneMappingModel.exposure, VIRUP.orbitsEnabled, VIRUP.labelsEnabled, VIRUP.darkmatterEnabled, VIRUP.gridEnabled))
+        if oldid == -1:
+            currentscene=Scene(SpatialData(VIRUP.cosmoPosition - getCosmoShift(), 1.0 / VIRUP.scale, VIRUP.planetTarget, VIRUP.planetarySystemName),
+               TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), scenes[oldid].ui)
+        else:
+            currentscene=scenes[oldid]
         if scenes[id].spatialData.systemName == currentscene.spatialData.systemName and (scenes[id].spatialData.cosmoPos - currentscene.spatialData.cosmoPos).length() > 0.1:
             currentscene.spatialData.systemName = ""
 
@@ -324,8 +360,36 @@ def updateScene():
             VIRUP.simulationTime = temporalData.simulationTime
 
     ui = scene.ui
-    VIRUP.orbitsEnabled = ui.orbits
-    VIRUP.labelsEnabled = ui.labels
-    VIRUP.darkmatterEnabled = ui.darkmatter
-    #VIRUP.gridEnabled = ui.grid
+    Universe.setVisibility("SDSS", ui.sdsslum)
+    Universe.setVisibility("Gaia", ui.gaialum)
+    Universe.setVisibility("Volumetric AGORA", ui.agoralum)
+    p = 1
+    if id == 5:
+        p = 15
+    Universe.setVisibility("IllustrisTNG", ui.illustrislum**p)
+    """
+    Universe.setVisibility("IllustrisTNG 0", ui.illustrislum**p)
+    Universe.setVisibility("IllustrisTNG 1", ui.illustrislum**p)
+    Universe.setVisibility("IllustrisTNG 2", ui.illustrislum**p)
+    Universe.setVisibility("IllustrisTNG 3", ui.illustrislum**p)
+    Universe.setVisibility("IllustrisTNG 4", ui.illustrislum**p)
+    Universe.setVisibility("IllustrisTNG 5", ui.illustrislum**p)
+    """
+    Universe.setVisibility("Hipparcos", ui.hyg)
+    Universe.setVisibility("Exoplanets", ui.exoplanets)
+    Universe.setVisibility("Constellations", ui.constellations)
+    if ui.orbits > 0.5:
+        VIRUP.orbitsEnabled = 1.0
+    else:
+        VIRUP.orbitsEnabled = 0.0
+    if ui.labels > 0.5:
+        VIRUP.labelsEnabled = 1.0
+    else:
+        VIRUP.labelsEnabled = 0.0
+    VIRUP.darkmatterEnabled = True
+
+    if id >= 14:
+        Universe.setVisibility("Labels", 1.0);
+    else:
+        Universe.setVisibility("Labels", 0.0);
 

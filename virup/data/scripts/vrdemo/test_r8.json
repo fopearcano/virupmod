@@ -1,0 +1,93 @@
+{
+    "entries": [
+        {
+            "brightnessmul": 1,
+            "file": "/media/florian/DataWin/labels/local_group.csv",
+            "name": "Labels",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": 8.299956,
+                "y": 0,
+                "z": -0.027
+            },
+            "type": "cosmolabels",
+            "unit": -1
+        },
+        {
+            "brightnessmul": 1,
+            "confile": "/media/florian/DataWin/hygdata/constellations.txt",
+            "file": "/media/florian/DataWin/hygdata/hygdata_clean.csv",
+            "name": "Hipparcos",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "csvstars",
+            "unit": 0.001
+        },
+        {
+            "atlasfile": "/media/florian/DataWin/sdss/BAK/atlas.png",
+            "brightnessmul": 1000000000,
+            "file": "/media/florian/DataWin/sdss/BAK/sdss.csv",
+            "name": "SDSS",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "csvgalaxies",
+            "unit": 1000
+        },
+        {
+            "brightnessmul": 10000000,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "/media/florian/DataWin/VIRUP-DATA/volumetric/darkmatter.dat",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "/media/florian/DataWin/VIRUP-DATA/volumetric/gas.dat",
+            "loaddarkmatter": false,
+            "name": "Volumetric AGORA",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.29995608,
+                "y": 0,
+                "z": 0.027
+            },
+            "starscolor": "#fff693",
+            "starsfile": "/media/florian/DataWin/VIRUP-DATA/volumetric/stars.octree",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 20000000,
+            "darkmattercolor": "#000000",
+            "darkmatterfile": "",
+            "file": "",
+            "gascolor": "#000000",
+            "gasfile": "",
+            "loaddarkmatter": null,
+            "name": "Gaia",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "starscolor": "#000000",
+            "starsfile": "/media/florian/DataWin/Gaia/hdf5/Gaia.octree",
+            "type": "cosmosim",
+            "unit": 0.001
+        },
+        {
+            "brightnessmul": 4800000000000000,
+            "darkmattercolor": "#ffa875",
+            "darkmatterfile": "/media/florian/DataLinux/Illustris_subsampled/dm.r8.octree",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "/media/florian/DataLinux/Illustris_subsampled/gas.r8.octree",
+            "loaddarkmatter": true,
+            "name": "IllustrisTNG",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": {
+                "x": 150000,
+                "y": 150000,
+                "z": 150000
+            },
+            "starscolor": "#fff693",
+            "starsfile": "/media/florian/DataLinux/Illustris_subsampled/stars.r8.octree",
+            "type": "cosmosim",
+            "unit": 1
+        }
+    ]
+}
