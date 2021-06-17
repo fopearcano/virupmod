@@ -240,6 +240,10 @@ void Universe::updateCosmo(Camera const& cam)
 	OctreeLOD::updateTanAngleLimit(cam);
 	for(auto pair : elements)
 	{
+		if(pair.second->visibility < 0.001)
+		{
+			continue;
+		}
 		pair.second->update(cam);
 	}
 	planetSystems->update(cam);
