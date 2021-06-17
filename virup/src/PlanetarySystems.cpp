@@ -151,11 +151,13 @@ void PlanetarySystems::update(Camera const& camera)
 void PlanetarySystems::render(Camera const& /*camera*/,
                               ToneMappingModel const& tmm)
 {
+	GLHandler::beginTransparent();
 	shader.setUniform("alpha", visibility);
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
+	GLHandler::endTransparent();
 }
 
 PlanetarySystems::~PlanetarySystems()
