@@ -265,7 +265,8 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 		}
 	}
 
-	if(isLeaf())
+#ifdef IGNORE
+	if(false && isLeaf())
 	{
 		Vector3 campos(Utils::fromQt(globalCampos));
 
@@ -346,6 +347,7 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 			neighborDist  = 0.0;
 		}
 	}
+#endif
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
