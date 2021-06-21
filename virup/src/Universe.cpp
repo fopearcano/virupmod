@@ -56,6 +56,10 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 			newElem = cs;
 			cosmoSims.append(cs);
 		}
+		else if(entryObj["type"] == "texsphere")
+		{
+			newElem = new TexturedSphere(entryObj);
+		}
 		else
 		{
 			qWarning()

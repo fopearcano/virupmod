@@ -27,6 +27,7 @@
 #include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
 #include "PlanetarySystems.hpp"
+#include "TexturedSphere.hpp"
 
 class Universe : public QObject
 {

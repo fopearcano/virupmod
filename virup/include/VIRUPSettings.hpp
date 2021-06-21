@@ -32,6 +32,7 @@
 #include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
 #include "SettingsWidget.hpp"
+#include "TexturedSphere.hpp"
 #include "UniverseElement.hpp"
 
 class VIRUPSettings : public SettingsWidget

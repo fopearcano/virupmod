@@ -24,7 +24,7 @@ class TemporalData:
         self.simulationTime = simulationTime
 
 class UI:
-    def __init__(self, sdsslum=0.0, gaialum=0.0, illustrislum=0.0, agoralum=0.0, hyg=0.0, exoplanets=0.0, constellations=0.0, orbits=0.0, labels=0.0):
+    def __init__(self, sdsslum=0.0, gaialum=0.0, illustrislum=0.0, agoralum=0.0, hyg=0.0, exoplanets=0.0, constellations=0.0, orbits=0.0, labels=0.0, cmb=0.0):
         self.sdsslum = sdsslum 
         self.gaialum = gaialum 
         self.illustrislum = illustrislum 
@@ -34,6 +34,7 @@ class UI:
         self.constellations = constellations
         self.orbits = orbits
         self.labels = labels
+        self.cmb = cmb
 
 class Scene:
     def __init__(self, spatialData, temporalData = TemporalData(), ui = UI()):
@@ -159,6 +160,7 @@ def interpolateUI(ui0, ui1, t):
         interpolateLinear(ui0.constellations, ui1.constellations, t),
         interpolateLinear(ui0.orbits, ui1.orbits, t),
         interpolateLinear(ui0.labels, ui1.labels, t),
+        interpolateLinear(ui0.cmb, ui1.cmb, t)
     )
 
 def interpolateScene(sc0, sc1, t):
@@ -172,7 +174,7 @@ def interpolateScene(sc0, sc1, t):
 
 solareclipsedt = QDateTime(QDate(2021, 6, 16), QTime(11, 20, 00))
 
-#sdsslum, gaialum, illustrislum, agoralum, hyg, exoplanets, constellations, orbits, labels):
+#sdsslum, gaialum, illustrislum, agoralum, hyg, exoplanets, constellations, orbits, labels, cmb):
 scenes = [
     # International Space Station Real scale
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
@@ -211,11 +213,11 @@ scenes = [
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
            TemporalData(), UI(0.0, 0.0, 1.0, 0.0, 0.0, 0.0)),
     # SDSS close
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.0e+25),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+25),
            TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
     # SDSS distant
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+27),
-           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 4.0e+26),
+           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
     # Gaia In
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+13),
           TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
@@ -378,6 +380,7 @@ def updateScene():
     Universe.setVisibility("Hipparcos", ui.hyg)
     Universe.setVisibility("Exoplanets", ui.exoplanets)
     Universe.setVisibility("Constellations", ui.constellations)
+    Universe.setVisibility("CMB", ui.cmb)
     if ui.orbits > 0.5:
         VIRUP.orbitsEnabled = 1.0
     else:

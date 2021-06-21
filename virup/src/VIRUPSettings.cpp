@@ -62,11 +62,13 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 DataListWidget::DataListWidget()
 {
 	entries << tr("Cosmological Labels") << tr("CSV Stars")
-	        << tr("CSV Galaxies") << tr("Cosmological Simulation");
+	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
+	        << tr("Textured Sphere");
 	entriesIds << "cosmolabels"
 	           << "csvstars"
 	           << "csvgalaxies"
-	           << "cosmosim";
+	           << "cosmosim"
+	           << "texsphere";
 
 	loadMainLayout();
 }
@@ -363,6 +365,10 @@ void DataDialog::setType(QString const& type)
 	{
 		fields
 		    = CosmologicalSimulation::getLauncherFields(specialized, &result);
+	}
+	if(type == "texsphere")
+	{
+		fields = TexturedSphere::getLauncherFields(specialized, &result);
 	}
 	for(auto const& pair : fields)
 	{
