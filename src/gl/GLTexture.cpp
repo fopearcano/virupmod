@@ -108,7 +108,8 @@ GLTexture::GLTexture(TexCubemapProperties const& properties,
 }
 
 GLTexture::GLTexture(QImage const& image, bool sRGB)
-    : GLTexture(GLTexture::Tex2DProperties(image.width(), image.height(), sRGB))
+    : GLTexture(GLTexture::Tex2DProperties(image.width(), image.height(), sRGB),
+                GLTexture::Sampler(GL_LINEAR, GL_REPEAT))
 {
 	QImage img_data = image.convertToFormat(QImage::Format_RGBA8888);
 	setData({img_data.bits()});

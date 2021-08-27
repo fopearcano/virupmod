@@ -416,7 +416,8 @@ void Renderer::renderFrame()
 		                      QMatrix4x4 overrProj) {
 			for(auto pair : sceneRenderPipeline_)
 			{
-				pair.second.camera->setWindowSize(getSize());
+				auto renderSize(mainRenderTarget->sceneTarget.getSize());
+				pair.second.camera->setWindowSize(renderSize);
 				GLHandler::glf().glClear(pair.second.clearMask);
 				QMatrix4x4 viewBack(pair.second.camera->getView()),
 				    projBack(pair.second.camera->getProj());
@@ -475,12 +476,30 @@ void Renderer::renderFrame()
 		{
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
 			                                  renderFunc);
+			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
+			    .generateMipmap();
 
 			GLShaderProgram shader("postprocess", "panorama360");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 		}
-		else if(projection == MainRenderTarget::Projection::VR360)
+		else if(projection == MainRenderTarget::Projection::VR180L
+		        || projection == MainRenderTarget::Projection::VR180R)
+		{
+			QVector3D shift(projection == MainRenderTarget::Projection::VR180L
+			                    ? -0.065
+			                    : 0.065,
+			                0.0, 0.0);
+
+			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
+			                                  renderFunc, shift);
+			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
+			    .generateMipmap();
+			GLShaderProgram shader("postprocess", "panorama180");
+			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
+			                       mainRenderTarget->postProcessingTargets[0]);
+		}
+		else if(projection == MainRenderTarget::Projection::VR180)
 		{
 			int tgtWidth(
 			    mainRenderTarget->postProcessingTargets[0].getSize().width()),
@@ -490,21 +509,25 @@ void Renderer::renderFrame()
 			QVector3D shift(0.065, 0.0, 0.0);
 
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
-			                                  renderFunc, shift);
-			GLShaderProgram shader("postprocess", "panorama360");
+			                                  renderFunc, -shift);
+			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
+			    .generateMipmap();
+			GLShaderProgram shader("postprocess", "panorama180");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 			mainRenderTarget->postProcessingTargets[0].blitColorBufferTo(
 			    mainRenderTarget->postProcessingTargets[1], 0, 0, tgtWidth,
-			    tgtHeight, 0, 0, tgtWidth, tgtHeight / 2);
+			    tgtHeight, 0, 0, tgtWidth / 2, tgtHeight);
 
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
-			                                  renderFunc, -shift);
+			                                  renderFunc, shift);
+			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
+			    .generateMipmap();
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 			mainRenderTarget->postProcessingTargets[0].blitColorBufferTo(
 			    mainRenderTarget->postProcessingTargets[1], 0, 0, tgtWidth,
-			    tgtHeight, 0, tgtHeight / 2, tgtWidth, tgtHeight);
+			    tgtHeight, tgtWidth / 2, 0, tgtWidth, tgtHeight);
 			mainRenderTarget->postProcessingTargets[1].blitColorBufferTo(
 			    mainRenderTarget->postProcessingTargets[0]);
 		}
@@ -512,6 +535,8 @@ void Renderer::renderFrame()
 		{
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
 			                                  renderFunc);
+			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
+			    .generateMipmap();
 
 			GLShaderProgram shader("postprocess", "domemaster180");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,

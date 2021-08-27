@@ -32,7 +32,13 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addUIntSetting("forcewidth", 1500, tr("Forced Rendering Width"), 0, 17000);
 	addUIntSetting("forceheight", 800, tr("Forced Rendering Height"), 0, 17000);
 	addScreenNameSetting();
-	addBoolSetting("domemaster", false, tr("Use Domemaster projection"));
+	addStringAmongListSetting("projection",
+	                          {"default", "panorama360", "vr180l", "vr180r",
+	                           "vr180", "domemaster180"},
+	                          {tr("Default"), tr("Panorama 360"),
+	                           tr("VR 180 Left"), tr("VR 180 Right"),
+	                           tr("VR 180"), tr("Domemaster 180")},
+	                          tr("Projection"));
 	addLanguageSetting();
 	addBoolSetting("videomode", false, tr("Start with video mode enabled"));
 	addUIntSetting("maxframe", 0,
@@ -290,6 +296,34 @@ void SettingsWidget::addStringSetting(QString const& name,
 	        [this, fullName](QString const& t) { updateValue(fullName, t); });
 
 	currentForm->addRow(label + " :", lineEdit);
+}
+
+void SettingsWidget::addStringAmongListSetting(QString const& name,
+                                               QStringList const& values,
+                                               QStringList const& strLabels,
+                                               QString const& label,
+                                               unsigned int defaultIndex)
+{
+	QString fullName(currentGroup + '/' + name);
+
+	if(!settings.contains(fullName))
+	{
+		settings.setValue(fullName, values[defaultIndex]);
+	}
+
+	QString currentVal(settings.value(fullName).toString());
+	int currentIndex(values.indexOf(currentVal));
+
+	auto comboBox = new QComboBox(this);
+	comboBox->addItems(strLabels);
+	comboBox->setCurrentIndex(currentIndex);
+
+	connect(comboBox, &QComboBox::currentTextChanged, this,
+	        [this, fullName, values, strLabels](QString const& t) {
+		        updateValue(fullName, values[strLabels.indexOf(t)]);
+	        });
+
+	currentForm->addRow(label + " : ", comboBox);
 }
 
 void SettingsWidget::addFilePathSetting(QString const& name,

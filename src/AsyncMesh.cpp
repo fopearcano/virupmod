@@ -18,6 +18,12 @@
 
 #include "AsyncMesh.hpp"
 
+bool& AsyncMesh::forceSync()
+{
+	static bool forceSync(false);
+	return forceSync;
+}
+
 QList<QPair<QFuture<void>, std::vector<AssetLoader::MeshDescriptor>*>>&
     AsyncMesh::waitingForDeletion()
 {
@@ -52,7 +58,14 @@ void AsyncMesh::updateMesh(GLShaderProgram const& shader)
 
 	if(loaded || !future.isFinished())
 	{
-		return;
+		if(forceSync())
+		{
+			future.waitForFinished();
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	loaded               = true;

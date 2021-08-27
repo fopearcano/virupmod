@@ -18,6 +18,12 @@
 
 #include "AsyncTexture.hpp"
 
+bool& AsyncTexture::forceSync()
+{
+	static bool forceSync(false);
+	return forceSync;
+}
+
 QList<QPair<at::WorkerThread*, GLPixelBufferObject*>>&
     AsyncTexture::waitingForDeletion()
 {
@@ -112,7 +118,14 @@ GLTexture const& AsyncTexture::getTexture()
 
 	if(!thread->isFinished())
 	{
-		return defaultTex;
+		if(forceSync())
+		{
+			thread->wait();
+		}
+		else
+		{
+			return defaultTex;
+		}
 	}
 
 	tex = pbo->copyContentToNewTex(sRGB);

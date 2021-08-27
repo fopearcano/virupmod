@@ -73,6 +73,11 @@ class SettingsWidget : public QTabWidget
 	                      double maxVal = 99, unsigned int decimals = 3);
 	void addStringSetting(QString const& name, QString const& defaultVal,
 	                      QString const& label);
+	void addStringAmongListSetting(QString const& name,
+	                               QStringList const& values,
+	                               QStringList const& strLabels,
+	                               QString const& label,
+	                               unsigned int defaultIndex = 0);
 	void addFilePathSetting(QString const& name, QString const& defaultVal,
 	                        QString const& label);
 	void addDirPathSetting(QString const& name, QString const& defaultVal,

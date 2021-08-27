@@ -620,6 +620,9 @@ void AbstractMainWin::paintGL()
 		networkManager->update(frameTiming);
 	}
 
+	AsyncTexture::forceSync() = videomode;
+	AsyncMesh::forceSync()    = videomode;
+
 	toneMappingModel->autoUpdateExposure(
 	    renderer.getLastFrameAverageLuminance(), frameTiming);
 
@@ -658,6 +661,10 @@ void AbstractMainWin::paintGL()
 
 	if(videomode)
 	{
+		if(!videoRenderingTimer.isValid() && currentVideoFrame > 1)
+		{
+			videoRenderingTimer.start();
+		}
 		QImage frame(renderer.getLastFrame());
 		QString number
 		    = QString("%1").arg(currentVideoFrame, 5, 10, QChar('0'));
@@ -671,8 +678,14 @@ void AbstractMainWin::paintGL()
 			case MainRenderTarget::Projection::PANORAMA360:
 				subdir = "PANORAMA360";
 				break;
-			case MainRenderTarget::Projection::VR360:
-				subdir = "VR360";
+			case MainRenderTarget::Projection::VR180L:
+				subdir = "VR180L";
+				break;
+			case MainRenderTarget::Projection::VR180R:
+				subdir = "VR180R";
+				break;
+			case MainRenderTarget::Projection::VR180:
+				subdir = "VR180";
 				break;
 			case MainRenderTarget::Projection::DOMEMASTER180:
 				subdir = "DOMEMASTER180";
@@ -689,10 +702,40 @@ void AbstractMainWin::paintGL()
 			             + subdir);
 			projdir.mkdir(res);
 		}
-		if(QSettings().value("window/maxframe").toUInt() > 0
-		   && currentVideoFrame > QSettings().value("window/maxframe").toUInt())
+		unsigned int maxframe(QSettings().value("window/maxframe").toUInt());
+		if(maxframe > 0)
 		{
-			close();
+			if(currentVideoFrame > maxframe)
+			{
+				QString resultStr("Rendered ");
+				resultStr += QString::number(maxframe) + " frames in ";
+				QTime t(0, 0, 0);
+				t = t.addSecs(videoRenderingTimer.elapsed() / 1000);
+				resultStr += t.toString();
+				qDebug() << resultStr;
+				close();
+			}
+			else if(currentVideoFrame != 0)
+			{
+				QString progressStr("Progress : ");
+				progressStr += QString::number(currentVideoFrame) + "/"
+				               + QString::number(maxframe)
+				               + " | Time remaining: ";
+				int elapsed(videoRenderingTimer.elapsed() / 1000);
+				int remaining(elapsed * (maxframe - currentVideoFrame)
+				              / currentVideoFrame);
+				if(remaining > 3600 * 24)
+				{
+					progressStr
+					    += QString::number(floor(remaining / (3600 * 24)))
+					       + "d";
+				}
+
+				QTime t(0, 0, 0);
+				t = t.addSecs(remaining);
+				progressStr += t.toString();
+				qDebug() << progressStr;
+			}
 		}
 
 		QString framePath(QSettings().value("window/viddir").toString() + "/"

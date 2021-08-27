@@ -28,36 +28,21 @@ class MainRenderTarget
 	{
 		DEFAULT       = 0,
 		PANORAMA360   = 1,
-		VR360         = 2,
-		DOMEMASTER180 = 3,
+		VR180L        = 2,
+		VR180R        = 3,
+		VR180         = 4,
+		DOMEMASTER180 = 5,
 	};
 
 	MainRenderTarget(unsigned int width, unsigned int height,
-	                 unsigned int samples, Projection projection)
-	    : sceneTarget(constructSceneTarget(width, height, samples, projection))
-	    , postProcessingTargets({GLFramebufferObject(GLTexture::Tex2DProperties(
-	                                 width, height, GL_RGBA32F)),
-	                             GLFramebufferObject(GLTexture::Tex2DProperties(
-	                                 width, height, GL_RGBA32F))}){};
+	                 unsigned int samples, Projection projection);
 
 	static GLFramebufferObject constructSceneTarget(unsigned int width,
 	                                                unsigned int height,
 	                                                unsigned int samples,
-	                                                Projection projection)
-	{
-		if(projection == Projection::DEFAULT)
-		{
-			if(samples > 1)
-			{
-				return GLFramebufferObject(GLTexture::TexMultisampleProperties(
-				    width, height, samples, GL_RGBA32F));
-			}
-			return GLFramebufferObject(
-			    GLTexture::Tex2DProperties(width, height, GL_RGBA32F));
-		}
-		return GLFramebufferObject(
-		    GLTexture::TexCubemapProperties(width / 3, GL_RGBA32F));
-	}
+	                                                Projection projection);
+	static MainRenderTarget::Projection strToProj(QString const& str);
+	static QString projToStr(MainRenderTarget::Projection proj);
 
   public:
 	GLFramebufferObject sceneTarget;

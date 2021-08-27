@@ -144,6 +144,10 @@ class AbstractMainWin : public QWindow
 	 * @brief Toggles video rendering mode.
 	 */
 	Q_PROPERTY(bool videomode MEMBER videomode)
+	/**
+	 * @brief Currently used projection.
+	 */
+	Q_PROPERTY(QString projection READ getProjection WRITE setProjection)
 
   public:
 	/**
@@ -234,6 +238,7 @@ class AbstractMainWin : public QWindow
 	virtual ~AbstractMainWin();
 
   public slots:
+	void close() { QWindow::close(); };
 	void reloadPythonEngine();
 	void sendPythonScript(unsigned int toClientId, QString const& script) const;
 	/**
@@ -445,6 +450,15 @@ class AbstractMainWin : public QWindow
 
 	// OFFSCREEN RENDERING
 	bool videomode = QSettings().value("window/videomode").toBool();
+	QString getProjection() const
+	{
+		return MainRenderTarget::projToStr(renderer.projection);
+	};
+	void setProjection(QString const& projStr)
+	{
+		renderer.projection = MainRenderTarget::strToProj(projStr);
+		renderer.reloadPostProcessingTargets();
+	};
 	unsigned int currentVideoFrame = 0;
 
 	// Postprocessing
@@ -459,6 +473,7 @@ class AbstractMainWin : public QWindow
 
 	float frameTiming_ = 0.f;
 	QElapsedTimer frameTimer;
+	QElapsedTimer videoRenderingTimer;
 
 	QOpenGLContext m_context;
 	bool initialized = false;

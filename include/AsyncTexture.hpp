@@ -91,6 +91,7 @@ class AsyncTexture
 	QColor getAverageColor() const { return averageColor; };
 	~AsyncTexture();
 
+	static bool& forceSync();
 	static void garbageCollect(bool force = false);
 
   private:

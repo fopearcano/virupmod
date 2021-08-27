@@ -175,10 +175,9 @@ class Renderer
 	QString pathIdRenderingControllers = "default";
 
 	bool wireframe = false;
-	MainRenderTarget::Projection projection
-	    = QSettings().value("window/domemaster").toBool()
-	          ? MainRenderTarget::Projection::DOMEMASTER180
-	          : MainRenderTarget::Projection::DEFAULT;
+
+	MainRenderTarget::Projection projection = MainRenderTarget::strToProj(
+	    QSettings().value("window/projection").toString());
 	/**
 	 * @brief Ordered list of render passes to apply as scene rendering.
 	 *

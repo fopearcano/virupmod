@@ -35,6 +35,7 @@ class AsyncMesh
 	GLMesh const& getMesh();
 	~AsyncMesh();
 
+	static bool& forceSync();
 	static void garbageCollect(bool force = false);
 
   private:
