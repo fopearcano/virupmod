@@ -18,6 +18,12 @@
 
 #include "CosmologicalSimulation.hpp"
 
+float& CosmologicalSimulation::animationTime()
+{
+	static float animationTime(0.f);
+	return animationTime;
+}
+
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 {
 	init(json["gasfile"].toString().toStdString(),
@@ -105,6 +111,22 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	trees.silent = true;
 }
 
+unsigned int CosmologicalSimulation::getClosestId(
+    std::map<unsigned int, QString> const& m, unsigned index)
+{
+	if(m.count(index) > 0)
+	{
+		return index;
+	}
+	unsigned int l(m.lower_bound(index)->first);
+	unsigned int u(m.upper_bound(index)->first);
+	if(index - l < u - index)
+	{
+		return l;
+	}
+	return u;
+}
+
 BBox CosmologicalSimulation::getBoundingBox() const
 {
 	return trees.getDataBoundingBox();
@@ -128,16 +150,21 @@ void CosmologicalSimulation::update(Camera const& camera)
 	if(cosmoFilesGas.size() > 1 || cosmoFilesStars.size() > 1
 	   || cosmoFilesDM.size() > 1)
 	{
-		++currentIndex;
-		if(currentIndex > maxIndex)
+		auto oldCurrent(currentIndex);
+		currentIndex
+		    = static_cast<unsigned int>(animationTime() * (maxIndex - 1));
+		if(currentIndex != oldCurrent)
 		{
-			currentIndex = 0;
+			trees.cleanUp();
+			trees.init(
+			    cosmoFilesGas[getClosestId(cosmoFilesGas, currentIndex)]
+			        .toStdString(),
+			    cosmoFilesStars[getClosestId(cosmoFilesStars, currentIndex)]
+			        .toStdString(),
+			    cosmoFilesDM[getClosestId(cosmoFilesDM, currentIndex)]
+			        .toStdString());
+			trees.setColors(gasColor, starsColor, darkMatterColor);
 		}
-		trees.cleanUp();
-		trees.init(cosmoFilesGas[currentIndex].toStdString(),
-		           cosmoFilesStars[currentIndex].toStdString(),
-		           cosmoFilesDM[currentIndex].toStdString());
-		trees.setColors(gasColor, starsColor, darkMatterColor);
 	}
 
 	trees.update(camera, model, campos);

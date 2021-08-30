@@ -45,14 +45,19 @@ class CosmologicalSimulation : public UniverseElement
 	                    ToneMappingModel const& tmm) override;
 	~CosmologicalSimulation() = default;
 
+	// normalized from 0 to 1
+	static float& animationTime();
+
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
-  public:
+  private:
 	void init(std::string const& gasOctreePath,
 	          std::string const& starsOctreePath,
 	          std::string const& darkMatterOctreePath, QColor const& gasColor,
 	          QColor const& starsColor, QColor const& darkMatterColor);
+	static unsigned int getClosestId(std::map<unsigned int, QString> const& m,
+	                                 unsigned index);
 	TreeMethodLOD trees;
 
 	QMatrix4x4 model;
