@@ -52,6 +52,9 @@ class UniverseElement
 	double unit                   = 1.0;                    // in kpc
 	Vector3 solarsystemPosition   = Vector3(0.0, 0.0, 0.0); // in unit
 	ReferenceFrame referenceFrame = ReferenceFrame::EQUATORIAL;
+	QMatrix4x4 properRotation;
+
+	void setProperRotationFromCustomZAxis(QVector3D const& customZAxis);
 
 	static QMatrix4x4 const& equatorialToEcliptic();
 	static QMatrix4x4 const& galacticToEcliptic();

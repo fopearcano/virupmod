@@ -22,11 +22,33 @@ QMatrix4x4 UniverseElement::getRelToAbsTransform() const
 {
 	QMatrix4x4 relToAbsTransform;
 	relToAbsTransform.scale(unit);
-	relToAbsTransform.translate(-1.0 * Utils::toQt(solarsystemPosition));
+	relToAbsTransform.translate(properRotation.inverted()
+	                            * Utils::toQt(-1.0 * solarsystemPosition));
 	relToAbsTransform = transform(referenceFrame, ReferenceFrame::ECLIPTIC)
-	                    * relToAbsTransform;
+	                    * properRotation * relToAbsTransform;
 
 	return relToAbsTransform;
+}
+
+void UniverseElement::setProperRotationFromCustomZAxis(
+    QVector3D const& customZAxis)
+{
+	if(customZAxis == QVector3D())
+	{
+		return;
+	}
+
+	QVector3D customXAxis(1.f, 0.f, 0.f), customYAxis(0.f, 1.f, 0.f);
+
+	customYAxis
+	    = QVector3D::crossProduct(customZAxis.normalized(), customXAxis);
+	customXAxis
+	    = QVector3D::crossProduct(customYAxis, customZAxis.normalized());
+
+	properRotation.setColumn(0, QVector4D(customXAxis, 0.0));
+	properRotation.setColumn(1, QVector4D(customYAxis, 0.0));
+	properRotation.setColumn(2, QVector4D(customZAxis, 0.0));
+	properRotation.setColumn(3, QVector4D(0.0, 0.0, 0.0, 1.0));
 }
 
 QMatrix4x4 const& UniverseElement::equatorialToEcliptic()
@@ -142,6 +164,36 @@ QList<QPair<QString, QWidget*>>
 	}
 
 	result.append({QObject::tr("Solar System local position:"), w});
+
+	stored          = (*jsonObj)["customzaxis"].toObject();
+	w               = new QWidget(parent);
+	layout          = new QHBoxLayout(w);
+	sboxes          = {{nullptr, nullptr, nullptr}};
+	componentLabels = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};
+	i               = 0;
+	for(auto& sbox : sboxes)
+	{
+		sbox = new SciDoubleSpinBox(parent);
+	}
+	for(auto& sbox : sboxes)
+	{
+		QObject::connect(sbox,
+		                 static_cast<void (QDoubleSpinBox::*)(double)>(
+		                     &QDoubleSpinBox::valueChanged),
+		                 [jsonObj, sboxes](double) {
+			                 (*jsonObj)["customzaxis"]
+			                     = Vector3(sboxes[0]->value(),
+			                               sboxes[1]->value(),
+			                               sboxes[2]->value())
+			                           .getJSONRepresentation();
+		                 });
+		sbox->setValue(stored[i]);
+		layout->addWidget(new QLabel(componentLabels.at(i) + " :", parent));
+		layout->addWidget(sbox);
+		++i;
+	}
+
+	result.append({QObject::tr("Custom z-axis:"), w});
 
 	sbox = new SciDoubleSpinBox(parent);
 	QObject::connect(sbox,

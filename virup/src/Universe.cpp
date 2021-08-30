@@ -88,6 +88,8 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 		}
 		newElem->solarsystemPosition
 		    = Vector3(entryObj["solarsyslocalpos"].toObject());
+		newElem->setProperRotationFromCustomZAxis(
+		    Utils::toQt(Vector3(entryObj["customzaxis"].toObject())));
 		newElem->brightnessMultiplier = entryObj["brightnessmul"].toDouble(1.0);
 		updateBoundingBox(newElem->getBoundingBox());
 		elements[entryObj["name"].toString()] = newElem;
