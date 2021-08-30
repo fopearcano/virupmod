@@ -26,6 +26,12 @@ int& OctreeLOD::forceQuality()
 	return forceQuality;
 }
 
+float& OctreeLOD::minTanAngleLimit()
+{
+	static float minTanAngleLimit(0.05f);
+	return minTanAngleLimit;
+}
+
 float& OctreeLOD::tanAngleLimit()
 {
 	static float tanAngleLimit(1.2f);
@@ -50,6 +56,7 @@ QElapsedTimer& OctreeLOD::timer()
 OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram)
     : shaderProgram(&shaderProgram)
 {
+	minTanAngleLimit() = QSettings().value("misc/mintanangle").toDouble();
 }
 
 OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram,
@@ -144,6 +151,7 @@ void OctreeLOD::unload()
 		usedMem() -= dataSize * sizeof(float);
 		dataSize = 0;
 		delete mesh;
+		mesh = nullptr;
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
@@ -232,8 +240,7 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 				recurse = true;
 			}
 		}
-		else if(forceMaxQuality()
-		        || currentTanAngle(globalCampos) > tanAngleLimit())
+		else if(currentTanAngle(globalCampos) > tanAngleLimit())
 		{
 			recurse = true;
 		}
@@ -466,6 +473,13 @@ OctreeLOD::~OctreeLOD()
 
 void OctreeLOD::updateTanAngleLimit(Camera const& camera)
 {
+	if(forceMaxQuality())
+	{
+		tanAngleLimit() = minTanAngleLimit(); // for dome min 0.2f comfortable
+		                                      // 0.4f | 2D : 0.05
+		return;
+	}
+
 	if(!timerStarted())
 	{
 		timer().start();
@@ -507,7 +521,8 @@ void OctreeLOD::updateTanAngleLimit(Camera const& camera)
 	coeff = coeff > 1.f / 90.f ? 1.f / 90.f : coeff;
 	tanAngleLimit() += coeff;
 	tanAngleLimit() = tanAngleLimit() > 1.2f ? 1.2f : tanAngleLimit();
-	tanAngleLimit() = tanAngleLimit() < 0.05f ? 0.05f : tanAngleLimit();
+	tanAngleLimit() = tanAngleLimit() < minTanAngleLimit() ? minTanAngleLimit()
+	                                                       : tanAngleLimit();
 
 	// if something very bad happened regarding last frame rendering
 	if(timer().restart() > 200)

@@ -90,6 +90,7 @@ class OctreeLOD : public Octree
 	/* LOD DETERMINATION */
 
 	// struct timeval t0;
+	static float& minTanAngleLimit();
 	static float& tanAngleLimit();
 	// PIDController ctrl;
 
