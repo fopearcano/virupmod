@@ -63,12 +63,13 @@ DataListWidget::DataListWidget()
 {
 	entries << tr("Cosmological Labels") << tr("CSV Stars")
 	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
-	        << tr("Textured Sphere");
+	        << tr("Textured Sphere") << tr("Credits");
 	entriesIds << "cosmolabels"
 	           << "csvstars"
 	           << "csvgalaxies"
 	           << "cosmosim"
-	           << "texsphere";
+	           << "texsphere"
+	           << "credits";
 
 	loadMainLayout();
 }
@@ -369,6 +370,10 @@ void DataDialog::setType(QString const& type)
 	if(type == "texsphere")
 	{
 		fields = TexturedSphere::getLauncherFields(specialized, &result);
+	}
+	if(type == "credits")
+	{
+		fields = Credits::getLauncherFields(specialized, &result);
 	}
 	for(auto const& pair : fields)
 	{

@@ -60,6 +60,10 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 		{
 			newElem = new TexturedSphere(entryObj);
 		}
+		else if(entryObj["type"] == "credits")
+		{
+			newElem = new Credits(entryObj);
+		}
 		else
 		{
 			qWarning()

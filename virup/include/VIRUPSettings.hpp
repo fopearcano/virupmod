@@ -31,6 +31,7 @@
 #include "CSVObjects.hpp"
 #include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
+#include "Credits.hpp"
 #include "SettingsWidget.hpp"
 #include "TexturedSphere.hpp"
 #include "UniverseElement.hpp"

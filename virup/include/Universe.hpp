@@ -26,6 +26,7 @@
 #include "CSVObjects.hpp"
 #include "CosmologicalLabels.hpp"
 #include "CosmologicalSimulation.hpp"
+#include "Credits.hpp"
 #include "PlanetarySystems.hpp"
 #include "TexturedSphere.hpp"
 
