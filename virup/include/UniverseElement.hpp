@@ -47,7 +47,7 @@ class UniverseElement
 	virtual ~UniverseElement() = default;
 
 	float brightnessMultiplier = 1.f;
-	float visibility           = 1.f;
+	float visibility           = 0.f;
 
 	double unit                   = 1.0;                    // in kpc
 	Vector3 solarsystemPosition   = Vector3(0.0, 0.0, 0.0); // in unit
