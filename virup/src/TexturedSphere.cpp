@@ -21,6 +21,7 @@
 TexturedSphere::TexturedSphere(QJsonObject const& json)
     : shader("texturedsphere")
     , tex(json["file"].toString().toLatin1().data())
+    , cullFrontFaces(json["cullfrontfaces"].toBool())
 {
 	Primitives::setAsUnitSphere(mesh, shader, 50, 50);
 }
@@ -35,7 +36,7 @@ void TexturedSphere::render(Camera const& camera,
 	shader.setUniform("exposure", visibility * brightnessMultiplier);
 
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
-	GLHandler::setBackfaceCulling(false);
+	GLHandler::setBackfaceCulling(cullFrontFaces, GL_FRONT);
 	GLHandler::useTextures({&tex});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
@@ -55,6 +56,15 @@ QList<QPair<QString, QWidget*>>
 	pathSelector->setPath((*jsonObj)["file"].toString());
 
 	result.append({QObject::tr("Texture Path:"), pathSelector});
+
+	auto cbox = new QCheckBox(parent);
+	QObject::connect(cbox, &QCheckBox::stateChanged, [jsonObj](int state) {
+		(*jsonObj)["cullfrontfaces"] = (state == Qt::Checked);
+	});
+	cbox->setCheckState((*jsonObj)["cullfrontfaces"].toBool() ? Qt::Checked
+	                                                          : Qt::Unchecked);
+
+	result.append({QObject::tr("Cull front faces :"), cbox});
 
 	return result;
 }

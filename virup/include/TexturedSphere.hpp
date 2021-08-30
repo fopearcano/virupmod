@@ -19,6 +19,8 @@
 #ifndef TEXTUREDSPHERE_HPP
 #define TEXTUREDSPHERE_HPP
 
+#include <QCheckBox>
+
 #include "Primitives.hpp"
 #include "UniverseElement.hpp"
 
@@ -37,6 +39,8 @@ class TexturedSphere : public UniverseElement
 	GLShaderProgram shader;
 	GLMesh mesh;
 	GLTexture tex;
+
+	bool cullFrontFaces = false;
 };
 
 #endif // TEXTUREDSPHERE_HPP
