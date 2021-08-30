@@ -62,11 +62,6 @@ class CSVObjects : public UniverseElement
 
 	CSVObjects(QJsonObject const& json, bool galaxies = false);
 	virtual BBox getBoundingBox() const override;
-	virtual void update(Camera const& /*camera*/) override
-	{
-		constellationsLabels = visibility;
-		constellationsAlpha  = visibility;
-	}
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
 	virtual ~CSVObjects();

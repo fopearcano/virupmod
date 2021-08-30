@@ -33,7 +33,7 @@ GLTexture*& CSVObjects::galTex()
 CSVObjects::CSVObjects(QJsonObject const& json, bool galaxies)
     : shader(galaxies ? "galaxies" : "stars")
     , galaxies(galaxies)
-    , conShader("default")
+    , conShader("constellations")
 {
 	if(!galaxies && QFile::exists(json["confile"].toString()))
 	{
@@ -243,6 +243,8 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 		conShader.setUniform("alpha", constellationsAlpha);
 		conShader.setUniform("exposure", tmm.exposure);
 		conShader.setUniform("dynamicrange", tmm.dynamicrange);
+		conShader.setUniform("camPos", Utils::toQt(camera.position));
+		conShader.setUniform("unit", float(unit));
 
 		GLHandler::setUpRender(conShader, model);
 		conMesh.render(PrimitiveType::LINE_STRIP);
@@ -254,6 +256,12 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 
 		if(constellationsLabels > 0.f)
 		{
+			float coeff(1.0 - 17.0 * camera.position.length());
+			if(coeff < 0.f)
+			{
+				coeff = 0.f;
+			}
+			coeff = pow(coeff, 0.5f);
 			for(auto conLabel : conLabels)
 			{
 				Vector3 pos(conLabel.first);
@@ -274,7 +282,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 				model2.scale(rescale * camRelPos.length() / 3.0);
 				conLabel.second->updateModel(model * model2);
 
-				conLabel.second->setAlpha(constellationsLabels);
+				conLabel.second->setAlpha(constellationsLabels * coeff);
 				conLabel.second->render(tmm.exposure, tmm.dynamicrange);
 			}
 		}
