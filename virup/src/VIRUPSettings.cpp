@@ -57,6 +57,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addUIntSetting("atmoquality", 6, tr("Atmosphere rendering quality"), 1, 5);
 	addUIntSetting("maxlightcasters", 2,
 	               tr("Maximum number of light casters per object"), 1, 2);
+	addFilePathSetting("customfont", "", tr("Custom font file"));
 
 	setCurrentIndex(0);
 }
