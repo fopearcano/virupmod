@@ -41,6 +41,8 @@ void main()
 
 	// in unit
 	float camdist     = length(position - campos);
+	float coeff = pow(clamp(camdist, 0.0, 1.0), 10.0);
+
 	float apparentmag = absmag + 5.0 * (log10(camdist) - 1.0);
 	// lux
 	// Derivation from http://stjarnhimlen.se/comp/radfaq.html#7 :
@@ -49,7 +51,7 @@ void main()
 	// magnitude by definition of magnitude (multiply by 100 each five
 	// magnitudes)
 	// solve 2.54E-6 = pow(10.0, 0.4*b) => b ~= -14.0
-	float illuminance = pow(10.0, 0.4 * (-apparentmag - 14.0));
+	float illuminance = coeff*pow(10.0, 0.4 * (-apparentmag - 14.0));
 	// lux/sr
 	float luminance = brightnessMultiplier * illuminance / pixelSolidAngle;
 
