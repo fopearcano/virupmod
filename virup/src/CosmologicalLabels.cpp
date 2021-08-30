@@ -39,7 +39,8 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 			Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
 			                fields[3].toDouble());
 
-			auto labelText = new LabelRenderer(label, QColor(255, 0, 0));
+			auto labelText
+			    = new LabelRenderer(label, QColor(json["color"].toString()));
 			cosmoLabels.emplace_back(dataPos, labelText);
 		}
 	}
@@ -87,6 +88,7 @@ void CosmologicalLabels::render(Camera const& /*camera*/,
 			{
 			    continue;
 			}*/
+			cosmoLabel.second->setAlpha(visibility);
 			cosmoLabel.second->render(tmm.exposure, tmm.dynamicrange);
 		}
 	}
@@ -112,6 +114,14 @@ QList<QPair<QString, QWidget*>>
 	pathSelector->setPath((*jsonObj)["file"].toString());
 
 	result.append({QObject::tr("File Path:"), pathSelector});
+
+	auto colorSelector = new ColorSelector(parent, QObject::tr("Color"));
+	QObject::connect(
+	    colorSelector, &ColorSelector::colorChanged,
+	    [jsonObj](QColor const& color) { (*jsonObj)["color"] = color.name(); });
+	colorSelector->setColor((*jsonObj)["color"].toString("#FF0000"));
+
+	result.append({QObject::tr("Color:"), colorSelector});
 
 	return result;
 }
