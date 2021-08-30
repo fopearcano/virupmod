@@ -96,15 +96,15 @@ class MainWin : public AbstractMainWin
 	/**
 	 * @brief Wether the orbits is enabled or not.
 	 *
-	 * @accessors orbitsEnabled(), setOrbitsEnabled()
+	 * @accessors renderOrbits(), setRenderOrbits()
 	 */
-	Q_PROPERTY(bool orbitsEnabled READ orbitsEnabled WRITE setOrbitsEnabled)
+	Q_PROPERTY(float renderOrbits READ renderOrbits WRITE setRenderOrbits)
 	/**
 	 * @brief Wether the labels is enabled or not.
 	 *
-	 * @accessors labelsEnabled(), setLabelsEnabled()
+	 * @accessors renderLabels(), setRenderLabels()
 	 */
-	Q_PROPERTY(bool labelsEnabled READ labelsEnabled WRITE setLabelsEnabled)
+	Q_PROPERTY(float renderLabels READ renderLabels WRITE setRenderLabels)
 	/**
 	 * @brief Wether the darkmatter is enabled or not.
 	 *
@@ -252,26 +252,26 @@ class MainWin : public AbstractMainWin
 	// CUBE
 
 	/**
-	 * @getter{orbitsEnabled}
+	 * @getter{renderOrbits}
 	 */
-	bool orbitsEnabled() const { return CelestialBodyRenderer::renderOrbits; };
+	float renderOrbits() const { return CelestialBodyRenderer::renderOrbits; };
 	/**
-	 * @setter{orbitsEnabled, orbitsEnabled}
+	 * @setter{renderOrbits, renderOrbits}
 	 */
-	void setOrbitsEnabled(bool enabled)
+	void setRenderOrbits(float render)
 	{
-		CelestialBodyRenderer::renderOrbits = enabled;
+		CelestialBodyRenderer::renderOrbits = render;
 	};
 	/**
-	 * @getter{labelsEnabled}
+	 * @getter{renderLabels}
 	 */
-	bool labelsEnabled() const { return CelestialBodyRenderer::renderLabels; };
+	float renderLabels() const { return CelestialBodyRenderer::renderLabels; };
 	/**
-	 * @setter{labelsEnabled, labelsEnabled}
+	 * @setter{renderLabels, renderLabels}
 	 */
-	void setLabelsEnabled(bool enabled)
+	void setRenderLabels(float render)
 	{
-		CelestialBodyRenderer::renderLabels = enabled;
+		CelestialBodyRenderer::renderLabels = render;
 	};
 	/**
 	 * @getter{darkmatterEnabled}
