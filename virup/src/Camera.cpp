@@ -128,6 +128,10 @@ Vector3 Camera::getTruePosition() const
 bool Camera::shouldBeCulled(BBox const& bbox, QMatrix4x4 const& model,
                             bool depthClamp) const
 {
+	if(currentProjection != MainRenderTarget::Projection::DEFAULT)
+	{
+		return false;
+	}
 	float negBoundingSphereRad(-bbox.diameter / 2.f);
 	QVector4D center(bbox.mid, 1.0);
 	center = model * center;

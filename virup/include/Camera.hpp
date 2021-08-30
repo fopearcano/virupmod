@@ -23,6 +23,7 @@
 
 #include "AbstractState.hpp"
 #include "BasicCamera.hpp"
+#include "MainRenderTarget.hpp"
 #include "graphics/Utils.hpp"
 #include "math/Vector3.hpp"
 
@@ -97,6 +98,9 @@ class Camera : public BasicCamera
 	float yaw   = 0.f;
 
 	float currentFrameTiming = 0;
+
+	MainRenderTarget::Projection currentProjection
+	    = MainRenderTarget::Projection::DEFAULT;
 
 	void readState(AbstractState const& s)
 	{
