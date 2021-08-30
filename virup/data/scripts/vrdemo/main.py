@@ -5,10 +5,14 @@ from PythonQt.QtCore import QDateTime
 from PythonQt.QtCore import QDate
 from PythonQt.QtCore import QTime
 from PythonQt.libplanet import Vector3
-from math import exp
-from math import log
+from math import exp, log, isnan, atan2, asin, cos, sin, pi
 
-
+def smoothstep(t, v0 = 0, v1 = 0):
+    if t < 0.0:
+        return 0.0
+    if t > 1.0:
+        return 1.00001
+    return (6*t**5 - 15*t**4 + 10*t**3 + 0.5*(v1-v0)*t**2 + v0*t) / (1.0 + 0.5*(v1+v0))
 
 class SpatialData:
     def __init__(self, cosmoPos, invscale, bodyName = '', systemName = '', planetPos = Vector3()):
@@ -24,23 +28,21 @@ class TemporalData:
         self.simulationTime = simulationTime
 
 class UI:
-    def __init__(self, sdsslum=0.0, gaialum=0.0, illustrislum=0.0, agoralum=0.0, hyg=0.0, exoplanets=0.0, constellations=0.0, orbits=0.0, labels=0.0, cmb=0.0):
-        self.sdsslum = sdsslum 
-        self.gaialum = gaialum 
-        self.illustrislum = illustrislum 
-        self.agoralum = agoralum
-        self.hyg=hyg
-        self.exoplanets = exoplanets
-        self.constellations = constellations
-        self.orbits = orbits
-        self.labels = labels
-        self.cmb = cmb
+    def __init__(self, lumsdic=[]):
+        self.lumsdic=lumsdic
+    def getLum(self, name):
+        if name in self.lumsdic.keys():
+            return self.lumsdic[name]
+        return 0.0
 
 class Scene:
-    def __init__(self, spatialData, temporalData = TemporalData(), ui = UI()):
+    def __init__(self, spatialData, temporalData = TemporalData(), ui = UI(), transitiontimeto=10.0, name="", custom=lambda *args: None):
         self.spatialData = spatialData
         self.temporalData = temporalData
         self.ui = ui
+        self.name = name
+        self.transitiontimeto = transitiontimeto
+        self.custom = custom
 
 
 # interpolate functions between 0 and 1 with continuous parameter t from 0 to 1
@@ -150,18 +152,15 @@ def interpolateTemporalData(t0, t1, t):
     )
 
 def interpolateUI(ui0, ui1, t):
-    return UI(
-        interpolateLinear(ui0.sdsslum, ui1.sdsslum, t),
-        interpolateLinear(ui0.gaialum, ui1.gaialum, t),
-        interpolateLinear(ui0.illustrislum, ui1.illustrislum, t),
-        interpolateLinear(ui0.agoralum, ui1.agoralum, t),
-        interpolateLinear(ui0.hyg, ui1.hyg, t),
-        interpolateLinear(ui0.exoplanets, ui1.exoplanets, t),
-        interpolateLinear(ui0.constellations, ui1.constellations, t),
-        interpolateLinear(ui0.orbits, ui1.orbits, t),
-        interpolateLinear(ui0.labels, ui1.labels, t),
-        interpolateLinear(ui0.cmb, ui1.cmb, t)
-    )
+    dic={}
+    for label in Universe.getUniverseElementsNames():
+        dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
+
+    additional=["Exoplanets", "Constellations", "Orbits", "PlanetsLabels", "Debris", "AnimationTime"]
+    for label in additional:
+        dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
+
+    return UI(dic)
 
 def interpolateScene(sc0, sc1, t):
     simTime0=interpolateDateTime(sc0.temporalData.simulationTime, sc1.temporalData.simulationTime, 0.25)
@@ -178,83 +177,93 @@ solareclipsedt = QDateTime(QDate(2021, 6, 16), QTime(11, 20, 00))
 scenes = [
     # International Space Station Real scale
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
-    # International Space Station
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 100, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
-    # Earth-Moon dynamics
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0})),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 30.0),
+    # Earth
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
-          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
-    # Earth-Moon dynamics
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 350000000, 'Earth', 'Solar System'),
-          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
+    # Moon
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4000000, 'Moon', 'Solar System'),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4000000, 'Moon', 'Solar System'),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Phobos
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
-          TemporalData(500.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
-    # Saturn moons dynamics
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 2000000000, 'Saturn', 'Solar System'),
-          TemporalData(100000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 1.0, 1.0)),
-    # Enceladus
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 3000000, 'Rhea',  'Solar System'),
-          TemporalData(1.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 0.0, 0.0, 0.0, 0.0)),
+          TemporalData(500.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
+          TemporalData(500.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Solar System dynamics Constellations
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
-          TemporalData(10000000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
-    # Kepler-11 dynamics
-    Scene(SpatialData(Vector3(0.20798, -0.209748, 0.537371), 1.65181e+11, 'Kepler-11', 'Kepler-11'),
-          TemporalData(10000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
-    # 51 Peg dynamics
-    Scene(SpatialData(Vector3(0.0132362, -0.00132559, 0.00625585), 1.65181e+10, '51 Peg', '51 Peg'),
-          TemporalData(10000.0), UI(0.0, 0.0, 0.0, 0.0, 10000.0, 1.0, 1.0, 1.0, 1.0)),
+          TemporalData(10000000.0), UI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 10.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
+          TemporalData(10000000.0), UI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 20.0),
     # Milky Way
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-           TemporalData(), UI(0.0, 0.0, 0.01, 1.0, 0.0, 0.1, 0.0, 0.0, 0.0)),
+          TemporalData(), UI({"IllustrisTNG":0.01, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 10.0),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
+          TemporalData(), UI({"IllustrisTNG":0.01, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 20.0),
+    # Local Group
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 3.04e+22),
+          TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 10.0),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 3.04e+22),
+          TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 20.0),
     # Illustris
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
-           TemporalData(), UI(0.0, 0.0, 1.0, 0.0, 0.0, 0.0)),
-    # SDSS close
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+25),
-           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)),
+          TemporalData(), UI({"IllustrisTNG":1.0})),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
+          TemporalData(), UI({"IllustrisTNG":1.0})),
     # SDSS distant
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 4.0e+26),
-           TemporalData(), UI(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
-    # Gaia In
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+13),
-          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
-    # Gaia Mid
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4.0e+19),
-          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
-    # Gaia Out
-    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1.7e+22),
-          TemporalData(10000000.0), UI(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)),
+          TemporalData(), UI({"SDSS":1.0})),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 4.0e+26),
+          TemporalData(), UI({"SDSS":1.0}))
 ]
+
+def getIdFromName(name):
+    global scenes
+
+    for i in range(len(scenes)):
+        if scenes[i].name == name:
+            return i
 
 id = 0
 disableanimations = False
 personheight=1.5
 ToneMappingModel.exposure=0.3
+shiftangle=0.0
+shiftvertangle=0.0
+fade_factor=1.0
 
 def getCosmoShift():
+    global shiftangle
+    global shiftvertangle
+    val=personheight*3.24078e-20 / VIRUP.scale
     try:
         VRHandler
     except NameError:
-        return Vector3(personheight*3.24078e-20 / VIRUP.scale, 0, 0.05 * personheight*3.24078e-20 / VIRUP.scale)
+        return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle) * val)
     else:
         if VRHandler.drivername != "OpenVR":
-            return Vector3(personheight*3.24078e-20 / VIRUP.scale, 0, 0.05 * personheight*3.24078e-20 / VIRUP.scale)
+            return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle)*0.05 * val)
         else:
-            return Vector3(0, 0, -personheight*3.24078e-20 / VIRUP.scale)
+            return Vector3(0, 0, -val)
 
 def getPlanetShift():
+    global shiftangle
+    global shiftvertangle
+    val=personheight / VIRUP.scale
     try:
         VRHandler
     except NameError:
-        return Vector3(personheight / VIRUP.scale, 0, 0.05 * personheight / VIRUP.scale)
+        return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle) * val)
     else:
         if VRHandler.drivername != "OpenVR":
-            return Vector3(personheight / VIRUP.scale, 0, 0.05 * personheight / VIRUP.scale)
+            return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle)*0.05 * val)
         else:
-            return Vector3(0, 0, -personheight / VIRUP.scale)
+            return Vector3(0, 0, -val)
 
 def setSceneId(newid):
     global timer
@@ -263,6 +272,8 @@ def setSceneId(newid):
 
     oldid = id
     id = newid
+    if id not in range(len(scenes)):
+        return
     timer.restart()
     if disableanimations:
         currentscene = scenes[id]
@@ -326,23 +337,38 @@ def initScene():
     longanimation = False
     currentscene = None
 
+    totaltime=0
+    for scene in scenes:
+        totaltime += scene.transitiontimeto
+    print(totaltime / 60.0)
+    print(totaltime)
+
+
 def updateScene():
     global id
     global timer
     global longanimation
     global currentscene
+    global shiftangle
+    global shiftvertangle
+    global fade_factor
     if id not in range(len(scenes)) or not VIRUP.isServer:
         return
 
-    if longanimation:
-        t = timer.elapsed() / 15000.0
-    else:
-        t = timer.elapsed() / 10000.0
+    t_harsh = timer.elapsed() / ((scenes[id].transitiontimeto) * 1000.0)
+    t = t_harsh
+    nextid = -1
     if t <= 1.0 and t >= 0.0 and currentscene != None:
         scene=interpolateScene(currentscene, scenes[id], t)
     else:
         timer.invalidate()
-        scene=scenes[id]
+        t_harsh = 1.0
+        t = 1.0
+        if currentscene != None:
+            scene=interpolateScene(currentscene, scenes[id], 1.0)
+        else:
+            scene=scenes[id]
+        nextid = id+1
 
     spatialData = scene.spatialData
     VIRUP.scale = spatialData.scale
@@ -351,9 +377,9 @@ def updateScene():
 
     if spatialData.bodyName != '' and VIRUP.planetarySystemLoaded:
         VIRUP.planetTarget = spatialData.bodyName
-        VIRUP.planetPosition = spatialData.planetPos + getPlanetShift()
+        VIRUP.planetPosition = spatialData.planetPos
     else:
-        VIRUP.cosmoPosition = spatialData.cosmoPos + getCosmoShift()
+        VIRUP.cosmoPosition = spatialData.cosmoPos
 
     temporalData = scene.temporalData
     VIRUP.timeCoeff = temporalData.timeCoeff
@@ -362,37 +388,37 @@ def updateScene():
             VIRUP.simulationTime = temporalData.simulationTime
 
     ui = scene.ui
-    Universe.setVisibility("SDSS", ui.sdsslum)
-    Universe.setVisibility("Gaia", ui.gaialum)
-    Universe.setVisibility("Volumetric AGORA", ui.agoralum)
-    p = 1
-    if id == 5:
-        p = 15
-    Universe.setVisibility("IllustrisTNG", ui.illustrislum**p)
-    """
-    Universe.setVisibility("IllustrisTNG 0", ui.illustrislum**p)
-    Universe.setVisibility("IllustrisTNG 1", ui.illustrislum**p)
-    Universe.setVisibility("IllustrisTNG 2", ui.illustrislum**p)
-    Universe.setVisibility("IllustrisTNG 3", ui.illustrislum**p)
-    Universe.setVisibility("IllustrisTNG 4", ui.illustrislum**p)
-    Universe.setVisibility("IllustrisTNG 5", ui.illustrislum**p)
-    """
-    Universe.setVisibility("Hipparcos", ui.hyg)
-    Universe.setVisibility("Exoplanets", ui.exoplanets)
-    Universe.setVisibility("Constellations", ui.constellations)
-    Universe.setVisibility("CMB", ui.cmb)
-    if ui.orbits > 0.5:
-        VIRUP.orbitsEnabled = 1.0
-    else:
-        VIRUP.orbitsEnabled = 0.0
-    if ui.labels > 0.5:
-        VIRUP.labelsEnabled = 1.0
-    else:
-        VIRUP.labelsEnabled = 0.0
-    VIRUP.darkmatterEnabled = True
+    for label in Universe.getUniverseElementsNames():
+        if fade_factor != 0.0:
+            if ToneMappingModel.exposure != 0.0:
+                Universe.setVisibility(label, ui.getLum(label) * 0.3 * fade_factor / ToneMappingModel.exposure)
+            else:
+                Universe.setVisibility(label, ui.getLum(label) * fade_factor)
 
-    if id >= 14:
-        Universe.setVisibility("Labels", 1.0);
-    else:
-        Universe.setVisibility("Labels", 0.0);
+    additional=["Exoplanets", "Constellations", "Orbits", "PlanetsLabels"]
+    for label in additional:
+        Universe.setVisibility(label, ui.getLum(label))
 
+    ToneMappingModel.exposure = 0.3
+    fade_factor = 1.0
+    Universe.setLabelsOrbitsOnly([])
+
+    animationtime=ui.getLum("AnimationTime")
+    Universe.setAnimationTime(animationtime)
+
+    VIRUP.camYaw = shiftangle
+    VIRUP.camPitch = -shiftvertangle
+    shiftangle = 0.0
+    shiftvertangle = 0.05
+
+    # apply custom function
+    scenes[id].custom(t, t_harsh)
+    ToneMappingModel.exposure *= fade_factor
+
+    if nextid != -1 and nextid < len(scenes):
+        setSceneId(nextid)
+
+    if spatialData.bodyName != '' and VIRUP.planetarySystemLoaded:
+        VIRUP.planetPosition += getPlanetShift()
+    else:
+        VIRUP.cosmoPosition += getCosmoShift()

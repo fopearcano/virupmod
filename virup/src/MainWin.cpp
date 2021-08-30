@@ -395,23 +395,14 @@ void MainWin::initScene()
 
 		layout->addWidget(new QLabel("Scenes :"));
 
-		QStringList scenes = {"0:International Space Station 1:1",
-		                      "1:International Space Station 100:1",
-		                      "2:Earth close-up",
-		                      "3:Earth-Moon System",
+		QStringList scenes = {"0:International Space Station",
+		                      "2:Earth",
+		                      "3:Moon",
 		                      "4:Phobos",
-		                      "5:Saturn Moons",
-		                      "6:Rhea",
 		                      "7:Solar System",
-		                      "8:Kepler-11",
-		                      "9:51 Peg",
 		                      "AGORA",
 		                      "IllustrisTNG",
-		                      "SDSS close",
-		                      "SDSS distant",
-		                      "Gaia In",
-		                      "Gaia Mid",
-		                      "Gaia out"};
+		                      "SDSS"};
 		for(int i(0); i < scenes.size(); ++i)
 		{
 			auto button = new QPushButton(scenes[i]);
