@@ -247,6 +247,22 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	}
 }
 
+void TreeMethodLOD::unload()
+{
+	if(gasTree != nullptr)
+	{
+		gasTree->unload();
+	}
+	if(starsTree != nullptr)
+	{
+		starsTree->unload();
+	}
+	if(darkMatterTree != nullptr)
+	{
+		darkMatterTree->unload();
+	}
+}
+
 void TreeMethodLOD::cleanUp()
 {
 	delete dustModel;
