@@ -116,7 +116,25 @@ class Universe : public QObject
 	QString planetarySystemName = "";
 
   public slots:
+	Vector3 getCameraCurrentRelPosToBody(QString const& bodyName) const;
+	void setAnimationTime(float t)
+	{
+		CosmologicalSimulation::animationTime() = t;
+	}
+	QStringList getUniverseElementsNames() const
+	{
+		QStringList result;
+		for(auto pair : elements)
+		{
+			result << pair.first;
+		}
+		return result;
+	}
+	double getVisibility(QString const& name) const;
 	void setVisibility(QString const& name, double visibility);
+	Vector3 getSolarSystemPosition(QString const& name) const;
+	void setSolarSystemPosition(QString const& name, Vector3 const& pos);
+	void setLabelsOrbitsOnly(QStringList const& nameList);
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);
@@ -140,6 +158,7 @@ class Universe : public QObject
 	Vector3 lastData                      = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
 	Vector3 sysInWorld                    = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
 	bool forceUpdateFromCosmo             = true;
+	UniversalTime lastCurrentUt;
 };
 
 #endif // UNIVERSE_HPP

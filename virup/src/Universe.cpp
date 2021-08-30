@@ -244,6 +244,48 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 	          * t);
 }
 
+Vector3 Universe::getCameraCurrentRelPosToBody(QString const& bodyName) const
+{
+	Orbitable const* orb(nullptr);
+
+	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
+	for(auto ptr : ptrs)
+	{
+		if(QString(ptr->getName().c_str()) == bodyName)
+		{
+			orb = ptr;
+		}
+	}
+	if(orb == nullptr)
+	{
+		return {};
+	}
+	return camPlanet.getRelativePositionTo(orb, lastCurrentUt);
+}
+
+double Universe::getVisibility(QString const& name) const
+{
+	if(name == "Exoplanets")
+	{
+		return planetSystems->visibility;
+	}
+	if(name == "Constellations")
+	{
+		for(auto csv : csvObjs)
+		{
+			return csv->constellationsAlpha;
+		}
+	}
+
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return 0.0;
+	}
+
+	return elements.at(name)->visibility;
+}
+
 void Universe::setVisibility(QString const& name, double visibility)
 {
 	if(name == "Exoplanets")
@@ -260,8 +302,62 @@ void Universe::setVisibility(QString const& name, double visibility)
 		}
 		return;
 	}
+	if(name == "Orbits")
+	{
+		CelestialBodyRenderer::renderOrbits = visibility;
+		return;
+	}
+	if(name == "PlanetsLabels")
+	{
+		CelestialBodyRenderer::renderLabels = visibility;
+		return;
+	}
+
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return;
+	}
 
 	elements[name]->visibility = visibility;
+}
+
+Vector3 Universe::getSolarSystemPosition(QString const& name) const
+{
+	if(name == "Exoplanets")
+	{
+		return planetSystems->solarsystemPosition;
+	}
+
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return {};
+	}
+
+	return elements.at(name)->solarsystemPosition;
+}
+
+void Universe::setSolarSystemPosition(QString const& name, Vector3 const& pos)
+{
+	if(name == "Exoplanets")
+	{
+		planetSystems->solarsystemPosition = pos;
+		return;
+	}
+
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return;
+	}
+
+	elements[name]->solarsystemPosition = pos;
+}
+
+void Universe::setLabelsOrbitsOnly(QStringList const& nameList)
+{
+	CelestialBodyRenderer::renderLabelsOrbitsOnly = nameList;
 }
 
 void Universe::updateCosmo(Camera const& cam)
@@ -283,6 +379,7 @@ void Universe::updateCosmo(Camera const& cam)
 void Universe::updatePlanetarySystem(Camera const& cam,
                                      UniversalTime const& currentUt)
 {
+	lastCurrentUt = currentUt;
 	if(!planetSystems->renderSystem())
 	{
 		return;
