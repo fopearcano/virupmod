@@ -6,14 +6,14 @@ IF NOT EXIST openvr\ (
 	cd openvr
 	mkdir openvr
 	cd openvr
-	appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/176b58f6ccaaae3e9d14efaf612c50b72ec5da76/headers/openvr.h -FileName openvr.h
+	appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/v1.12.5/headers/openvr.h -FileName openvr.h
 	cd ..
 	IF "%BUILD_TYPE%" == "64bit" (
-		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/176b58f6ccaaae3e9d14efaf612c50b72ec5da76/lib/win64/openvr_api.lib -FileName openvr_api.lib
-		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/176b58f6ccaaae3e9d14efaf612c50b72ec5da76/bin/win64/openvr_api.dll -FileName openvr_api.dll
+		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/v1.12.5/lib/win64/openvr_api.lib -FileName openvr_api.lib
+		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/v1.12.5/bin/win64/openvr_api.dll -FileName openvr_api.dll
 	) ELSE (
-		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/176b58f6ccaaae3e9d14efaf612c50b72ec5da76/lib/win32/openvr_api.lib -FileName openvr_api.lib
-		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/176b58f6ccaaae3e9d14efaf612c50b72ec5da76/bin/win32/openvr_api.dll -FileName openvr_api.dll
+		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/v1.12.5/lib/win32/openvr_api.lib -FileName openvr_api.lib
+		appveyor DownloadFile https://raw.githubusercontent.com/ValveSoftware/openvr/v1.12.5/bin/win32/openvr_api.dll -FileName openvr_api.dll
 	)
 	echo "OpenVR installed..."
 	cd ..

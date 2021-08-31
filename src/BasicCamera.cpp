@@ -218,14 +218,19 @@ QMatrix4x4 BasicCamera::screenToWorldTransform() const
 	return view.inverted() * proj.inverted();
 }
 
-float BasicCamera::pixelSolidAngle() const
+float BasicCamera::pixelVertFOV() const
 {
 	QMatrix4x4 p(vrHandler.isEnabled()
 	                 ? vrHandler.getProjectionMatrix(
 	                       Side::LEFT, 0.1f * eyeDistanceFactor,
 	                       10000.f * eyeDistanceFactor)
 	                 : proj);
-	double radPerPix = atan(1.0f / p.column(1)[1]) * 2.0 / windowSize.height();
+	return atan(1.0f / p.column(1)[1]) * 2.0 / windowSize.height();
+}
+
+float BasicCamera::pixelSolidAngle() const
+{
+	float radPerPix(pixelVertFOV());
 	// https://en.wikipedia.org/wiki/Solid_angle#Pyramid
 	return 4.0 * asin(sin(radPerPix / 2.0) * sin(radPerPix / 2.0));
 }

@@ -118,6 +118,13 @@ class BasicCamera : public QObject
 	 */
 	Q_PROPERTY(QMatrix4x4 screentoworldtransform READ screenToWorldTransform)
 	/**
+	 * @brief Knowing the FOV of the camera, computes the vertical FOV of one
+	 * pixel in radians.
+	 *
+	 * @accessors pixelVertFOV()
+	 */
+	Q_PROPERTY(float pixelVertFOV READ pixelVertFOV)
+	/**
 	 * @brief Knowing the FOV of the camera, computes the solid angle of one
 	 * pixel in steradians.
 	 *
@@ -224,6 +231,10 @@ class BasicCamera : public QObject
 	 * @getter{screentoworldtransform}
 	 */
 	QMatrix4x4 screenToWorldTransform() const;
+	/**
+	 * @getter{pixelVertFOV}
+	 */
+	float pixelVertFOV() const;
 	/**
 	 * @getter{pixelSolidAngle}
 	 */
