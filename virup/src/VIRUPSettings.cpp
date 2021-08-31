@@ -28,17 +28,11 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	                   tr("Start time (UTC)"));
 	addBoolSetting("lockedrealtime", false, tr("Lock to Real Time"));
 
-	addDirPathSetting(
-	    "solarsystemdir",
-	    QFileInfo(QSettings().fileName()).absoluteDir().absolutePath()
-	        + "/systems/",
-	    tr("Solar System Root Directory"));
+	addDirPathSetting("solarsystemdir", "solarsystem/systems/Solar System/",
+	                  tr("Solar System Root Directory"));
 
-	addDirPathSetting(
-	    "planetsystemdir",
-	    QFileInfo(QSettings().fileName()).absoluteDir().absolutePath()
-	        + "/systems/",
-	    tr("Exoplanetary Systems Root Directory"));
+	addDirPathSetting("planetsystemdir", "exoplanets/systems",
+	                  tr("Exoplanetary Systems Root Directory"));
 
 	insertGroup("misc", tr("Miscellaneous"), 3);
 	addBoolSetting("showgrid", false, tr("Show Grid"));
@@ -82,11 +76,11 @@ void DataListWidget::loadMainLayout()
 	layout = new QVBoxLayout(this);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-	auto w            = new QWidget(this);
-	auto l            = new QHBoxLayout(w);
-	auto label        = new QLabel(tr("Root directory :"));
-	auto pathSelector = new PathSelector(this, tr("Data root directory"),
-	                                     PathSelector::Type::DIRECTORY);
+	auto w       = new QWidget(this);
+	auto l       = new QHBoxLayout(w);
+	auto label   = new QLabel(tr("Root directory :"));
+	pathSelector = new PathSelector(this, tr("Data root directory"),
+	                                PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
 	connect(pathSelector, &PathSelector::pathChanged, this,
 	        [](QString const& t) {
@@ -284,6 +278,7 @@ void DataListWidget::importJson()
 	saveJsonRepresentation();
 	delete layout;
 	loadMainLayout();
+	pathSelector->setPath(QFileInfo(in).absoluteDir().absolutePath());
 }
 
 DataDialog::DataDialog(QStringList const& entries,

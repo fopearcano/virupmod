@@ -64,6 +64,7 @@ class DataListWidget : public QScrollArea
 
 	QStringList entries;
 	QStringList entriesIds;
+	PathSelector* pathSelector;
 };
 
 class DataDialog : public QDialog
