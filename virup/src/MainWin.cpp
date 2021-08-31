@@ -395,14 +395,22 @@ void MainWin::initScene()
 
 		layout->addWidget(new QLabel("Scenes :"));
 
-		QStringList scenes = {"0:International Space Station",
-		                      "2:Earth",
-		                      "3:Moon",
-		                      "4:Phobos",
-		                      "7:Solar System",
-		                      "AGORA",
-		                      "IllustrisTNG",
-		                      "SDSS"};
+		QStringList scenes = {"0:International Space Station begin",
+		                      "1:International Space Station stay",
+		                      "2:Earth transition",
+		                      "3:Earth stay",
+		                      "4:Moon transition",
+		                      "5:Moon stay",
+		                      "6:Phobos transition",
+		                      "7:Phobos Stay",
+		                      "8:Solar System transition",
+		                      "9:Solar System stay",
+		                      "AGORA transition",
+		                      "AGORA stay",
+		                      "IllustrisTNG transition",
+		                      "IllustrisTNG stay",
+		                      "SDSS transition",
+		                      "SDSS stay"};
 		for(int i(0); i < scenes.size(); ++i)
 		{
 			auto button = new QPushButton(scenes[i]);
