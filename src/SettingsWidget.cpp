@@ -54,8 +54,8 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addUIntSetting("antialiasing", 0, tr("Anti-aliasing"), 0, 3);
 	addUIntSetting("shadowsquality", 1, tr("Shadows Quality"), 1, 5);
 	addUIntSetting("smoothshadows", 0, tr("Shadow Smoothing Quality"), 0, 5);
-	addBoolSetting("dithering", true, tr("Enable Dithering"));
-	addBoolSetting("bloom", true, tr("Bloom"));
+	addBoolSetting("dithering", false, tr("Enable Dithering"));
+	addBoolSetting("bloom", false, tr("Bloom"));
 	addDoubleSetting("vfov", 0.0, tr("Vertical field of view (0=auto)"), 0.0,
 	                 360.0);
 	addDoubleSetting("hfov", 0.0, tr("Horizontal field of view (0=auto)"), 0.0,
@@ -107,12 +107,21 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	                 tr("Vertical angle shift compared to server (degrees)"),
 	                 -180.0, 180.0);
 
+	QString scriptsDir("./data/" + QString(PROJECT_DIRECTORY) + "/scripts/");
+	QDirIterator it(scriptsDir, QStringList() << "main.py", QDir::Files,
+	                QDirIterator::Subdirectories);
+	QStringList dirList;
+	while(it.hasNext())
+	{
+		QString path(it.next());
+		path.replace(scriptsDir, "");
+		path.replace("/main.py", "");
+		dirList << path;
+	}
+	dirList.sort();
 	addGroup("scripting", tr("Scripting"));
-	addDirPathSetting(
-	    "rootdir",
-	    QFileInfo(settings.fileName()).absoluteDir().absolutePath()
-	        + "/scripts",
-	    tr("Scripts Root Directory"));
+	addStringAmongListSetting("rootdir", dirList, dirList,
+	                          tr("Scripts Root Directory"));
 
 	addGroup("debugcamera", tr("Debug Camera"));
 	addBoolSetting("enabled", false, tr("Enable Debug Camera"));
