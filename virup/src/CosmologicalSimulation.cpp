@@ -62,11 +62,14 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	QRegularExpression rxNumber("[0-9]+");
 	QString dirPathGas = gasOctreePath.c_str();
 	QDir gasDir(dirPathGas);
-	for(auto const& path :
-	    gasDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+	if(!gasOctreePath.empty())
 	{
-		unsigned int index(rxNumber.match(path).captured().toInt());
-		cosmoFilesGas[index] = dirPathGas + "/" + path;
+		for(auto const& path :
+		    gasDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+		{
+			unsigned int index(rxNumber.match(path).captured().toInt());
+			cosmoFilesGas[index] = dirPathGas + "/" + path;
+		}
 	}
 
 	QString dirPathStars = starsOctreePath.c_str();
@@ -80,11 +83,14 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 
 	QString dirPathDM = darkMatterOctreePath.c_str();
 	QDir dmDir(dirPathDM);
-	for(auto const& path :
-	    dmDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+	if(!darkMatterOctreePath.empty())
 	{
-		unsigned int index(rxNumber.match(path).captured().toInt());
-		cosmoFilesDM[index] = dirPathDM + "/" + path;
+		for(auto const& path :
+		    dmDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
+		{
+			unsigned int index(rxNumber.match(path).captured().toInt());
+			cosmoFilesDM[index] = dirPathDM + "/" + path;
+		}
 	}
 
 	if(cosmoFilesGas.empty())
