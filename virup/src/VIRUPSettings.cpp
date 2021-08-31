@@ -82,7 +82,21 @@ void DataListWidget::loadMainLayout()
 	layout = new QVBoxLayout(this);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-	auto w = new QWidget(this);
+	auto w            = new QWidget(this);
+	auto l            = new QHBoxLayout(w);
+	auto label        = new QLabel(tr("Root directory :"));
+	auto pathSelector = new PathSelector(this, tr("Data root directory"),
+	                                     PathSelector::Type::DIRECTORY);
+	pathSelector->setPath(QSettings().value("data/rootdir").toString());
+	connect(pathSelector, &PathSelector::pathChanged, this,
+	        [](QString const& t) {
+		        QSettings().setValue("data/rootdir", t + '/');
+	        });
+	l->addWidget(label);
+	l->addWidget(pathSelector);
+	layout->addWidget(w);
+
+	w = new QWidget(this);
 	w->resize(size());
 	loadJsonRepresentation();
 

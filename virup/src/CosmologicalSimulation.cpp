@@ -26,10 +26,16 @@ float& CosmologicalSimulation::animationTime()
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 {
-	init(json["gasfile"].toString().toStdString(),
-	     json["starsfile"].toString().toStdString(),
+	init((QSettings().value("data/rootdir").toString()
+	      + json["gasfile"].toString())
+	         .toStdString(),
+	     (QSettings().value("data/rootdir").toString()
+	      + json["starsfile"].toString())
+	         .toStdString(),
 	     json["loaddarkmatter"].toBool()
-	         ? json["darkmatterfile"].toString().toStdString()
+	         ? (QSettings().value("data/rootdir").toString()
+	            + json["darkmatterfile"].toString())
+	               .toStdString()
 	         : "",
 	     json["gascolor"].toString(), json["starscolor"].toString(),
 	     json["darkmattercolor"].toString());

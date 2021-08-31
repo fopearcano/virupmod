@@ -562,7 +562,8 @@ void AbstractMainWin::setupPythonScripts()
 {
 	setupPythonAPI();
 
-	QString mainScriptPath(QSettings().value("scripting/rootdir").toString()
+	QString mainScriptPath("./data/" + QString(PROJECT_DIRECTORY) + "/scripts/"
+	                       + QSettings().value("scripting/rootdir").toString()
 	                       + "/main.py");
 	if(QFile(mainScriptPath).exists())
 	{

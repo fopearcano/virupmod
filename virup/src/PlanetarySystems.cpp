@@ -22,7 +22,8 @@ PlanetarySystems::PlanetarySystems()
     : shader("default")
 {
 	QString planetsystemdir(
-	    QSettings().value("simulation/planetsystemdir").toString());
+	    QSettings().value("data/rootdir").toString()
+	    + QSettings().value("simulation/planetsystemdir").toString());
 
 	QStringList files;
 	QDirIterator it(planetsystemdir, QStringList() << "*.json", QDir::Files,
@@ -64,7 +65,8 @@ PlanetarySystems::PlanetarySystems()
 		}
 	}
 	QString solarsystemjson(
-	    QSettings().value("simulation/solarsystemdir").toString()
+	    QSettings().value("data/rootdir").toString()
+	    + QSettings().value("simulation/solarsystemdir").toString()
 	    + "/definition.json");
 	QFile jsonFile(solarsystemjson);
 	if(jsonFile.exists())

@@ -35,14 +35,21 @@ CSVObjects::CSVObjects(QJsonObject const& json, bool galaxies)
     , galaxies(galaxies)
     , conShader("constellations")
 {
-	if(!galaxies && QFile::exists(json["confile"].toString()))
+	if(!galaxies
+	   && QFile::exists(QSettings().value("data/rootdir").toString()
+	                    + json["confile"].toString()))
 	{
-		initWithConstellations(json["file"].toString(),
-		                       json["confile"].toString());
+		initWithConstellations(QSettings().value("data/rootdir").toString()
+		                           + json["file"].toString(),
+		                       QSettings().value("data/rootdir").toString()
+		                           + json["confile"].toString());
 	}
 	else
 	{
-		init(json["file"].toString(), json["atlasfile"].toString());
+		init(QSettings().value("data/rootdir").toString()
+		         + json["file"].toString(),
+		     QSettings().value("data/rootdir").toString()
+		         + json["atlasfile"].toString());
 	}
 }
 

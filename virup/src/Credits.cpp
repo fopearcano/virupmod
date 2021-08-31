@@ -20,7 +20,10 @@
 
 Credits::Credits(QJsonObject const& json)
     : shader("credits")
-    , tex(json["file"].toString().toLatin1().data())
+    , tex((QSettings().value("data/rootdir").toString()
+           + json["file"].toString())
+              .toLatin1()
+              .data())
     , texsFolder(json["file"].toString().toLatin1().data())
 {
 	Primitives::setAsUnitCube(mesh, shader);

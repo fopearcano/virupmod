@@ -30,7 +30,13 @@ class PathSelector : public QWidget
 {
 	Q_OBJECT
   public:
-	PathSelector(QWidget* parent, QString const& caption);
+	enum class Type
+	{
+		FILE,
+		DIRECTORY
+	};
+
+	PathSelector(QWidget* parent, QString const& caption, Type type = Type::FILE);
 
   signals:
 	void pathChanged(QString const& path);

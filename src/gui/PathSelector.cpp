@@ -18,7 +18,7 @@
 
 #include "gui/PathSelector.hpp"
 
-PathSelector::PathSelector(QWidget* parent, QString const& caption)
+PathSelector::PathSelector(QWidget* parent, QString const& caption, Type type)
     : QWidget(parent)
     , fileEdit(new QLineEdit(this))
 {
@@ -27,14 +27,18 @@ PathSelector::PathSelector(QWidget* parent, QString const& caption)
 
 	auto browsePb = new QPushButton(parent);
 	browsePb->setText("...");
-	QObject::connect(browsePb, &QPushButton::clicked, [this, caption](bool) {
-		QString result(
-		    QFileDialog::getOpenFileName(this, caption, fileEdit->text()));
-		if(result != "")
-		{
-			setPath(result);
-		}
-	});
+	QObject::connect(
+	    browsePb, &QPushButton::clicked, [this, caption, type](bool) {
+		    QString result(type == Type::FILE
+		                       ? QFileDialog::getOpenFileName(this, caption,
+		                                                      fileEdit->text())
+		                       : QFileDialog::getExistingDirectory(
+		                             this, caption, fileEdit->text()));
+		    if(result != "")
+		    {
+			    setPath(result);
+		    }
+	    });
 
 	auto layout = new QHBoxLayout(this);
 	layout->addWidget(fileEdit);

@@ -20,7 +20,10 @@
 
 TexturedSphere::TexturedSphere(QJsonObject const& json)
     : shader("texturedsphere")
-    , tex(json["file"].toString().toLatin1().data())
+    , tex((QSettings().value("data/rootdir").toString()
+           + json["file"].toString())
+              .toLatin1()
+              .data())
     , cullFrontFaces(json["cullfrontfaces"].toBool())
 {
 	Primitives::setAsUnitSphere(mesh, shader, 50, 50);

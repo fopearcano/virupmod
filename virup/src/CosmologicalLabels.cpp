@@ -20,7 +20,8 @@
 
 CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 {
-	QString path(json["file"].toString());
+	QString path(QSettings().value("data/rootdir").toString()
+	             + json["file"].toString());
 	visibility = 0.f;
 	QFile f(path);
 	if(!f.open(QFile::ReadOnly | QFile::Text))
