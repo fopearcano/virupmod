@@ -26,17 +26,25 @@ float& CosmologicalSimulation::animationTime()
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 {
-	init((QSettings().value("data/rootdir").toString()
-	      + json["gasfile"].toString())
-	         .toStdString(),
-	     (QSettings().value("data/rootdir").toString()
-	      + json["starsfile"].toString())
-	         .toStdString(),
-	     json["loaddarkmatter"].toBool()
-	         ? (QSettings().value("data/rootdir").toString()
-	            + json["darkmatterfile"].toString())
-	               .toStdString()
-	         : "",
+	QString rootdir(QSettings().value("data/rootdir").toString() + '/'),
+	    gasPath(json["gasfile"].toString()),
+	    starsPath(json["starsfile"].toString()),
+	    dmPath(json["darkmatterfile"].toString());
+	if(!gasPath.isEmpty())
+	{
+		gasPath = rootdir + gasPath;
+	}
+	if(!starsPath.isEmpty())
+	{
+		starsPath = rootdir + starsPath;
+	}
+	if(!dmPath.isEmpty())
+	{
+		dmPath = rootdir + dmPath;
+	}
+
+	init(gasPath.toStdString(), starsPath.toStdString(),
+	     json["loaddarkmatter"].toBool() ? dmPath.toStdString() : "",
 	     json["gascolor"].toString(), json["starscolor"].toString(),
 	     json["darkmattercolor"].toString());
 }
