@@ -6,7 +6,8 @@ The VIrtual Reality Universe Project uses astrophysical data to propose a virtua
 
 ## Documentation
 
-Documentation can be read here : [VIRUP Documentation](https://dexter9313.gitlab.io/virup/).
+Quick start instructions can be found here : [Quick start instructions](https://www.epfl.ch/labs/lastro/public-outreach/virup/documentation/).
+Code documentation can be found here : [Code documentation](https://dexter9313.gitlab.io/virup/).
 
 ## Releases
 
