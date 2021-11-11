@@ -116,6 +116,9 @@ void PlanetarySystems::update(Camera const& camera)
 	                                      : getRelToAbsTransform().inverted()
 	                                            * Utils::toQt(camera.position);
 
+	// only show Solar System
+	pos = QVector3D();
+
 	double dist(DBL_MAX);
 	unsigned int oldClosestId(closestId);
 	for(unsigned int i(0); i < positions.size(); ++i)

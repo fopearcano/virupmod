@@ -393,42 +393,60 @@ void MainWin::initScene()
 
 		auto layout = new QVBoxLayout(dialog);
 
+		auto w = new QWidget(dialog);
+		layout->addWidget(w);
+		auto hl = new QHBoxLayout(w);
+
+		auto b = new QPushButton(w);
+		b->setText(tr("RESTART"));
+		connect(b, &QPushButton::clicked, this,
+		        [this]() { reloadPythonEngine(); });
+		hl->addWidget(b);
+
+		hl->addWidget(new QLabel(tr("EN (on) / JP (off) : ")));
+
+		auto cb = new QCheckBox(dialog);
+		cb->setCheckState(Qt::Checked);
+		connect(cb, &QCheckBox::stateChanged,
+		        [this](int state) { english = state != Qt::Unchecked; });
+		hl->addWidget(cb);
+
+		b = new QPushButton(w);
+		b->setText(tr("Stop Voiceover"));
+		connect(b, &QPushButton::clicked, this,
+		        []() { PythonQtHandler::evalScript("del s"); });
+		hl->addWidget(b);
+
 		layout->addWidget(new QLabel("Scenes :"));
 
-		QStringList scenes = {"0:International Space Station begin",
-		                      "1:International Space Station stay",
-		                      "2:Earth transition",
-		                      "3:Earth stay",
-		                      "4:Moon transition",
-		                      "5:Moon stay",
-		                      "6:Phobos transition",
-		                      "7:Phobos Stay",
-		                      "8:Solar System transition",
-		                      "9:Solar System stay",
-		                      "AGORA transition",
-		                      "AGORA stay",
-		                      "IllustrisTNG transition",
-		                      "IllustrisTNG stay",
-		                      "SDSS transition",
-		                      "SDSS stay"};
+		QStringList scenes = {"0:International Space Station",
+		                      "1:Earth",
+		                      "2:Moon",
+		                      "3:Phobos",
+		                      "4:Solar System",
+		                      "5:AGORA",
+		                      "6:Local Group",
+		                      "7:IllustrisTNG",
+		                      "8:SDSS"};
 		for(int i(0); i < scenes.size(); ++i)
 		{
 			auto button = new QPushButton(scenes[i]);
 			connect(button, &QPushButton::clicked, this, [i]() {
-				PythonQtHandler::evalScript("setSceneId(" + QString::number(i)
-				                            + ")");
+				PythonQtHandler::evalScript(
+				    "setSceneId(" + QString::number(10 + 2 * i) + ")");
 			});
 			button->setFocusPolicy(Qt::NoFocus);
 			layout->addWidget(button);
 			buttons.push_back(button);
 		}
-		layout->addWidget(new QLabel("Options :"));
+		// layout->addWidget(new QLabel("Options :"));
 		transitionsButton
 		    = new QPushButton("Toggle transitions (only if user is sick, can "
 		                      "introduce problems !)");
 		connect(transitionsButton, &QPushButton::clicked, this,
 		        []() { PythonQtHandler::evalScript("toggleAnimations()"); });
 		transitionsButton->setFocusPolicy(Qt::NoFocus);
+		transitionsButton->hide();
 		layout->addWidget(transitionsButton);
 	}
 }
@@ -457,7 +475,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(networkManager->isServer())
 		{
-			int currentScene(PythonQtHandler::getVariable("id").toInt());
+			int currentScene((PythonQtHandler::getVariable("id").toInt() - 10)
+			                 / 2);
 			for(int i(0); i < static_cast<int>(buttons.size()); ++i)
 			{
 				auto button  = buttons[i];

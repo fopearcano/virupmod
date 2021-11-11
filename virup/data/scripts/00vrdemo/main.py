@@ -4,6 +4,8 @@ from PythonQt.QtCore import Qt
 from PythonQt.QtCore import QDateTime
 from PythonQt.QtCore import QDate
 from PythonQt.QtCore import QTime
+from PythonQt.QtCore import QTimeZone
+from PythonQt.QtMultimedia import QSound
 from PythonQt.libplanet import Vector3
 from math import exp, log, isnan, atan2, asin, cos, sin, pi
 
@@ -171,15 +173,119 @@ def interpolateScene(sc0, sc1, t):
         interpolateUI(sc0.ui, sc1.ui, t)
     )
 
-solareclipsedt = QDateTime(QDate(2021, 6, 16), QTime(11, 20, 00))
+#2021-06-26T01:52:07Z
+#2021-06-25T22:00:07Z
+solareclipsedt = QDateTime(QDate(2021, 6, 26), QTime(1, 51, 30), QTimeZone(0))
+
+# CUSTOM
+def clamp(val, minVal, maxVal):
+    if val < minVal:
+        return minVal
+    elif val > maxVal:
+        return maxVal
+    return val
+
+def squeeze_t(t, power):
+    t = clamp(t, 0.0, 1.0)
+    if t < 0.5:
+        t *= 2.0
+        t = t**power
+        t /= 2.0
+    if t > 0.5:
+        t -= 0.5
+        t *= 2.0
+        t = 1.0 - t
+        t = t**power
+        t = 1.0 - t
+        t /= 2.0
+        t += 0.5
+
+    return t
+
+def fade_in_factor(t_harsh):
+    t=squeeze_t(t_harsh,0.4)
+    t=smoothstep(t)
+    if t > 0.5:
+        return 1.0
+    return t*2
+
+def fade_out_factor(t_harsh):
+    t=squeeze_t(t_harsh,0.4)
+    t=smoothstep(t)
+    if t < 0.5:
+        return 1.0
+    return 1.0 - (2.0*(t-0.5))
+
+def fade_out(t, t_harsh):
+    global fade_factor
+    fade_factor = fade_out_factor(t_harsh)
+
+def intro(t, t_harsh):
+    global fade_factor
+    global id
+    global scenes
+    fade_factor = fade_in_factor(t_harsh) * fade_out_factor(t_harsh)
+    scale0=scenes[id-1].spatialData.scale
+    scale1=scenes[id].spatialData.scale
+    VIRUP.scale=interpolateLog(scale0, scale1, t_harsh)
+
+def black(t, t_harsh):
+    global fade_factor
+    fade_factor = 0.0
+
+def begin(t, t_harsh):
+    global fade_factor
+    fade_factor = fade_in_factor(t_harsh)
+
+def end(t, t_harsh):
+    global fade_factor
+    fade_factor = fade_out_factor(t_harsh)
+
+def showOrbitsWhileTraveling(t, t_harsh):
+    if t_harsh > 0.3 and t_harsh < 0.7:
+        Universe.setVisibility("Orbits", 1.0)
+        Universe.setVisibility("PlanetsLabels", 1.0)
+    elif t_harsh <= 0.3:
+        Universe.setVisibility("Orbits", (t_harsh*3)**5)
+        Universe.setVisibility("PlanetsLabels", (t_harsh*3)**5)
+    elif t_harsh >= 0.7:
+        Universe.setVisibility("Orbits", (1.0 - (t_harsh-0.7)*3)**5)
+        Universe.setVisibility("PlanetsLabels", (1.0 - (t_harsh-0.7)*3)**5)
+# END CUSTOM
 
 #sdsslum, gaialum, illustrislum, agoralum, hyg, exoplanets, constellations, orbits, labels, cmb):
 scenes = [
+# Intro
+    # Earth
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Hipparcos":1.0}), 1.0, "begin", begin),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Hipparcos":1.0}), 3.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 1.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 3.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Volumetric AGORA":1.0}), 1.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"Volumetric AGORA":1.0}), 3.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"IllustrisTNG":1.0}), 1.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"IllustrisTNG":1.0}), 3.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"SDSS":1.0}), 1.0),
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
+          TemporalData(1.0), UI({"SDSS":1.0}), 3.0),
+
+
+
+
     # International Space Station Real scale
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0})),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 30.0),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 19.0),
     # Earth
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
           TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
@@ -192,7 +298,7 @@ scenes = [
           TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Phobos
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
-          TemporalData(500.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+          TemporalData(100.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0, "phobos", showOrbitsWhileTraveling),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
           TemporalData(500.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Solar System dynamics Constellations
@@ -202,9 +308,9 @@ scenes = [
           TemporalData(10000000.0), UI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 20.0),
     # Milky Way
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-          TemporalData(), UI({"IllustrisTNG":0.01, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 10.0),
+          TemporalData(), UI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-          TemporalData(), UI({"IllustrisTNG":0.01, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 20.0),
+          TemporalData(), UI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 20.0),
     # Local Group
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 3.04e+22),
           TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 10.0),
@@ -212,14 +318,19 @@ scenes = [
           TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 20.0),
     # Illustris
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
-          TemporalData(), UI({"IllustrisTNG":1.0})),
+          TemporalData(), UI({"IllustrisTNG":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
-          TemporalData(), UI({"IllustrisTNG":1.0})),
+          TemporalData(), UI({"IllustrisTNG":1.0}), 20.0),
     # SDSS distant
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 4.0e+26),
-          TemporalData(), UI({"SDSS":1.0})),
-    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 4.0e+26),
-          TemporalData(), UI({"SDSS":1.0}))
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
+          TemporalData(), UI({"SDSS":1.0}), 10.0),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
+          TemporalData(), UI({"SDSS":1.0}), 35.0),
+    Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
+          TemporalData(), UI({"SDSS":1.0}), 1.0, "end", end),
+
+    Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
+          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 1.0, "fooend", black)
 ]
 
 def getIdFromName(name):
@@ -326,10 +437,12 @@ def keyPressEvent(e):
         return
 
 
+s=QSound(VIRUP.getVoiceoverPath())
 def initScene():
     global timer
     global longanimation
     global currentscene
+    global s
 
     VIRUP.simulationTime = solareclipsedt
 
@@ -342,6 +455,8 @@ def initScene():
         totaltime += scene.transitiontimeto
     print(totaltime / 60.0)
     print(totaltime)
+
+    s.play()
 
 
 def updateScene():

@@ -344,6 +344,12 @@ class MainWin : public AbstractMainWin
 	                               QString const& celestialBodyName1,
 	                               float t) const;
 
+	QString getVoiceoverPath()
+	{
+		return QSettings().value("data/rootdir").toString() + "/voiceover/"
+		       + (english ? "EN" : "JP") + ".wav";
+	};
+
   protected:
 	virtual void actionEvent(BaseInputManager::Action a, bool pressed) override;
 	virtual bool event(QEvent* e) override;
@@ -472,6 +478,8 @@ class MainWin : public AbstractMainWin
 	QDialog* dialog                   = nullptr;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;
+
+	bool english = true;
 };
 
 #endif // MAINWIN_H
