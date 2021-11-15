@@ -187,6 +187,7 @@ bool AbstractMainWin::event(QEvent* e)
 	}
 	if(e->type() == QEvent::Type::Close)
 	{
+		menuBar->close();
 		PythonQtHandler::closeConsole();
 	}
 	return QWindow::event(e);
@@ -511,6 +512,18 @@ void AbstractMainWin::initializeGL()
 		vrHandler->resetPos();
 	}
 
+	// init menuBar
+
+	menuBar = new QMenuBar();
+	menuBar->setWindowFlags(Qt::X11BypassWindowManagerHint
+	                        | Qt::MSWindowsFixedSizeDialogHint
+	                        | Qt::FramelessWindowHint);
+
+	auto file(menuBar->addMenu(tr("File")));
+	file->addAction(tr("Close"), this, [this]() { this->close(); });
+
+	menuBar->show();
+
 	// let user init
 	initScene();
 
@@ -593,6 +606,22 @@ void AbstractMainWin::paintGL()
 
 	setTitle(QString(PROJECT_NAME) + " - "
 	         + QString::number(round(1.f / frameTiming)) + " FPS");
+
+	// update menubar visibility
+	auto cursorPos(QCursor::pos() - position());
+	if(cursorPos.y() < menuBar->height() + 10 && cursorPos.y() >= 0
+	   && cursorPos.x() >= 0 && cursorPos.x() < width())
+	{
+		if(!menuBar->isVisible())
+		{
+			menuBar->move(position());
+			menuBar->show();
+		}
+	}
+	else if(menuBar->activeAction() == nullptr && menuBar->isVisible())
+	{
+		menuBar->hide();
+	}
 
 	if(reloadPy)
 	{
@@ -753,6 +782,7 @@ void AbstractMainWin::paintGL()
 
 AbstractMainWin::~AbstractMainWin()
 {
+	delete menuBar;
 	delete networkManager;
 	delete toneMappingModel;
 	delete bloomTargets[0];

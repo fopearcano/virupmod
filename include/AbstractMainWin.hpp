@@ -5,6 +5,7 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QMenuBar>
 #include <QProcess>
 #include <QRunnable>
 #include <QScreen>
@@ -463,6 +464,9 @@ class AbstractMainWin : public QWindow
 
 	// Postprocessing
 	ToneMappingModel* toneMappingModel = nullptr;
+
+	// Menu Bar
+	QMenuBar* menuBar = nullptr;
 
   private:
 	void initializeGL();
