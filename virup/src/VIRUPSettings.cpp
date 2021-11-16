@@ -37,9 +37,6 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	insertGroup("misc", tr("Miscellaneous"), 3);
 	addBoolSetting("showgrid", false, tr("Show Grid"));
 	addColorSetting("gridcolor", QColor(255, 255, 255), tr("Grid Color"));
-	addVector3DSetting("focuspoint", QVector3D(), tr("Focus Point"),
-	                   {{tr("x"), tr("y"), tr("z")}}, -1000, 1000);
-	// focuspoint=-0.352592, -0.062213, 0.144314
 	addDoubleSetting("mintanangle", 0.05,
 	                 tr("Minimum octree tan of open angle"));
 	addUIntSetting("maxvramusagemb", 500, tr("Max VRAM Usage (in Mb)"), 0,
