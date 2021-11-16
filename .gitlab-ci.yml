@@ -7,11 +7,7 @@ stages:
 dockerbuild:bionic:
     image: docker:19.03.12
     services:
-        - name: docker:19.03.12-dind
-          alias: docker
-          command: [ "--tls=false" ]
-    variables:
-        DOCKER_HOST: tcp://docker:2375
+      - docker:19.03.12-dind
     stage: dockerbuild
     only:
         refs:
@@ -33,11 +29,7 @@ dockerbuild:bionic:
 dockerbuild:focal:
     image: docker:19.03.12
     services:
-        - name: docker:19.03.12-dind
-          alias: docker
-          command: [ "--tls=false" ]
-    variables:
-        DOCKER_HOST: tcp://docker:2375
+      - docker:19.03.12-dind
     stage: dockerbuild
     only:
         refs:
