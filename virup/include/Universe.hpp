@@ -33,7 +33,25 @@
 class Universe : public QObject
 {
 	Q_OBJECT
+
+	Q_PROPERTY(float tanAngleLimit READ getTanAngleLimit WRITE setTanAngleLimit)
+
   public:
+	/**
+	 * @getter{tanAngleLimit}
+	 */
+	float getTanAngleLimit() const
+	{
+		return OctreeLOD::getCurrentTanAngleLimit();
+	};
+	/**
+	 * @setter{tanAngleLimit, tanAngleLimit}
+	 */
+	void setTanAngleLimit(float tanAngleLimit)
+	{
+		OctreeLOD::setCurrentTanAngleLimit(tanAngleLimit);
+	};
+
 	class State : public AbstractState
 	{
 	  public:
@@ -135,6 +153,7 @@ class Universe : public QObject
 	Vector3 getSolarSystemPosition(QString const& name) const;
 	void setSolarSystemPosition(QString const& name, Vector3 const& pos);
 	void setLabelsOrbitsOnly(QStringList const& nameList);
+	void unlockTanAngleLimit() { OctreeLOD::unsetCurrentTanAngleLimit(); };
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);

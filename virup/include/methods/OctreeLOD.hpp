@@ -45,6 +45,18 @@ class OctreeLOD : public Octree
 	static bool& forceMaxQuality();
 	static int& forceQuality();
 
+	static float getCurrentTanAngleLimit() { return tanAngleLimit(); };
+	static void setCurrentTanAngleLimit(float tanAngleLimit)
+	{
+		forceMaxQuality()  = true;
+		minTanAngleLimit() = tanAngleLimit;
+	};
+	static void unsetCurrentTanAngleLimit()
+	{
+		forceMaxQuality()  = false;
+		minTanAngleLimit() = QSettings().value("misc/mintanangle").toDouble();
+	}
+
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,
 	          Octree::CommonData& commonData, unsigned int lvl = 0);

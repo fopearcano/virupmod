@@ -465,8 +465,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		cam.currentProjection  = renderer.projection;
 		cam.updateTargetFPS();
 
-		OctreeLOD::forceMaxQuality() = videomode;
-		OrbitRenderer::forceRedraw   = videomode;
+		if(videomode)
+		{
+			OctreeLOD::forceMaxQuality() = true;
+		}
+		OrbitRenderer::forceRedraw = videomode;
 
 		universe->updateCosmo(cam);
 
