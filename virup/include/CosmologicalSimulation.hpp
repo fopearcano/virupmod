@@ -43,6 +43,8 @@ class CosmologicalSimulation : public UniverseElement
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
+	void dumpOctreesStates(QString const& dirPath,
+	                       QString const& filePathPrefix);
 	~CosmologicalSimulation() = default;
 
 	// normalized from 0 to 1

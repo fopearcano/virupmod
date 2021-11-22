@@ -153,7 +153,11 @@ class Universe : public QObject
 	Vector3 getSolarSystemPosition(QString const& name) const;
 	void setSolarSystemPosition(QString const& name, Vector3 const& pos);
 	void setLabelsOrbitsOnly(QStringList const& nameList);
-	void unlockTanAngleLimit() { OctreeLOD::unsetCurrentTanAngleLimit(); };
+	void unlockTanAngleLimit() const
+	{
+		OctreeLOD::unsetCurrentTanAngleLimit();
+	};
+	void dumpOctreesStates();
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);
@@ -163,6 +167,7 @@ class Universe : public QObject
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
 	std::map<QString, UniverseElement*> elements;
+	std::map<UniverseElement*, QString> elementsRev;
 	QList<CosmologicalSimulation*> cosmoSims;
 	QList<CSVObjects*> csvObjs;
 

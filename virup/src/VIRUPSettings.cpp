@@ -41,6 +41,8 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	                 tr("Minimum octree tan of open angle"));
 	addUIntSetting("maxvramusagemb", 500, tr("Max VRAM Usage (in Mb)"), 0,
 	               1000000);
+	addDirPathSetting("octreestatesdir", QDir::homePath() + "/octree_states/",
+	                  tr("Octree states (OBJ) save directory"));
 
 	editGroup("graphics");
 	addUIntSetting("texmaxsize", 8, tr("Textures max size (x2048)"), 1, 11);

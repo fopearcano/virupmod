@@ -247,6 +247,24 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	}
 }
 
+void TreeMethodLOD::dumpOctreesStates(QString const& dirPath,
+                                      QString const& filePathPrefix)
+{
+	if(gasTree != nullptr)
+	{
+		gasTree->dumpState(dirPath + "/" + filePathPrefix + "_gas.obj");
+	}
+	if(starsTree != nullptr)
+	{
+		starsTree->dumpState(dirPath + "/" + filePathPrefix + "_stars.obj");
+	}
+	if(darkMatterTree != nullptr)
+	{
+		darkMatterTree->dumpState(dirPath + "/" + filePathPrefix
+		                          + "_darkMatter.obj");
+	}
+}
+
 void TreeMethodLOD::unload()
 {
 	if(gasTree != nullptr)

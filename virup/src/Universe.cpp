@@ -93,6 +93,7 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 		newElem->brightnessMultiplier = entryObj["brightnessmul"].toDouble(1.0);
 		updateBoundingBox(newElem->getBoundingBox());
 		elements[entryObj["name"].toString()] = newElem;
+		elementsRev[newElem]                  = entryObj["name"].toString();
 	}
 
 	planetSystems = new PlanetarySystems;
@@ -358,6 +359,17 @@ void Universe::setSolarSystemPosition(QString const& name, Vector3 const& pos)
 void Universe::setLabelsOrbitsOnly(QStringList const& nameList)
 {
 	CelestialBodyRenderer::renderLabelsOrbitsOnly = nameList;
+}
+
+void Universe::dumpOctreesStates()
+{
+	for(auto cosmoSim : cosmoSims)
+	{
+		auto name(elementsRev.at(cosmoSim));
+		cosmoSim->dumpOctreesStates(
+		    QSettings().value("misc/octreestatesdir").toString(),
+		    name.toLower().replace(' ', '_'));
+	}
 }
 
 void Universe::updateCosmo(Camera const& cam)

@@ -268,3 +268,9 @@ QList<QPair<QString, QWidget*>>
 
 	return result;
 }
+
+void CosmologicalSimulation::dumpOctreesStates(QString const& dirPath,
+                                               QString const& filePathPrefix)
+{
+	trees.dumpOctreesStates(dirPath, filePathPrefix);
+}

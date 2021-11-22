@@ -390,6 +390,82 @@ void OctreeLOD::render(Camera const& camera, QMatrix4x4 const& globalModel,
 	           alpha * totalDataSize / dataSize, globalDustModel * model);
 }
 
+void OctreeLOD::dumpState(QString const& filePath)
+{
+	if(!doRender)
+	{
+		return;
+	}
+
+	qDebug() << filePath;
+	QFile file(filePath);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		qWarning() << "Error while trying to open \"" + filePath
+		                  + "\" for writing.";
+		return;
+	}
+
+	QTextStream out(&file);
+	auto totalDumped(dumpRenderedPos(out));
+
+	if(totalDumped == 0)
+	{
+		return;
+	}
+
+	// add fake faces for OBJ to be read everywhere
+	for(unsigned int i(0); i < totalDumped / 3; ++i)
+	{
+		out << "f " << i * 3 + 1 << " " << i * 3 + 2 << " " << i * 3 + 3
+		    << "\n";
+	}
+	out << "f " << totalDumped - 2 << " " << totalDumped - 1 << " "
+	    << totalDumped << "\n";
+}
+
+unsigned int OctreeLOD::dumpRenderedPos(QTextStream& stream)
+{
+	if(!doRender)
+	{
+		return 0;
+	}
+
+	if(recurse)
+	{
+		unsigned int totalDumped(0);
+		// RENDER SUBTREES
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr)
+			{
+				totalDumped
+				    += dynamic_cast<OctreeLOD*>(oct)->dumpRenderedPos(stream);
+			}
+		}
+		return totalDumped;
+	}
+
+	if(absoluteData.empty())
+	{
+		readOwnData(*file);
+		absoluteData = getOwnData();
+		data.resize(0);
+		data.shrink_to_fit();
+	}
+	unsigned int i(0);
+	for(; i < absoluteData.size() / commonData.dimPerVertex; ++i)
+	{
+		stream << "v ";
+		stream << absoluteData[commonData.dimPerVertex * i] << " ";
+		stream << absoluteData[commonData.dimPerVertex * i + 1] << " ";
+		stream << absoluteData[commonData.dimPerVertex * i + 2] << "\n";
+	}
+	absoluteData.resize(0);
+	absoluteData.shrink_to_fit();
+	return i;
+}
+
 void OctreeLOD::renderNode(Camera const& /*camera*/,
                            QMatrix4x4 const& localToWorld,
                            QVector3D const& localCamPos, float compensatedAlpha,

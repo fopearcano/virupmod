@@ -36,6 +36,7 @@ class OctreeLOD : public Octree
 	void render(Camera const& camera, QMatrix4x4 const& globalModel,
 	            QVector3D const& globalCampos, float alpha,
 	            QMatrix4x4 const& globalDustModel);
+	void dumpState(QString const& filePath);
 	~OctreeLOD();
 
 	static void updateTanAngleLimit(Camera const& camera);
@@ -112,6 +113,9 @@ class OctreeLOD : public Octree
 
 	bool doRender = false;
 	bool recurse  = false;
+
+	// returns number of particles dumped
+	unsigned int dumpRenderedPos(QTextStream& stream);
 };
 
 #endif // OCTREELOD_H
