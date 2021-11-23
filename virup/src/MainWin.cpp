@@ -177,6 +177,10 @@ bool MainWin::event(QEvent* e)
 {
 	if(e->type() == QEvent::Type::Close)
 	{
+		if(visibilities != nullptr)
+		{
+			visibilities->close();
+		}
 		if(dialog != nullptr)
 		{
 			dialog->close();
@@ -382,9 +386,14 @@ void MainWin::initScene()
 
 	renderer.appendPostProcessingShader("lensing", "lensing");
 
-	// TRANSITIONS
+	// UI
 	if(networkManager->isServer())
 	{
+		visibilities = new Visibilities(*universe);
+		auto tools(menuBar->addMenu(tr("Tools")));
+		tools->addAction(tr("Visibilities List"), this,
+		                 [this]() { this->visibilities->show(); });
+
 		dialog = new QDialog;
 		dialog->show();
 		dialog->setWindowTitle("VIRUP Scenes");
@@ -732,6 +741,7 @@ std::vector<float> MainWin::generateVertices(unsigned int number,
 MainWin::~MainWin()
 {
 	delete dialog;
+	delete visibilities;
 	delete lenseDistortionMap;
 	delete debugText;
 	delete movementControls;

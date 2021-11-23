@@ -15,6 +15,7 @@
 #include "Grid.hpp"
 #include "MovementControls.hpp"
 #include "universe/Universe.hpp"
+#include "ui/Visibilities.hpp"
 
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"
@@ -474,7 +475,11 @@ class MainWin : public AbstractMainWin
 	QVector4D lenseScreenCoord;
 	float lenseDist = 0.f;
 
-	// SCENES
+	// UI
+	// visibilities
+	Visibilities* visibilities = nullptr;
+
+	// scenes
 	QDialog* dialog                   = nullptr;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;
