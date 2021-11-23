@@ -412,6 +412,12 @@ void MainWin::initScene()
 		        [this]() { reloadPythonEngine(); });
 		hl->addWidget(b);
 
+		b = new QPushButton(w);
+		b->setText(tr("STOP"));
+		connect(b, &QPushButton::clicked, this,
+		        []() { PythonQtHandler::evalScript("stop()"); });
+		hl->addWidget(b);
+
 		hl->addWidget(new QLabel(tr("EN (on) / JP (off) : ")));
 
 		auto cb = new QCheckBox(dialog);
@@ -442,7 +448,7 @@ void MainWin::initScene()
 			auto button = new QPushButton(scenes[i]);
 			connect(button, &QPushButton::clicked, this, [i]() {
 				PythonQtHandler::evalScript(
-				    "setSceneId(" + QString::number(10 + 2 * i) + ")");
+				    "setSceneId(" + QString::number(10 + 2 * i) + ")\ndel s");
 			});
 			button->setFocusPolicy(Qt::NoFocus);
 			layout->addWidget(button);

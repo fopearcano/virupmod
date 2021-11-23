@@ -397,6 +397,14 @@ def setSceneId(newid):
         if scenes[id].spatialData.systemName == currentscene.spatialData.systemName and (scenes[id].spatialData.cosmoPos - currentscene.spatialData.cosmoPos).length() > 0.1:
             currentscene.spatialData.systemName = ""
 
+autoIdScrolling=True
+def stop():
+    global autoIdScrolling
+    global s
+    autoIdScrolling=False
+    setSceneId(-1)
+    del s
+
 def toggleAnimations():
     global disableanimations
     disableanimations = not disableanimations
@@ -430,7 +438,7 @@ def keyPressEvent(e):
     elif e.key() == Qt.Key_Minus and numpad_mod:
         toggleAnimations()
     elif e.key() == Qt.Key_Space:
-        setSceneId(-1)
+        stop()
     elif e.key() == Qt.Key_Enter:
         setSceneId((id+1) % len(scenes))
     else:
@@ -467,6 +475,7 @@ def updateScene():
     global shiftangle
     global shiftvertangle
     global fade_factor
+    global autoIdScrolling
     if id not in range(len(scenes)) or not VIRUP.isServer:
         return
 
@@ -530,7 +539,7 @@ def updateScene():
     scenes[id].custom(t, t_harsh)
     ToneMappingModel.exposure *= fade_factor
 
-    if nextid != -1 and nextid < len(scenes):
+    if nextid != -1 and nextid < len(scenes) and autoIdScrolling:
         setSceneId(nextid)
 
     if spatialData.bodyName != '' and VIRUP.planetarySystemLoaded:
