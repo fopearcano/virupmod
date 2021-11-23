@@ -106,6 +106,10 @@ class Universe : public QObject
 
 	Universe(OrbitalSystemCamera& camPlanet);
 	BBox getBoundingBox() const { return boundingBox; };
+	UniverseElement const* getElement(QString const& name) const
+	{
+		return elements.at(name);
+	};
 	bool isPlanetarySystemRendered() const
 	{
 		return planetSystems->renderSystem();
@@ -158,6 +162,11 @@ class Universe : public QObject
 		OctreeLOD::unsetCurrentTanAngleLimit();
 	};
 	void dumpOctreesStates();
+
+  signals:
+	// if setting visibility of something that is not a UniverseElement
+	// namely : Constellations, Orbits and PlanetLabels
+	void nonElementVisibilityChanged(QString const& name, float visibility);
 
   private:
 	void updateBoundingBox(BBox const& elementBoundingBox);

@@ -158,7 +158,7 @@ def interpolateUI(ui0, ui1, t):
     for label in Universe.getUniverseElementsNames():
         dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
 
-    additional=["Exoplanets", "Constellations", "Orbits", "PlanetsLabels", "Debris", "AnimationTime"]
+    additional=["Constellations", "Orbits", "PlanetsLabels", "Debris", "AnimationTime"]
     for label in additional:
         dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
 
@@ -510,7 +510,7 @@ def updateScene():
             else:
                 Universe.setVisibility(label, ui.getLum(label) * fade_factor)
 
-    additional=["Exoplanets", "Constellations", "Orbits", "PlanetsLabels"]
+    additional=["Constellations", "Orbits", "PlanetsLabels"]
     for label in additional:
         Universe.setVisibility(label, ui.getLum(label))
 

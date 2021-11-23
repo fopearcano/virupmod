@@ -98,6 +98,7 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 
 	planetSystems = new PlanetarySystems;
 	updateBoundingBox(planetSystems->getBoundingBox());
+	elements["Exoplanets"] = planetSystems;
 
 	loadClosestSystem();
 
@@ -266,16 +267,20 @@ Vector3 Universe::getCameraCurrentRelPosToBody(QString const& bodyName) const
 
 double Universe::getVisibility(QString const& name) const
 {
-	if(name == "Exoplanets")
-	{
-		return planetSystems->getVisibility();
-	}
 	if(name == "Constellations")
 	{
 		for(auto csv : csvObjs)
 		{
 			return csv->constellationsAlpha;
 		}
+	}
+	if(name == "Orbits")
+	{
+		return CelestialBodyRenderer::renderOrbits;
+	}
+	if(name == "PlanetsLabels")
+	{
+		return CelestialBodyRenderer::renderLabels;
 	}
 
 	if(elements.count(name) == 0)
@@ -289,28 +294,41 @@ double Universe::getVisibility(QString const& name) const
 
 void Universe::setVisibility(QString const& name, double visibility)
 {
-	if(name == "Exoplanets")
-	{
-		planetSystems->setVisibility(visibility);
-		return;
-	}
 	if(name == "Constellations")
 	{
+		bool sendSig(false);
 		for(auto csv : csvObjs)
 		{
-			csv->constellationsAlpha  = visibility;
-			csv->constellationsLabels = visibility;
+			if(visibility != csv->constellationsAlpha
+			   || visibility != csv->constellationsLabels)
+			{
+				csv->constellationsAlpha  = visibility;
+				csv->constellationsLabels = visibility;
+				sendSig                   = true;
+			}
+			if(sendSig)
+			{
+				emit nonElementVisibilityChanged(name, visibility);
+			}
 		}
 		return;
 	}
 	if(name == "Orbits")
 	{
-		CelestialBodyRenderer::renderOrbits = visibility;
+		if(CelestialBodyRenderer::renderOrbits != visibility)
+		{
+			CelestialBodyRenderer::renderOrbits = visibility;
+			emit nonElementVisibilityChanged(name, visibility);
+		}
 		return;
 	}
 	if(name == "PlanetsLabels")
 	{
-		CelestialBodyRenderer::renderLabels = visibility;
+		if(CelestialBodyRenderer::renderLabels != visibility)
+		{
+			CelestialBodyRenderer::renderLabels = visibility;
+			emit nonElementVisibilityChanged(name, visibility);
+		}
 		return;
 	}
 
@@ -325,11 +343,6 @@ void Universe::setVisibility(QString const& name, double visibility)
 
 Vector3 Universe::getSolarSystemPosition(QString const& name) const
 {
-	if(name == "Exoplanets")
-	{
-		return planetSystems->solarsystemPosition;
-	}
-
 	if(elements.count(name) == 0)
 	{
 		qWarning() << name + " is not a valid UniverseElement";
@@ -341,12 +354,6 @@ Vector3 Universe::getSolarSystemPosition(QString const& name) const
 
 void Universe::setSolarSystemPosition(QString const& name, Vector3 const& pos)
 {
-	if(name == "Exoplanets")
-	{
-		planetSystems->solarsystemPosition = pos;
-		return;
-	}
-
 	if(elements.count(name) == 0)
 	{
 		qWarning() << name + " is not a valid UniverseElement";
@@ -535,7 +542,6 @@ void Universe::loadClosestSystem()
 Universe::~Universe()
 {
 	delete systemRenderer;
-	delete planetSystems;
 	for(auto const& pair : elements)
 	{
 		delete pair.second;
