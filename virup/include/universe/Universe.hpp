@@ -90,7 +90,7 @@ class Universe : public QObject
 		unsigned int i(0);
 		for(auto& pair : elements)
 		{
-			pair.second->visibility = state.visibilities[i];
+			pair.second->setVisibility(state.visibilities[i]);
 			++i;
 		}
 	};
@@ -100,7 +100,7 @@ class Universe : public QObject
 		state.visibilities.clear();
 		for(auto& pair : elements)
 		{
-			state.visibilities.push_back(pair.second->visibility);
+			state.visibilities.push_back(pair.second->getVisibility());
 		}
 	};
 

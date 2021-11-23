@@ -157,7 +157,7 @@ void PlanetarySystems::render(Camera const& /*camera*/,
                               ToneMappingModel const& tmm)
 {
 	GLHandler::beginTransparent();
-	shader.setUniform("alpha", visibility);
+	shader.setUniform("alpha", getVisibility());
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shader, model);

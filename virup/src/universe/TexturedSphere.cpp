@@ -36,7 +36,7 @@ void TexturedSphere::render(Camera const& camera,
 	QVector3D campos;
 	getModelAndCampos(camera, model, campos);
 
-	shader.setUniform("exposure", visibility * brightnessMultiplier);
+	shader.setUniform("exposure", getVisibility() * brightnessMultiplier);
 
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	GLHandler::setBackfaceCulling(cullFrontFaces, GL_FRONT);

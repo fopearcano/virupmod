@@ -29,9 +29,12 @@
 #include "gui/SciDoubleSpinBox.hpp"
 #include "math/Vector3.hpp"
 
-class UniverseElement
+class UniverseElement : public QObject
 {
+	Q_OBJECT
+
   public:
+
 	enum class ReferenceFrame
 	{
 		EQUATORIAL,
@@ -42,12 +45,13 @@ class UniverseElement
 	UniverseElement()                   = default;
 	virtual BBox getBoundingBox() const = 0;
 	QMatrix4x4 getRelToAbsTransform() const;
+	float getVisibility() const { return visibility; };
+	void setVisibility(float visibility);
 	virtual void update(Camera const& /*camera*/){};
 	virtual void render(Camera const& camera, ToneMappingModel const& tmm) = 0;
 	virtual ~UniverseElement() = default;
 
 	float brightnessMultiplier = 1.f;
-	float visibility           = 0.f;
 
 	double unit                   = 1.0;                    // in kpc
 	Vector3 solarsystemPosition   = Vector3(0.0, 0.0, 0.0); // in unit
@@ -63,9 +67,15 @@ class UniverseElement
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
+  signals:
+	void visibilityChanged(float newValue);
+
   protected:
 	void getModelAndCampos(Camera const& camera, QMatrix4x4& model,
 	                       QVector3D& campos);
+
+  private:
+	float visibility = 0.f;
 };
 
 #endif // UNIVERSEELEMENT_HPP

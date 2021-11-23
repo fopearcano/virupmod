@@ -268,7 +268,7 @@ double Universe::getVisibility(QString const& name) const
 {
 	if(name == "Exoplanets")
 	{
-		return planetSystems->visibility;
+		return planetSystems->getVisibility();
 	}
 	if(name == "Constellations")
 	{
@@ -284,14 +284,14 @@ double Universe::getVisibility(QString const& name) const
 		return 0.0;
 	}
 
-	return elements.at(name)->visibility;
+	return elements.at(name)->getVisibility();
 }
 
 void Universe::setVisibility(QString const& name, double visibility)
 {
 	if(name == "Exoplanets")
 	{
-		planetSystems->visibility = visibility;
+		planetSystems->setVisibility(visibility);
 		return;
 	}
 	if(name == "Constellations")
@@ -320,7 +320,7 @@ void Universe::setVisibility(QString const& name, double visibility)
 		return;
 	}
 
-	elements[name]->visibility = visibility;
+	elements[name]->setVisibility(visibility);
 }
 
 Vector3 Universe::getSolarSystemPosition(QString const& name) const
@@ -377,7 +377,7 @@ void Universe::updateCosmo(Camera const& cam)
 	OctreeLOD::updateTanAngleLimit(cam);
 	for(auto pair : elements)
 	{
-		if(pair.second->visibility < 0.001)
+		if(pair.second->getVisibility() < 0.001)
 		{
 			continue;
 		}
@@ -429,8 +429,8 @@ void Universe::renderCosmo(Camera const& cam,
 	for(auto pair : elements)
 	{
 		// only used by CosmologicalLabels for now
-		// pair.second->visibility = CelestialBodyRenderer::renderLabels;
-		if(pair.second->visibility < 0.001)
+		// pair.second->setVisibility(CelestialBodyRenderer::renderLabels);
+		if(pair.second->getVisibility() < 0.001)
 		{
 			continue;
 		}

@@ -30,6 +30,15 @@ QMatrix4x4 UniverseElement::getRelToAbsTransform() const
 	return relToAbsTransform;
 }
 
+void UniverseElement::setVisibility(float visibility)
+{
+	if(this->visibility != visibility)
+	{
+		this->visibility = visibility;
+		emit visibilityChanged(visibility);
+	}
+}
+
 void UniverseElement::setProperRotationFromCustomZAxis(
     QVector3D const& customZAxis)
 {

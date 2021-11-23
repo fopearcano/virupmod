@@ -22,7 +22,7 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 {
 	QString path(QSettings().value("data/rootdir").toString()
 	             + json["file"].toString());
-	visibility = 0.f;
+	setVisibility(0.f);
 	QFile f(path);
 	if(!f.open(QFile::ReadOnly | QFile::Text))
 	{
@@ -77,7 +77,7 @@ void CosmologicalLabels::update(Camera const& camera)
 void CosmologicalLabels::render(Camera const& /*camera*/,
                                 ToneMappingModel const& tmm)
 {
-	if(visibility > 0.f)
+	if(getVisibility() > 0.f)
 	{
 		for(auto cosmoLabel : cosmoLabels)
 		{
@@ -89,7 +89,7 @@ void CosmologicalLabels::render(Camera const& /*camera*/,
 			{
 			    continue;
 			}*/
-			cosmoLabel.second->setAlpha(visibility);
+			cosmoLabel.second->setAlpha(getVisibility());
 			cosmoLabel.second->render(tmm.exposure, tmm.dynamicrange);
 		}
 	}
