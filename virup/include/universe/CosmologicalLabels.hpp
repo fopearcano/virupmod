@@ -19,8 +19,8 @@
 #ifndef COSMOLOGICALLABELS_HPP
 #define COSMOLOGICALLABELS_HPP
 
-#include "universe/UniverseElement.hpp"
 #include "graphics/renderers/LabelRenderer.hpp"
+#include "universe/UniverseElement.hpp"
 
 class CosmologicalLabels : public UniverseElement
 {

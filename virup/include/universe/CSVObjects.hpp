@@ -25,11 +25,11 @@
 #include <algorithm>
 #include <cmath>
 
-#include "universe/UniverseElement.hpp"
 #include "gl/GLHandler.hpp"
 #include "graphics/renderers/LabelRenderer.hpp"
 #include "physics/Color.hpp"
 #include "physics/blackbody.hpp"
+#include "universe/UniverseElement.hpp"
 
 class CSVObjects : public UniverseElement
 {

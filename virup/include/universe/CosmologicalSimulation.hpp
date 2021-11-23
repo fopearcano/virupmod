@@ -23,8 +23,8 @@
 #include <map>
 #include <set>
 
-#include "universe/UniverseElement.hpp"
 #include "methods/TreeMethodLOD.hpp"
+#include "universe/UniverseElement.hpp"
 
 class CosmologicalSimulation : public UniverseElement
 {

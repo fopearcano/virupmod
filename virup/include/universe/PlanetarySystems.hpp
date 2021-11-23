@@ -21,10 +21,10 @@
 
 #include <QJsonDocument>
 
-#include "universe/UniverseElement.hpp"
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"
 #include "physics/OrbitalSystem.hpp"
+#include "universe/UniverseElement.hpp"
 
 class PlanetarySystems : public UniverseElement
 {

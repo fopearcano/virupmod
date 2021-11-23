@@ -34,7 +34,6 @@ class UniverseElement : public QObject
 	Q_OBJECT
 
   public:
-
 	enum class ReferenceFrame
 	{
 		EQUATORIAL,

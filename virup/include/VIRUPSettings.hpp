@@ -28,11 +28,11 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
+#include "SettingsWidget.hpp"
 #include "universe/CSVObjects.hpp"
 #include "universe/CosmologicalLabels.hpp"
 #include "universe/CosmologicalSimulation.hpp"
 #include "universe/Credits.hpp"
-#include "SettingsWidget.hpp"
 #include "universe/TexturedSphere.hpp"
 #include "universe/UniverseElement.hpp"
 
