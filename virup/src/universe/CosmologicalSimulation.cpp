@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "CosmologicalSimulation.hpp"
+#include "universe/CosmologicalSimulation.hpp"
 
 float& CosmologicalSimulation::animationTime()
 {

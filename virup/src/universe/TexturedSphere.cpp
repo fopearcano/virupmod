@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "TexturedSphere.hpp"
+#include "universe/TexturedSphere.hpp"
 
 TexturedSphere::TexturedSphere(QJsonObject const& json)
     : shader("texturedsphere")

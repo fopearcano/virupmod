@@ -28,13 +28,13 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "CSVObjects.hpp"
-#include "CosmologicalLabels.hpp"
-#include "CosmologicalSimulation.hpp"
-#include "Credits.hpp"
+#include "universe/CSVObjects.hpp"
+#include "universe/CosmologicalLabels.hpp"
+#include "universe/CosmologicalSimulation.hpp"
+#include "universe/Credits.hpp"
 #include "SettingsWidget.hpp"
-#include "TexturedSphere.hpp"
-#include "UniverseElement.hpp"
+#include "universe/TexturedSphere.hpp"
+#include "universe/UniverseElement.hpp"
 
 class VIRUPSettings : public SettingsWidget
 {

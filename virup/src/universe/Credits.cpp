@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Credits.hpp"
+#include "universe/Credits.hpp"
 
 Credits::Credits(QJsonObject const& json)
     : shader("credits")

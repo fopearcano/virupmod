@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "UniverseElement.hpp"
+#include "universe/UniverseElement.hpp"
 #include "gl/GLHandler.hpp"
 #include "graphics/renderers/LabelRenderer.hpp"
 #include "physics/Color.hpp"

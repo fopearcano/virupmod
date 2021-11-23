@@ -14,7 +14,7 @@
 
 #include "Grid.hpp"
 #include "MovementControls.hpp"
-#include "Universe.hpp"
+#include "universe/Universe.hpp"
 
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"

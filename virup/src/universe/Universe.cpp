@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Universe.hpp"
+#include "universe/Universe.hpp"
 
 unsigned int Universe::State::elementsSize = 0;
 

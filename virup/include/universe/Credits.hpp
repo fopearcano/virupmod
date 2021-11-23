@@ -16,18 +16,16 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TEXTUREDSPHERE_HPP
-#define TEXTUREDSPHERE_HPP
-
-#include <QCheckBox>
+#ifndef CREDITS_HPP
+#define CREDITS_HPP
 
 #include "Primitives.hpp"
-#include "UniverseElement.hpp"
+#include "universe/UniverseElement.hpp"
 
-class TexturedSphere : public UniverseElement
+class Credits : public UniverseElement
 {
   public:
-	TexturedSphere(QJsonObject const& json);
+	Credits(QJsonObject const& json);
 	virtual BBox getBoundingBox() const override { return {}; };
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
@@ -40,7 +38,7 @@ class TexturedSphere : public UniverseElement
 	GLMesh mesh;
 	GLTexture tex;
 
-	bool cullFrontFaces = false;
+	QString texsFolder;
 };
 
-#endif // TEXTUREDSPHERE_HPP
+#endif // CREDITS_HPP

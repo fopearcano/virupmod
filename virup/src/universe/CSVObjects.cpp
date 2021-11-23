@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "CSVObjects.hpp"
+#include "universe/CSVObjects.hpp"
 
 GLTexture*& CSVObjects::starTex()
 {

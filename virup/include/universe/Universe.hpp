@@ -23,12 +23,12 @@
 #include <vector>
 
 #include "AbstractState.hpp"
-#include "CSVObjects.hpp"
-#include "CosmologicalLabels.hpp"
-#include "CosmologicalSimulation.hpp"
-#include "Credits.hpp"
-#include "PlanetarySystems.hpp"
-#include "TexturedSphere.hpp"
+#include "universe/CSVObjects.hpp"
+#include "universe/CosmologicalLabels.hpp"
+#include "universe/CosmologicalSimulation.hpp"
+#include "universe/Credits.hpp"
+#include "universe/PlanetarySystems.hpp"
+#include "universe/TexturedSphere.hpp"
 
 class Universe : public QObject
 {

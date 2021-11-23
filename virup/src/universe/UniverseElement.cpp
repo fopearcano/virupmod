@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "UniverseElement.hpp"
+#include "universe/UniverseElement.hpp"
 
 QMatrix4x4 UniverseElement::getRelToAbsTransform() const
 {

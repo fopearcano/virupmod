@@ -16,47 +16,32 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef PLANETARYSYSTEMS_HPP
-#define PLANETARYSYSTEMS_HPP
+#ifndef COSMOLOGICALLABELS_HPP
+#define COSMOLOGICALLABELS_HPP
 
-#include <QJsonDocument>
+#include "universe/UniverseElement.hpp"
+#include "graphics/renderers/LabelRenderer.hpp"
 
-#include "UniverseElement.hpp"
-#include "graphics/OrbitalSystemCamera.hpp"
-#include "graphics/renderers/OrbitalSystemRenderer.hpp"
-#include "physics/OrbitalSystem.hpp"
-
-class PlanetarySystems : public UniverseElement
+class CosmologicalLabels : public UniverseElement
 {
   public:
-	PlanetarySystems();
+	CosmologicalLabels(QJsonObject const& json);
 	virtual BBox getBoundingBox() const override { return {}; };
-	bool renderSystem() const { return doRender; };
-	Vector3 getClosestSystemPosition()
-	{
-		return Utils::fromQt(getRelToAbsTransform()
-		                     * Utils::toQt(positions[closestId]));
-	};
-	OrbitalSystem* getClosestSystem() { return systems[closestId]; };
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	~PlanetarySystems();
+	~CosmologicalLabels();
 
-	bool useVRCamposForClosest = true;
+	static QList<QPair<QString, QWidget*>>
+	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
   private:
-	bool doRender          = false;
-	unsigned int closestId = 0;
-	std::vector<Vector3> positions;
-	std::vector<OrbitalSystem*> systems;
-	std::vector<QString> directories;
-
-	GLShaderProgram shader;
-	GLMesh mesh;
+	// in kpc
+	Vector3 solarSystemDataPos = Vector3();
+	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
 
 	QMatrix4x4 model;
 	QVector3D campos;
 };
 
-#endif // PLANETARYSYSTEMS_HPP
+#endif // COSMOLOGICALLABELS_HPP

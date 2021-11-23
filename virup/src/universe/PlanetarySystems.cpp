@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "PlanetarySystems.hpp"
+#include "universe/PlanetarySystems.hpp"
 
 PlanetarySystems::PlanetarySystems()
     : shader("default")
