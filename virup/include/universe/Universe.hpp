@@ -34,9 +34,46 @@ class Universe : public QObject
 {
 	Q_OBJECT
 
+	/**
+	 * @brief The current time of the simulation.
+	 *
+	 * @accessors getSimulationTime(), setSimulationTime()
+	 */
+	Q_PROPERTY(
+	    QDateTime simulationTime READ getSimulationTime WRITE setSimulationTime)
+	/**
+	 * @brief The current time coefficient of the simulation.
+	 *
+	 * @accessors getTimeCoeff(), setTimeCoeff()
+	 */
+	Q_PROPERTY(float timeCoeff READ getTimeCoeff WRITE setTimeCoeff)
+	Q_PROPERTY(bool lockedRealTime READ getLockedRealTime)
 	Q_PROPERTY(float tanAngleLimit READ getTanAngleLimit WRITE setTanAngleLimit)
 
   public:
+	// TIME
+
+	/**
+	 * @getter{simulationTime}
+	 */
+	QDateTime getSimulationTime() const;
+	/**
+	 * @setter{simulationTime, simulationTime}
+	 */
+	void setSimulationTime(QDateTime const& simulationTime);
+	/**
+	 * @getter{timeCoeff}
+	 */
+	float getTimeCoeff() const { return clock.getTimeCoeff(); };
+	/**
+	 * @setter{timeCoeff, timeCoeff}
+	 */
+	void setTimeCoeff(float timeCoeff) { clock.setTimeCoeff(timeCoeff); };
+	/**
+	 * @getter{lockedRealTime}
+	 */
+	float getLockedRealTime() const { return clock.getLockedRealTime(); };
+
 	/**
 	 * @getter{tanAngleLimit}
 	 */
@@ -67,6 +104,9 @@ class Universe : public QObject
 				stream >> foo;
 				visibilities.push_back(foo);
 			}
+			double dut;
+			stream >> dut;
+			ut = dut;
 		};
 		virtual void writeInDataStream(QDataStream& stream) override
 		{
@@ -74,10 +114,13 @@ class Universe : public QObject
 			{
 				stream << visibilities[i];
 			}
+			double dut(ut);
+			stream << dut;
 		};
 
 		std::vector<double> visibilities;
 		static unsigned int elementsSize;
+		UniversalTime ut;
 	};
 
 	void readState(AbstractState const& s)
@@ -93,6 +136,7 @@ class Universe : public QObject
 			pair.second->setVisibility(state.visibilities[i]);
 			++i;
 		}
+		clock.setCurrentUt(state.ut);
 	};
 	void writeState(AbstractState& s) const
 	{
@@ -102,6 +146,7 @@ class Universe : public QObject
 		{
 			state.visibilities.push_back(pair.second->getVisibility());
 		}
+		state.ut = clock.getCurrentUt();
 	};
 
 	Universe(OrbitalSystemCamera& camPlanet);
@@ -116,19 +161,9 @@ class Universe : public QObject
 	};
 	QString getPlanetTarget() const;
 	void setPlanetTarget(QString const& name);
-	QString
-	    getClosestCommonAncestorName(QString const& celestialBodyName0,
-	                                 QString const& celestialBodyName1) const;
-	Vector3 getCelestialBodyPosition(QString const& bodyName,
-	                                 QString const& referenceBodyName,
-	                                 QDateTime const& dt,
-	                                 UniversalTime const& currentUt) const;
-	Vector3 interpolateCoordinates(QString const& celestialBodyName0,
-	                               QString const& celestialBodyName1, float t,
-	                               UniversalTime const& currentUt) const;
 	void updateCosmo(Camera const& cam);
-	void updatePlanetarySystem(Camera const& cam,
-	                           UniversalTime const& currentUt);
+	void updatePlanetarySystem(Camera const& cam);
+	void updateClock(bool videomode, float frameTiming);
 	void renderCosmo(Camera const& cam,
 	                 ToneMappingModel const& toneMappingModel);
 	void renderPlanetarySystem();
@@ -138,6 +173,27 @@ class Universe : public QObject
 	QString planetarySystemName = "";
 
   public slots:
+	/**
+	 * @brief Returns closest common ancestor between two planetary bodies.
+	 */
+	QString
+	    getClosestCommonAncestorName(QString const& celestialBodyName0,
+	                                 QString const& celestialBodyName1) const;
+	/**
+	 * @brief Returns celestial body position relative to another at a given
+	 * date/time.
+	 */
+	Vector3 getCelestialBodyPosition(QString const& bodyName,
+	                                 QString const& referenceBodyName,
+	                                 QDateTime const& dt
+	                                 = QDateTime::currentDateTimeUtc()) const;
+	/**
+	 * @brief Interpolates celestial bodies coordinates relative to their
+	 * closest common ancestor.
+	 */
+	Vector3 interpolateCoordinates(QString const& celestialBodyName0,
+	                               QString const& celestialBodyName1,
+	                               float t) const;
 	Vector3 getCameraCurrentRelPosToBody(QString const& bodyName) const;
 	void setAnimationTime(float t)
 	{
@@ -192,6 +248,8 @@ class Universe : public QObject
 	Vector3 sysInWorld                    = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
 	bool forceUpdateFromCosmo             = true;
 	UniversalTime lastCurrentUt;
+	SimulationTime clock = SimulationTime(
+	    QSettings().value("simulation/starttime").value<QDateTime>());
 };
 
 #endif // UNIVERSE_HPP

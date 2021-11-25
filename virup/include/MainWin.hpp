@@ -33,19 +33,6 @@ class MainWin : public AbstractMainWin
 {
 	Q_OBJECT
 	/**
-	 * @brief The current time of the simulation.
-	 *
-	 * @accessors getSimulationTime(), setSimulationTime()
-	 */
-	Q_PROPERTY(
-	    QDateTime simulationTime READ getSimulationTime WRITE setSimulationTime)
-	/**
-	 * @brief The current time coefficient of the simulation.
-	 *
-	 * @accessors getTimeCoeff(), setTimeCoeff()
-	 */
-	Q_PROPERTY(float timeCoeff READ getTimeCoeff WRITE setTimeCoeff)
-	/**
 	 * @brief The current global scale of the visualization.
 	 * Ratio 1 real meter / 1 visualized meter. For example, if scale == 1/1000,
 	 * each real meter you see represents one kilometer. There should be no
@@ -148,9 +135,6 @@ class MainWin : public AbstractMainWin
 			toneMappingState.readFromDataStream(stream);
 			cosmoCamState.readFromDataStream(stream);
 			planetCamState.readFromDataStream(stream);
-			double dut;
-			stream >> dut;
-			ut = dut;
 			stream >> renderLabels;
 			stream >> renderOrbits;
 			stream >> planetarySystemName;
@@ -164,8 +148,6 @@ class MainWin : public AbstractMainWin
 			toneMappingState.writeInDataStream(stream);
 			cosmoCamState.writeInDataStream(stream);
 			planetCamState.writeInDataStream(stream);
-			double dut(ut);
-			stream << dut;
 			stream << renderLabels;
 			stream << renderOrbits;
 			stream << planetarySystemName;
@@ -178,7 +160,6 @@ class MainWin : public AbstractMainWin
 		ToneMappingModel::State toneMappingState;
 		Camera::State cosmoCamState;
 		OrbitalSystemCamera::State planetCamState;
-		UniversalTime ut;
 		float renderLabels;
 		float renderOrbits;
 		QString planetarySystemName;
@@ -189,25 +170,6 @@ class MainWin : public AbstractMainWin
 	};
 
 	MainWin();
-
-	// TIME
-
-	/**
-	 * @getter{simulationTime}
-	 */
-	QDateTime getSimulationTime() const;
-	/**
-	 * @setter{simulationTime, simulationTime}
-	 */
-	void setSimulationTime(QDateTime const& simulationTime);
-	/**
-	 * @getter{timeCoeff}
-	 */
-	float getTimeCoeff() const { return clock.getTimeCoeff(); };
-	/**
-	 * @setter{timeCoeff, timeCoeff}
-	 */
-	void setTimeCoeff(float timeCoeff) { clock.setTimeCoeff(timeCoeff); };
 
 	// SPACE
 
@@ -324,27 +286,6 @@ class MainWin : public AbstractMainWin
 	 * @brief Toggles the @e gridEnabled property.
 	 */
 	void toggleGrid() { setGridEnabled(!gridEnabled()); };
-	/**
-	 * @brief Returns closest common ancestor between two planetary bodies.
-	 */
-	QString
-	    getClosestCommonAncestorName(QString const& celestialBodyName0,
-	                                 QString const& celestialBodyName1) const;
-	/**
-	 * @brief Returns celestial body position relative to another at a given
-	 * date/time.
-	 */
-	Vector3 getCelestialBodyPosition(QString const& bodyName,
-	                                 QString const& referenceBodyName,
-	                                 QDateTime const& dt
-	                                 = QDateTime::currentDateTimeUtc()) const;
-	/**
-	 * @brief Interpolates celestial bodies coordinates relative to their
-	 * closest common ancestor.
-	 */
-	Vector3 interpolateCoordinates(QString const& celestialBodyName0,
-	                               QString const& celestialBodyName1,
-	                               float t) const;
 
 	QString getVoiceoverPath()
 	{
@@ -408,7 +349,6 @@ class MainWin : public AbstractMainWin
 			{
 			}
 		}
-		clock.setCurrentUt(state.ut);
 		CelestialBodyRenderer::renderLabels = state.renderLabels;
 		CelestialBodyRenderer::renderOrbits = state.renderOrbits;
 		universe->planetarySystemName       = state.planetarySystemName;
@@ -430,7 +370,6 @@ class MainWin : public AbstractMainWin
 			    renderer.getCamera<OrbitalSystemCamera const&>("planet"));
 			cam2.writeState(state.planetCamState);
 		}
-		state.ut                  = clock.getCurrentUt();
 		state.renderLabels        = CelestialBodyRenderer::renderLabels;
 		state.renderOrbits        = CelestialBodyRenderer::renderOrbits;
 		state.planetarySystemName = universe->planetarySystemName;
@@ -457,9 +396,6 @@ class MainWin : public AbstractMainWin
 	/* PLANET SYSTEMS */
 	// 1 m = 3.24078e-20 kpc
 	const double mtokpc = 3.24078e-20;
-
-	SimulationTime clock = SimulationTime(
-	    QSettings().value("simulation/starttime").value<QDateTime>());
 
 	/* TEXT */
 	Text3D* debugText         = nullptr;

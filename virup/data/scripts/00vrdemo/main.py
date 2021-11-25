@@ -98,11 +98,11 @@ def interpolateSpatialData(s0, s1, t, simTime0, simTime1):
 
     if s0.bodyName != '' and s1.bodyName != '' and s0.bodyName != s1.bodyName :
         longanimation = True
-        bn = VIRUP.getClosestCommonAncestorName(s0.bodyName, s1.bodyName)
-        planetpos = VIRUP.interpolateCoordinates(s0.bodyName, s1.bodyName, t)
+        bn = Universe.getClosestCommonAncestorName(s0.bodyName, s1.bodyName)
+        planetpos = Universe.interpolateCoordinates(s0.bodyName, s1.bodyName, t)
 
-        start=VIRUP.getCelestialBodyPosition(s0.bodyName, bn, simTime0)
-        end=VIRUP.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
+        start=Universe.getCelestialBodyPosition(s0.bodyName, bn, simTime0)
+        end=Universe.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
 
         dist = (end-start).length()
         if dist == 0:
@@ -373,7 +373,7 @@ def setSceneId(newid):
     else:
         if oldid == -1:
             currentscene=Scene(SpatialData(VIRUP.cosmoPosition - getCosmoShift(), 1.0 / VIRUP.scale, VIRUP.planetTarget, VIRUP.planetarySystemName),
-               TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), scenes[oldid].ui)
+               TemporalData(Universe.timeCoeff, Universe.simulationTime), scenes[oldid].ui)
         else:
             currentscene=scenes[oldid]
         if scenes[id].spatialData.systemName == currentscene.spatialData.systemName and (scenes[id].spatialData.cosmoPos - currentscene.spatialData.cosmoPos).length() > 0.1:
@@ -434,7 +434,7 @@ def initScene():
     global currentscene
     global s
 
-    VIRUP.simulationTime = solareclipsedt
+    Universe.simulationTime = solareclipsedt
 
     timer = QElapsedTimer()
     longanimation = False
@@ -488,10 +488,10 @@ def updateScene():
         VIRUP.cosmoPosition = spatialData.cosmoPos
 
     temporalData = scene.temporalData
-    VIRUP.timeCoeff = temporalData.timeCoeff
+    Universe.timeCoeff = temporalData.timeCoeff
     if temporalData.simulationTime != None:
         if temporalData.simulationTime.isValid() and t <= 1:
-            VIRUP.simulationTime = temporalData.simulationTime
+            Universe.simulationTime = temporalData.simulationTime
 
     ui = scene.ui
     for label in Universe.getUniverseElementsNames():

@@ -5,16 +5,6 @@ MainWin::MainWin()
 	srand(time(nullptr));
 }
 
-QDateTime MainWin::getSimulationTime() const
-{
-	return SimulationTime::utToDateTime(clock.getCurrentUt());
-}
-
-void MainWin::setSimulationTime(QDateTime const& simulationTime)
-{
-	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
-}
-
 double MainWin::getScale() const
 {
 	return renderer.getCamera<Camera>("cosmo").scale * mtokpc;
@@ -78,29 +68,6 @@ void MainWin::setCamYaw(float yaw)
 	renderer.getCamera<OrbitalSystemCamera>("planet").yaw = yaw;
 }
 
-QString MainWin::getClosestCommonAncestorName(
-    QString const& celestialBodyName0, QString const& celestialBodyName1) const
-{
-	return universe->getClosestCommonAncestorName(celestialBodyName0,
-	                                              celestialBodyName1);
-}
-
-Vector3 MainWin::getCelestialBodyPosition(QString const& bodyName,
-                                          QString const& referenceBodyName,
-                                          QDateTime const& dt) const
-{
-	return universe->getCelestialBodyPosition(bodyName, referenceBodyName, dt,
-	                                          clock.getCurrentUt());
-}
-
-Vector3 MainWin::interpolateCoordinates(QString const& celestialBodyName0,
-                                        QString const& celestialBodyName1,
-                                        float t) const
-{
-	return universe->interpolateCoordinates(
-	    celestialBodyName0, celestialBodyName1, t, clock.getCurrentUt());
-}
-
 void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 {
 	if(loaded)
@@ -143,10 +110,10 @@ void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 			}
 			else if(a.id == "timecoeffdown")
 			{
-				float tc(clock.getTimeCoeff());
-				if(tc > 1.f && !clock.getLockedRealTime())
+				float tc(universe->getTimeCoeff());
+				if(tc > 1.f && !universe->getLockedRealTime())
 				{
-					clock.setTimeCoeff(tc / 10.f);
+					universe->setTimeCoeff(tc / 10.f);
 					debugText->setText(
 					    ("Time coeff. : "
 					     + std::to_string(static_cast<int>(tc / 10.f)) + "x")
@@ -156,10 +123,10 @@ void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 			}
 			else if(a.id == "timecoeffup")
 			{
-				float tc(clock.getTimeCoeff());
-				if(tc < 1000000.f && !clock.getLockedRealTime())
+				float tc(universe->getTimeCoeff());
+				if(tc < 1000000.f && !universe->getLockedRealTime())
 				{
-					clock.setTimeCoeff(tc * 10.f);
+					universe->setTimeCoeff(tc * 10.f);
 					debugText->setText(
 					    ("Time coeff. : "
 					     + std::to_string(static_cast<int>(tc * 10.f)) + "x")
@@ -270,12 +237,13 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 							}
 							else // UP OR DOWN
 							{
-								float tc(clock.getTimeCoeff());
+								float tc(universe->getTimeCoeff());
 								if(padCoords[1] < 0.0f) // DOWN
 								{
-									if(tc > 1.f && !clock.getLockedRealTime())
+									if(tc > 1.f
+									   && !universe->getLockedRealTime())
 									{
-										clock.setTimeCoeff(tc / 10.f);
+										universe->setTimeCoeff(tc / 10.f);
 										debugText->setText(
 										    ("Time coeff. : "
 										     + std::to_string(
@@ -288,9 +256,9 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 								else // UP
 								{
 									if(tc < 1000000.f
-									   && !clock.getLockedRealTime())
+									   && !universe->getLockedRealTime())
 									{
-										clock.setTimeCoeff(tc * 10.f);
+										universe->setTimeCoeff(tc * 10.f);
 										debugText->setText(
 										    ("Time coeff. : "
 										     + std::to_string(
@@ -556,21 +524,14 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		                                  toneMappingModel->exposure);
 		debugText->getShader().setUniform("dynamicrange",
 		                                  toneMappingModel->dynamicrange);
-		if(videomode)
-		{
-			clock.update(frameTiming);
-		}
-		else
-		{
-			clock.update();
-		}
-		cam.updateUT(clock.getCurrentUt());
+
+		universe->updateClock(videomode, frameTiming);
 
 		if(!universe->planetSystems->renderSystem())
 		{
 			return;
 		}
-		universe->updatePlanetarySystem(cosmoCam, clock.getCurrentUt());
+		universe->updatePlanetarySystem(cosmoCam);
 
 		timeSinceTextUpdate += frameTiming;
 		std::string targetName(cam.target->getName());

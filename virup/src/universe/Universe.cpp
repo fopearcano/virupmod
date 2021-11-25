@@ -131,6 +131,16 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 	PythonQtHandler::addObject("Universe", this);
 }
 
+QDateTime Universe::getSimulationTime() const
+{
+	return SimulationTime::utToDateTime(clock.getCurrentUt());
+}
+
+void Universe::setSimulationTime(QDateTime const& simulationTime)
+{
+	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
+}
+
 QString Universe::getPlanetTarget() const
 {
 	return camPlanet.target->getName().c_str();
@@ -180,8 +190,7 @@ QString Universe::getClosestCommonAncestorName(
 
 Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
                                            QString const& referenceBodyName,
-                                           QDateTime const& dt,
-                                           UniversalTime const& currentUt) const
+                                           QDateTime const& dt) const
 {
 	Orbitable const* orb(nullptr);
 	Orbitable const* orbRef(nullptr);
@@ -207,13 +216,13 @@ Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
 		return Orbitable::getRelativePositionAtUt(
 		    orbRef, orb, SimulationTime::dateTimeToUT(dt));
 	}
-	return Orbitable::getRelativePositionAtUt(orbRef, orb, currentUt);
+	return Orbitable::getRelativePositionAtUt(orbRef, orb,
+	                                          clock.getCurrentUt());
 }
 
 Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
                                          QString const& celestialBodyName1,
-                                         float t,
-                                         UniversalTime const& currentUt) const
+                                         float t) const
 {
 	Orbitable const* orb0(nullptr);
 	Orbitable const* orb1(nullptr);
@@ -240,9 +249,11 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 		return {};
 	}
 
-	return (Orbitable::getRelativePositionAtUt(ancestor, orb0, currentUt)
+	return (Orbitable::getRelativePositionAtUt(ancestor, orb0,
+	                                           clock.getCurrentUt())
 	        * (1 - t))
-	       + (Orbitable::getRelativePositionAtUt(ancestor, orb1, currentUt)
+	       + (Orbitable::getRelativePositionAtUt(ancestor, orb1,
+	                                             clock.getCurrentUt())
 	          * t);
 }
 
@@ -395,10 +406,23 @@ void Universe::updateCosmo(Camera const& cam)
 	    = PythonQtHandler::getVariable("id").toInt() == -1;
 }
 
-void Universe::updatePlanetarySystem(Camera const& cam,
-                                     UniversalTime const& currentUt)
+void Universe::updateClock(bool videomode, float frameTiming)
 {
-	lastCurrentUt = currentUt;
+	if(videomode)
+	{
+		clock.update(frameTiming);
+	}
+	else
+	{
+		clock.update();
+	}
+	camPlanet.updateUT(clock.getCurrentUt());
+}
+
+void Universe::updatePlanetarySystem(Camera const& cam)
+{
+	auto currentUt = clock.getCurrentUt();
+	lastCurrentUt  = currentUt;
 	if(!planetSystems->renderSystem())
 	{
 		return;
