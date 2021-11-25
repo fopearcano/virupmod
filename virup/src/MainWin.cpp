@@ -390,15 +390,10 @@ void MainWin::initScene()
 	if(networkManager->isServer())
 	{
 		visibilities = new Visibilities(*universe);
-		auto tools(menuBar->addMenu(tr("Tools")));
-		tools->addAction(tr("Visibilities List"), this,
-		                 [this]() { this->visibilities->show(); });
 
 		dialog = new QDialog;
 		dialog->show();
 		dialog->setWindowTitle("VIRUP Scenes");
-		// dialog->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint |
-		// Qt::X11BypassWindowManagerHint );
 
 		auto layout = new QVBoxLayout(dialog);
 
@@ -463,6 +458,12 @@ void MainWin::initScene()
 		transitionsButton->setFocusPolicy(Qt::NoFocus);
 		transitionsButton->hide();
 		layout->addWidget(transitionsButton);
+
+		auto tools(menuBar->addMenu(tr("Tools")));
+		tools->addAction(tr("Scenes"), this,
+		                 [this]() { this->dialog->show(); });
+		tools->addAction(tr("Visibilities List"), this,
+		                 [this]() { this->visibilities->show(); });
 	}
 }
 
