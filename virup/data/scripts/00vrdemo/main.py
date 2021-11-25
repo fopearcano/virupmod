@@ -7,6 +7,7 @@ from PythonQt.QtCore import QTime
 from PythonQt.QtCore import QTimeZone
 from PythonQt.QtMultimedia import QSound
 from PythonQt.libplanet import Vector3
+from PythonQt.virup import SceneUI
 from math import exp, log, isnan, atan2, asin, cos, sin, pi
 
 def smoothstep(t, v0 = 0, v1 = 0):
@@ -29,16 +30,8 @@ class TemporalData:
         self.timeCoeff = timeCoeff
         self.simulationTime = simulationTime
 
-class UI:
-    def __init__(self, lumsdic=[]):
-        self.lumsdic=lumsdic
-    def getLum(self, name):
-        if name in self.lumsdic.keys():
-            return self.lumsdic[name]
-        return 0.0
-
 class Scene:
-    def __init__(self, spatialData, temporalData = TemporalData(), ui = UI(), transitiontimeto=10.0, name="", custom=lambda *args: None):
+    def __init__(self, spatialData, temporalData = TemporalData(), ui = SceneUI(), transitiontimeto=10.0, name="", custom=lambda *args: None):
         self.spatialData = spatialData
         self.temporalData = temporalData
         self.ui = ui
@@ -153,24 +146,13 @@ def interpolateTemporalData(t0, t1, t):
         interpolateDateTime(t0.simulationTime, t1.simulationTime, t)
     )
 
-def interpolateUI(ui0, ui1, t):
-    dic={}
-    for label in Universe.getUniverseElementsNames():
-        dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
-
-    additional=["Constellations", "Orbits", "PlanetsLabels", "Debris", "AnimationTime"]
-    for label in additional:
-        dic[label] = interpolateLinear(ui0.getLum(label), ui1.getLum(label), t)
-
-    return UI(dic)
-
 def interpolateScene(sc0, sc1, t):
     simTime0=interpolateDateTime(sc0.temporalData.simulationTime, sc1.temporalData.simulationTime, 0.25)
     simTime1=interpolateDateTime(sc0.temporalData.simulationTime, sc1.temporalData.simulationTime, 0.75)
     return Scene(
         interpolateSpatialData(sc0.spatialData, sc1.spatialData, t, simTime0, simTime1),
         interpolateTemporalData(sc0.temporalData, sc1.temporalData, t),
-        interpolateUI(sc0.ui, sc1.ui, t)
+        SceneUI.interpolate(sc0.ui, sc1.ui, t)
     )
 
 #2021-06-26T01:52:07Z
@@ -258,79 +240,79 @@ scenes = [
 # Intro
     # Earth
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Hipparcos":1.0}), 1.0, "begin", begin),
+          TemporalData(1.0), SceneUI({"Hipparcos":1.0}), 1.0, "begin", begin),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Hipparcos":1.0}), 3.0),
+          TemporalData(1.0), SceneUI({"Hipparcos":1.0}), 3.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 1.0),
+          TemporalData(1.0), SceneUI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 3.0),
+          TemporalData(1.0), SceneUI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 3.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Volumetric AGORA":1.0}), 1.0),
+          TemporalData(1.0), SceneUI({"Volumetric AGORA":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Volumetric AGORA":1.0}), 3.0),
+          TemporalData(1.0), SceneUI({"Volumetric AGORA":1.0}), 3.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"IllustrisTNG":1.0}), 1.0),
+          TemporalData(1.0), SceneUI({"IllustrisTNG":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"IllustrisTNG":1.0}), 3.0),
+          TemporalData(1.0), SceneUI({"IllustrisTNG":1.0}), 3.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"SDSS":1.0}), 1.0),
+          TemporalData(1.0), SceneUI({"SDSS":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"SDSS":1.0}), 3.0),
+          TemporalData(1.0), SceneUI({"SDSS":1.0}), 3.0),
 
 
 
 
     # International Space Station Real scale
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 1.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 1.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 1, 'ISS', 'Solar System', Vector3(-50, 0, 30)),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 19.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 19.0),
     # Earth
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Moon
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4000000, 'Moon', 'Solar System'),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 10.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 4000000, 'Moon', 'Solar System'),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Phobos
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
-          TemporalData(100.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 10.0, "phobos", showOrbitsWhileTraveling),
+          TemporalData(100.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 10.0, "phobos", showOrbitsWhileTraveling),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 30000, 'Phobos', 'Solar System'),
-          TemporalData(500.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
+          TemporalData(500.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 20.0),
     # Solar System dynamics Constellations
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
-          TemporalData(10000000.0), UI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 10.0),
+          TemporalData(10000000.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 10.0),
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 5.65181e+12, 'Sun', 'Solar System'),
-          TemporalData(10000000.0), UI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 20.0),
+          TemporalData(10000000.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0}), 20.0),
     # Milky Way
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-          TemporalData(), UI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 10.0),
+          TemporalData(), SceneUI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 6.171e+20),
-          TemporalData(), UI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 20.0),
+          TemporalData(), SceneUI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0}), 20.0),
     # Local Group
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 3.04e+22),
-          TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 10.0),
+          TemporalData(), SceneUI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 3.04e+22),
-          TemporalData(), UI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 20.0),
+          TemporalData(), SceneUI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0}), 20.0),
     # Illustris
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
-          TemporalData(), UI({"IllustrisTNG":1.0}), 10.0),
+          TemporalData(), SceneUI({"IllustrisTNG":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 0.2e+25),
-          TemporalData(), UI({"IllustrisTNG":1.0}), 20.0),
+          TemporalData(), SceneUI({"IllustrisTNG":1.0}), 20.0),
     # SDSS distant
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
-          TemporalData(), UI({"SDSS":1.0}), 10.0),
+          TemporalData(), SceneUI({"SDSS":1.0}), 10.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
-          TemporalData(), UI({"SDSS":1.0}), 35.0),
+          TemporalData(), SceneUI({"SDSS":1.0}), 35.0),
     Scene(SpatialData(Vector3(-0.43, -8.24, -0.81), 2.0e+26),
-          TemporalData(), UI({"SDSS":1.0}), 1.0, "end", end),
+          TemporalData(), SceneUI({"SDSS":1.0}), 1.0, "end", end),
 
     Scene(SpatialData(Vector3(0.0, 0.0, 0.0), 15000000, 'Earth', 'Solar System'),
-          TemporalData(1.0), UI({"Gaia":1.0, "Hipparcos":1.0}), 1.0, "fooend", black)
+          TemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0}), 1.0, "fooend", black)
 ]
 
 def getIdFromName(name):
@@ -515,19 +497,19 @@ def updateScene():
     for label in Universe.getUniverseElementsNames():
         if fade_factor != 0.0:
             if ToneMappingModel.exposure != 0.0:
-                Universe.setVisibility(label, ui.getLum(label) * 0.3 * fade_factor / ToneMappingModel.exposure)
+                Universe.setVisibility(label, ui.getVisibility(label) * 0.3 * fade_factor / ToneMappingModel.exposure)
             else:
-                Universe.setVisibility(label, ui.getLum(label) * fade_factor)
+                Universe.setVisibility(label, ui.getVisibility(label) * fade_factor)
 
     additional=["Constellations", "Orbits", "PlanetsLabels"]
     for label in additional:
-        Universe.setVisibility(label, ui.getLum(label))
+        Universe.setVisibility(label, ui.getVisibility(label))
 
     ToneMappingModel.exposure = 0.3
     fade_factor = 1.0
     Universe.setLabelsOrbitsOnly([])
 
-    animationtime=ui.getLum("AnimationTime")
+    animationtime=ui.getVisibility("AnimationTime")
     Universe.setAnimationTime(animationtime)
 
     VIRUP.camYaw = shiftangle

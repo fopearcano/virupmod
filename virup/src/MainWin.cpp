@@ -334,6 +334,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 void MainWin::setupPythonAPI()
 {
 	PythonQtHandler::addObject("VIRUP", this);
+	PythonQtHandler::addWrapper<SceneUIWrapper>();
 }
 
 void MainWin::initLibraries()

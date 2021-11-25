@@ -14,6 +14,7 @@
 
 #include "Grid.hpp"
 #include "MovementControls.hpp"
+#include "scenes/Scene.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
 
