@@ -72,7 +72,7 @@ class Universe : public QObject
 	/**
 	 * @getter{lockedRealTime}
 	 */
-	float getLockedRealTime() const { return clock.getLockedRealTime(); };
+	bool getLockedRealTime() const { return clock.getLockedRealTime(); };
 
 	/**
 	 * @getter{tanAngleLimit}

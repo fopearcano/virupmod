@@ -18,20 +18,14 @@
 
 #include "scenes/SceneUI.hpp"
 
-SceneUI::SceneUI(std::map<QString, float> const& visibilities)
-    : visibilities(visibilities)
+SceneUI::SceneUI(std::map<QString, float> visibilities)
+    : visibilities(std::move(visibilities))
 {
 }
 
 SceneUI::SceneUI(QVariantMap const& visibilities)
     : visibilities(fromQt(visibilities))
 {
-}
-
-SceneUI& SceneUI::operator=(SceneUI const& ui)
-{
-	visibilities = ui.visibilities;
-	return *this;
 }
 
 float SceneUI::getVisibility(QString const& name) const

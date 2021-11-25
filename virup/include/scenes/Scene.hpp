@@ -19,6 +19,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include "SceneTemporalData.hpp"
 #include "SceneUI.hpp"
 
 class Scene
