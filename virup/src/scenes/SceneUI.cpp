@@ -63,14 +63,27 @@ SceneUI SceneUI::interpolate(SceneUI const& ui0, SceneUI const& ui1, float t)
 {
 	std::map<QString, float> vis;
 
+	QStringList names;
+
 	for(auto const& pair : ui0.visibilities)
 	{
-		if(ui1.visibilities.count(pair.first) == 0)
+		if(!names.contains(pair.first))
 		{
-			continue;
+			names.append(pair.first);
 		}
-		vis[pair.first]
-		    = pair.second * (1.f - t) + ui1.visibilities.at(pair.first) * t;
+	}
+	for(auto const& pair : ui1.visibilities)
+	{
+		if(!names.contains(pair.first))
+		{
+			names.append(pair.first);
+		}
+	}
+
+	for(auto const& name : names)
+	{
+		vis[name]
+		    = ui0.getVisibility(name) * (1.f - t) + ui1.getVisibility(name) * t;
 	}
 
 	return {vis};
