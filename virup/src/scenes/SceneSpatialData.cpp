@@ -110,7 +110,23 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 			                             ancestor, 1.0 / sd0.scale, start);
 			SceneSpatialData sd1ancestor(*sd1.universe, sd1.systemName,
 			                             ancestor, 1.0 / sd1.scale, end);
-			return noFrameChangeInterpolate(sd0ancestor, sd1ancestor, t, 1.f);
+			auto result
+			    = noFrameChangeInterpolate(sd0ancestor, sd1ancestor, t, 1.f);
+			// if we are still focused on a body, keep it as frame of reference
+			// for precision
+			if(result.position == sd0ancestor.position)
+			{
+				auto trueResult(sd0);
+				trueResult.scale = result.scale;
+				return trueResult;
+			}
+			else if(result.position == sd1ancestor.position)
+			{
+				auto trueResult(sd1);
+				trueResult.scale = result.scale;
+				return trueResult;
+			}
+			return result;
 		}
 	}
 
