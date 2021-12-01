@@ -38,6 +38,7 @@ class PlanetarySystems : public UniverseElement
 		                     * Utils::toQt(positions[closestId]));
 	};
 	OrbitalSystem* getClosestSystem() { return systems[closestId]; };
+	Vector3 getAbsolutePosition(QString const& systemName) const;
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
@@ -51,6 +52,7 @@ class PlanetarySystems : public UniverseElement
 	std::vector<Vector3> positions;
 	std::vector<OrbitalSystem*> systems;
 	std::vector<QString> directories;
+	std::map<QString, unsigned int> ids;
 
 	GLShaderProgram shader;
 	GLMesh mesh;

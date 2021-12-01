@@ -62,6 +62,7 @@ PlanetarySystems::PlanetarySystems()
 			positions.push_back(position);
 			systems.push_back(orbitalSystem);
 			directories.push_back(QFileInfo(jsonFile).absoluteDir().path());
+			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
 		}
 	}
 	QString solarsystemjson(
@@ -94,6 +95,7 @@ PlanetarySystems::PlanetarySystems()
 			positions.emplace_back();
 			systems.push_back(orbitalSystem);
 			directories.push_back(dir);
+			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
 			qDebug() << dir;
 		}
 	}
@@ -108,6 +110,12 @@ PlanetarySystems::PlanetarySystems()
 	CSVOrbit::currentSystemDir       = directories[closestId];
 }
 
+Vector3 PlanetarySystems::getAbsolutePosition(QString const& systemName) const
+{
+	auto relativePos(positions[ids.at(systemName)]);
+	return Utils::fromQt(getRelToAbsTransform() * Utils::toQt(relativePos));
+}
+
 void PlanetarySystems::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
@@ -115,9 +123,6 @@ void PlanetarySystems::update(Camera const& camera)
 	QVector3D pos = useVRCamposForClosest ? campos
 	                                      : getRelToAbsTransform().inverted()
 	                                            * Utils::toQt(camera.position);
-
-	// only show Solar System
-	pos = QVector3D();
 
 	double dist(DBL_MAX);
 	unsigned int oldClosestId(closestId);

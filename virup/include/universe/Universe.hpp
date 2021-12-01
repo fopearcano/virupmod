@@ -49,8 +49,107 @@ class Universe : public QObject
 	Q_PROPERTY(float timeCoeff READ getTimeCoeff WRITE setTimeCoeff)
 	Q_PROPERTY(bool lockedRealTime READ getLockedRealTime)
 	Q_PROPERTY(float tanAngleLimit READ getTanAngleLimit WRITE setTanAngleLimit)
+	/**
+	 * @brief The current global scale of the visualization.
+	 * Ratio 1 real meter / 1 visualized meter. For example, if scale == 1/1000,
+	 * each real meter you see represents one kilometer. There should be no
+	 * point to set scale > 1 for astrophysics.
+	 *
+	 * @accessors getScale(), setScale()
+	 */
+	Q_PROPERTY(double scale READ getScale WRITE setScale)
+	/**
+	 * @brief The current camera position in the visualization, relative to the
+	 * cosmological space, in kpc.
+	 *
+	 * @accessors getCosmoPosition(), setCosmoPosition()
+	 */
+	Q_PROPERTY(
+	    Vector3 cosmoPosition READ getCosmoPosition WRITE setCosmoPosition)
+	/**
+	 * @brief Wether a planetary system is loaded or not.
+	 *
+	 * @accessors isPlanetarySystemLoaded()
+	 */
+	Q_PROPERTY(bool planetarySystemLoaded READ isPlanetarySystemLoaded)
+	/**
+	 * @brief Name of the currently (pre-)loaded planetary system.
+	 *
+	 * If set, the corresponding planetary system will be loaded.
+	 *
+	 * The special name "Solar System" will load whichever system that is set as
+	 * the "Solar System" in the launcher, whichever its actual name is. If the
+	 * name isn't "Solar System", then the system must reside in a directory
+	 * named after it, within the exoplanetary systems directory.
+	 */
+	Q_PROPERTY(QString planetarySystemName READ getPlanetarySystemName)
+	/**
+	 * @brief Name of the planetary system camera target.
+	 *
+	 * @accessors getPlanetTarget(), setPlanetTarget()
+	 */
+	Q_PROPERTY(QString planetTarget READ getPlanetTarget WRITE setPlanetTarget)
+	/**
+	 * @brief The current camera position in the visualization, relative to the
+	 * planetTarget, in meters. Undefined if !planetarySystemLoaded.
+	 *
+	 * @accessors getPlanetPosition(), setPlanetPosition()
+	 */
+	Q_PROPERTY(
+	    Vector3 planetPosition READ getPlanetPosition WRITE setPlanetPosition)
 
   public:
+	// SPACE
+
+	/**
+	 * @getter{scale}
+	 */
+	double getScale() const;
+	/**
+	 * @setter{scale, scale}
+	 */
+	void setScale(double scale);
+	/**
+	 * @getter{cosmoPosition}
+	 */
+	Vector3 getCosmoPosition() const;
+	/**
+	 * @setter{cosmoPosition, cosmoPosition}
+	 */
+	void setCosmoPosition(Vector3 cosmoPosition);
+	/**
+	 * @getter{planetarySystemLoaded}
+	 */
+	bool isPlanetarySystemLoaded() const
+	{
+		return isPlanetarySystemRendered();
+	};
+	/**
+	 * @getter{planetarySystemName}
+	 */
+	QString getPlanetarySystemName() const
+	{
+		return isPlanetarySystemLoaded()
+		           ? planetSystems->getClosestSystem()->getName().c_str()
+		           : "";
+	}
+	/**
+	 * @getter{planetTarget}
+	 */
+	QString getPlanetTarget() const;
+	/**
+	 * @setter{planetTarget, planetTarget}
+	 */
+	void setPlanetTarget(QString const& name);
+	/**
+	 * @getter{planetPosition}
+	 */
+	Vector3 getPlanetPosition() const;
+	/**
+	 * @setter{planetPosition, planetPosition}
+	 */
+	void setPlanetPosition(Vector3 planetPosition);
+
 	// TIME
 
 	/**
@@ -149,7 +248,7 @@ class Universe : public QObject
 		state.ut = clock.getCurrentUt();
 	};
 
-	Universe(OrbitalSystemCamera& camPlanet);
+	Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet);
 	BBox getBoundingBox() const { return boundingBox; };
 	UniverseElement const* getElement(QString const& name) const
 	{
@@ -159,18 +258,13 @@ class Universe : public QObject
 	{
 		return planetSystems->renderSystem();
 	};
-	QString getPlanetTarget() const;
-	void setPlanetTarget(QString const& name);
-	void updateCosmo(Camera const& cam);
-	void updatePlanetarySystem(Camera const& cam);
+	void updateCosmo();
+	void updatePlanetarySystem();
 	void updateClock(bool videomode, float frameTiming);
-	void renderCosmo(Camera const& cam,
-	                 ToneMappingModel const& toneMappingModel);
+	void renderCosmo(ToneMappingModel const& toneMappingModel);
 	void renderPlanetarySystem();
 	void renderPlanetarySystemTransparent();
 	~Universe();
-
-	QString planetarySystemName = "";
 
   public slots:
 	/**
@@ -240,6 +334,12 @@ class Universe : public QObject
 	PlanetarySystems* planetSystems = nullptr;
 
   private:
+	Camera& camCosmo;
+
+	/* PLANET SYSTEMS */
+	// 1 m = 3.24078e-20 kpc
+	const double mtokpc = 3.24078e-20;
+
 	// planets
 	OrbitalSystemCamera& camPlanet;
 	OrbitalSystem* orbitalSystem          = nullptr;

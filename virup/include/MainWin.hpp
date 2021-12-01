@@ -33,56 +33,6 @@ class MainWin : public AbstractMainWin
 {
 	Q_OBJECT
 	/**
-	 * @brief The current global scale of the visualization.
-	 * Ratio 1 real meter / 1 visualized meter. For example, if scale == 1/1000,
-	 * each real meter you see represents one kilometer. There should be no
-	 * point to set scale > 1 for astrophysics.
-	 *
-	 * @accessors getScale(), setScale()
-	 */
-	Q_PROPERTY(double scale READ getScale WRITE setScale)
-	/**
-	 * @brief The current camera position in the visualization, relative to the
-	 * cosmological space, in kpc.
-	 *
-	 * @accessors getCosmoPosition(), setCosmoPosition()
-	 */
-	Q_PROPERTY(
-	    Vector3 cosmoPosition READ getCosmoPosition WRITE setCosmoPosition)
-	/**
-	 * @brief Wether a planetary system is loaded or not.
-	 *
-	 * @accessors isPlanetarySystemLoaded()
-	 */
-	Q_PROPERTY(bool planetarySystemLoaded READ isPlanetarySystemLoaded)
-	/**
-	 * @brief Name of the currently (pre-)loaded planetary system.
-	 *
-	 * If set, the corresponding planetary system will be loaded.
-	 *
-	 * The special name "Solar System" will load whichever system that is set as
-	 * the "Solar System" in the launcher, whichever its actual name is. If the
-	 * name isn't "Solar System", then the system must reside in a directory
-	 * named after it, within the exoplanetary systems directory.
-	 */
-	Q_PROPERTY(QString planetarySystemName READ getPSN WRITE setPSN)
-	QString getPSN() const { return universe->planetarySystemName; }
-	void setPSN(QString const& psn) { universe->planetarySystemName = psn; }
-	/**
-	 * @brief Name of the planetary system camera target.
-	 *
-	 * @accessors getPlanetTarget(), setPlanetTarget()
-	 */
-	Q_PROPERTY(QString planetTarget READ getPlanetTarget WRITE setPlanetTarget)
-	/**
-	 * @brief The current camera position in the visualization, relative to the
-	 * planetTarget, in meters. Undefined if !planetarySystemLoaded.
-	 *
-	 * @accessors getPlanetPosition(), setPlanetPosition()
-	 */
-	Q_PROPERTY(
-	    Vector3 planetPosition READ getPlanetPosition WRITE setPlanetPosition)
-	/**
 	 * @brief Wether the orbits is enabled or not.
 	 *
 	 * @accessors renderOrbits(), setRenderOrbits()
@@ -137,7 +87,6 @@ class MainWin : public AbstractMainWin
 			planetCamState.readFromDataStream(stream);
 			stream >> renderLabels;
 			stream >> renderOrbits;
-			stream >> planetarySystemName;
 			stream >> compass;
 			compassState.readFromDataStream(stream);
 			stream >> stereoMultiplier;
@@ -150,7 +99,6 @@ class MainWin : public AbstractMainWin
 			planetCamState.writeInDataStream(stream);
 			stream << renderLabels;
 			stream << renderOrbits;
-			stream << planetarySystemName;
 			stream << compass;
 			compassState.writeInDataStream(stream);
 			stream << stereoMultiplier;
@@ -162,7 +110,6 @@ class MainWin : public AbstractMainWin
 		OrbitalSystemCamera::State planetCamState;
 		float renderLabels;
 		float renderOrbits;
-		QString planetarySystemName;
 		bool compass = false;
 		CalibrationCompass::State compassState;
 		double stereoMultiplier = 1.0;
@@ -170,48 +117,6 @@ class MainWin : public AbstractMainWin
 	};
 
 	MainWin();
-
-	// SPACE
-
-	/**
-	 * @getter{scale}
-	 */
-	double getScale() const;
-	/**
-	 * @setter{scale, scale}
-	 */
-	void setScale(double scale);
-	/**
-	 * @getter{cosmoPosition}
-	 */
-	Vector3 getCosmoPosition() const;
-	/**
-	 * @setter{cosmoPosition, cosmoPosition}
-	 */
-	void setCosmoPosition(Vector3 cosmoPosition);
-	/**
-	 * @getter{planetarySystemLoaded}
-	 */
-	bool isPlanetarySystemLoaded() const
-	{
-		return universe->isPlanetarySystemRendered();
-	};
-	/**
-	 * @getter{planetTarget}
-	 */
-	QString getPlanetTarget() const;
-	/**
-	 * @setter{planetTarget, planetTarget}
-	 */
-	void setPlanetTarget(QString const& name);
-	/**
-	 * @getter{planetPosition}
-	 */
-	Vector3 getPlanetPosition() const;
-	/**
-	 * @setter{planetPosition, planetPosition}
-	 */
-	void setPlanetPosition(Vector3 planetPosition);
 
 	// CUBE
 
@@ -338,7 +243,7 @@ class MainWin : public AbstractMainWin
 
 		auto& cam(renderer.getCamera<Camera&>("cosmo"));
 		cam.readState(state.cosmoCamState);
-		if(isPlanetarySystemLoaded())
+		if(universe->isPlanetarySystemLoaded())
 		{
 			try
 			{
@@ -351,7 +256,6 @@ class MainWin : public AbstractMainWin
 		}
 		CelestialBodyRenderer::renderLabels = state.renderLabels;
 		CelestialBodyRenderer::renderOrbits = state.renderOrbits;
-		universe->planetarySystemName       = state.planetarySystemName;
 		renderer.setCalibrationCompass(state.compass);
 		CalibrationCompass::readState(state.compassState);
 		vrHandler->setStereoMultiplier(state.stereoMultiplier);
@@ -364,16 +268,15 @@ class MainWin : public AbstractMainWin
 
 		auto const& cam(renderer.getCamera<Camera const&>("cosmo"));
 		cam.writeState(state.cosmoCamState);
-		if(isPlanetarySystemLoaded())
+		if(universe->isPlanetarySystemLoaded())
 		{
 			auto const& cam2(
 			    renderer.getCamera<OrbitalSystemCamera const&>("planet"));
 			cam2.writeState(state.planetCamState);
 		}
-		state.renderLabels        = CelestialBodyRenderer::renderLabels;
-		state.renderOrbits        = CelestialBodyRenderer::renderOrbits;
-		state.planetarySystemName = universe->planetarySystemName;
-		state.compass             = renderer.getCalibrationCompass();
+		state.renderLabels = CelestialBodyRenderer::renderLabels;
+		state.renderOrbits = CelestialBodyRenderer::renderOrbits;
+		state.compass      = renderer.getCalibrationCompass();
 		CalibrationCompass::writeState(state.compassState);
 		state.stereoMultiplier = vrHandler->getStereoMultiplier();
 		universe->writeState(state.universeState);
@@ -392,10 +295,6 @@ class MainWin : public AbstractMainWin
 	bool moveView = false;
 	QPoint cursorPosBackup;
 	MovementControls* movementControls = nullptr;
-
-	/* PLANET SYSTEMS */
-	// 1 m = 3.24078e-20 kpc
-	const double mtokpc = 3.24078e-20;
 
 	/* TEXT */
 	Text3D* debugText         = nullptr;

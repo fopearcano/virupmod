@@ -20,8 +20,9 @@
 
 unsigned int Universe::State::elementsSize = 0;
 
-Universe::Universe(OrbitalSystemCamera& camPlanet)
-    : camPlanet(camPlanet)
+Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
+    : camCosmo(camCosmo)
+    , camPlanet(camPlanet)
 {
 	QJsonDocument jsondoc(QJsonDocument::fromJson(
 	    QSettings().value("data/json").toString().toLatin1()));
@@ -131,14 +132,27 @@ Universe::Universe(OrbitalSystemCamera& camPlanet)
 	PythonQtHandler::addObject("Universe", this);
 }
 
-QDateTime Universe::getSimulationTime() const
+double Universe::getScale() const
 {
-	return SimulationTime::utToDateTime(clock.getCurrentUt());
+	return camCosmo.scale * mtokpc;
 }
 
-void Universe::setSimulationTime(QDateTime const& simulationTime)
+void Universe::setScale(double scale)
 {
-	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
+	camCosmo.scale                        = scale / mtokpc;
+	CelestialBodyRenderer::overridenScale = scale;
+}
+
+Vector3 Universe::getCosmoPosition() const
+{
+	return camCosmo.position;
+}
+
+void Universe::setCosmoPosition(Vector3 cosmoPosition)
+{
+	Vector3 diff(cosmoPosition - camCosmo.position);
+	camCosmo.position = cosmoPosition;
+	camPlanet.relativePosition += diff / mtokpc;
 }
 
 QString Universe::getPlanetTarget() const
@@ -156,6 +170,28 @@ void Universe::setPlanetTarget(QString const& name)
 			camPlanet.target = ptr;
 		}
 	}
+}
+
+Vector3 Universe::getPlanetPosition() const
+{
+	return camPlanet.relativePosition;
+}
+
+void Universe::setPlanetPosition(Vector3 planetPosition)
+{
+	Vector3 diff(planetPosition - camPlanet.relativePosition);
+	camPlanet.relativePosition = planetPosition;
+	camCosmo.position += diff * mtokpc;
+}
+
+QDateTime Universe::getSimulationTime() const
+{
+	return SimulationTime::utToDateTime(clock.getCurrentUt());
+}
+
+void Universe::setSimulationTime(QDateTime const& simulationTime)
+{
+	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
 }
 
 QString Universe::getClosestCommonAncestorName(
@@ -390,18 +426,18 @@ void Universe::dumpOctreesStates()
 	}
 }
 
-void Universe::updateCosmo(Camera const& cam)
+void Universe::updateCosmo()
 {
-	OctreeLOD::updateTanAngleLimit(cam);
+	OctreeLOD::updateTanAngleLimit(camCosmo);
 	for(auto pair : elements)
 	{
 		if(pair.second->getVisibility() < 0.001)
 		{
 			continue;
 		}
-		pair.second->update(cam);
+		pair.second->update(camCosmo);
 	}
-	planetSystems->update(cam);
+	planetSystems->update(camCosmo);
 	planetSystems->useVRCamposForClosest
 	    = PythonQtHandler::getVariable("id").toInt() == -1;
 }
@@ -419,7 +455,7 @@ void Universe::updateClock(bool videomode, float frameTiming)
 	camPlanet.updateUT(clock.getCurrentUt());
 }
 
-void Universe::updatePlanetarySystem(Camera const& cam)
+void Universe::updatePlanetarySystem()
 {
 	auto currentUt = clock.getCurrentUt();
 	lastCurrentUt  = currentUt;
@@ -430,29 +466,28 @@ void Universe::updatePlanetarySystem(Camera const& cam)
 	const double mtokpc = 3.24078e-20;
 	if(lastData != planetSystems->getClosestSystemPosition())
 	{
-		planetarySystemName = "";
 		loadClosestSystem();
 	}
 
 	lastData   = planetSystems->getClosestSystemPosition();
-	sysInWorld = cam.dataToWorldPosition(lastData);
+	sysInWorld = camCosmo.dataToWorldPosition(lastData);
 
-	CelestialBodyRenderer::overridenScale = mtokpc * cam.scale;
+	CelestialBodyRenderer::overridenScale = mtokpc * camCosmo.scale;
 
 	if((camPlanet.target == orbitalSystem->getMainCelestialBody()
 	    && CelestialBodyRenderer::overridenScale < 1e-12)
 	   || forceUpdateFromCosmo)
 	{
-		camPlanet.relativePosition = -1 * sysInWorld / (mtokpc * cam.scale);
-		forceUpdateFromCosmo       = false;
+		camPlanet.relativePosition
+		    = -1 * sysInWorld / (mtokpc * camCosmo.scale);
+		forceUpdateFromCosmo = false;
 	}
-	sysInWorld = cam.dataToWorldPosition(lastData);
+	sysInWorld = camCosmo.dataToWorldPosition(lastData);
 	planetSystems->getClosestSystem()->update(currentUt);
 	systemRenderer->updateMesh(currentUt, camPlanet);
 }
 
-void Universe::renderCosmo(Camera const& cam,
-                           ToneMappingModel const& toneMappingModel)
+void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 {
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
 	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
@@ -465,10 +500,10 @@ void Universe::renderCosmo(Camera const& cam,
 		{
 			continue;
 		}
-		pair.second->render(cam, toneMappingModel);
+		pair.second->render(camCosmo, toneMappingModel);
 	}
 
-	planetSystems->render(cam, toneMappingModel);
+	planetSystems->render(camCosmo, toneMappingModel);
 
 	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 	GLHandler::glf().glDisable(GL_DEPTH_CLAMP);
@@ -559,8 +594,6 @@ void Universe::loadClosestSystem()
 
 	CelestialBodyRenderer::overridenScale = 1.0;
 	forceUpdateFromCosmo                  = true;
-
-	planetarySystemName = orbitalSystem->getName().c_str();
 }
 
 Universe::~Universe()

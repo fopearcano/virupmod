@@ -5,57 +5,6 @@ MainWin::MainWin()
 	srand(time(nullptr));
 }
 
-double MainWin::getScale() const
-{
-	return renderer.getCamera<Camera>("cosmo").scale * mtokpc;
-}
-
-void MainWin::setScale(double scale)
-{
-	renderer.getCamera<Camera>("cosmo").scale = scale / mtokpc;
-	CelestialBodyRenderer::overridenScale     = scale;
-}
-
-Vector3 MainWin::getCosmoPosition() const
-{
-	return renderer.getCamera<Camera>("cosmo").position;
-}
-
-void MainWin::setCosmoPosition(Vector3 cosmoPosition)
-{
-	auto& cosmoCam(renderer.getCamera<Camera>("cosmo"));
-	auto& planetCam(renderer.getCamera<OrbitalSystemCamera>("planet"));
-
-	Vector3 diff(cosmoPosition - cosmoCam.position);
-	cosmoCam.position = cosmoPosition;
-	planetCam.relativePosition += diff / mtokpc;
-}
-
-QString MainWin::getPlanetTarget() const
-{
-	return universe->getPlanetTarget();
-}
-
-void MainWin::setPlanetTarget(QString const& name)
-{
-	universe->setPlanetTarget(name);
-}
-
-Vector3 MainWin::getPlanetPosition() const
-{
-	return renderer.getCamera<OrbitalSystemCamera>("planet").relativePosition;
-}
-
-void MainWin::setPlanetPosition(Vector3 planetPosition)
-{
-	auto& cosmoCam(renderer.getCamera<Camera>("cosmo"));
-	auto& planetCam(renderer.getCamera<OrbitalSystemCamera>("planet"));
-
-	Vector3 diff(planetPosition - planetCam.relativePosition);
-	planetCam.relativePosition = planetPosition;
-	cosmoCam.position += diff * mtokpc;
-}
-
 void MainWin::setCamPitch(float pitch)
 {
 	renderer.getCamera<Camera>("cosmo").pitch               = pitch;
@@ -302,6 +251,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 void MainWin::setupPythonAPI()
 {
 	PythonQtHandler::addObject("VIRUP", this);
+	PythonQtHandler::addWrapper<SceneSpatialDataWrapper>();
 	PythonQtHandler::addWrapper<SceneTemporalDataWrapper>();
 	PythonQtHandler::addWrapper<SceneUIWrapper>();
 }
@@ -329,7 +279,7 @@ void MainWin::initScene()
 	                              renderer.getAspectRatioFromFOV());
 
 	// COSMO LOADING
-	universe = new Universe(*camPlanet);
+	universe = new Universe(*cam, *camPlanet);
 
 	// PLANETS LOADING
 	debugText = new Text3D(textWidth, textHeight);
@@ -457,7 +407,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		OrbitRenderer::forceRedraw = videomode;
 
-		universe->updateCosmo(cam);
+		universe->updateCosmo();
 
 		movementControls->update(frameTiming,
 		                         universe->isPlanetarySystemRendered());
@@ -502,8 +452,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	}
 	if(pathId == "planet")
 	{
-		auto& cam      = dynamic_cast<OrbitalSystemCamera&>(camera);
-		auto& cosmoCam = renderer.getCamera<Camera>("cosmo");
+		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
 		if(vrHandler->isEnabled())
 		{
 			debugText->getModel() = cam.hmdSpaceToWorldTransform();
@@ -532,7 +481,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		{
 			return;
 		}
-		universe->updatePlanetarySystem(cosmoCam);
+		universe->updatePlanetarySystem();
 
 		timeSinceTextUpdate += frameTiming;
 		std::string targetName(cam.target->getName());
@@ -574,7 +523,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		}
 		if(showGrid)
 		{
-			grid->render(getScale(), 1.125);
+			grid->render(universe->getScale(), 1.125);
 		}
 		movementControls->renderGuides();
 
@@ -601,7 +550,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	}
 	auto& cam(dynamic_cast<Camera const&>(camera));
 
-	universe->renderCosmo(cam, *toneMappingModel);
+	universe->renderCosmo(*toneMappingModel);
 
 	// update here because depends on eye
 	QVector3D pos(
@@ -629,7 +578,8 @@ void MainWin::applyPostProcShaderParams(
 		}
 
 		shader.setUniform("aspectRatio", aspectRatio);
-		shader.setUniform("lenseSize", static_cast<float>(1.0e14 * getScale()));
+		shader.setUniform("lenseSize",
+		                  static_cast<float>(1.0e14 * universe->getScale()));
 		shader.setUniform("lenseScreenCoord", lenseScreenCoord);
 		shader.setUniform("lenseDist", lenseDist);
 		shader.setUniform("radiusLimit", 0.2f);
