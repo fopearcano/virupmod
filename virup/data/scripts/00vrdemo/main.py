@@ -384,7 +384,7 @@ def updateScene():
         timer.invalidate()
         t_harsh = 1.0
         t = 1.0
-        if currentscene != None:
+        if currentscene != None and autoIdScrolling:
             scene=interpolateScene(currentscene, scenes[id], 1.0)
         else:
             scene=scenes[id]
