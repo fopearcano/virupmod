@@ -85,6 +85,16 @@ class SceneTemporalDataWrapper : public PythonQtWrapper
 	{
 		return td->getSimulationTime();
 	};
+
+	SceneTemporalData
+	    static_SceneTemporalData_getCurrentState(Universe const& universe)
+	{
+		return SceneTemporalData::getCurrentState(universe);
+	};
+	void setAsUniverseState(SceneTemporalData* td, Universe& universe) const
+	{
+		td->setAsUniverseState(universe);
+	};
 	SceneTemporalData static_SceneTemporalData_interpolate(
 	    SceneTemporalData const& td0, SceneTemporalData const& td1, float t)
 	{

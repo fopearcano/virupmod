@@ -37,6 +37,11 @@ float SceneUI::getVisibility(QString const& name) const
 	return visibilities.at(name);
 }
 
+void SceneUI::setVisibility(QString const& name, float vis)
+{
+	visibilities[name] = vis;
+}
+
 SceneUI SceneUI::getCurrentState(Universe const& universe)
 {
 	QStringList n = {"Constellations", "Orbits", "PlanetsLabels"};
@@ -53,9 +58,12 @@ SceneUI SceneUI::getCurrentState(Universe const& universe)
 
 void SceneUI::setAsUniverseState(Universe& universe) const
 {
-	for(auto const& pair : visibilities)
+	QStringList n = {"Constellations", "Orbits", "PlanetsLabels"};
+	n.append(universe.getUniverseElementsNames());
+
+	for(auto const& name : n)
 	{
-		universe.setVisibility(pair.first, pair.second);
+		universe.setVisibility(name, getVisibility(name));
 	}
 }
 

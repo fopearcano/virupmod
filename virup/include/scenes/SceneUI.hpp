@@ -31,6 +31,7 @@ class SceneUI
 	SceneUI(QVariantMap const& visibilities);
 	SceneUI& operator=(SceneUI const& ui) = default;
 	float getVisibility(QString const& name) const;
+	void setVisibility(QString const& name, float vis);
 	static SceneUI getCurrentState(Universe const& universe);
 	void setAsUniverseState(Universe& universe) const;
 
@@ -66,6 +67,19 @@ class SceneUIWrapper : public PythonQtWrapper
 	float getVisibility(SceneUI* u, QString const& name)
 	{
 		return u->getVisibility(name);
+	};
+	void setVisibility(SceneUI* u, QString const& name, float vis)
+	{
+		u->setVisibility(name, vis);
+	};
+
+	SceneUI static_SceneUI_getCurrentState(Universe const& universe)
+	{
+		return SceneUI::getCurrentState(universe);
+	};
+	void setAsUniverseState(SceneUI* ui, Universe& universe) const
+	{
+		ui->setAsUniverseState(universe);
 	};
 	SceneUI static_SceneUI_interpolate(SceneUI const& ui0, SceneUI const& ui1,
 	                                   float t)

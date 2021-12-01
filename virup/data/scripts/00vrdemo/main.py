@@ -393,23 +393,16 @@ def updateScene():
     spatialData = scene.spatialData
     spatialData.setAsUniverseState(Universe)
 
-    temporalData = scene.temporalData
-    Universe.timeCoeff = temporalData.getTimeCoeff()
-    if temporalData.getSimulationTime() != None:
-        if temporalData.getSimulationTime().isValid():
-            Universe.simulationTime = temporalData.getSimulationTime()
+    scene.temporalData.setAsUniverseState(Universe)
 
     ui = scene.ui
-    for label in Universe.getUniverseElementsNames():
-        if fade_factor != 0.0:
-            if ToneMappingModel.exposure != 0.0:
-                Universe.setVisibility(label, ui.getVisibility(label) * 0.3 * fade_factor / ToneMappingModel.exposure)
-            else:
-                Universe.setVisibility(label, ui.getVisibility(label) * fade_factor)
-
-    additional=["Constellations", "Orbits", "PlanetsLabels"]
-    for label in additional:
-        Universe.setVisibility(label, ui.getVisibility(label))
+    if fade_factor != 0.0:
+        for label in Universe.getUniverseElementsNames():
+            ui.setVisibility(label, ui.getVisibility(label) * fade_factor)
+        additional=["Constellations", "Orbits", "PlanetsLabels"]
+        for label in additional:
+            ui.setVisibility(label, ui.getVisibility(label) * fade_factor)
+    ui.setAsUniverseState(Universe)
 
     ToneMappingModel.exposure = 0.3
     fade_factor = 1.0
