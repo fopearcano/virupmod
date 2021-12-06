@@ -32,8 +32,8 @@ SceneSpatialData::SceneSpatialData(Universe const& universe, QString systemName,
     : universe(&universe)
     , position(position)
     , scale(1.0 / invScale)
-    , systemName(systemName)
-    , bodyName(bodyName)
+    , systemName(std::move(systemName))
+    , bodyName(std::move(bodyName))
 {
 }
 
@@ -97,15 +97,18 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 			return noFrameChangeInterpolate(sd0, sd1, t, unit);
 		}
 		// or stay within a planetary system
-		else if(sd0.systemName != "" && sd0.bodyName != ""
-		        && sd1.bodyName != "")
+		if(sd0.systemName != "" && sd0.bodyName != "" && sd1.bodyName != "")
 		{
 			auto ancestor = sd1.universe->getClosestCommonAncestorName(
 			    sd0.bodyName, sd1.bodyName);
-			auto start = sd1.universe->getCelestialBodyPosition(
-			    sd0.bodyName, ancestor, sd0.universe->getSimulationTime());
-			auto end = sd1.universe->getCelestialBodyPosition(
-			    sd1.bodyName, ancestor, sd0.universe->getSimulationTime());
+			auto start
+			    = sd1.universe->getCelestialBodyPosition(
+			          sd0.bodyName, ancestor, sd0.universe->getSimulationTime())
+			      + sd0.position;
+			auto end
+			    = sd1.universe->getCelestialBodyPosition(
+			          sd1.bodyName, ancestor, sd0.universe->getSimulationTime())
+			      + sd1.position;
 			SceneSpatialData sd0ancestor(*sd0.universe, sd0.systemName,
 			                             ancestor, 1.0 / sd0.scale, start);
 			SceneSpatialData sd1ancestor(*sd1.universe, sd1.systemName,
@@ -120,7 +123,7 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 				trueResult.scale = result.scale;
 				return trueResult;
 			}
-			else if(result.position == sd1ancestor.position)
+			if(result.position == sd1ancestor.position)
 			{
 				auto trueResult(sd1);
 				trueResult.scale = result.scale;
@@ -146,7 +149,7 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 		return result;
 	}
 	// or zooming out of a system
-	else if(sd1.systemName == "")
+	if(sd1.systemName == "")
 	{
 		SceneSpatialData sd0Cosmo(
 		    *sd0.universe, 1.0 / sd0.scale,
@@ -161,29 +164,25 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 		return result;
 	}
 	// or switching planetary system
-	else
-	{
-		SceneSpatialData sd0Cosmo(
-		    *sd0.universe, 1.0 / sd0.scale,
-		    sd0.universe->planetSystems->getAbsolutePosition(sd0.systemName));
-		SceneSpatialData sd1Cosmo(
-		    *sd1.universe, 1.0 / sd1.scale,
-		    sd1.universe->planetSystems->getAbsolutePosition(sd1.systemName));
+	SceneSpatialData sd0Cosmo(
+	    *sd0.universe, 1.0 / sd0.scale,
+	    sd0.universe->planetSystems->getAbsolutePosition(sd0.systemName));
+	SceneSpatialData sd1Cosmo(
+	    *sd1.universe, 1.0 / sd1.scale,
+	    sd1.universe->planetSystems->getAbsolutePosition(sd1.systemName));
 
-		auto result
-		    = noFrameChangeInterpolate(sd0Cosmo, sd1Cosmo, t, 3.086e+19);
-		if(sd0.universe->getPlanetarySystemName() == sd0.systemName)
-		{
-			return {*sd0.universe, sd0.systemName, sd0.bodyName,
-			        1.0 / result.scale, sd0.position};
-		}
-		else if(sd1.universe->getPlanetarySystemName() == sd1.systemName)
-		{
-			return {*sd1.universe, sd1.systemName, sd1.bodyName,
-			        1.0 / result.scale, sd1.position};
-		}
-		return result;
+	auto result = noFrameChangeInterpolate(sd0Cosmo, sd1Cosmo, t, 3.086e+19);
+	if(sd0.universe->getPlanetarySystemName() == sd0.systemName)
+	{
+		return {*sd0.universe, sd0.systemName, sd0.bodyName, 1.0 / result.scale,
+		        sd0.position};
 	}
+	if(sd1.universe->getPlanetarySystemName() == sd1.systemName)
+	{
+		return {*sd1.universe, sd1.systemName, sd1.bodyName, 1.0 / result.scale,
+		        sd1.position};
+	}
+	return result;
 }
 
 SceneSpatialData
@@ -237,14 +236,11 @@ SceneSpatialData
 		{
 			return noFrameChangeInterpolate(sd0, inter0, t * 4);
 		}
-		else if(t <= 0.75)
+		if(t <= 0.75)
 		{
 			return noFrameChangeInterpolate(inter0, inter1, t * 2 - 0.5);
 		}
-		else
-		{
-			return noFrameChangeInterpolate(inter1, sd1, t * 4 - 3);
-		}
+		return noFrameChangeInterpolate(inter1, sd1, t * 4 - 3);
 	}
 
 	if(sd0.scale < 1.0 / dist && sd0.scale < sd1.scale)
@@ -255,22 +251,13 @@ SceneSpatialData
 		{
 			return noFrameChangeInterpolate(sd0, inter, t * 2);
 		}
-		else
-		{
-			return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
-		}
+		return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
 	}
-	else
+	SceneSpatialData inter(*sd1.universe, sd0.systemName, sd0.bodyName,
+	                       1.0 / sd1.scale, sd0.position);
+	if(t <= 0.5)
 	{
-		SceneSpatialData inter(*sd1.universe, sd0.systemName, sd0.bodyName,
-		                       1.0 / sd1.scale, sd0.position);
-		if(t <= 0.5)
-		{
-			return noFrameChangeInterpolate(sd0, inter, t * 2);
-		}
-		else
-		{
-			return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
-		}
+		return noFrameChangeInterpolate(sd0, inter, t * 2);
 	}
+	return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
 }

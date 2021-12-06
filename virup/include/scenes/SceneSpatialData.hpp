@@ -38,6 +38,8 @@ class SceneSpatialData
 	                 Vector3 position = Vector3());
 	SceneSpatialData& operator=(SceneSpatialData const& other) = default;
 
+	Universe const& getUniverse() const { return *universe; };
+
 	Vector3 getPosition() const { return position; };
 	void setPosition(Vector3 position) { this->position = position; };
 	double getScale() const { return scale; };
