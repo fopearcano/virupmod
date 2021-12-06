@@ -251,6 +251,8 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 void MainWin::setupPythonAPI()
 {
 	PythonQtHandler::addObject("VIRUP", this);
+	PythonQtHandler::addWrapper<TransitionWrapper>();
+	PythonQtHandler::addWrapper<SceneWrapper>();
 	PythonQtHandler::addWrapper<SceneSpatialDataWrapper>();
 	PythonQtHandler::addWrapper<SceneTemporalDataWrapper>();
 	PythonQtHandler::addWrapper<SceneUIWrapper>();
@@ -362,8 +364,9 @@ void MainWin::initScene()
 		{
 			auto button = new QPushButton(scenes[i]);
 			connect(button, &QPushButton::clicked, this, [i]() {
-				PythonQtHandler::evalScript(
-				    "setSceneId(" + QString::number(10 + 2 * i) + ")\ndel s");
+				PythonQtHandler::evalScript("setTransitionId("
+				                            + QString::number(10 + 2 * i)
+				                            + ")\ndel s");
 			});
 			button->setFocusPolicy(Qt::NoFocus);
 			layout->addWidget(button);

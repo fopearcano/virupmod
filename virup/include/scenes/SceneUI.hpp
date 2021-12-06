@@ -30,6 +30,7 @@ class SceneUI
 	SceneUI(std::map<QString, float> visibilities);
 	SceneUI(QVariantMap const& visibilities);
 	SceneUI& operator=(SceneUI const& ui) = default;
+
 	float getVisibility(QString const& name) const;
 	void setVisibility(QString const& name, float vis);
 	static SceneUI getCurrentState(Universe const& universe);

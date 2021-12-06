@@ -26,11 +26,96 @@
 class Scene
 {
   public:
-	Scene(SceneUI const& ui)
-	    : ui(ui){};
+	Scene()                   = default;
+	Scene(Scene const& other) = default;
+	Scene(Scene&& other)      = default;
+	Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
+	      QString name = "");
+	Scene& operator=(Scene const& other) = default;
+
+	SceneSpatialData const& getSpatialData() const { return sd; };
+	void setSpatialData(SceneSpatialData sd) { this->sd = sd; };
+	SceneTemporalData const& getTemporalData() const { return td; };
+	void setTemporalData(SceneTemporalData td) { this->td = td; };
+	SceneUI const& getUI() const { return ui; };
+	void setUI(SceneUI ui) { this->ui = ui; };
+	QString const& getName() const { return name; };
+	void setName(QString name) { this->name = name; };
+
+	static Scene getCurrentState(Universe const& universe);
+	void setAsUniverseState(Universe& universe);
+
+	static Scene interpolate(Scene const& s0, Scene const& s1, float t);
 
   private:
+	SceneSpatialData sd;
+	SceneTemporalData td;
 	SceneUI ui;
+	QString name;
+};
+
+/* PYTHONQT */
+
+Q_DECLARE_METATYPE(Scene)
+
+class SceneWrapper : public PythonQtWrapper
+{
+	Q_OBJECT
+  public:
+	virtual const char* wrappedClassName() const override { return "Scene"; }
+	virtual const char* wrappedClassPackage() const override { return "virup"; }
+
+  public Q_SLOTS:
+	Scene* new_Scene() { return new Scene; }
+	Scene* new_Scene(Scene const& s) { return new Scene(s); }
+	Scene* new_Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui)
+	{
+		return new Scene(std::move(sd), std::move(td), std::move(ui));
+	}
+	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
+	                 SceneUI const& ui, QString name)
+	{
+		return new Scene(std::move(sd), std::move(td), std::move(ui),
+		                 std::move(name));
+	}
+
+	void delete_Scene(Scene* s) { delete s; }
+
+	// access methods
+
+	SceneSpatialData getSpatialData(Scene* s) const
+	{
+		return s->getSpatialData();
+	};
+	void setSpatialData(Scene* s, SceneSpatialData sd)
+	{
+		s->setSpatialData(sd);
+	};
+	SceneTemporalData getTemporalData(Scene* s) const
+	{
+		return s->getTemporalData();
+	};
+	void setTemporalData(Scene* s, SceneTemporalData td)
+	{
+		s->setTemporalData(td);
+	};
+	SceneUI getUI(Scene* s) const { return s->getUI(); };
+	void setUI(Scene* s, SceneUI ui) { s->setUI(ui); };
+	QString getName(Scene* s) const { return s->getName(); };
+	void setName(Scene* s, QString name) { s->setName(name); };
+
+	Scene static_Scene_getCurrentState(Universe const& universe)
+	{
+		return Scene::getCurrentState(universe);
+	};
+	void setAsUniverseState(Scene* s, Universe& universe) const
+	{
+		s->setAsUniverseState(universe);
+	};
+	Scene static_Scene_interpolate(Scene const& s0, Scene const& s1, float t)
+	{
+		return Scene::interpolate(s0, s1, t);
+	}
 };
 
 #endif // SCENE_HPP

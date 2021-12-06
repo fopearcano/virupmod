@@ -17,3 +17,33 @@
 */
 
 #include "scenes/Scene.hpp"
+
+Scene::Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
+             QString name)
+    : sd(std::move(sd))
+    , td(std::move(td))
+    , ui(std::move(ui))
+    , name(std::move(name))
+{
+}
+
+Scene Scene::getCurrentState(Universe const& universe)
+{
+	return {SceneSpatialData::getCurrentState(universe),
+	        SceneTemporalData::getCurrentState(universe),
+	        SceneUI::getCurrentState(universe)};
+}
+
+void Scene::setAsUniverseState(Universe& universe)
+{
+	sd.setAsUniverseState(universe);
+	td.setAsUniverseState(universe);
+	ui.setAsUniverseState(universe);
+}
+
+Scene Scene::interpolate(Scene const& s0, Scene const& s1, float t)
+{
+	return {SceneSpatialData::interpolate(s0.sd, s1.sd, t),
+	        SceneTemporalData::interpolate(s0.td, s1.td, t),
+	        SceneUI::interpolate(s0.ui, s1.ui, t)};
+}
