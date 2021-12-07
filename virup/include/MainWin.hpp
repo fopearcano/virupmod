@@ -15,6 +15,7 @@
 #include "Grid.hpp"
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
+#include "ui/PlanetarySystemSelector.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
 
@@ -278,8 +279,8 @@ class MainWin : public AbstractMainWin
 	float lenseDist = 0.f;
 
 	// UI
-	// visibilities
-	Visibilities* visibilities = nullptr;
+	Visibilities* visibilities               = nullptr;
+	PlanetarySystemSelector* planetSysSelect = nullptr;
 
 	// scenes
 	Animator* animator                = nullptr;

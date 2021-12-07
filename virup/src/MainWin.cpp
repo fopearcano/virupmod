@@ -85,6 +85,10 @@ bool MainWin::event(QEvent* e)
 		{
 			visibilities->close();
 		}
+		if(planetSysSelect != nullptr)
+		{
+			planetSysSelect->close();
+		}
 		if(dialog != nullptr)
 		{
 			dialog->close();
@@ -301,7 +305,8 @@ void MainWin::initScene()
 	// UI
 	if(networkManager->isServer())
 	{
-		visibilities = new Visibilities(*universe);
+		visibilities    = new Visibilities(*universe);
+		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 
 		dialog = new QDialog;
 		dialog->show();
@@ -376,6 +381,8 @@ void MainWin::initScene()
 		                 [this]() { this->dialog->show(); });
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
+		tools->addAction(tr("Planetary Systems"), this,
+		                 [this]() { this->planetSysSelect->show(); });
 	}
 }
 
@@ -654,6 +661,7 @@ MainWin::~MainWin()
 	delete animator;
 	delete dialog;
 	delete visibilities;
+	delete planetSysSelect;
 	delete lenseDistortionMap;
 	delete debugText;
 	delete movementControls;
