@@ -16,6 +16,7 @@
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
+#include "ui/UniverseElementSelector.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
 
@@ -281,6 +282,7 @@ class MainWin : public AbstractMainWin
 	// UI
 	Visibilities* visibilities               = nullptr;
 	PlanetarySystemSelector* planetSysSelect = nullptr;
+	UniverseElementSelector* univElemSelect  = nullptr;
 
 	// scenes
 	Animator* animator                = nullptr;

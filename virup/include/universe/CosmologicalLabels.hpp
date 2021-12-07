@@ -26,7 +26,7 @@ class CosmologicalLabels : public UniverseElement
 {
   public:
 	CosmologicalLabels(QJsonObject const& json);
-	virtual BBox getBoundingBox() const override { return {}; };
+	virtual BBox getBoundingBox() const override { return bbox; };
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
@@ -42,6 +42,8 @@ class CosmologicalLabels : public UniverseElement
 
 	QMatrix4x4 model;
 	QVector3D campos;
+
+	BBox bbox;
 };
 
 #endif // COSMOLOGICALLABELS_HPP

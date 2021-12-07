@@ -25,7 +25,7 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
     , tree(this)
 {
 	setFixedSize(250, 600);
-	setWindowTitle("Orbitables List");
+	setWindowTitle(tr("Orbital Systems List"));
 
 	auto layout = new QVBoxLayout(this);
 

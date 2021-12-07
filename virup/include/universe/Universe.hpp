@@ -365,12 +365,13 @@ class Universe : public QObject
   public:
 	PlanetarySystems* planetSystems = nullptr;
 
+	// 1 m = 3.24078e-20 kpc
+	const double mtokpc = 3.24078e-20;
+
   private:
 	Camera& camCosmo;
 
 	/* PLANET SYSTEMS */
-	// 1 m = 3.24078e-20 kpc
-	const double mtokpc = 3.24078e-20;
 
 	// planets
 	OrbitalSystemCamera& camPlanet;

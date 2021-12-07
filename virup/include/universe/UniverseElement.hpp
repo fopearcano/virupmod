@@ -43,6 +43,7 @@ class UniverseElement : public QObject
 
 	UniverseElement()                   = default;
 	virtual BBox getBoundingBox() const = 0;
+	Vector3 getAbsoluteBBoxCenter() const;
 	QMatrix4x4 getRelToAbsTransform() const;
 	float getVisibility() const { return visibility; };
 	void setVisibility(float visibility);

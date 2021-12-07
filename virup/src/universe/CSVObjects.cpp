@@ -111,7 +111,21 @@ void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 		vertices.push_back(object.color.redF());
 		vertices.push_back(object.color.greenF());
 		vertices.push_back(object.color.blueF());
+
+		bbox.minx = std::min(bbox.minx, static_cast<float>(object.x));
+		bbox.miny = std::min(bbox.miny, static_cast<float>(object.y));
+		bbox.minz = std::min(bbox.minz, static_cast<float>(object.z));
+
+		bbox.maxx = std::max(bbox.maxx, static_cast<float>(object.x));
+		bbox.maxy = std::max(bbox.maxy, static_cast<float>(object.y));
+		bbox.maxz = std::max(bbox.maxz, static_cast<float>(object.z));
 	}
+	bbox.mid = QVector3D((bbox.maxx + bbox.minx) * 0.5f,
+	                     (bbox.maxy + bbox.miny) * 0.5f,
+	                     (bbox.maxz + bbox.minz) * 0.5f);
+	bbox.diameter
+	    = sqrt(pow(bbox.maxx - bbox.minx, 2) + pow(bbox.maxy - bbox.miny, 2)
+	           + pow(bbox.maxz - bbox.minz, 2));
 
 	mesh.setVertexShaderMapping(shader,
 	                            {{"position", 3}, {"absmag", 1}, {"color", 3}});
@@ -201,8 +215,7 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 
 BBox CSVObjects::getBoundingBox() const
 {
-	// TODO compute
-	return {};
+	return bbox;
 }
 
 void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)

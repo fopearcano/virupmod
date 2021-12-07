@@ -16,32 +16,25 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef PLANETARYSYSTEMSELECTOR_HPP
-#define PLANETARYSYSTEMSELECTOR_HPP
+#ifndef UNIVERSEELEMENTSELECTOR_HPP
+#define UNIVERSEELEMENTSELECTOR_HPP
 
-#include "graphics/OrbitalSystemCamera.hpp"
-#include "scenes/Animator.hpp"
-#include "universe/Universe.hpp"
 #include <QDialog>
-#include <QTreeWidgetItem>
+#include <QListWidgetItem>
 
-class PlanetarySystemSelector : public QDialog
+#include "scenes/Animator.hpp"
+
+class UniverseElementSelector : public QDialog
 {
-	Q_OBJECT
   public:
-	PlanetarySystemSelector(Universe const& universe, Animator& animator);
+	UniverseElementSelector(Universe const& universe, Animator& animator);
 
   private:
-	QTreeWidgetItem* constructItems(Orbitable const& orbitable,
-	                                QTreeWidgetItem* parent);
-	void selectOrbitable(QTreeWidgetItem* item, int column);
-	void setVisibleItems(QString const& match);
+	void selectElement(QListWidgetItem* item);
 
 	Universe const& universe;
 	Animator& animator;
-	QTreeWidget tree;
-
-	std::vector<QTreeWidgetItem*> topLevelItems;
+	QListWidget listWidget;
 };
 
-#endif // PLANETARYSYSTEMSELECTOR_HPP
+#endif // UNIVERSEELEMENTSELECTOR_HPP

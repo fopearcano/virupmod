@@ -30,7 +30,7 @@ class PlanetarySystems : public UniverseElement
 {
   public:
 	PlanetarySystems();
-	virtual BBox getBoundingBox() const override { return {}; };
+	virtual BBox getBoundingBox() const override { return bbox; };
 	bool renderSystem() const { return doRender; };
 	QStringList getSystemsNames() const;
 	OrbitalSystem const* getSystem(QString const& name)
@@ -64,6 +64,8 @@ class PlanetarySystems : public UniverseElement
 
 	QMatrix4x4 model;
 	QVector3D campos;
+
+	BBox bbox;
 };
 
 #endif // PLANETARYSYSTEMS_HPP

@@ -89,6 +89,7 @@ class CSVObjects : public UniverseElement
 	                        std::map<QString, int> const& columnsNumbers);
 
 	std::vector<Object> objects;
+	BBox bbox;
 
 	std::map<QString, unsigned int> indexByName;
 

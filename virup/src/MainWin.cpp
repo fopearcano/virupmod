@@ -89,6 +89,10 @@ bool MainWin::event(QEvent* e)
 		{
 			planetSysSelect->close();
 		}
+		if(univElemSelect != nullptr)
+		{
+			univElemSelect->close();
+		}
 		if(dialog != nullptr)
 		{
 			dialog->close();
@@ -307,6 +311,7 @@ void MainWin::initScene()
 	{
 		visibilities    = new Visibilities(*universe);
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
+		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 
 		dialog = new QDialog;
 		dialog->show();
@@ -383,6 +388,8 @@ void MainWin::initScene()
 		                 [this]() { this->visibilities->show(); });
 		tools->addAction(tr("Planetary Systems"), this,
 		                 [this]() { this->planetSysSelect->show(); });
+		tools->addAction(tr("Universe Elements"), this,
+		                 [this]() { this->univElemSelect->show(); });
 	}
 }
 
@@ -662,6 +669,7 @@ MainWin::~MainWin()
 	delete dialog;
 	delete visibilities;
 	delete planetSysSelect;
+	delete univElemSelect;
 	delete lenseDistortionMap;
 	delete debugText;
 	delete movementControls;

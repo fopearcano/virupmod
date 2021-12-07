@@ -43,7 +43,20 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 			auto labelText
 			    = new LabelRenderer(label, QColor(json["color"].toString()));
 			cosmoLabels.emplace_back(dataPos, labelText);
+			bbox.minx = std::min(bbox.minx, static_cast<float>(dataPos[0]));
+			bbox.miny = std::min(bbox.miny, static_cast<float>(dataPos[1]));
+			bbox.minz = std::min(bbox.minz, static_cast<float>(dataPos[2]));
+
+			bbox.maxx = std::max(bbox.maxx, static_cast<float>(dataPos[0]));
+			bbox.maxy = std::max(bbox.maxy, static_cast<float>(dataPos[1]));
+			bbox.maxz = std::max(bbox.maxz, static_cast<float>(dataPos[2]));
 		}
+		bbox.mid = QVector3D((bbox.maxx + bbox.minx) * 0.5f,
+		                     (bbox.maxy + bbox.miny) * 0.5f,
+		                     (bbox.maxz + bbox.minz) * 0.5f);
+		bbox.diameter
+		    = sqrt(pow(bbox.maxx - bbox.minx, 2) + pow(bbox.maxy - bbox.miny, 2)
+		           + pow(bbox.maxz - bbox.minz, 2));
 	}
 }
 

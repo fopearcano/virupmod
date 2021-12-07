@@ -18,6 +18,11 @@
 
 #include "universe/UniverseElement.hpp"
 
+Vector3 UniverseElement::getAbsoluteBBoxCenter() const
+{
+	return Utils::fromQt(getRelToAbsTransform() * getBoundingBox().mid);
+}
+
 QMatrix4x4 UniverseElement::getRelToAbsTransform() const
 {
 	QMatrix4x4 relToAbsTransform;
