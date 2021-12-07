@@ -159,15 +159,36 @@ void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
 		item = rootItem->child(0);
 	}
 
-	auto body   = (*universe.planetSystems->getSystem(
-        rootItem->text(column)))[item->text(column).toStdString()];
+	QString name(item->text(column));
+	if(name.contains('('))
+	{
+		unsigned int pos(name.lastIndexOf('('));
+		name = name.left(pos - 1);
+	}
+
+	auto body = (*universe.planetSystems->getSystem(
+	    rootItem->text(column)))[name.toStdString()];
+
+	if(body->getOrbit() != nullptr
+	   && !body->getOrbit()->isInRange(universe.getClock().getCurrentUt()))
+	{
+		if(body->getOrbitableType() == Orbitable::Type::SPACECRAFT)
+		{
+			item->setTextColor(0, QColor("red"));
+		}
+		return;
+	}
+	if(body->getOrbitableType() == Orbitable::Type::SPACECRAFT)
+	{
+		item->setTextColor(0, QColor("green"));
+	}
+
 	auto radius = dynamic_cast<CelestialBody const*>(body)
 	                  ->getCelestialBodyParameters()
 	                  .radius;
 
 	auto scene = animator.getCurrentScene();
-	SceneSpatialData sd(universe, rootItem->text(column), item->text(column),
-	                    2.3f * radius);
+	SceneSpatialData sd(universe, rootItem->text(column), name, 2.3f * radius);
 	animator.executeTransition(Transition(
 	    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
 	          scene.getUI()),
