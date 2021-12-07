@@ -106,3 +106,38 @@ bool Transition::updateUniverse(Universe& universe, Scene const& fromScene,
 
 	return returnedVal;
 }
+
+void Transition::applyDestination(Universe& universe, float fadeFactor,
+                                  Vector3 const& cosmoShift,
+                                  Vector3 const& planetShift) const
+{
+	auto scene(toScene);
+	auto ui = scene.getUI();
+	if(fadeFactor != 0.0)
+	{
+		QStringList names({"Constellations", "Orbits", "PlanetsLabels"});
+		names.append(universe.getUniverseElementsNames());
+		for(auto const& n : names)
+		{
+			ui.setVisibility(n, ui.getVisibility(n) * fadeFactor);
+		}
+	}
+	scene.setUI(ui);
+
+	scene.setAsUniverseState(universe);
+
+	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
+
+	// apply custom function
+	custom(1.f, 1.f);
+
+	if(scene.getSpatialData().getBodyName() != ""
+	   && universe.isPlanetarySystemLoaded())
+	{
+		universe.setPlanetPosition(universe.getPlanetPosition() + planetShift);
+	}
+	else
+	{
+		universe.setCosmoPosition(universe.getCosmoPosition() + cosmoShift);
+	}
+}

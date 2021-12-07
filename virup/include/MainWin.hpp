@@ -14,7 +14,7 @@
 
 #include "Grid.hpp"
 #include "MovementControls.hpp"
-#include "scenes/Transition.hpp"
+#include "scenes/Animator.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
 
@@ -57,18 +57,6 @@ class MainWin : public AbstractMainWin
 	 * @accessors gridEnabled(), setGridEnabled()
 	 */
 	Q_PROPERTY(bool gridEnabled READ gridEnabled WRITE setGridEnabled)
-	/**
-	 * @brief Camera's pitch in radians.
-	 *
-	 * @accessors getCamPitch(), setCamPitch()
-	 */
-	Q_PROPERTY(float camPitch READ getCamPitch WRITE setCamPitch)
-	/**
-	 * @brief Camera's yaw in radians.
-	 *
-	 * @accessors getCamYaw(), setCamYaw()
-	 */
-	Q_PROPERTY(float camYaw READ getCamYaw WRITE setCamYaw)
 	Q_PROPERTY(bool isServer READ isServer)
 
 	bool isServer() const { return networkManager->isServer(); };
@@ -161,28 +149,6 @@ class MainWin : public AbstractMainWin
 	 * @setter{gridEnabled, gridEnabled}
 	 */
 	void setGridEnabled(bool enabled) { showGrid = enabled; };
-
-	// CAMERA ORIENTATION
-
-	/**
-	 * @getter{camPitch}
-	 */
-	float getCamPitch() const
-	{
-		return renderer.getCamera<Camera>("cosmo").pitch;
-	}
-	/**
-	 * @setter{camPitch, camPitch}
-	 */
-	void setCamPitch(float pitch);
-	/**
-	 * @getter{camYaw}
-	 */
-	float getCamYaw() const { return renderer.getCamera<Camera>("cosmo").yaw; }
-	/**
-	 * @setter{camYaw, camYaw}
-	 */
-	void setCamYaw(float yaw);
 
 	~MainWin();
 
@@ -316,6 +282,7 @@ class MainWin : public AbstractMainWin
 	Visibilities* visibilities = nullptr;
 
 	// scenes
+	Animator* animator                = nullptr;
 	QDialog* dialog                   = nullptr;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;

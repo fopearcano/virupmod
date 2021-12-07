@@ -1,4 +1,5 @@
-from PythonQt.QtGui import QKeyEvent, Qt, QDateTime, QDate, QTime, QTimeZone
+from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone
+from PythonQt.QtGui import QKeyEvent
 from PythonQt.QtMultimedia import QSound
 from PythonQt.libplanet import Vector3
 from PythonQt.virup import Transition, Scene, SceneSpatialData, SceneTemporalData, SceneUI
@@ -51,16 +52,13 @@ def fade_out_factor(t_harsh):
     return 1.0 - (2.0*(t-0.5))
 
 def black(t, t_harsh):
-    global fade_factor
-    fade_factor = 0.0
+    Animator.fadeFactor = 0.0
 
 def begin(t, t_harsh):
-    global fade_factor
-    fade_factor = fade_in_factor(t_harsh)
+    Animator.fadeFactor = fade_in_factor(t_harsh)
 
 def end(t, t_harsh):
-    global fade_factor
-    fade_factor = fade_out_factor(t_harsh)
+    Animator.fadeFactor = fade_out_factor(t_harsh)
 
 def showOrbitsWhileTraveling(t, t_harsh):
     if t_harsh > 0.3 and t_harsh < 0.7:
@@ -156,161 +154,63 @@ transitions = [
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend", "black")
 ]
 
-id = 0
-disableanimations = False
-personheight=1.5
-ToneMappingModel.exposure=0.3
-shiftangle=0.0
-shiftvertangle=0.0
-fade_factor=1.0
-
-def getCosmoShift():
-    global shiftangle
-    global shiftvertangle
-    val=personheight*3.24078e-20 / Universe.scale
-    try:
-        VRHandler
-    except NameError:
-        return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle) * val)
-    else:
-        if VRHandler.drivername != "OpenVR":
-            return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle)*0.05 * val)
-        else:
-            return Vector3(0, 0, -val)
-
-def getPlanetShift():
-    global shiftangle
-    global shiftvertangle
-    val=personheight / Universe.scale
-    try:
-        VRHandler
-    except NameError:
-        return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle) * val)
-    else:
-        if VRHandler.drivername != "OpenVR":
-            return Vector3(cos(shiftvertangle)*cos(shiftangle)*val, cos(shiftvertangle)*sin(shiftangle)*val, sin(shiftvertangle)*0.05 * val)
-        else:
-            return Vector3(0, 0, -val)
-
-def setTransitionId(newid):
-    global id
-    global currentscene
-
-    oldid = id
-    id = newid
-    if oldid in range(len(transitions)):
-        transitions[oldid].stop()
-    if id not in range(len(transitions)):
-        return
-    transitions[id].play()
-    if disableanimations:
-        currentscene = transitions[id].getDestination()
-    else:
-        if oldid == -1:
-            currentscene=Scene.getCurrentState(Universe)
-            sd = currentscene.getSpatialData()
-            if sd.getSystemName() == "" and sd.getBodyName() == "":
-                sd.setPosition(sd.getPosition() - getCosmoShift())
-                currentscene.setSpatialData(sd)
-            else:
-                sd.setPosition(sd.getPosition() - getPlanetShift())
-                currentscene.setSpatialData(sd)
-
-        else:
-            currentscene=transitions[oldid].getDestination()
-
-autoIdScrolling=True
 def stop():
-    global autoIdScrolling
     global s
-    autoIdScrolling=False
-    setTransitionId(-1)
+    Animator.autoIdScrolling=False
+    Animator.setTransition(-1)
     del s
 
-def toggleAnimations():
-    global disableanimations
-    disableanimations = not disableanimations
-
 def keyPressEvent(e):
-    global disableanimations
-    global id
-
     # if spacebar pressed, start animation
     numpad_mod = int(e.modifiers()) == Qt.KeypadModifier
     if e.key() == Qt.Key_0 and numpad_mod:
-        setTransitionId(0)
+        Animator.setTransition(0)
     elif e.key() == Qt.Key_1 and numpad_mod:
-        setTransitionId(1)
+        Animator.setTransition(1)
     elif e.key() == Qt.Key_2 and numpad_mod:
-        setTransitionId(2)
+        Animator.setTransition(2)
     elif e.key() == Qt.Key_3 and numpad_mod:
-        setTransitionId(3)
+        Animator.setTransition(3)
     elif e.key() == Qt.Key_4 and numpad_mod:
-        setTransitionId(4)
+        Animator.setTransition(4)
     elif e.key() == Qt.Key_5 and numpad_mod:
-        setTransitionId(5)
+        Animator.setTransition(5)
     elif e.key() == Qt.Key_6 and numpad_mod:
-        setTransitionId(6)
+        Animator.setTransition(6)
     elif e.key() == Qt.Key_7 and numpad_mod:
-        setTransitionId(7)
+        Animator.setTransition(7)
     elif e.key() == Qt.Key_8 and numpad_mod:
-        setTransitionId(8)
+        Animator.setTransition(8)
     elif e.key() == Qt.Key_9 and numpad_mod:
-        setTransitionId(9)
+        Animator.setTransition(9)
     elif e.key() == Qt.Key_Minus and numpad_mod:
-        toggleAnimations()
+        Animator.toggleAnimations()
     elif e.key() == Qt.Key_Space:
         stop()
     elif e.key() == Qt.Key_Enter:
-        setTransitionId((id+1) % len(transitions))
+        Animator.setTransition((Animator.id+1) % len(transitions))
     else:
         return
 
 
 s=QSound(VIRUP.getVoiceoverPath())
 def initScene():
-    global currentscene
     global s
 
-    Universe.simulationTime = solareclipsedt
-
-    currentscene = None
-    setTransitionId(0)
-
-    totaltime=0
+    Animator.removeAllTransitions()
     for t in transitions:
-        totaltime += t.getDuration()
-    print(totaltime / 60.0)
-    print(totaltime)
+        Animator.appendTransition(t)
 
+    Universe.simulationTime = solareclipsedt
+    Animator.animationsDisabled = True
+    Animator.setTransition(0)
+    Animator.animationsDisabled = False
     s.play()
 
 
 def updateScene():
-    global id
-    global currentscene
-    global shiftangle
-    global shiftvertangle
-    global fade_factor
-    global autoIdScrolling
-    if id not in range(len(transitions)) or not VIRUP.isServer:
+    if not VIRUP.isServer:
         return
 
-    nextid = -1
-    if not transitions[id].updateUniverse(Universe, currentscene, fade_factor, getCosmoShift(), getPlanetShift()):
-        nextid = id+1
-
-    ToneMappingModel.exposure = 0.3
-    fade_factor = 1.0
-    Universe.setLabelsOrbitsOnly([])
-
-    VIRUP.camYaw = shiftangle
-    VIRUP.camPitch = -shiftvertangle
-    shiftangle = 0.0
-    shiftvertangle = 0.05
-
-    ToneMappingModel.exposure *= fade_factor
-
-    if nextid != -1 and nextid < len(transitions) and autoIdScrolling:
-        setTransitionId(nextid)
+    Animator.update()
 

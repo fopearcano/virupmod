@@ -98,6 +98,18 @@ class Universe : public QObject
 	Q_PROPERTY(
 	    Vector3 planetPosition READ getPlanetPosition WRITE setPlanetPosition)
 
+	/**
+	 * @brief Camera's pitch in radians.
+	 *
+	 * @accessors getCamPitch(), setCamPitch()
+	 */
+	Q_PROPERTY(float camPitch READ getCamPitch WRITE setCamPitch)
+	/**
+	 * @brief Camera's yaw in radians.
+	 *
+	 * @accessors getCamYaw(), setCamYaw()
+	 */
+	Q_PROPERTY(float camYaw READ getCamYaw WRITE setCamYaw)
   public:
 	// SPACE
 
@@ -187,6 +199,25 @@ class Universe : public QObject
 	{
 		OctreeLOD::setCurrentTanAngleLimit(tanAngleLimit);
 	};
+	//
+	// CAMERA ORIENTATION
+
+	/**
+	 * @getter{camPitch}
+	 */
+	float getCamPitch() const { return camCosmo.pitch; }
+	/**
+	 * @setter{camPitch, camPitch}
+	 */
+	void setCamPitch(float pitch);
+	/**
+	 * @getter{camYaw}
+	 */
+	float getCamYaw() const { return camCosmo.yaw; }
+	/**
+	 * @setter{camYaw, camYaw}
+	 */
+	void setCamYaw(float yaw);
 
 	class State : public AbstractState
 	{
@@ -258,6 +289,7 @@ class Universe : public QObject
 	{
 		return planetSystems->renderSystem();
 	};
+	SimulationTime const& getClock() const { return clock; };
 	void updateCosmo();
 	void updatePlanetarySystem();
 	void updateClock(bool videomode, float frameTiming);

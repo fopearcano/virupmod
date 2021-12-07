@@ -185,6 +185,31 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 	return result;
 }
 
+QString SceneSpatialData::getPythonRepresentation() const
+{
+	QString result("SceneSpatialData(Universe, ");
+
+	if(systemName != "" || bodyName != "")
+	{
+		result += "'" + systemName + "', '" + bodyName + "', ";
+	}
+
+	result += QString::number(1.0 / scale);
+	if(position != Vector3())
+	{
+		result += ", Vector3(";
+		result += QString::number(position[0]);
+		result += ", ";
+		result += QString::number(position[1]);
+		result += ", ";
+		result += QString::number(position[2]);
+		result += ")";
+	}
+	result += ')';
+
+	return result;
+}
+
 SceneSpatialData
     SceneSpatialData::noFrameChangeInterpolate(SceneSpatialData const& sd0,
                                                SceneSpatialData const& sd1,

@@ -30,6 +30,7 @@ class Transition
 	Transition(Scene toScene, float duration = 10.f, QString name = "",
 	           QString customPythonFunction = "");
 	Transition& operator=(Transition const& other) = default;
+	Transition& operator=(Transition&& other) = default;
 
 	Scene getDestination() const { return toScene; };
 	float getDuration() const { return duration; };
@@ -49,6 +50,10 @@ class Transition
 	bool updateUniverse(Universe& universe, Scene const& fromScene,
 	                    float fadeFactor, Vector3 const& cosmoShift,
 	                    Vector3 const& planetShift);
+
+	void applyDestination(Universe& universe, float fadeFactor,
+	                      Vector3 const& cosmoShift,
+	                      Vector3 const& planetShift) const;
 
   private:
 	Scene toScene;

@@ -5,18 +5,6 @@ MainWin::MainWin()
 	srand(time(nullptr));
 }
 
-void MainWin::setCamPitch(float pitch)
-{
-	renderer.getCamera<Camera>("cosmo").pitch               = pitch;
-	renderer.getCamera<OrbitalSystemCamera>("planet").pitch = pitch;
-}
-
-void MainWin::setCamYaw(float yaw)
-{
-	renderer.getCamera<Camera>("cosmo").yaw               = yaw;
-	renderer.getCamera<OrbitalSystemCamera>("planet").yaw = yaw;
-}
-
 void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 {
 	if(loaded)
@@ -297,6 +285,8 @@ void MainWin::initScene()
 	renderer.appendSceneRenderPath("cosmo", Renderer::RenderPath(cam));
 	renderer.appendSceneRenderPath("planet", Renderer::RenderPath(camPlanet));
 
+	animator = new Animator(*universe, *vrHandler, *toneMappingModel);
+
 	// we will draw them ourselves
 	renderer.pathIdRenderingControllers = "";
 
@@ -363,10 +353,9 @@ void MainWin::initScene()
 		for(int i(0); i < scenes.size(); ++i)
 		{
 			auto button = new QPushButton(scenes[i]);
-			connect(button, &QPushButton::clicked, this, [i]() {
-				PythonQtHandler::evalScript("setTransitionId("
-				                            + QString::number(10 + 2 * i)
-				                            + ")\ndel s");
+			connect(button, &QPushButton::clicked, this, [this, i]() {
+				PythonQtHandler::evalScript("del s");
+				animator->setTransition(10 + 2 * i);
 			});
 			button->setFocusPolicy(Qt::NoFocus);
 			layout->addWidget(button);
@@ -417,8 +406,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(networkManager->isServer())
 		{
-			int currentScene((PythonQtHandler::getVariable("id").toInt() - 10)
-			                 / 2);
+			int currentScene((animator->getCurrentTransitionId() - 10) / 2);
 			for(int i(0); i < static_cast<int>(buttons.size()); ++i)
 			{
 				auto button  = buttons[i];
@@ -663,6 +651,7 @@ std::vector<float> MainWin::generateVertices(unsigned int number,
 
 MainWin::~MainWin()
 {
+	delete animator;
 	delete dialog;
 	delete visibilities;
 	delete lenseDistortionMap;

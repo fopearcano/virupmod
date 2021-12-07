@@ -162,7 +162,7 @@ QString Universe::getPlanetTarget() const
 
 void Universe::setPlanetTarget(QString const& name)
 {
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
+	auto ptrs = orbitalSystem->getAllOrbitablesPointers();
 	for(auto ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == name)
@@ -194,6 +194,17 @@ void Universe::setSimulationTime(QDateTime const& simulationTime)
 	clock.setCurrentUt(SimulationTime::dateTimeToUT(simulationTime, false));
 }
 
+void Universe::setCamPitch(float pitch)
+{
+	camCosmo.pitch  = pitch;
+	camPlanet.pitch = pitch;
+}
+
+void Universe::setCamYaw(float yaw)
+{
+	camCosmo.yaw  = yaw;
+	camPlanet.yaw = yaw;
+}
 QString Universe::getClosestCommonAncestorName(
     QString const& celestialBodyName0, QString const& celestialBodyName1) const
 {
@@ -231,7 +242,7 @@ Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
 	Orbitable const* orb(nullptr);
 	Orbitable const* orbRef(nullptr);
 
-	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
+	auto ptrs = orbitalSystem->getAllOrbitablesPointers();
 	for(auto ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == bodyName)
@@ -588,9 +599,7 @@ void Universe::loadClosestSystem()
 	}
 	std::cout << std::endl;
 
-	camPlanet.target           = orbitalSystem->getMainCelestialBody();
-	camPlanet.relativePosition = Vector3(
-	    camPlanet.target->getCelestialBodyParameters().radius * 2.0, 0.0, 0.0);
+	camPlanet.target = orbitalSystem->getMainCelestialBody();
 
 	CelestialBodyRenderer::overridenScale = 1.0;
 	forceUpdateFromCosmo                  = true;

@@ -56,3 +56,33 @@ SceneTemporalData SceneTemporalData::interpolate(SceneTemporalData const& td0,
 	    td0.simulationTime, td1.simulationTime, t);
 	return {timeCoeff, simulationTime};
 }
+
+QString SceneTemporalData::getPythonRepresentation() const
+{
+	QString result("SceneTemporalData(");
+
+	result += QString::number(timeCoeff);
+
+	if(simulationTime.isValid())
+	{
+		result += ", QDateTime(QDate(";
+		result += QString::number(simulationTime.date().year());
+		result += ", ";
+		result += QString::number(simulationTime.date().month());
+		result += ", ";
+		result += QString::number(simulationTime.date().day());
+		result += "), QTime(";
+		result += QString::number(simulationTime.time().hour());
+		result += ", ";
+		result += QString::number(simulationTime.time().minute());
+		result += ", ";
+		result += QString::number(simulationTime.time().second());
+		result += "), QTimeZone(";
+		result += QString::number(
+		    simulationTime.timeZone().offsetFromUtc(simulationTime));
+		result += "))";
+	}
+
+	result += ")";
+	return result;
+}

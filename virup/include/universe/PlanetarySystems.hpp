@@ -32,6 +32,11 @@ class PlanetarySystems : public UniverseElement
 	PlanetarySystems();
 	virtual BBox getBoundingBox() const override { return {}; };
 	bool renderSystem() const { return doRender; };
+	QStringList getSystemsNames() const;
+	OrbitalSystem const* getSystem(QString const& name)
+	{
+		return systems[ids.at(name)];
+	};
 	Vector3 getClosestSystemPosition()
 	{
 		return Utils::fromQt(getRelToAbsTransform()

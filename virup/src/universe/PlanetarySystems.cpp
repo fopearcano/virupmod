@@ -110,6 +110,16 @@ PlanetarySystems::PlanetarySystems()
 	CSVOrbit::currentSystemDir       = directories[closestId];
 }
 
+QStringList PlanetarySystems::getSystemsNames() const
+{
+	QStringList result;
+	for(auto const& pair : ids)
+	{
+		result << pair.first;
+	}
+	return result;
+}
+
 Vector3 PlanetarySystems::getAbsolutePosition(QString const& systemName) const
 {
 	auto relativePos(positions[ids.at(systemName)]);
