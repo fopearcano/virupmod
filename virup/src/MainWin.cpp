@@ -93,9 +93,9 @@ bool MainWin::event(QEvent* e)
 		{
 			univElemSelect->close();
 		}
-		if(dialog != nullptr)
+		if(scenes != nullptr)
 		{
-			dialog->close();
+			scenes->close();
 		}
 	}
 	return AbstractMainWin::event(e);
@@ -312,78 +312,11 @@ void MainWin::initScene()
 		visibilities    = new Visibilities(*universe);
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
-
-		dialog = new QDialog;
-		dialog->show();
-		dialog->setWindowTitle("VIRUP Scenes");
-
-		auto layout = new QVBoxLayout(dialog);
-
-		auto w = new QWidget(dialog);
-		layout->addWidget(w);
-		auto hl = new QHBoxLayout(w);
-
-		auto b = new QPushButton(w);
-		b->setText(tr("RESTART"));
-		connect(b, &QPushButton::clicked, this,
-		        [this]() { reloadPythonEngine(); });
-		hl->addWidget(b);
-
-		b = new QPushButton(w);
-		b->setText(tr("STOP"));
-		connect(b, &QPushButton::clicked, this,
-		        []() { PythonQtHandler::evalScript("stop()"); });
-		hl->addWidget(b);
-
-		hl->addWidget(new QLabel(tr("EN (on) / JP (off) : ")));
-
-		auto cb = new QCheckBox(dialog);
-		cb->setCheckState(Qt::Checked);
-		connect(cb, &QCheckBox::stateChanged,
-		        [this](int state) { english = state != Qt::Unchecked; });
-		hl->addWidget(cb);
-
-		b = new QPushButton(w);
-		b->setText(tr("Stop Voiceover"));
-		connect(b, &QPushButton::clicked, this,
-		        []() { PythonQtHandler::evalScript("del s"); });
-		hl->addWidget(b);
-
-		layout->addWidget(new QLabel("Scenes :"));
-
-		QStringList scenes = {"0:International Space Station",
-		                      "1:Earth",
-		                      "2:Moon",
-		                      "3:Phobos",
-		                      "4:Solar System",
-		                      "5:AGORA",
-		                      "6:Local Group",
-		                      "7:IllustrisTNG",
-		                      "8:SDSS"};
-		for(int i(0); i < scenes.size(); ++i)
-		{
-			auto button = new QPushButton(scenes[i]);
-			connect(button, &QPushButton::clicked, this, [this, i]() {
-				PythonQtHandler::evalScript("del s");
-				animator->setTransition(10 + 2 * i);
-			});
-			button->setFocusPolicy(Qt::NoFocus);
-			layout->addWidget(button);
-			buttons.push_back(button);
-		}
-		// layout->addWidget(new QLabel("Options :"));
-		transitionsButton
-		    = new QPushButton("Toggle transitions (only if user is sick, can "
-		                      "introduce problems !)");
-		connect(transitionsButton, &QPushButton::clicked, this,
-		        []() { PythonQtHandler::evalScript("toggleAnimations()"); });
-		transitionsButton->setFocusPolicy(Qt::NoFocus);
-		transitionsButton->hide();
-		layout->addWidget(transitionsButton);
+		scenes          = new SceneSelector(*animator);
 
 		auto tools(menuBar->addMenu(tr("Tools")));
 		tools->addAction(tr("Scenes"), this,
-		                 [this]() { this->dialog->show(); });
+		                 [this]() { this->scenes->show(); });
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
 		tools->addAction(tr("Planetary Systems"), this,
@@ -402,6 +335,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 	if(pathId == "cosmo")
 	{
+		if(networkManager->isServer())
+		{
+			animator->update();
+		}
+
 		auto& cam(dynamic_cast<Camera&>(camera));
 		cam.currentFrameTiming = frameTiming;
 		cam.currentProjection  = renderer.projection;
@@ -420,39 +358,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(networkManager->isServer())
 		{
-			int currentScene((animator->getCurrentTransitionId() - 10) / 2);
-			for(int i(0); i < static_cast<int>(buttons.size()); ++i)
-			{
-				auto button  = buttons[i];
-				QPalette pal = button->palette();
-				if(i == currentScene)
-				{
-					pal.setColor(QPalette::Button, QColor(Qt::green));
-				}
-				else
-				{
-					pal.setColor(QPalette::Button, QColor(255, 128, 128));
-				}
-				button->setAutoFillBackground(true);
-				button->setPalette(pal);
-				button->update();
-			}
-			QPalette pal = transitionsButton->palette();
-			bool animationDisabled(
-			    PythonQtHandler::getVariable("disableanimations").toBool());
-			if(animationDisabled)
-			{
-				transitionsButton->setText("Transitions : DISABLED");
-				pal.setColor(QPalette::Button, QColor(255, 128, 128));
-			}
-			else
-			{
-				transitionsButton->setText("Transitions : ENABLED");
-				pal.setColor(QPalette::Button, QColor(Qt::green));
-			}
-			transitionsButton->setAutoFillBackground(true);
-			transitionsButton->setPalette(pal);
-			transitionsButton->update();
+			scenes->update();
 		}
 	}
 	if(pathId == "planet")
@@ -496,7 +402,6 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			timeSinceTextUpdate = 0.f;
 			lastTargetName      = targetName;
 		}
-		return;
 	}
 }
 
@@ -666,7 +571,7 @@ std::vector<float> MainWin::generateVertices(unsigned int number,
 MainWin::~MainWin()
 {
 	delete animator;
-	delete dialog;
+	delete scenes;
 	delete visibilities;
 	delete planetSysSelect;
 	delete univElemSelect;

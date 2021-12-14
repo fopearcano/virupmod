@@ -19,6 +19,7 @@
 #ifndef ANIMATOR_HPP
 #define ANIMATOR_HPP
 
+#include "PythonQtHandler.hpp"
 #include "Transition.hpp"
 #include "universe/Universe.hpp"
 
@@ -34,7 +35,6 @@ class Animator : public QObject
 	Q_PROPERTY(bool animationsDisabled READ areAnimationsDisabled WRITE
 	               setAnimationsDisabled)
 	Q_PROPERTY(bool autoIdScrolling MEMBER autoIdScrolling)
-	Q_PROPERTY(int id MEMBER id)
 	Q_PROPERTY(Scene currentScene READ getCurrentScene)
   public:
 	Animator(Universe& universe, VRHandler const& vrHandler,
@@ -78,6 +78,14 @@ class Animator : public QObject
 	void update();
 	void removeAllTransitions() { transitions.clear(); };
 	void executeTransition(Transition t);
+	float getTotalDuration() const;
+	float getWholeAnimationPercentage() const;
+
+	void restart();
+	void play();
+	void pause();
+	void stop();
+	void stopVoiceover();
 
   private:
 	Vector3 getShift(double coeff = 1.0) const;
@@ -99,6 +107,9 @@ class Animator : public QObject
 
 	bool playCustom = false;
 	Transition customTransition;
+
+	QElapsedTimer timer;
+	float pausedAt = 0.f;
 };
 
 #endif // ANIMATOR_HPP

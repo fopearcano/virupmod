@@ -1,9 +1,7 @@
 from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone
-from PythonQt.QtGui import QKeyEvent
 from PythonQt.QtMultimedia import QSound
 from PythonQt.libplanet import Vector3
 from PythonQt.virup import Transition, Scene, SceneSpatialData, SceneTemporalData, SceneUI
-from math import cos, sin
 
 # CUSTOM
 def smoothstep(t, v0 = 0, v1 = 0):
@@ -80,7 +78,7 @@ transitions = [
 # Intro
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
-          SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0})), 1.0, "begin", "begin"),
+          SceneTemporalData(1.0, solareclipsedt), SceneUI({"Hipparcos":1.0})), 1.0, "begin", "begin"),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
           SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0})), 3.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
@@ -154,63 +152,9 @@ transitions = [
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend", "black")
 ]
 
-def stop():
-    global s
-    Animator.autoIdScrolling=False
-    Animator.setTransition(-1)
-    del s
-
-def keyPressEvent(e):
-    # if spacebar pressed, start animation
-    numpad_mod = int(e.modifiers()) == Qt.KeypadModifier
-    if e.key() == Qt.Key_0 and numpad_mod:
-        Animator.setTransition(0)
-    elif e.key() == Qt.Key_1 and numpad_mod:
-        Animator.setTransition(1)
-    elif e.key() == Qt.Key_2 and numpad_mod:
-        Animator.setTransition(2)
-    elif e.key() == Qt.Key_3 and numpad_mod:
-        Animator.setTransition(3)
-    elif e.key() == Qt.Key_4 and numpad_mod:
-        Animator.setTransition(4)
-    elif e.key() == Qt.Key_5 and numpad_mod:
-        Animator.setTransition(5)
-    elif e.key() == Qt.Key_6 and numpad_mod:
-        Animator.setTransition(6)
-    elif e.key() == Qt.Key_7 and numpad_mod:
-        Animator.setTransition(7)
-    elif e.key() == Qt.Key_8 and numpad_mod:
-        Animator.setTransition(8)
-    elif e.key() == Qt.Key_9 and numpad_mod:
-        Animator.setTransition(9)
-    elif e.key() == Qt.Key_Minus and numpad_mod:
-        Animator.toggleAnimations()
-    elif e.key() == Qt.Key_Space:
-        stop()
-    elif e.key() == Qt.Key_Enter:
-        Animator.setTransition((Animator.id+1) % len(transitions))
-    else:
-        return
-
-
-s=QSound(VIRUP.getVoiceoverPath())
 def initScene():
-    global s
-
     Animator.removeAllTransitions()
     for t in transitions:
         Animator.appendTransition(t)
 
-    Universe.simulationTime = solareclipsedt
-    Animator.animationsDisabled = True
-    Animator.setTransition(0)
-    Animator.animationsDisabled = False
-    s.play()
-
-
-def updateScene():
-    if not VIRUP.isServer:
-        return
-
-    Animator.update()
-
+    Animator.restart()

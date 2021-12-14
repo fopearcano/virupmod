@@ -37,37 +37,15 @@ void Transition::custom(float t, float t_harsh) const
 	                            + ',' + QString::number(t_harsh) + ')');
 }
 
-void Transition::play()
+bool Transition::updateUniverse(Universe& universe, float t_harsh,
+                                Scene const& fromScene, float fadeFactor,
+                                Vector3 const& cosmoShift,
+                                Vector3 const& planetShift) const
 {
-	timer.restart();
-}
-
-void Transition::pause()
-{
-	pausedAt += timer.elapsed() / 1000.f;
-	timer.invalidate();
-}
-
-void Transition::stop()
-{
-	pausedAt = 0.f;
-	timer.invalidate();
-}
-
-bool Transition::updateUniverse(Universe& universe, Scene const& fromScene,
-                                float fadeFactor, Vector3 const& cosmoShift,
-                                Vector3 const& planetShift)
-{
-	if(!timer.isValid())
-	{
-		return false;
-	}
-	float t_harsh = timer.elapsed() / (duration * 1000.f);
 	float t(t_harsh);
 	bool returnedVal = true;
 	if(t > 1.0 || t < 0.0)
 	{
-		stop();
 		t_harsh     = 1.0;
 		t           = 1.0;
 		returnedVal = false;

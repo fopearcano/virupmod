@@ -21,7 +21,7 @@
 Scene Animator::getCurrentScene() const
 {
 	auto result = Scene::getCurrentState(universe);
-	auto sd     = currentScene.getSpatialData();
+	auto sd     = result.getSpatialData();
 	if(sd.getSystemName() == "" && sd.getBodyName() == "")
 	{
 		sd.setPosition(sd.getPosition() - getCosmoShift());
@@ -65,53 +65,22 @@ Vector3 Animator::getShift(double coeff) const
 
 void Animator::setTransition(int newid)
 {
-	playCustom = false;
-	customTransition.stop();
-	auto oldid = id;
-	id         = newid;
-	if(oldid >= 0 && oldid < static_cast<int>(transitions.size()))
+	if(newid < 0 || newid >= static_cast<int>(transitions.size()))
 	{
-		transitions[oldid].stop();
-	}
-	if(id < 0 || id >= static_cast<int>(transitions.size()))
-	{
+		stop();
 		return;
 	}
-	transitions[id].play();
-	if(animationsDisabled)
-	{
-		currentScene = transitions[id].getDestination();
-	}
-	else
-	{
-		if(oldid == -1)
-		{
-			currentScene = Scene::getCurrentState(universe);
-			auto sd      = currentScene.getSpatialData();
-			if(sd.getSystemName() == "" && sd.getBodyName() == "")
-			{
-				sd.setPosition(sd.getPosition() - getCosmoShift());
-				currentScene.setSpatialData(sd);
-			}
-			else
-			{
-				sd.setPosition(sd.getPosition() - getPlanetShift());
-				currentScene.setSpatialData(sd);
-			}
-		}
-		else
-		{
-			currentScene = transitions[oldid].getDestination();
-		}
-	}
+	executeTransition(transitions[newid]);
 }
 
 void Animator::update()
 {
-	if(!playCustom && (id < 0 || id >= static_cast<int>(transitions.size())))
+	if(!timer.isValid())
 	{
 		return;
 	}
+	float t_secs = pausedAt + timer.elapsed() * 0.001f;
+
 	OrbitalSystemRenderer::autoCameraTarget = false;
 	tmm.exposure                            = 0.3;
 	fadeFactor                              = 1.0;
@@ -122,35 +91,53 @@ void Animator::update()
 	shiftHorizontalAngle = 0.0;
 	shiftVerticalAngle   = 0.05;
 
-	int nextid = -1;
-	if(!playCustom
-	   && !transitions[id].updateUniverse(universe, currentScene, fadeFactor,
-	                                      getCosmoShift(), getPlanetShift()))
+	if(playCustom)
 	{
-		OrbitalSystemRenderer::autoCameraTarget = true;
-		nextid                                  = id + 1;
-	}
-	else if(playCustom
-	        && !customTransition.updateUniverse(universe, currentScene,
-	                                            fadeFactor, getCosmoShift(),
-	                                            getPlanetShift()))
-	{
-		OrbitalSystemRenderer::autoCameraTarget = true;
-		customTransition.stop();
-		playCustom = false;
-	}
-
-	if(nextid != -1)
-	{
-		if(nextid < static_cast<int>(transitions.size()) && autoIdScrolling)
+		if(!customTransition.updateUniverse(
+		       universe, t_secs / customTransition.getDuration(), currentScene,
+		       fadeFactor, getCosmoShift(), getPlanetShift()))
 		{
-			setTransition(nextid);
+			stop();
+		}
+	}
+	else if(!transitions.empty())
+	{
+		Transition const* currentTransition = &transitions[0];
+		unsigned int i(1);
+		float durationSum(0.f);
+		while(i < transitions.size()
+		      && t_secs > currentTransition->getDuration() + durationSum)
+		{
+			durationSum += currentTransition->getDuration();
+			currentTransition = &transitions[i];
+			id                = i;
+			++i;
+		}
+		if(t_secs <= currentTransition->getDuration() + durationSum)
+		{
+			float t_harsh((t_secs - durationSum)
+			              / currentTransition->getDuration());
+			if(currentTransition == &transitions[0])
+			{
+				currentTransition->updateUniverse(
+				    universe, t_harsh, currentTransition->getDestination(),
+				    fadeFactor, getCosmoShift(), getPlanetShift());
+			}
+			else
+			{
+				currentTransition->updateUniverse(
+				    universe, t_harsh, transitions[i - 2].getDestination(),
+				    fadeFactor, getCosmoShift(), getPlanetShift());
+			}
 		}
 		else
 		{
-			transitions[id].applyDestination(universe, fadeFactor,
-			                                 getCosmoShift(), getPlanetShift());
+			stop();
 		}
+	}
+	else
+	{
+		stop();
 	}
 
 	tmm.exposure *= fadeFactor;
@@ -158,37 +145,77 @@ void Animator::update()
 
 void Animator::executeTransition(Transition t)
 {
-	if(id >= 0 && id < static_cast<int>(transitions.size()))
-	{
-		setTransition(-1);
-	}
+	stop();
+	play();
 	playCustom       = true;
 	customTransition = std::move(t);
-	customTransition.play();
 	if(animationsDisabled)
 	{
 		currentScene = customTransition.getDestination();
 	}
 	else
 	{
-		if(id == -1)
-		{
-			currentScene = Scene::getCurrentState(universe);
-			auto sd      = currentScene.getSpatialData();
-			if(sd.getSystemName() == "" && sd.getBodyName() == "")
-			{
-				sd.setPosition(sd.getPosition() - getCosmoShift());
-				currentScene.setSpatialData(sd);
-			}
-			else
-			{
-				sd.setPosition(sd.getPosition() - getPlanetShift());
-				currentScene.setSpatialData(sd);
-			}
-		}
-		else
-		{
-			currentScene = transitions[id].getDestination();
-		}
+		currentScene = getCurrentScene();
+	}
+}
+
+float Animator::getTotalDuration() const
+{
+	float ret(0.f);
+	for(auto const& t : transitions)
+	{
+		ret += t.getDuration();
+	}
+	return ret;
+}
+
+float Animator::getWholeAnimationPercentage() const
+{
+	float ret(pausedAt);
+	if(timer.isValid())
+	{
+		ret += timer.elapsed() * 0.001f;
+	}
+	return 100.f * ret / getTotalDuration();
+}
+
+void Animator::restart()
+{
+	animationsDisabled = true;
+	stop();
+	play();
+	animationsDisabled = false;
+	PythonQtHandler::evalScript(
+	    "voiceover=QSound(VIRUP.getVoiceoverPath())\nvoiceover.play()");
+}
+
+void Animator::play()
+{
+	timer.restart();
+}
+
+void Animator::pause()
+{
+	pausedAt += timer.elapsed() / 1000.f;
+	timer.invalidate();
+	stopVoiceover();
+}
+
+void Animator::stop()
+{
+	id                                      = -1;
+	OrbitalSystemRenderer::autoCameraTarget = true;
+	playCustom                              = false;
+	pausedAt                                = 0.f;
+	timer.invalidate();
+	stopVoiceover();
+}
+
+void Animator::stopVoiceover()
+{
+	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
+	if(PythonQtHandler::getVariable("__foo").toBool())
+	{
+		PythonQtHandler::evalScript("del voiceover");
 	}
 }

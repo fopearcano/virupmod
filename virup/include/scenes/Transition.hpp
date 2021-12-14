@@ -38,18 +38,16 @@ class Transition
 	QString getCustomPythonFunction() const { return customPythonFunction; };
 	void custom(float t, float t_harsh) const;
 
-	void play();
-	void pause();
-	void stop();
 	/* Returns if the transition is running or not.
 	 *
 	 * Can return false if either :
 	 * - the transition wasn't being played
 	 * - the transition finished and is stopping by itself
 	 */
-	bool updateUniverse(Universe& universe, Scene const& fromScene,
-	                    float fadeFactor, Vector3 const& cosmoShift,
-	                    Vector3 const& planetShift);
+	bool updateUniverse(Universe& universe, float t_harsh,
+	                    Scene const& fromScene, float fadeFactor,
+	                    Vector3 const& cosmoShift,
+	                    Vector3 const& planetShift) const;
 
 	void applyDestination(Universe& universe, float fadeFactor,
 	                      Vector3 const& cosmoShift,
@@ -60,9 +58,6 @@ class Transition
 	float duration = 10.f;
 	QString name;
 	QString customPythonFunction;
-
-	QElapsedTimer timer;
-	float pausedAt = 0.f;
 };
 
 /* PYTHONQT */
@@ -115,15 +110,12 @@ class TransitionWrapper : public PythonQtWrapper
 		t->custom(t_, t_harsh);
 	};
 
-	void play(Transition* t) { t->play(); };
-	void pause(Transition* t) { t->pause(); };
-	void stop(Transition* t) { t->stop(); };
-	bool updateUniverse(Transition* t, Universe& universe,
+	bool updateUniverse(Transition* t, Universe& universe, float t_harsh,
 	                    Scene const& fromScene, float fadeFactor,
 	                    Vector3 const& cosmoShift, Vector3 const& planetShift)
 	{
-		return t->updateUniverse(universe, fromScene, fadeFactor, cosmoShift,
-		                         planetShift);
+		return t->updateUniverse(universe, t_harsh, fromScene, fadeFactor,
+		                         cosmoShift, planetShift);
 	};
 };
 

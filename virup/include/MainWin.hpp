@@ -16,6 +16,7 @@
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
+#include "ui/SceneSelector.hpp"
 #include "ui/UniverseElementSelector.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
@@ -163,7 +164,7 @@ class MainWin : public AbstractMainWin
 	QString getVoiceoverPath()
 	{
 		return QSettings().value("data/rootdir").toString() + "/voiceover/"
-		       + (english ? "EN" : "JP") + ".wav";
+		       + (scenes->voiceOverIsEnglish() ? "EN" : "JP") + ".wav";
 	};
 
   protected:
@@ -283,14 +284,10 @@ class MainWin : public AbstractMainWin
 	Visibilities* visibilities               = nullptr;
 	PlanetarySystemSelector* planetSysSelect = nullptr;
 	UniverseElementSelector* univElemSelect  = nullptr;
+	SceneSelector* scenes                    = nullptr;
 
 	// scenes
-	Animator* animator                = nullptr;
-	QDialog* dialog                   = nullptr;
-	std::vector<QPushButton*> buttons = {};
-	QPushButton* transitionsButton    = nullptr;
-
-	bool english = true;
+	Animator* animator = nullptr;
 };
 
 #endif // MAINWIN_H
