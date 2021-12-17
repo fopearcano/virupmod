@@ -1,3 +1,6 @@
+branches:
+  except:
+    - /draft/
 image:
 - Visual Studio 2015
 build:

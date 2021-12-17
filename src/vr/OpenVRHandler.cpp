@@ -1,12 +1,12 @@
 #include "vr/OpenVRHandler.hpp"
 
-bool OpenVRHandler::init(Renderer const& renderer)
+bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 {
 	if(!vr::VR_IsRuntimeInstalled())
 	{
 		return false;
 	}
-	VRHandler::init(renderer);
+	VRHandler::init(renderer, tmm);
 
 // Start SteamVR if not running on unix-based
 #ifdef Q_OS_UNIX
@@ -315,11 +315,11 @@ void OpenVRHandler::renderControllers() const
 {
 	if(leftController != nullptr)
 	{
-		leftController->render();
+		leftController->render(*tmm);
 	}
 	if(rightController != nullptr)
 	{
-		rightController->render();
+		rightController->render(*tmm);
 	}
 }
 
@@ -327,11 +327,11 @@ void OpenVRHandler::renderHands() const
 {
 	if(leftHand->isValid())
 	{
-		leftHand->render();
+		leftHand->render(*tmm);
 	}
 	if(rightHand->isValid())
 	{
-		rightHand->render();
+		rightHand->render(*tmm);
 	}
 }
 

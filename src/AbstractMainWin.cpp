@@ -135,7 +135,7 @@ void AbstractMainWin::setVR(bool vr)
 	}
 	else if(!vrHandler->isEnabled() && vr)
 	{
-		if(vrHandler->init(renderer))
+		if(vrHandler->init(renderer, *toneMappingModel))
 		{
 			vrHandler->resetPos();
 		}

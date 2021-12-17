@@ -20,18 +20,21 @@
 
 Widget3D::Widget3D(QWidget* widget)
     : shader("billboard")
+    , widget(widget)
 {
 	Primitives::setAsQuad(quad, shader);
-	setWidget(widget);
 }
 
-void Widget3D::setWidget(QWidget* widget)
+void Widget3D::update()
 {
-	this->widget = widget;
-	widget->setVisible(true);
-	widget->setVisible(false);
+	if(!widget->isVisible())
+	{
+		widget->setVisible(true);
+		widget->setVisible(false);
+	}
 	unsigned int width(widget->width()), height(widget->height());
 	originalSize = widget->size();
+	aspectratio  = QMatrix4x4();
 	if(width > height)
 	{
 		aspectratio.scale(1.f, static_cast<float>(height) / width);
@@ -41,11 +44,19 @@ void Widget3D::setWidget(QWidget* widget)
 		aspectratio.scale(static_cast<float>(width) / height, 1.f);
 	}
 	updateTex();
+	repaint = false;
 }
 
-void Widget3D::render()
+void Widget3D::render(ToneMappingModel const& tmm)
 {
-	GLHandler::setUpRender(shader, model * aspectratio);
+	if(repaint)
+	{
+		update();
+	}
+	shader.setUniform("exposure", tmm.exposure);
+	shader.setUniform("dynamicrange", tmm.dynamicrange);
+	GLHandler::setUpRender(shader, model * aspectratio,
+	                       GLHandler::GeometricSpace::SEATEDTRACKED);
 	GLHandler::useTextures({tex});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }

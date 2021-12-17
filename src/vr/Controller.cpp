@@ -203,9 +203,10 @@ void Controller::update(QMatrix4x4 const& model, unsigned int nDevice)
 	padCoords[1] = controllerState.rAxis[padid].y;
 }
 
-void Controller::render() const
+void Controller::render(ToneMappingModel const& tmm) const
 {
-	GLHandler::setPointSize(8);
+	shaderProgram.setUniform("exposure", tmm.exposure);
+	shaderProgram.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shaderProgram, model,
 	                       GLHandler::GeometricSpace::SEATEDTRACKED);
 	GLHandler::useTextures({tex});

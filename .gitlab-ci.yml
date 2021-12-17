@@ -1,3 +1,7 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME != "draft"
+
 stages:
     - dockerbuild
     - build
@@ -55,7 +59,7 @@ build:bionic:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/ubuntu/18.04/build.sh
+        - bash ./ci/gitlab-ci/ubuntu/18.04/build.sh
     artifacts:
         paths:
             - build/*.deb

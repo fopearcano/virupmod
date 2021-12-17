@@ -26,7 +26,8 @@ class OpenVRHandler : public VRHandler
 	OpenVRHandler() = default;
 	virtual QString getDriverName() const override { return "OpenVR"; }
 	virtual bool isEnabled() const override { return vr_pointer != nullptr; }
-	virtual bool init(Renderer const& renderer) override;
+	virtual bool init(Renderer const& renderer,
+	                  ToneMappingModel const& tmm) override;
 	virtual QSize getEyeRenderTargetSize() const override;
 	virtual float getFrameTiming() const override;
 	virtual const Controller* getController(Side side) const override;

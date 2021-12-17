@@ -23,6 +23,7 @@
 #include <Leap.h>
 #endif
 #include "../BasicCamera.hpp"
+#include "../ToneMappingModel.hpp"
 #include "../utils.hpp"
 
 /** @ingroup pycall
@@ -54,7 +55,7 @@ class Hand : public QObject
 #ifdef LEAP_MOTION
 	void update(Leap::Hand const& hand);
 #endif
-	void render() const;
+	void render(ToneMappingModel const& tmm) const;
 
 	const Side side;
 

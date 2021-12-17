@@ -77,7 +77,7 @@ void Hand::update(Leap::Hand const& hand)
 }
 #endif
 
-void Hand::render() const
+void Hand::render(ToneMappingModel const& tmm) const
 {
 	GLHandler::setUpRender(shaderProgram, model,
 	                       GLHandler::GeometricSpace::HMD);
@@ -105,7 +105,8 @@ void Hand::render() const
 	{
 		shaderProgram.setUniform("color", QColor::fromRgbF(0.0f, 1.0f, 0.0f));
 	}
-
+	shaderProgram.setUniform("exposure", tmm.exposure);
+	shaderProgram.setUniform("dynamicrange", tmm.dynamicrange);
 	mesh.render(PrimitiveType::LINES);
 }
 

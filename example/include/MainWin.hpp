@@ -6,6 +6,7 @@
 #include "AbstractMainWin.hpp"
 #include "Billboard.hpp"
 #include "CalibrationCompass.hpp"
+#include "DemoDialog.hpp"
 #include "Model.hpp"
 #include "Primitives.hpp"
 #include "ShaderProgram.hpp"
@@ -55,9 +56,11 @@ class MainWin : public AbstractMainWin
 
   protected:
 	virtual void actionEvent(BaseInputManager::Action a, bool pressed) override;
+	virtual bool event(QEvent* e) override;
 	virtual void mousePressEvent(QMouseEvent* e) override;
 	virtual void mouseReleaseEvent(QMouseEvent* e) override;
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
+	virtual void vrEvent(VRHandler::Event const& e) override;
 
 	// declare drawn resources
 	virtual void initScene() override;
@@ -127,6 +130,7 @@ class MainWin : public AbstractMainWin
 	Billboard* bill;
 	Text3D* text;
 	Widget3D* widget3d;
+	DemoDialog* dialog;
 
 	float barrelPower = 1.01f;
 

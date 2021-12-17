@@ -6,6 +6,7 @@
 
 #include "../gl/GLHandler.hpp"
 
+class ToneMappingModel;
 class Controller;
 class Hand;
 class Renderer;
@@ -56,9 +57,10 @@ class VRHandler : public QObject
 	VRHandler()                           = default;
 	virtual QString getDriverName() const = 0;
 	virtual bool isEnabled() const        = 0;
-	virtual bool init(Renderer const& renderer)
+	virtual bool init(Renderer const& renderer, ToneMappingModel const& tmm)
 	{
 		this->renderer = &renderer;
+		this->tmm      = &tmm;
 		return true;
 	};
 	virtual QSize getEyeRenderTargetSize() const = 0;
@@ -109,6 +111,7 @@ class VRHandler : public QObject
 
   protected:
 	Renderer const* renderer;
+	ToneMappingModel const* tmm;
 
 	double stereoMultiplier
 	    = QSettings().value("vr/stereomultiplier").toDouble();

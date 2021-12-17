@@ -24,6 +24,7 @@
 #include <QWidget>
 
 #include "Primitives.hpp"
+#include "ToneMappingModel.hpp"
 #include "gl/GLHandler.hpp"
 
 class Widget3D
@@ -32,15 +33,19 @@ class Widget3D
 	explicit Widget3D(QWidget* widget);
 	QMatrix4x4 const& getModel() const { return model; };
 	QMatrix4x4& getModel() { return model; };
+	QMatrix4x4 getAspectRatioMatrix() const { return aspectratio; };
 	QImage const getImage() const { return image; };
 	QWidget& getWidget() const { return *widget; };
-	void setWidget(QWidget* widget);
-	void render();
+	void triggerRepaint() { this->repaint = true; };
+	void render(ToneMappingModel const& tmm);
 	~Widget3D();
 
 	static void paintWidget(QImage& image, QWidget& widget);
 
   private:
+	void update();
+
+	bool repaint = true;
 	void updateTex();
 
 	GLShaderProgram shader;

@@ -6,6 +6,7 @@
 #include <openvr/openvr.h>
 
 #include "../BasicCamera.hpp"
+#include "../ToneMappingModel.hpp"
 #include "../utils.hpp"
 
 /** @ingroup pycall
@@ -86,6 +87,7 @@ class Controller : public QObject
 	 * @getter{position}
 	 */
 	QVector3D getPosition() const { return QVector3D(model.column(3)); };
+	QMatrix4x4 getModel() const { return model; };
 	/**
 	 * @brief Updates every property of the controller and its internal state.
 	 *
@@ -97,7 +99,7 @@ class Controller : public QObject
 	/**
 	 * @brief Renders the controller.
 	 */
-	void render() const;
+	void render(ToneMappingModel const& tmm) const;
 
 	/**
 	 * @brief Read-only direct access to the @ref side property.

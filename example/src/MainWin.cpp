@@ -24,6 +24,18 @@ void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 	AbstractMainWin::actionEvent(a, pressed);
 }
 
+bool MainWin::event(QEvent* e)
+{
+	if(e->type() == QEvent::Type::Close)
+	{
+		if(dialog != nullptr)
+		{
+			dialog->close();
+		}
+	}
+	return AbstractMainWin::event(e);
+}
+
 void MainWin::mousePressEvent(QMouseEvent* e)
 {
 	if(e->button() == Qt::MouseButton::LeftButton)
@@ -60,6 +72,39 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	yaw += dx * 3.14f / 3.f;
 	pitch += dy * 3.14f / 3.f;
 	QCursor::setPos(width() / 2, height() / 2);
+}
+
+void MainWin::vrEvent(VRHandler::Event const& e)
+{
+	switch(e.type)
+	{
+		case VRHandler::EventType::BUTTON_PRESSED:
+			switch(e.button)
+			{
+				case VRHandler::Button::MENU:
+					dialog->toggleFromController(
+					    *vrHandler->getController(e.side));
+					break;
+				case VRHandler::Button::TRIGGER:
+					dialog->triggerPressed(*vrHandler->getController(e.side));
+					break;
+				default:
+					break;
+			}
+			break;
+		case VRHandler::EventType::BUTTON_UNPRESSED:
+			switch(e.button)
+			{
+				case VRHandler::Button::TRIGGER:
+					dialog->triggerReleased(*vrHandler->getController(e.side));
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
 }
 
 void MainWin::initScene()
@@ -176,9 +221,17 @@ void MainWin::initScene()
 	widget3d->getModel().rotate(45.f, 1.f, 0.f);
 	widget3d->getModel().translate(0.6f, 0.f, 0.5f);
 
+	dialog = new DemoDialog;
+	dialog->show();
+
+	auto tools(menuBar->addMenu(tr("Tools")));
+	tools->addAction(tr("Demo Dialog"), this,
+	                 [this]() { this->dialog->show(); });
+
 	renderer.getCamera("default").setEyeDistanceFactor(1.0f);
 
 	renderer.appendPostProcessingShader("distort", "distort");
+	renderer.renderControllersBeforeScene = false;
 
 	timer.start();
 }
@@ -251,9 +304,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 
 void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 {
+	QMatrix4x4 skyboxSize;
+	skyboxSize.scale(1000.f);
 	GLHandler::useTextures({sbTexture});
 	GLHandler::setBackfaceCulling(false);
-	GLHandler::setUpRender(sbShader.toGLShaderProgram(), QMatrix4x4(),
+	GLHandler::setUpRender(sbShader.toGLShaderProgram(), skyboxSize,
 	                       GLHandler::GeometricSpace::SKYBOX);
 	skybox->render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
@@ -291,7 +346,8 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 		model->render(camera.getWorldSpacePosition(), modelModel, *light);
 	}
 
-	widget3d->render();
+	dialog->render(*vrHandler, *toneMappingModel);
+	// widget3d->render(*toneMappingModel);
 	bill->render(camera);
 	text->render();
 }
@@ -326,4 +382,5 @@ MainWin::~MainWin()
 	delete bill;
 	delete text;
 	delete widget3d;
+	delete dialog;
 }

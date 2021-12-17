@@ -2,9 +2,10 @@
 
 #include "Renderer.hpp"
 
-bool StereoBeamerHandler::init(Renderer const& renderer)
+bool StereoBeamerHandler::init(Renderer const& renderer,
+                               ToneMappingModel const& tmm)
 {
-	VRHandler::init(renderer);
+	VRHandler::init(renderer, tmm);
 	hmdPosMatrix = QMatrix4x4();
 	enabled      = true;
 	return true;
