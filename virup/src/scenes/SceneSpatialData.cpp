@@ -70,6 +70,7 @@ void SceneSpatialData::setAsUniverseState(Universe& universe) const
 		}
 		else
 		{
+			qDebug() << "Trying !";
 			universe.setCosmoPosition(
 			    universe.planetSystems->getAbsolutePosition(systemName));
 		}
@@ -172,12 +173,12 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 	    sd1.universe->planetSystems->getAbsolutePosition(sd1.systemName));
 
 	auto result = noFrameChangeInterpolate(sd0Cosmo, sd1Cosmo, t, 3.086e+19);
-	if(sd0.universe->getPlanetarySystemName() == sd0.systemName)
+	if(sd0.universe->isPlanetarySystemRendered() && t < 0.5f)
 	{
 		return {*sd0.universe, sd0.systemName, sd0.bodyName, 1.0 / result.scale,
 		        sd0.position};
 	}
-	if(sd1.universe->getPlanetarySystemName() == sd1.systemName)
+	if(sd0.universe->isPlanetarySystemRendered() && t >= 0.5f)
 	{
 		return {*sd1.universe, sd1.systemName, sd1.bodyName, 1.0 / result.scale,
 		        sd1.position};
