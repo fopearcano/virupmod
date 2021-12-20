@@ -20,6 +20,7 @@
 
 SceneSelector::SceneSelector(Animator& animator)
     : animator(animator)
+    , slider(Qt::Horizontal, this)
 {
 	show();
 	setWindowTitle(tr("VIRUP Scenes"));
@@ -56,6 +57,16 @@ SceneSelector::SceneSelector(Animator& animator)
 	        [&animator]() { animator.stopVoiceover(); });
 	hl->addWidget(b);
 
+	slider.setMaximum(1000);
+	connect(&slider, &QSlider::sliderPressed,
+	        [this]() { animateSlider = false; });
+	connect(&slider, &QSlider::sliderReleased,
+	        [this]() { animateSlider = true; });
+	connect(&slider, &QSlider::sliderMoved, [&animator](int value) {
+		animator.setWholeAnimationPercentage(value / 10.f);
+	});
+	layout->addWidget(&slider);
+
 	layout->addWidget(new QLabel("Scenes :"));
 
 	QStringList scenes = {"0:International Space Station",
@@ -89,6 +100,11 @@ SceneSelector::SceneSelector(Animator& animator)
 
 void SceneSelector::update()
 {
+	if(animateSlider)
+	{
+		slider.setValue(
+		    static_cast<int>(10 * animator.getWholeAnimationPercentage()));
+	}
 	int currentScene((animator.getCurrentTransitionId() - 10) / 2);
 	for(int i(0); i < static_cast<int>(buttons.size()); ++i)
 	{

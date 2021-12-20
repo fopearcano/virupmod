@@ -63,6 +63,32 @@ Vector3 Animator::getShift(double coeff) const
 	return {0, 0, -val};
 }
 
+void Animator::appendTransition(Transition t)
+{
+	/*
+	if(transitions.size() > 0)
+	{
+	    auto scene  = t.getDestination();
+	    auto td     = scene.getTemporalData();
+	    auto prevTd = transitions[transitions.size() - 1]
+	                      .getDestination()
+	                      .getTemporalData();
+	    if(prevTd.getTimeCoeff() == td.getTimeCoeff()
+	       && !td.getSimulationTime().isValid()
+	       && prevTd.getSimulationTime().isValid())
+	    {
+	        SceneTemporalData newTd(
+	            td.getTimeCoeff(),
+	            prevTd.getSimulationTime().addSecs(t.getDuration() *
+	td.getTimeCoeff())); scene.setTemporalData(newTd);
+	        appendTransition(Transition(scene, t.getDuration(), t.getName(),
+	                                    t.getCustomPythonFunction()));
+	        return;
+	    }
+	}*/
+	transitions.push_back(std::move(t));
+}
+
 void Animator::setTransition(int newid)
 {
 	if(newid < 0 || newid >= static_cast<int>(transitions.size()))
@@ -177,6 +203,14 @@ float Animator::getWholeAnimationPercentage() const
 		ret += timer.elapsed() * 0.001f;
 	}
 	return 100.f * ret / getTotalDuration();
+}
+
+void Animator::setWholeAnimationPercentage(float percentage)
+{
+	float time(getTotalDuration() * percentage / 100.f);
+	stop();
+	pausedAt = time;
+	play();
 }
 
 void Animator::restart()

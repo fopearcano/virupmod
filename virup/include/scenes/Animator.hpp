@@ -70,16 +70,14 @@ class Animator : public QObject
 	Vector3 getCosmoShift() const;
 	Vector3 getPlanetShift() const;
 	void toggleAnimations() { animationsDisabled = !animationsDisabled; };
-	void appendTransition(Transition t)
-	{
-		transitions.push_back(std::move(t));
-	};
+	void appendTransition(Transition t);
 	void setTransition(int newid);
 	void update();
 	void removeAllTransitions() { transitions.clear(); };
 	void executeTransition(Transition t);
 	float getTotalDuration() const;
 	float getWholeAnimationPercentage() const;
+	void setWholeAnimationPercentage(float percentage);
 
 	void restart();
 	void play();

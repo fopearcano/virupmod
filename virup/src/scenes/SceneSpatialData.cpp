@@ -70,7 +70,6 @@ void SceneSpatialData::setAsUniverseState(Universe& universe) const
 		}
 		else
 		{
-			qDebug() << "Trying !";
 			universe.setCosmoPosition(
 			    universe.planetSystems->getAbsolutePosition(systemName));
 		}

@@ -37,6 +37,8 @@ class SceneSelector : public QDialog
 	bool english                      = true;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;
+	QSlider slider;
+	bool animateSlider = true;
 };
 
 #endif // SCENESELECTOR_HPP
