@@ -19,12 +19,12 @@
 #ifndef UNIVERSEELEMENTSELECTOR_HPP
 #define UNIVERSEELEMENTSELECTOR_HPP
 
-#include <QDialog>
 #include <QListWidgetItem>
 
+#include "Dialog3D.hpp"
 #include "scenes/Animator.hpp"
 
-class UniverseElementSelector : public QDialog
+class UniverseElementSelector : public Dialog3D
 {
   public:
 	UniverseElementSelector(Universe const& universe, Animator& animator);

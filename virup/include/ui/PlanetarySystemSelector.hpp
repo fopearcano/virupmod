@@ -19,13 +19,13 @@
 #ifndef PLANETARYSYSTEMSELECTOR_HPP
 #define PLANETARYSYSTEMSELECTOR_HPP
 
+#include "Dialog3D.hpp"
 #include "graphics/OrbitalSystemCamera.hpp"
 #include "scenes/Animator.hpp"
 #include "universe/Universe.hpp"
-#include <QDialog>
 #include <QTreeWidgetItem>
 
-class PlanetarySystemSelector : public QDialog
+class PlanetarySystemSelector : public Dialog3D
 {
 	Q_OBJECT
   public:

@@ -96,6 +96,8 @@ SceneSelector::SceneSelector(Animator& animator)
 	transitionsButton->setFocusPolicy(Qt::NoFocus);
 	transitionsButton->hide();
 	layout->addWidget(transitionsButton);
+
+	installEventFilters();
 }
 
 void SceneSelector::update()

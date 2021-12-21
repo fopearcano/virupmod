@@ -19,12 +19,12 @@
 #ifndef SCENESELECTOR_HPP
 #define SCENESELECTOR_HPP
 
-#include <QDialog>
 #include <QMouseEvent>
 
+#include "Dialog3D.hpp"
 #include "scenes/Animator.hpp"
 
-class SceneSelector : public QDialog
+class SceneSelector : public Dialog3D
 {
   public:
 	SceneSelector(Animator& animator);

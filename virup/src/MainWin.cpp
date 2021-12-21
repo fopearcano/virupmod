@@ -218,16 +218,47 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 						break;
 					}
 					case VRHandler::Button::TRIGGER:
-						CelestialBodyRenderer::renderLabels
-						    = CelestialBodyRenderer::renderLabels > 0.f ? 0.f
-						                                                : 1.f;
-						CelestialBodyRenderer::renderOrbits
-						    = CelestialBodyRenderer::renderOrbits > 0.f ? 0.f
-						                                                : 1.f;
-						// toggleGrid();
+						if(currentDialog >= 0
+						   && currentDialog
+						          < static_cast<int>(dialog3Ds.size()))
+						{
+							dialog3Ds[currentDialog]->triggerPressed(
+							    *vrHandler->getController(e.side));
+						}
 						break;
 					case VRHandler::Button::MENU:
-						printPositionInDataSpace(e.side);
+						// printPositionInDataSpace(e.side);
+						for(auto d : dialog3Ds)
+						{
+							d->hide();
+						}
+						if(currentDialog
+						   < static_cast<int>(dialog3Ds.size() - 1))
+						{
+							++currentDialog;
+							dialog3Ds[currentDialog]->toggleFromController(
+							    *vrHandler->getController(e.side));
+						}
+						else
+						{
+							currentDialog = -1;
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			case VRHandler::EventType::BUTTON_UNPRESSED:
+				switch(e.button)
+				{
+					case VRHandler::Button::TRIGGER:
+						if(currentDialog >= 0
+						   && currentDialog
+						          < static_cast<int>(dialog3Ds.size()))
+						{
+							dialog3Ds[currentDialog]->triggerReleased(
+							    *vrHandler->getController(e.side));
+						}
 						break;
 					default:
 						break;
@@ -313,6 +344,11 @@ void MainWin::initScene()
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 		scenes          = new SceneSelector(*animator);
+
+		dialog3Ds.push_back(scenes);
+		dialog3Ds.push_back(univElemSelect);
+		dialog3Ds.push_back(planetSysSelect);
+		dialog3Ds.push_back(visibilities);
 
 		auto tools(menuBar->addMenu(tr("Tools")));
 		tools->addAction(tr("Scenes"), this,
@@ -425,6 +461,10 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		{
 			universe->renderPlanetarySystem();
 			renderer.renderVRControls();
+			for(auto d : dialog3Ds)
+			{
+				d->render(*vrHandler, *toneMappingModel);
+			}
 			universe->renderPlanetarySystemTransparent();
 			if(timeSinceTextUpdate < 5.f)
 			{
@@ -457,6 +497,10 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	if(!universe->isPlanetarySystemRendered())
 	{
 		renderer.renderVRControls();
+		for(auto d : dialog3Ds)
+		{
+			d->render(*vrHandler, *toneMappingModel);
+		}
 	}
 	auto& cam(dynamic_cast<Camera const&>(camera));
 

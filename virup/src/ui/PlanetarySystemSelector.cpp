@@ -56,6 +56,7 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 		    item));
 		topLevelItems.push_back(item);
 	}
+	installEventFilters();
 }
 
 void PlanetarySystemSelector::setVisibleItems(QString const& match)

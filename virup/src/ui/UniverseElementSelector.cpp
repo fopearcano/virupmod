@@ -37,6 +37,7 @@ UniverseElementSelector::UniverseElementSelector(Universe const& universe,
 	{
 		listWidget.addItem(elementName);
 	}
+	installEventFilters();
 }
 
 void UniverseElementSelector::selectElement(QListWidgetItem* item)

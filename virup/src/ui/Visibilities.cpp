@@ -76,4 +76,6 @@ Visibilities::Visibilities(Universe& universe)
 			universe.setVisibility(name, val / 100.f);
 		});
 	}
+
+	installEventFilters();
 }

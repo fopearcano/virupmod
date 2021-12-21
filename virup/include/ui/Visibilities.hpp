@@ -19,13 +19,13 @@
 #ifndef VISIBILITIES_HPP
 #define VISIBILITIES_HPP
 
-#include <QDialog>
 #include <QScrollArea>
 #include <QSlider>
 
+#include "Dialog3D.hpp"
 #include "universe/Universe.hpp"
 
-class Visibilities : public QDialog
+class Visibilities : public Dialog3D
 {
 	Q_OBJECT
   public:
