@@ -25,6 +25,7 @@
 #include "BasicCamera.hpp"
 #include "CalibrationCompass.hpp"
 #include "DebugCamera.hpp"
+#include "Dialog3DWheel.hpp"
 #include "MainRenderTarget.hpp"
 #include "vr/VRHandler.hpp"
 
@@ -46,7 +47,7 @@ class Renderer
 	};
 
 	Renderer(AbstractMainWin& window, VRHandler& vrHandler);
-	void init();
+	void init(Dialog3DWheel* dialog3dWheel);
 	// if ignore VR, returns hypothetical size if VR wasn't enabled
 	// of course real RT size doesn't ignore VR
 	QSize getSize(bool ignoreVR = false) const;
@@ -216,7 +217,8 @@ class Renderer
 
 	AbstractMainWin& window;
 	VRHandler& vrHandler;
-	DebugCamera* dbgCamera = nullptr;
+	Dialog3DWheel* dialog3dWheel = nullptr;
+	DebugCamera* dbgCamera       = nullptr;
 
 	QMatrix4x4 angleShiftMat;
 	float vFOV = 0.f;

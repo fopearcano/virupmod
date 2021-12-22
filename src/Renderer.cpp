@@ -26,12 +26,14 @@ Renderer::Renderer(AbstractMainWin& window, VRHandler& vrHandler)
 {
 }
 
-void Renderer::init()
+void Renderer::init(Dialog3DWheel* dialog3dWheel)
 {
 	if(initialized)
 	{
 		clean();
 	}
+
+	this->dialog3dWheel = dialog3dWheel;
 
 	QObject::connect(&vrHandler, &VRHandler::renderTargetSizeChanged,
 	                 [this]() { this->updateRenderTargets(); });
@@ -260,6 +262,7 @@ void Renderer::renderVRControls() const
 	{
 		vrHandler.renderControllers();
 		vrHandler.renderHands();
+		dialog3dWheel->render();
 	}
 }
 

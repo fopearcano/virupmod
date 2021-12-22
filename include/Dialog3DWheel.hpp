@@ -16,26 +16,27 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "DemoDialog.hpp"
+#ifndef DIALOG3DWHEEL_HPP
+#define DIALOG3DWHEEL_HPP
 
-DemoDialog::DemoDialog()
+#include <QPushButton>
+#include <QVBoxLayout>
+
+#include "Dialog3D.hpp"
+
+class Dialog3DWheel : public Dialog3D
 {
-	setFixedSize(250, 600);
-	setWindowTitle(tr("Demo 3D Dialog"));
+  public:
+	Dialog3DWheel(VRHandler const& vrHandler, ToneMappingModel const& tmm);
+	void addDialog3D(QString const& name, Dialog3D& dialog3d);
+	void vrEvent(VRHandler::Event const& e);
+	void render();
 
-	auto layout = new QVBoxLayout(this);
+  private:
+	VRHandler const& vrHandler;
+	ToneMappingModel const& tmm;
+	QVBoxLayout layout;
+	std::vector<Dialog3D*> dialog3Ds;
+};
 
-	connect(&listWidget, &QListWidget::itemActivated, [](QListWidgetItem *item) { qDebug() << item->text();});
-	layout->addWidget(&listWidget);
-
-	for(auto const& elementName : QStringList({"Foo", "Bar", "Baz"}))
-	{
-		listWidget.addItem(elementName);
-	}
-
-	auto b = new QPushButton(this);
-	b->setText(tr("Close"));
-	connect(b, &QPushButton::clicked, [this](){this->hide();});
-	layout->addWidget(b);
-	installEventFilters();
-}
+#endif // DIALOG3DWHEEL_HPP

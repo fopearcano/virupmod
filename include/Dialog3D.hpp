@@ -30,16 +30,20 @@ class Dialog3D : public QDialog
   public:
 	Dialog3D();
 	void installEventFilters();
-	void toggleFromController(Controller const& controller);
+	void showFromHeadset(VRHandler const& vrHandler);
+	void showFromController(Controller const& controller);
 	void triggerPressed(Controller const& controller);
 	void triggerReleased(Controller const& controller);
+	void click(Controller const& controller);
 	void render(VRHandler const& vrHandler, ToneMappingModel const& tmm);
+	virtual ~Dialog3D() = default;
 
   protected:
 	virtual void paintEvent(QPaintEvent* event) override;
 	void mouseMove(QPointF const& relativePosition);
 	void mousePress(QPointF const& relativePosition);
 	void mouseRelease(QPointF const& relativePosition);
+	void mouseClick(QPointF const& relativePosition);
 	bool eventFilter(QObject* obj, QEvent* event) override;
 	void installEventFilters(QObject* obj);
 
@@ -50,6 +54,10 @@ class Dialog3D : public QDialog
 	Widget3D widget3d;
 	GLMesh pointer;
 	GLShaderProgram shader;
+
+	Side sidePriority = Side::LEFT;
+
+	const float sqrt2over2 = sqrt(2.f) / 2.f;
 };
 
 #endif // DIALOG3D_HPP

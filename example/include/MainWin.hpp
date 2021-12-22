@@ -60,7 +60,6 @@ class MainWin : public AbstractMainWin
 	virtual void mousePressEvent(QMouseEvent* e) override;
 	virtual void mouseReleaseEvent(QMouseEvent* e) override;
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
-	virtual void vrEvent(VRHandler::Event const& e) override;
 
 	// declare drawn resources
 	virtual void initScene() override;

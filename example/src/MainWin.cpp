@@ -74,39 +74,6 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	QCursor::setPos(width() / 2, height() / 2);
 }
 
-void MainWin::vrEvent(VRHandler::Event const& e)
-{
-	switch(e.type)
-	{
-		case VRHandler::EventType::BUTTON_PRESSED:
-			switch(e.button)
-			{
-				case VRHandler::Button::MENU:
-					dialog->toggleFromController(
-					    *vrHandler->getController(e.side));
-					break;
-				case VRHandler::Button::TRIGGER:
-					dialog->triggerPressed(*vrHandler->getController(e.side));
-					break;
-				default:
-					break;
-			}
-			break;
-		case VRHandler::EventType::BUTTON_UNPRESSED:
-			switch(e.button)
-			{
-				case VRHandler::Button::TRIGGER:
-					dialog->triggerReleased(*vrHandler->getController(e.side));
-					break;
-				default:
-					break;
-			}
-			break;
-		default:
-			break;
-	}
-}
-
 void MainWin::initScene()
 {
 	// SKYBOX
@@ -222,7 +189,7 @@ void MainWin::initScene()
 	widget3d->getModel().translate(0.6f, 0.f, 0.5f);
 
 	dialog = new DemoDialog;
-	dialog->show();
+	dialog3dWheel->addDialog3D("Demo Dialog", *dialog);
 
 	auto tools(menuBar->addMenu(tr("Tools")));
 	tools->addAction(tr("Demo Dialog"), this,
@@ -346,8 +313,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 		model->render(camera.getWorldSpacePosition(), modelModel, *light);
 	}
 
-	dialog->render(*vrHandler, *toneMappingModel);
-	// widget3d->render(*toneMappingModel);
+	widget3d->render(*toneMappingModel);
 	bill->render(camera);
 	text->render();
 }

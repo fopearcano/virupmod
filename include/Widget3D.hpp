@@ -37,7 +37,9 @@ class Widget3D
 	QImage const getImage() const { return image; };
 	QWidget& getWidget() const { return *widget; };
 	void triggerRepaint() { this->repaint = true; };
-	void render(ToneMappingModel const& tmm);
+	void render(ToneMappingModel const& tmm,
+	            GLHandler::GeometricSpace geometricSpace
+	            = GLHandler::GeometricSpace::WORLD);
 	~Widget3D();
 
 	static void paintWidget(QImage& image, QWidget& widget);

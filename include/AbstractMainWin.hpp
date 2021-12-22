@@ -19,6 +19,7 @@
 #include "AsyncTexture.hpp"
 #include "BasicCamera.hpp"
 #include "DebugCamera.hpp"
+#include "Dialog3DWheel.hpp"
 #include "InputManager.hpp"
 #include "NetworkManager.hpp"
 #include "PythonQtHandler.hpp"
@@ -467,6 +468,9 @@ class AbstractMainWin : public QWindow
 
 	// Menu Bar
 	QMenuBar* menuBar = nullptr;
+
+	// Dialog3Ds Wheel
+	Dialog3DWheel* dialog3dWheel = nullptr;
 
   private:
 	void initializeGL();

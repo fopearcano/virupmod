@@ -188,6 +188,7 @@ bool AbstractMainWin::event(QEvent* e)
 	if(e->type() == QEvent::Type::Close)
 	{
 		menuBar->close();
+		dialog3dWheel->close();
 		PythonQtHandler::closeConsole();
 	}
 	return QWindow::event(e);
@@ -412,6 +413,36 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 
 void AbstractMainWin::vrEvent(VRHandler::Event const& e)
 {
+	switch(e.type)
+	{
+		case VRHandler::EventType::BUTTON_PRESSED:
+			switch(e.button)
+			{
+				case VRHandler::Button::MENU:
+					dialog3dWheel->showFromController(
+					    *vrHandler->getController(e.side));
+					break;
+				default:
+					break;
+			}
+			break;
+		case VRHandler::EventType::BUTTON_UNPRESSED:
+			switch(e.button)
+			{
+				case VRHandler::Button::MENU:
+					dialog3dWheel->click(*vrHandler->getController(e.side));
+					dialog3dWheel->hide();
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+
+	dialog3dWheel->vrEvent(e);
+
 	PythonQtHandler::evalScript(
 	    "if \"vrEvent\" in dir():\n\tvrEvent("
 	    + QString::number(static_cast<int>(e.type)) + ","
@@ -491,10 +522,12 @@ void AbstractMainWin::initializeGL()
 	m_context.makeCurrent(this);
 	// Init GL
 	GLHandler::init();
-	// Init Renderer
-	renderer.init();
 	// Init ToneMappingModel
 	toneMappingModel = new ToneMappingModel(*vrHandler);
+	// Init Dialog3DWheel
+	dialog3dWheel = new Dialog3DWheel(*vrHandler, *toneMappingModel);
+	// Init Renderer
+	renderer.init(dialog3dWheel);
 	// Init PythonQt
 	initializePythonQt();
 	// Init VR
@@ -797,6 +830,7 @@ AbstractMainWin::~AbstractMainWin()
 	renderer.clean();
 	vrHandler->close();
 	PythonQtHandler::clean();
+	delete dialog3dWheel;
 	delete vrHandler;
 }
 

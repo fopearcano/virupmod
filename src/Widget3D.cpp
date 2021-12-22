@@ -47,7 +47,8 @@ void Widget3D::update()
 	repaint = false;
 }
 
-void Widget3D::render(ToneMappingModel const& tmm)
+void Widget3D::render(ToneMappingModel const& tmm,
+                      GLHandler::GeometricSpace geometricSpace)
 {
 	if(repaint)
 	{
@@ -55,8 +56,7 @@ void Widget3D::render(ToneMappingModel const& tmm)
 	}
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
-	GLHandler::setUpRender(shader, model * aspectratio,
-	                       GLHandler::GeometricSpace::SEATEDTRACKED);
+	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
 	GLHandler::useTextures({tex});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
