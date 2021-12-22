@@ -87,6 +87,7 @@ after_build:
     - copy %QTPATH%\bin\Qt5Multimedia.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Quick.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Sql.dll %RELEASE_DIR%
+    - copy %QTPATH%\bin\Qt5Test.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5XmlPatterns.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Qml.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Network.dll %RELEASE_DIR%
