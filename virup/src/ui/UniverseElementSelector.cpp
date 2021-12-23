@@ -37,6 +37,11 @@ UniverseElementSelector::UniverseElementSelector(Universe const& universe,
 	{
 		listWidget.addItem(elementName);
 	}
+	auto b = new QPushButton(this);
+	b->setText(tr("Go !"));
+	connect(b, &QPushButton::pressed,
+	        [this]() { selectElement(listWidget.currentItem()); });
+	layout->addWidget(b);
 	installEventFilters();
 }
 

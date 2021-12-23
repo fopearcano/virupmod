@@ -56,6 +56,11 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 		    item));
 		topLevelItems.push_back(item);
 	}
+	auto b = new QPushButton(this);
+	b->setText(tr("Go !"));
+	connect(b, &QPushButton::pressed,
+	        [this]() { selectOrbitable(tree.currentItem(), 0); });
+	layout->addWidget(b);
 	installEventFilters();
 }
 
