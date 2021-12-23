@@ -285,8 +285,6 @@ class MainWin : public AbstractMainWin
 	PlanetarySystemSelector* planetSysSelect = nullptr;
 	UniverseElementSelector* univElemSelect  = nullptr;
 	SceneSelector* scenes                    = nullptr;
-	std::vector<Dialog3D*> dialog3Ds;
-	int currentDialog = 0;
 
 	// scenes
 	Animator* animator = nullptr;
