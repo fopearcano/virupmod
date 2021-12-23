@@ -37,10 +37,10 @@ void Transition::custom(float t, float t_harsh) const
 	                            + ',' + QString::number(t_harsh) + ')');
 }
 
-bool Transition::updateUniverse(Universe& universe, float t_harsh,
-                                Scene const& fromScene, float fadeFactor,
-                                Vector3 const& cosmoShift,
-                                Vector3 const& planetShift) const
+bool Transition::updateUniverse(
+    Universe& universe, float t_harsh, Scene const& fromScene, float fadeFactor,
+    std::function<Vector3()> const& getCosmoShift,
+    std::function<Vector3()> const& getPlanetShift) const
 {
 	float t(t_harsh);
 	bool returnedVal = true;
@@ -75,19 +75,22 @@ bool Transition::updateUniverse(Universe& universe, float t_harsh,
 	if(scene.getSpatialData().getBodyName() != ""
 	   && universe.isPlanetarySystemLoaded())
 	{
-		universe.setPlanetPosition(universe.getPlanetPosition() + planetShift);
+		universe.setPlanetPosition(universe.getPlanetPosition()
+		                           + getPlanetShift());
 	}
 	else
 	{
-		universe.setCosmoPosition(universe.getCosmoPosition() + cosmoShift);
+		universe.setCosmoPosition(universe.getCosmoPosition()
+		                          + getCosmoShift());
 	}
 
 	return returnedVal;
 }
 
-void Transition::applyDestination(Universe& universe, float fadeFactor,
-                                  Vector3 const& cosmoShift,
-                                  Vector3 const& planetShift) const
+void Transition::applyDestination(
+    Universe& universe, float fadeFactor,
+    std::function<Vector3()> const& getCosmoShift,
+    std::function<Vector3()> const& getPlanetShift) const
 {
 	auto scene(toScene);
 	auto ui = scene.getUI();
@@ -112,10 +115,12 @@ void Transition::applyDestination(Universe& universe, float fadeFactor,
 	if(scene.getSpatialData().getBodyName() != ""
 	   && universe.isPlanetarySystemLoaded())
 	{
-		universe.setPlanetPosition(universe.getPlanetPosition() + planetShift);
+		universe.setPlanetPosition(universe.getPlanetPosition()
+		                           + getPlanetShift());
 	}
 	else
 	{
-		universe.setCosmoPosition(universe.getCosmoPosition() + cosmoShift);
+		universe.setCosmoPosition(universe.getCosmoPosition()
+		                          + getCosmoShift());
 	}
 }

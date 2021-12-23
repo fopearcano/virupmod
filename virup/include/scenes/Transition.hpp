@@ -46,12 +46,12 @@ class Transition
 	 */
 	bool updateUniverse(Universe& universe, float t_harsh,
 	                    Scene const& fromScene, float fadeFactor,
-	                    Vector3 const& cosmoShift,
-	                    Vector3 const& planetShift) const;
+	                    std::function<Vector3()> const& getCosmoShift,
+	                    std::function<Vector3()> const& getPlanetShift) const;
 
 	void applyDestination(Universe& universe, float fadeFactor,
-	                      Vector3 const& cosmoShift,
-	                      Vector3 const& planetShift) const;
+	                      std::function<Vector3()> const& getCosmoShift,
+	                      std::function<Vector3()> const& getPlanetShift) const;
 
   private:
 	Scene toScene;
@@ -108,14 +108,6 @@ class TransitionWrapper : public PythonQtWrapper
 	void custom(Transition* t, float t_, float t_harsh) const
 	{
 		t->custom(t_, t_harsh);
-	};
-
-	bool updateUniverse(Transition* t, Universe& universe, float t_harsh,
-	                    Scene const& fromScene, float fadeFactor,
-	                    Vector3 const& cosmoShift, Vector3 const& planetShift)
-	{
-		return t->updateUniverse(universe, t_harsh, fromScene, fadeFactor,
-		                         cosmoShift, planetShift);
 	};
 };
 

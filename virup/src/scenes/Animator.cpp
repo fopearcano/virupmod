@@ -121,7 +121,8 @@ void Animator::update()
 	{
 		if(!customTransition.updateUniverse(
 		       universe, t_secs / customTransition.getDuration(), currentScene,
-		       fadeFactor, getCosmoShift(), getPlanetShift()))
+		       fadeFactor, [this]() { return getCosmoShift(); },
+		       [this]() { return getPlanetShift(); }))
 		{
 			stop();
 		}
@@ -147,13 +148,15 @@ void Animator::update()
 			{
 				currentTransition->updateUniverse(
 				    universe, t_harsh, currentTransition->getDestination(),
-				    fadeFactor, getCosmoShift(), getPlanetShift());
+				    fadeFactor, [this]() { return getCosmoShift(); },
+				    [this]() { return getPlanetShift(); });
 			}
 			else
 			{
 				currentTransition->updateUniverse(
 				    universe, t_harsh, transitions[i - 2].getDestination(),
-				    fadeFactor, getCosmoShift(), getPlanetShift());
+				    fadeFactor, [this]() { return getCosmoShift(); },
+				    [this]() { return getPlanetShift(); });
 			}
 		}
 		else
