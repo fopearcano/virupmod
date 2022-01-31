@@ -20,11 +20,15 @@
 #define LAUNCHER_H
 
 #include "BaseLauncher.hpp"
+#include "ExampleSettings.hpp"
 
 class Launcher : public BaseLauncher
 {
   public:
 	Launcher() = default;
+
+  protected:
+	virtual SettingsWidget* newSettingsWidget() override;
 };
 
 #endif // LAUNCHER_H

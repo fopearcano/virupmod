@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Florian Cabot <florian.cabot@epfl.ch>
+    Copyright (C) 2022 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,9 +16,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Launcher.hpp"
+#ifndef GLFUNCTIONS_HPP
+#define GLFUNCTIONS_HPP
 
-SettingsWidget* Launcher::newSettingsWidget()
+#include <QOpenGLFunctions_4_2_Core>
+
+typedef QOpenGLFunctions_4_2_Core OpenGLFunctions;
+
+namespace gl
 {
-	return new ExampleSettings(this);
-}
+const unsigned int majorVersion = 4;
+const unsigned int minorVersion = 2;
+const QSurfaceFormat::OpenGLContextProfile profile
+    = QSurfaceFormat::CoreProfile;
+} // namespace gl
+
+#endif // GLFUNCTIONS_HPP

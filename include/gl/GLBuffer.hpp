@@ -19,8 +19,6 @@
 #ifndef GLBUFFER_HPP
 #define GLBUFFER_HPP
 
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_4_2_Core>
 #include <QSize>
 
 #include "GLTexture.hpp"

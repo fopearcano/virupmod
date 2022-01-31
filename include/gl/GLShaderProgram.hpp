@@ -19,8 +19,7 @@
 #ifndef GLSHADERPROGRAM_HPP
 #define GLSHADERPROGRAM_HPP
 
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_4_2_Core>
+#include "glfunctions.hpp"
 
 #include "PythonQtHandler.hpp"
 

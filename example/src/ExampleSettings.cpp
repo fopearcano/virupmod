@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Florian Cabot <florian.cabot@epfl.ch>
+    Copyright (C) 2022 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,9 +16,12 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Launcher.hpp"
+#include "ExampleSettings.hpp"
 
-SettingsWidget* Launcher::newSettingsWidget()
+ExampleSettings::ExampleSettings(QWidget* parent)
+    : SettingsWidget(parent)
 {
-	return new ExampleSettings(this);
+	addGroup("misc", tr("Miscellaneous"));
+	addBoolSetting("mouseview", true, tr("Toggle mouse view"));
 }
+

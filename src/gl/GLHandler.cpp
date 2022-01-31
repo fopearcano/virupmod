@@ -1,8 +1,8 @@
 #include "gl/GLHandler.hpp"
 
-QOpenGLFunctions_4_2_Core& GLHandler::glf()
+OpenGLFunctions& GLHandler::glf()
 {
-	static QOpenGLFunctions_4_2_Core glf;
+	static OpenGLFunctions glf;
 	return glf;
 }
 

@@ -19,9 +19,6 @@
 #ifndef GLMESH_HPP
 #define GLMESH_HPP
 
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_4_2_Core>
-
 #include "PythonQtHandler.hpp"
 
 #include "GLShaderProgram.hpp"

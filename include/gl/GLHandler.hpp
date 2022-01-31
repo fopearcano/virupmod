@@ -6,8 +6,6 @@
 #include <QFile>
 #include <QImage>
 #include <QMatrix4x4>
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_4_2_Core>
 #include <QSettings>
 #include <QString>
 #include <QVector2D>
@@ -28,6 +26,7 @@
 #include "gl/GLPixelBufferObject.hpp"
 #include "gl/GLShaderProgram.hpp"
 #include "gl/GLTexture.hpp"
+#include "gl/glfunctions.hpp"
 
 /** @ingroup pycall
  *
@@ -84,7 +83,7 @@ class GLHandler : public QObject
 	 * You can call OpenGL directly through that reference, but be careful !
 	 * Make sure you keep a clean OpenGL state.
 	 */
-	static QOpenGLFunctions_4_2_Core& glf();
+	static OpenGLFunctions& glf();
 
 	static QOpenGLExtension_ARB_compute_shader& glf_ARB_compute_shader();
 

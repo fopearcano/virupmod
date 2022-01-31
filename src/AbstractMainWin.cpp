@@ -8,7 +8,8 @@ AbstractMainWin::AbstractMainWin()
 	QSurfaceFormat format;
 	format.setDepthBufferSize(24);
 	format.setStencilBufferSize(8);
-	format.setVersion(4, 2);
+	format.setVersion(gl::majorVersion, gl::minorVersion);
+	format.setProfile(gl::profile);
 	format.setSwapInterval(QSettings().value("window/vsync").toBool() ? 1 : 0);
 	format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
 	setFormat(format);

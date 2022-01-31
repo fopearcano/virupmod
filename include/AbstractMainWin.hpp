@@ -431,7 +431,7 @@ class AbstractMainWin : public QWindow
 	 * @brief The engine's only @ref VRHandler.
 	 */
 	VRHandler* vrHandler
-	    = QSettings().value("vr/mode").toBool()
+	    = QSettings().value("vr/handler").toString() == "openvr"
 	          ? static_cast<VRHandler*>(new OpenVRHandler)
 	          : static_cast<VRHandler*>(new StereoBeamerHandler);
 	/**

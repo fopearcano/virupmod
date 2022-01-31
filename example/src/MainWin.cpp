@@ -67,10 +67,13 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	{
 		return;
 	}
-	float dx = (static_cast<float>(width()) / 2 - e->globalX()) / width();
-	float dy = (static_cast<float>(height()) / 2 - e->globalY()) / height();
-	yaw += dx * 3.14f / 3.f;
-	pitch += dy * 3.14f / 3.f;
+	if(QSettings().value("misc/mouseview").toBool())
+	{
+		float dx = (static_cast<float>(width()) / 2 - e->globalX()) / width();
+		float dy = (static_cast<float>(height()) / 2 - e->globalY()) / height();
+		yaw += dx * 3.14f / 3.f;
+		pitch += dy * 3.14f / 3.f;
+	}
 	QCursor::setPos(width() / 2, height() / 2);
 }
 
@@ -83,17 +86,17 @@ void MainWin::initScene()
 
 	std::array<const char*, 6> paths = {};
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::BACK))
-	    = "data/example/images/ame_ash/ashcanyon_bk.tga";
+	    = "data/example/images/ame_ash/ashcanyon_bk.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::BOTTOM))
-	    = "data/example/images/ame_ash/ashcanyon_dn.tga";
+	    = "data/example/images/ame_ash/ashcanyon_dn.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::FRONT))
-	    = "data/example/images/ame_ash/ashcanyon_ft.tga";
+	    = "data/example/images/ame_ash/ashcanyon_ft.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::LEFT))
-	    = "data/example/images/ame_ash/ashcanyon_lf.tga";
+	    = "data/example/images/ame_ash/ashcanyon_lf.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::RIGHT))
-	    = "data/example/images/ame_ash/ashcanyon_rt.tga";
+	    = "data/example/images/ame_ash/ashcanyon_rt.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::TOP))
-	    = "data/example/images/ame_ash/ashcanyon_up.tga";
+	    = "data/example/images/ame_ash/ashcanyon_up.png";
 	sbTexture = new GLTexture(paths);
 
 	shaderProgram.load("colorpervert");

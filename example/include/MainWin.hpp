@@ -135,8 +135,8 @@ class MainWin : public AbstractMainWin
 
 	bool moveView = false;
 	QPoint cursorPosBackup;
-	float yaw;
-	float pitch;
+	float yaw = 0.f;
+	float pitch = 0.f;
 
 	QElapsedTimer timer;
 };
