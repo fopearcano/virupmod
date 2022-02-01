@@ -163,8 +163,15 @@ class MainWin : public AbstractMainWin
 
 	QString getVoiceoverPath()
 	{
-		return QSettings().value("data/rootdir").toString() + "/voiceover/"
-		       + (scenes->voiceOverIsEnglish() ? "EN" : "JP") + ".wav";
+		if(isServer())
+		{
+			return QSettings().value("data/rootdir").toString() + "/voiceover/"
+			       + (scenes->voiceOverIsEnglish() ? "EN" : "JP") + ".wav";
+		}
+		else
+		{
+			return "";
+		}
 	};
 
   protected:
