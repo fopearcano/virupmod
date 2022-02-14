@@ -86,6 +86,11 @@ class Animator : public QObject
 	void stop();
 	void stopVoiceover();
 
+  signals:
+	void resumed();
+	void paused();
+	void stopped();
+
   private:
 	Vector3 getShift(double coeff = 1.0) const;
 

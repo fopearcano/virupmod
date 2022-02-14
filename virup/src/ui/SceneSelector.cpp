@@ -39,6 +39,23 @@ SceneSelector::SceneSelector(Animator& animator)
 	hl->addWidget(b);
 
 	b = new QPushButton(w);
+	b->setText(tr("PAUSE"));
+	connect(b, &QPushButton::clicked, this,
+	        [&animator]() { animator.pause(); });
+	hl->addWidget(b);
+
+	b = new QPushButton(w);
+	b->setText(tr("RESUME"));
+	connect(b, &QPushButton::clicked, this, [&animator]() { animator.play(); });
+	connect(&animator, &Animator::paused, this,
+	        [b]() { b->setDisabled(false); });
+	connect(&animator, &Animator::resumed, this,
+	        [b]() { b->setDisabled(true); });
+	connect(&animator, &Animator::stopped, this,
+	        [b]() { b->setDisabled(true); });
+	hl->addWidget(b);
+
+	b = new QPushButton(w);
 	b->setText(tr("STOP"));
 	connect(b, &QPushButton::clicked, this, [&animator]() { animator.stop(); });
 	hl->addWidget(b);

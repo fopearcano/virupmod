@@ -238,6 +238,7 @@ void Animator::restart()
 void Animator::play()
 {
 	timer.restart();
+	emit resumed();
 }
 
 void Animator::pause()
@@ -245,6 +246,7 @@ void Animator::pause()
 	pausedAt += timer.elapsed() / 1000.f;
 	timer.invalidate();
 	stopVoiceover();
+	emit paused();
 }
 
 void Animator::stop()
@@ -255,6 +257,7 @@ void Animator::stop()
 	pausedAt                                = 0.f;
 	timer.invalidate();
 	stopVoiceover();
+	emit stopped();
 }
 
 void Animator::stopVoiceover()
