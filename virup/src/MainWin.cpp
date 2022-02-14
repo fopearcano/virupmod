@@ -130,6 +130,13 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 {
 	if(!isActive() || vrHandler->isEnabled() || !loaded || !moveView)
 	{
+		cursorTimer.restart();
+		auto c(cursor());
+		if(c.shape() == Qt::CursorShape::BlankCursor)
+		{
+			c.setShape(Qt::CursorShape::ArrowCursor);
+			setCursor(c);
+		}
 		return;
 	}
 	float dx = (static_cast<float>(width()) / 2 - e->globalX()) / width();
@@ -317,6 +324,7 @@ void MainWin::initScene()
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
 	}
+	cursorTimer.start();
 }
 
 void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
@@ -328,6 +336,13 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 	if(pathId == "cosmo")
 	{
+		if(cursorTimer.elapsed() > 2000
+		   && cursor().shape() == Qt::CursorShape::ArrowCursor)
+		{
+			auto c(cursor());
+			c.setShape(Qt::CursorShape::BlankCursor);
+			setCursor(c);
+		}
 		if(networkManager->isServer())
 		{
 			animator->update();

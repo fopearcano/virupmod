@@ -270,6 +270,7 @@ class MainWin : public AbstractMainWin
 
 	bool moveView = false;
 	QPoint cursorPosBackup;
+	QElapsedTimer cursorTimer;
 	MovementControls* movementControls = nullptr;
 
 	/* TEXT */
