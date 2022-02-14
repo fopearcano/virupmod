@@ -149,7 +149,9 @@ transitions = [
           SceneTemporalData(), SceneUI({"SDSS":1.0})), 1.0, "end", "end"),
 
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend", "black")
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend", "black"),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend2", "black")
 ]
 
 def initScene():

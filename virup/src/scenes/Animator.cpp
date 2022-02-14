@@ -108,8 +108,6 @@ void Animator::update()
 	float t_secs = pausedAt + timer.elapsed() * 0.001f;
 
 	OrbitalSystemRenderer::autoCameraTarget = false;
-	tmm.exposure                            = 0.3;
-	fadeFactor                              = 1.0;
 	universe.setLabelsOrbitsOnly({});
 
 	universe.setCamYaw(shiftHorizontalAngle);
@@ -119,6 +117,8 @@ void Animator::update()
 
 	if(playCustom)
 	{
+		tmm.exposure = 0.3;
+		fadeFactor   = 1.0;
 		if(!customTransition.updateUniverse(
 		       universe, t_secs / customTransition.getDuration(), currentScene,
 		       fadeFactor, [this]() { return getCosmoShift(); },
@@ -126,6 +126,7 @@ void Animator::update()
 		{
 			stop();
 		}
+		tmm.exposure *= fadeFactor;
 	}
 	else if(!transitions.empty())
 	{
@@ -142,6 +143,8 @@ void Animator::update()
 		}
 		if(t_secs <= currentTransition->getDuration() + durationSum)
 		{
+			tmm.exposure = 0.3;
+			fadeFactor   = 1.0;
 			float t_harsh((t_secs - durationSum)
 			              / currentTransition->getDuration());
 			if(currentTransition == &transitions[0])
@@ -158,6 +161,7 @@ void Animator::update()
 				    fadeFactor, [this]() { return getCosmoShift(); },
 				    [this]() { return getPlanetShift(); });
 			}
+			tmm.exposure *= fadeFactor;
 		}
 		else
 		{
@@ -168,8 +172,6 @@ void Animator::update()
 	{
 		stop();
 	}
-
-	tmm.exposure *= fadeFactor;
 }
 
 void Animator::executeTransition(Transition t)
