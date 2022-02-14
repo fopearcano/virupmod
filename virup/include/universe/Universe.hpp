@@ -229,7 +229,7 @@ class Universe : public QObject
 		{
 			visibilities.clear();
 			double foo;
-			for(unsigned int i(0); i < elementsSize; ++i)
+			for(unsigned int i(0); i < elementsSize + 1; ++i)
 			{
 				stream >> foo;
 				visibilities.push_back(foo);
@@ -256,7 +256,7 @@ class Universe : public QObject
 	void readState(AbstractState const& s)
 	{
 		auto const& state = dynamic_cast<State const&>(s);
-		if(state.visibilities.size() != elements.size())
+		if(state.visibilities.size() != elements.size() + 1)
 		{
 			return;
 		}
@@ -266,6 +266,7 @@ class Universe : public QObject
 			pair.second->setVisibility(state.visibilities[i]);
 			++i;
 		}
+		setVisibility("Constellations", state.visibilities[elements.size()]);
 		clock.setCurrentUt(state.ut);
 	};
 	void writeState(AbstractState& s) const
@@ -276,6 +277,7 @@ class Universe : public QObject
 		{
 			state.visibilities.push_back(pair.second->getVisibility());
 		}
+		state.visibilities.push_back(getVisibility("Constellations"));
 		state.ut = clock.getCurrentUt();
 	};
 
