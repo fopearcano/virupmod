@@ -79,6 +79,7 @@ class Animator : public QObject
 	float getWholeAnimationPercentage() const;
 	void setWholeAnimationPercentage(float percentage);
 
+	void setFirstScene();
 	void restart();
 	void play();
 	void pause();

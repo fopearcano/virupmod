@@ -216,6 +216,15 @@ void Animator::setWholeAnimationPercentage(float percentage)
 	play();
 }
 
+void Animator::setFirstScene()
+{
+	if(transitions.empty())
+	{
+		return;
+	}
+	executeTransition(transitions[0]);
+}
+
 void Animator::restart()
 {
 	animationsDisabled = true;

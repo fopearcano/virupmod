@@ -157,4 +157,4 @@ def initScene():
     for t in transitions:
         Animator.appendTransition(t)
 
-    Animator.restart()
+    Animator.setFirstScene()
