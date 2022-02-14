@@ -109,7 +109,7 @@ void MainWin::mousePressEvent(QMouseEvent* e)
 		QCursor c(cursor());
 		c.setShape(Qt::CursorShape::BlankCursor);
 		cursorPosBackup = QCursor::pos();
-		QCursor::setPos(width() / 2, height() / 2);
+		QCursor::setPos(x() + width() / 2, y() + height() / 2);
 		setCursor(c);
 	}
 }
