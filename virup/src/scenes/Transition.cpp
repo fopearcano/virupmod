@@ -56,7 +56,8 @@ bool Transition::updateUniverse(
 	auto ui = scene.getUI();
 	if(fadeFactor != 0.0)
 	{
-		QStringList names({"Constellations", "Orbits", "PlanetsLabels"});
+		QStringList names(
+		    {"Constellations", "Orbits", "PlanetsLabels", "Debris"});
 		names.append(universe.getUniverseElementsNames());
 		for(auto const& n : names)
 		{
@@ -96,7 +97,8 @@ void Transition::applyDestination(
 	auto ui = scene.getUI();
 	if(fadeFactor != 0.0)
 	{
-		QStringList names({"Constellations", "Orbits", "PlanetsLabels"});
+		QStringList names(
+		    {"Constellations", "Orbits", "PlanetsLabels", "Debris"});
 		names.append(universe.getUniverseElementsNames());
 		for(auto const& n : names)
 		{

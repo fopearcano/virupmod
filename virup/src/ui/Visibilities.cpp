@@ -53,7 +53,7 @@ Visibilities::Visibilities(Universe& universe)
 	}
 
 	QStringList nonElementsVisibilities
-	    = {{"Constellations", "Orbits", "PlanetsLabels"}};
+	    = {{"Constellations", "Orbits", "PlanetsLabels", "Debris"}};
 
 	for(auto const& name : nonElementsVisibilities)
 	{

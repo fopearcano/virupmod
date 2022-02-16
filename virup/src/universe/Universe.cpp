@@ -340,6 +340,10 @@ double Universe::getVisibility(QString const& name) const
 	{
 		return CelestialBodyRenderer::renderLabels;
 	}
+	if(name == "Debris")
+	{
+		return DebrisRenderer::opacity;
+	}
 
 	if(elements.count(name) == 0)
 	{
@@ -385,6 +389,15 @@ void Universe::setVisibility(QString const& name, double visibility)
 		if(CelestialBodyRenderer::renderLabels != visibility)
 		{
 			CelestialBodyRenderer::renderLabels = visibility;
+			emit nonElementVisibilityChanged(name, visibility);
+		}
+		return;
+	}
+	if(name == "Debris")
+	{
+		if(DebrisRenderer::opacity != visibility)
+		{
+			DebrisRenderer::opacity = visibility;
 			emit nonElementVisibilityChanged(name, visibility);
 		}
 		return;
