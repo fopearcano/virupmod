@@ -188,6 +188,7 @@ bool AbstractMainWin::event(QEvent* e)
 	}
 	if(e->type() == QEvent::Type::Close)
 	{
+		shaderSelector->close();
 		menuBar->close();
 		dialog3dWheel->close();
 		PythonQtHandler::closeConsole();
@@ -556,7 +557,14 @@ void AbstractMainWin::initializeGL()
 	auto file(menuBar->addMenu(tr("File")));
 	file->addAction(tr("Close"), this, [this]() { this->close(); });
 
+	auto engine(menuBar->addMenu(tr("HydrogenVR")));
+	engine->addAction(tr("Explore Shaders..."), this, [this]() {
+		this->shaderSelector->setVisible(!this->shaderSelector->isVisible());
+	});
+
 	menuBar->show();
+
+	shaderSelector = new ShaderSelector;
 
 	// let user init
 	initScene();
@@ -816,6 +824,7 @@ void AbstractMainWin::paintGL()
 
 AbstractMainWin::~AbstractMainWin()
 {
+	delete shaderSelector;
 	delete menuBar;
 	delete networkManager;
 	delete toneMappingModel;

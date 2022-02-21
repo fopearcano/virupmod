@@ -82,7 +82,7 @@ void MainWin::initScene()
 	// SKYBOX
 	sbShader.load("skybox");
 	skybox = new GLMesh;
-	Primitives::setAsUnitCube(*skybox, sbShader.toGLShaderProgram());
+	Primitives::setAsUnitCube(*skybox, sbShader);
 
 	std::array<const char*, 6> paths = {};
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::BACK))
@@ -121,11 +121,9 @@ void MainWin::initScene()
 	    1, 2, 3  // second Triangle
 	};
 	mesh = new GLMesh;
-	mesh->setVertexShaderMapping(shaderProgram.toGLShaderProgram(),
-	                             {{"position", 3}});
+	mesh->setVertexShaderMapping(shaderProgram, {{"position", 3}});
 	mesh->setVertices(vertices, indices);
-	shaderProgram.toGLShaderProgram().setUnusedAttributesValues(
-	    {{"color", {1.0, 1.0, 0.0}}});
+	shaderProgram.setUnusedAttributesValues({{"color", {1.0, 1.0, 0.0}}});
 
 	// create cube
 	movingCube = new MovingCube;
@@ -136,16 +134,14 @@ void MainWin::initScene()
 	pointsShader.setUniform("alpha", 1.0f);
 	pointsShader.setUniform("color", QColor::fromRgbF(1.0f, 1.0f, 1.0f));
 	std::vector<float> points = {0, 0, 0};
-	pointsMesh->setVertexShaderMapping(pointsShader.toGLShaderProgram(),
-	                                   {{"position", 3}});
+	pointsMesh->setVertexShaderMapping(pointsShader, {{"position", 3}});
 	pointsMesh->setVertices(points);
 
 	sphereShader.load("default");
 	sphereShader.setUniform("alpha", 1.0f);
 	sphereShader.setUniform("color", QColor::fromRgbF(0.5f, 0.5f, 1.0f));
 	sphere = new GLMesh;
-	Primitives::setAsUnitSphere(*sphere, sphereShader.toGLShaderProgram(), 100,
-	                            100);
+	Primitives::setAsUnitSphere(*sphere, sphereShader, 100, 100);
 
 	playareaShader.load("default");
 	playareaShader.setUniform("color", QColor(255, 0, 0));
@@ -161,8 +157,7 @@ void MainWin::initScene()
 		    playareaquad[3].x(), playareaquad[3].y(), playareaquad[3].z(),
 		};
 		indices = {0, 1, 1, 2, 2, 3, 3, 0};
-		playarea->setVertexShaderMapping(playareaShader.toGLShaderProgram(),
-		                                 {{"position", 3}});
+		playarea->setVertexShaderMapping(playareaShader, {{"position", 3}});
 		playarea->setVertices(vertices, indices);
 	}
 
@@ -278,7 +273,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	skyboxSize.scale(1000.f);
 	GLHandler::useTextures({sbTexture});
 	GLHandler::setBackfaceCulling(false);
-	GLHandler::setUpRender(sbShader.toGLShaderProgram(), skyboxSize,
+	GLHandler::setUpRender(sbShader, skyboxSize,
 	                       GLHandler::GeometricSpace::SKYBOX);
 	skybox->render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
@@ -286,21 +281,21 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 
 	QMatrix4x4 modelSphere;
 	modelSphere.translate(-1.5, 0, 0);
-	GLHandler::setUpRender(sphereShader.toGLShaderProgram(), modelSphere,
+	GLHandler::setUpRender(sphereShader, modelSphere,
 	                       GLHandler::GeometricSpace::SKYBOX);
 	sphere->render();
 	GLHandler::clearDepthBuffer();
 
 	movingCube->render();
 
-	GLHandler::setUpRender(shaderProgram.toGLShaderProgram());
+	GLHandler::setUpRender(shaderProgram);
 	mesh->render();
-	GLHandler::setUpRender(pointsShader.toGLShaderProgram());
+	GLHandler::setUpRender(pointsShader);
 	GLHandler::setPointSize(8);
 	pointsMesh->render();
 	GLHandler::setPointSize(1);
 
-	GLHandler::setUpRender(playareaShader.toGLShaderProgram(), QMatrix4x4(),
+	GLHandler::setUpRender(playareaShader, QMatrix4x4(),
 	                       GLHandler::GeometricSpace::STANDINGTRACKED);
 	playarea->render(PrimitiveType::LINES);
 

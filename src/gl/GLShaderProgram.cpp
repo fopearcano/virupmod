@@ -262,54 +262,74 @@ std::pair<QString, GLenum> GLShaderProgram::decodeStage(Stage s)
 }
 
 QString GLShaderProgram::getFullPreprocessedSource(
-    QString const& path, QMap<QString, QString> const& defines)
+    QString const& path, QMap<QString, QString> const& defines,
+    std::vector<QString>& debugFiles)
 {
+	unsigned int id(debugFiles.size());
+	debugFiles.push_back(path);
 	// Read source
 	QFile f(getAbsoluteDataPath(path));
 	if(!f.exists())
 	{
 		f.setFileName(getAbsoluteDataPath("shaders/" + path));
+		if(!f.exists())
+		{
+			return "///!ERROR";
+		}
 	}
 	f.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in(&f);
 	QString source(in.readAll().toLocal8Bit());
 
-	// Strip comments
-	// One-liners
-	int commentPos(source.indexOf("//"));
-	while(commentPos != -1)
-	{
-		int endOfComment(source.indexOf('\n', commentPos));
-		source.replace(commentPos, endOfComment - commentPos, "");
-		commentPos = source.indexOf("//", commentPos);
-	}
-	// Blocks
-	commentPos = source.indexOf("/*");
-	while(commentPos != -1)
-	{
-		int endOfComment(source.indexOf("*/", commentPos));
-		source.replace(commentPos, endOfComment - commentPos + 2, "");
-		commentPos = source.indexOf("/*", commentPos);
-	}
+	// add source name at the beginning and end of the file
+	source.insert(source.indexOf('\n'), QString(" ///!BEGSRC " + path));
+	source.insert(source.lastIndexOf('\n'), QString(" ///!ENDSRC"));
 
 	// include other preprocessed sources within source
-	int includePos(source.indexOf("#include"));
+	int includePos(source.lastIndexOf("#include"));
 	while(includePos != -1)
 	{
 		int beginPath(source.indexOf('<', includePos));
 		int endPath(source.indexOf('>', includePos));
-		int endOfLine(source.indexOf('\n', includePos));
+		int endOfLine(source.indexOf('\n', includePos) + 1);
 
-		QString includedSrc(getFullPreprocessedSource(
-		    source.mid(beginPath + 1, endPath - beginPath - 1), defines));
+		QString includePath(source.mid(beginPath + 1, endPath - beginPath - 1));
+
+		QString includedSrc(
+		    getFullPreprocessedSource(includePath, {}, debugFiles));
+
+		unsigned int line(source.left(includePos).count('\n'));
+
+		if(includedSrc == "///!ERROR")
+		{
+			QString warning("SHADER ERROR (");
+			warning += path + ":" + QString::number(line + 1) + ") : ";
+			warning += "include error : '" + includePath + "' does not exist";
+			qWarning() << warning;
+		}
+
+		includedSrc += "#line " + QString::number(line) + ' '
+		               + QString::number(id) + '\n';
+
 		source.replace(includePos, endOfLine - includePos, includedSrc);
 
-		includePos = source.indexOf("#include", includePos);
+		includePos = source.lastIndexOf("#include", includePos);
 	}
 
 	// add defines after #version
 	int definesInsertPoint(source.indexOf("#version"));
-	definesInsertPoint = source.indexOf('\n', definesInsertPoint) + 1;
+	if(definesInsertPoint == -1)
+	{
+		definesInsertPoint = 0;
+	}
+	else
+	{
+		definesInsertPoint = source.indexOf('\n', definesInsertPoint) + 1;
+	}
+
+	unsigned int line(source.left(definesInsertPoint).count('\n') - 1);
+	source.insert(definesInsertPoint, "#line " + QString::number(line) + ' '
+	                                      + QString::number(id) + '\n');
 	for(auto const& key : defines.keys())
 	{
 		source.insert(definesInsertPoint, QString("#define ") + key + " "
@@ -322,13 +342,16 @@ QString GLShaderProgram::getFullPreprocessedSource(
 GLuint GLShaderProgram::loadShader(QString const& path, GLenum shaderType,
                                    QMap<QString, QString> const& defines)
 {
-	QString source(getFullPreprocessedSource(path, defines));
+	std::vector<QString> debugFiles;
+	QString source(getFullPreprocessedSource(path, defines, debugFiles));
+
 	QByteArray ba     = source.toLatin1();
 	const char* bytes = ba.data();
 
 	GLuint shader = GLHandler::glf().glCreateShader(shaderType);
 	GLHandler::glf().glShaderSource(shader, 1, &bytes, nullptr);
 	GLHandler::glf().glCompileShader(shader);
+
 	// checks
 	GLint status;
 	GLHandler::glf().glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
@@ -336,8 +359,24 @@ GLuint GLShaderProgram::loadShader(QString const& path, GLenum shaderType,
 	GLHandler::glf().glGetShaderInfoLog(shader, 512, nullptr, &buffer[0]);
 	if(status != GL_TRUE)
 	{
-		qWarning() << "SHADER ERROR (" << path << "-" << shader
-		           << ") :" << &buffer[0] << '\n';
+		QString bufStrs(&buffer[0]);
+		for(auto const& bufStr : bufStrs.split('\n'))
+		{
+			if(bufStr.isEmpty())
+			{
+				continue;
+			}
+			int lineBeg       = bufStr.indexOf('(') + 1;
+			int lineSize      = bufStr.indexOf(')') - lineBeg;
+			int msgBeg        = bufStr.indexOf(':') + 2;
+			unsigned int file = bufStr.left(lineBeg - 1).toInt();
+			unsigned int line = bufStr.mid(lineBeg, lineSize).toInt();
+			QString warning("SHADER ERROR (");
+			warning += QString::number(shader) + " - ";
+			warning += debugFiles[file] + ":" + QString::number(line) + ") : ";
+			warning += bufStr.mid(msgBeg).replace('"', '\'');
+			qWarning() << warning;
+		}
 	}
 
 	return shader;

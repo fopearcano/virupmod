@@ -18,6 +18,11 @@
 
 #include "ShaderProgram.hpp"
 
+ShaderProgram::operator GLSRef() const
+{
+	return toGLShaderProgram();
+}
+
 std::unordered_set<ShaderProgram*>& ShaderProgram::allShaderPrograms()
 {
 	static std::unordered_set<ShaderProgram*> allShaderPrograms = {};
@@ -42,11 +47,6 @@ ShaderProgram::ShaderProgram(QString const& vertexName,
 	load(vertexName, fragmentName, defines);
 
 	allShaderPrograms().insert(this);
-}
-
-GLShaderProgram const& ShaderProgram::toGLShaderProgram() const
-{
-	return *glShader;
 }
 
 void ShaderProgram::load(QString const& shadersCommonName,
@@ -183,6 +183,40 @@ void ShaderProgram::reload()
 					glShader->setUniform(pair.first,
 					                     pair.second.value<QColor>());
 					break;
+				case QMetaType::QVariantList:
+				{
+					QVariantList l(pair.second.toList());
+					if(!l.isEmpty())
+					{
+						type = static_cast<QMetaType::Type>(l[0].type());
+						switch(type)
+						{
+							case QMetaType::QVector3D:
+							{
+								auto arr = new QVector3D[l.size()];
+								for(int i(0); i < l.size(); ++i)
+								{
+									arr[i] = l.at(i).value<QVector3D>();
+								}
+								glShader->setUniform(pair.first, l.size(), arr);
+							}
+							break;
+							case QMetaType::QVector4D:
+							{
+								auto arr = new QVector4D[l.size()];
+								for(int i(0); i < l.size(); ++i)
+								{
+									arr[i] = l.at(i).value<QVector4D>();
+								}
+								glShader->setUniform(pair.first, l.size(), arr);
+							}
+							break;
+							default:
+								break;
+						}
+					}
+				}
+				break;
 				default:
 					break;
 			}

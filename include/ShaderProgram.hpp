@@ -24,6 +24,8 @@
 
 #include "gl/GLHandler.hpp"
 
+typedef GLShaderProgram& GLSRef;
+
 class ShaderProgram
 {
   public:
@@ -41,16 +43,40 @@ class ShaderProgram
 	              QMap<QString, QString> const& defines = {});
 	ShaderProgram(QString const& vertexName, QString const& fragmentName,
 	              QMap<QString, QString> const& defines = {});
-	GLShaderProgram const& toGLShaderProgram() const;
+	QString getVertexShaderPath() const { return vert; };
+	QString getFragmentShaderPath() const { return frag; };
+	QMap<QString, QString> getDefines() const { return defines; };
 	void load(QString const& shadersCommonName,
 	          QMap<QString, QString> const& defines = {});
 	void load(QString const& vertexName, QString const& fragmentName,
 	          QMap<QString, QString> const& defines = {});
 	void reload();
 	static void reloadAllShaderPrograms();
+	void setUnusedAttributesValues(
+	    std::vector<QPair<const char*, std::vector<float>>> const&
+	        defaultValues) const
+	{
+		glShader->setUnusedAttributesValues(defaultValues);
+	};
+	void setUnusedAttributesValues(
+	    QStringList const& names,
+	    std::vector<std::vector<float>> const& values) const
+	{
+		glShader->setUnusedAttributesValues(names, values);
+	};
 	template <typename T>
-	void setUniform(char const* name, T const& value);
+	void setUniform(char const* name, T const& value) const;
+	template <typename T>
+	void setUniform(char const* name, unsigned int size, T const* value) const;
+	QString toStr() const { return glShader->toStr(); };
 	~ShaderProgram();
+
+	static std::unordered_set<ShaderProgram*> const& getAllShaderPrograms()
+	{
+		return allShaderPrograms();
+	};
+
+	operator GLSRef() const;
 
   private:
 	GLShaderProgram* glShader = nullptr;
@@ -59,18 +85,32 @@ class ShaderProgram
 	QString frag;
 	QMap<QString, QString> defines;
 
-	std::map<char const*, QVariant> uniformsBackup;
+	mutable std::map<char const*, QVariant> uniformsBackup;
 
 	static std::unordered_set<ShaderProgram*>& allShaderPrograms();
 
 	// static std::pair<UniformBaseType, unsigned int> decodeUniformType(GLenum
 	// type);
+	GLShaderProgram& toGLShaderProgram() const { return *glShader; };
 };
 
 template <typename T>
-void ShaderProgram::setUniform(char const* name, T const& value)
+void ShaderProgram::setUniform(char const* name, T const& value) const
 {
 	uniformsBackup[name] = value;
 	glShader->setUniform(name, value);
+}
+
+template <typename T>
+void ShaderProgram::setUniform(char const* name, unsigned int size,
+                               T const* value) const
+{
+	QList<QVariant> list;
+	for(unsigned int i(0); i < size; ++i)
+	{
+		list << value[i];
+	}
+	uniformsBackup[name] = list;
+	glShader->setUniform(name, size, value);
 }
 #endif // SHADERPROGRAM_HPP

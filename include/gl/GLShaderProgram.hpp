@@ -227,6 +227,12 @@ class GLShaderProgram
 	void use() const;
 	virtual ~GLShaderProgram() { cleanUp(); };
 
+	static std::pair<QString, GLenum> decodeStage(Stage s);
+	static QString
+	    getFullPreprocessedSource(QString const& path,
+	                              QMap<QString, QString> const& defines,
+	                              std::vector<QString>& debugFiles);
+
   protected:
 	/**
 	 * @brief Frees the underlying OpenGL shader program.
@@ -248,10 +254,6 @@ class GLShaderProgram
 	bool doClean = true;
 	static unsigned int& instancesCount();
 
-	static std::pair<QString, GLenum> decodeStage(Stage s);
-	static QString
-	    getFullPreprocessedSource(QString const& path,
-	                              QMap<QString, QString> const& defines);
 	static GLuint loadShader(QString const& path, GLenum shaderType,
 	                         QMap<QString, QString> const& defines);
 };

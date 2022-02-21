@@ -28,6 +28,7 @@
 #include "ToneMappingModel.hpp"
 #include "gl/GLHandler.hpp"
 #include "gl/GLShaderProgram.hpp"
+#include "gui/ShaderSelector.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
 
@@ -471,6 +472,8 @@ class AbstractMainWin : public QWindow
 
 	// Dialog3Ds Wheel
 	Dialog3DWheel* dialog3dWheel = nullptr;
+
+	ShaderSelector* shaderSelector = nullptr;
 
   private:
 	void initializeGL();
