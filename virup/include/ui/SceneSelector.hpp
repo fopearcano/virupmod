@@ -26,15 +26,20 @@
 
 class SceneSelector : public Dialog3D
 {
+	Q_OBJECT
   public:
 	SceneSelector(Animator& animator);
 	bool voiceOverIsEnglish() const { return english; };
 	void update();
 
+  private slots:
+	void updateButtons();
+
   private:
 	Animator& animator;
 
-	bool english                      = true;
+	bool english = true;
+	QVBoxLayout buttonsLayout;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;
 	QSlider slider;

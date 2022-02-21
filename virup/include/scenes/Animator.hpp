@@ -66,6 +66,11 @@ class Animator : public QObject
 	int getCurrentTransitionId() const { return this->id; };
 	Scene getCurrentScene() const;
 
+	std::vector<Transition> const& getTransitions() const
+	{
+		return transitions;
+	};
+
   public slots:
 	Vector3 getCosmoShift() const;
 	Vector3 getPlanetShift() const;
@@ -73,7 +78,7 @@ class Animator : public QObject
 	void appendTransition(Transition t);
 	void setTransition(int newid);
 	void update();
-	void removeAllTransitions() { transitions.clear(); };
+	void removeAllTransitions();
 	void executeTransition(Transition t);
 	float getTotalDuration() const;
 	float getWholeAnimationPercentage() const;
@@ -90,6 +95,7 @@ class Animator : public QObject
 	void resumed();
 	void paused();
 	void stopped();
+	void transitionsModified();
 
   private:
 	Vector3 getShift(double coeff = 1.0) const;

@@ -87,6 +87,7 @@ void Animator::appendTransition(Transition t)
 	    }
 	}*/
 	transitions.push_back(std::move(t));
+	emit transitionsModified();
 }
 
 void Animator::setTransition(int newid)
@@ -172,6 +173,12 @@ void Animator::update()
 	{
 		stop();
 	}
+}
+
+void Animator::removeAllTransitions()
+{
+	transitions.clear();
+	emit transitionsModified();
 }
 
 void Animator::executeTransition(Transition t)

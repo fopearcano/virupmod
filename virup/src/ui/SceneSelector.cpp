@@ -86,24 +86,12 @@ SceneSelector::SceneSelector(Animator& animator)
 
 	layout->addWidget(new QLabel("Scenes :"));
 
-	QStringList scenes = {"0:International Space Station",
-	                      "1:Earth",
-	                      "2:Moon",
-	                      "3:Phobos",
-	                      "4:Solar System",
-	                      "5:AGORA",
-	                      "6:Local Group",
-	                      "7:IllustrisTNG",
-	                      "8:SDSS"};
-	for(int i(0); i < scenes.size(); ++i)
-	{
-		auto button = new QPushButton(scenes[i]);
-		connect(button, &QPushButton::clicked, this,
-		        [&animator, i]() { animator.setTransition(10 + 2 * i); });
-		button->setFocusPolicy(Qt::NoFocus);
-		layout->addWidget(button);
-		buttons.push_back(button);
-	}
+	auto buttonsWidget = new QWidget(this);
+	layout->addWidget(buttonsWidget);
+	buttonsWidget->setLayout(&buttonsLayout);
+	connect(&animator, &Animator::transitionsModified, this,
+	        &SceneSelector::updateButtons);
+
 	// layout->addWidget(new QLabel("Options :"));
 	transitionsButton
 	    = new QPushButton("Toggle transitions (only if user is sick, can "
@@ -124,12 +112,13 @@ void SceneSelector::update()
 		slider.setValue(
 		    static_cast<int>(10 * animator.getWholeAnimationPercentage()));
 	}
-	int currentScene((animator.getCurrentTransitionId() - 10) / 2);
-	for(int i(0); i < static_cast<int>(buttons.size()); ++i)
+	int id(animator.getCurrentTransitionId());
+	QString currentScene
+	    = id < 0 ? "" : animator.getTransitions()[id].getName();
+	for(auto button : buttons)
 	{
-		auto button  = buttons[i];
 		QPalette pal = button->palette();
-		if(i == currentScene)
+		if(button->text() == currentScene)
 		{
 			pal.setColor(QPalette::Button, QColor(Qt::green));
 		}
@@ -157,4 +146,28 @@ void SceneSelector::update()
 	transitionsButton->setAutoFillBackground(true);
 	transitionsButton->setPalette(pal);
 	transitionsButton->update();
+}
+
+void SceneSelector::updateButtons()
+{
+	for(auto button : buttons)
+	{
+		delete button;
+		buttons.clear();
+	}
+
+	auto const& transitions(animator.getTransitions());
+	for(unsigned int i(0); i < transitions.size(); ++i)
+	{
+		if(transitions[i].getName().isEmpty())
+		{
+			continue;
+		}
+		auto button = new QPushButton(transitions[i].getName());
+		connect(button, &QPushButton::clicked, this,
+		        [this, i]() { animator.setTransition(i); });
+		button->setFocusPolicy(Qt::NoFocus);
+		buttonsLayout.addWidget(button);
+		buttons.push_back(button);
+	}
 }

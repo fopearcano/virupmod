@@ -78,7 +78,7 @@ transitions = [
 # Intro
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
-          SceneTemporalData(1.0, solareclipsedt), SceneUI({"Hipparcos":1.0})), 1.0, "begin", "begin"),
+          SceneTemporalData(1.0, solareclipsedt), SceneUI({"Hipparcos":1.0})), 1.0, "", "begin"),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
           SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0})), 3.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
@@ -104,54 +104,54 @@ transitions = [
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 19.0),
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 19.0, "International Space Station"),
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0),
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0, "Earth"),
     # Moon
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Moon', 4000000),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Moon', 4000000),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0),
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0, "Moon"),
     # Phobos
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Phobos', 30000),
-          SceneTemporalData(100.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 10.0, "phobos", "showOrbitsWhileTraveling"),
+          SceneTemporalData(100.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 10.0, "", "showOrbitsWhileTraveling"),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Phobos', 30000),
-          SceneTemporalData(500.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0),
+          SceneTemporalData(500.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 20.0, "Phobos"),
     # Solar System dynamics Constellations
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Sun', 5.65181e+12),
           SceneTemporalData(10000000.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Sun', 5.65181e+12),
-          SceneTemporalData(10000000.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0})), 20.0),
+          SceneTemporalData(10000000.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0, "Exoplanets":1.0, "Constellations":1.0, "Orbits":1.0, "PlanetsLabels":1.0})), 20.0, "Solar System"),
     # Milky Way
     Transition(Scene(SceneSpatialData(Universe, 6.171e+20, Vector3(-0.43, -8.24, -0.81)),
           SceneTemporalData(), SceneUI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 6.171e+20, Vector3(-0.43, -8.24, -0.81)),
-          SceneTemporalData(), SceneUI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0})), 20.0),
+          SceneTemporalData(), SceneUI({"Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Exoplanets":0.1, "Volumetric AGORA":1.0, "Orbits":1.0, "Labels":1.0})), 20.0, "Milky Way"),
     # Local Group
     Transition(Scene(SceneSpatialData(Universe, 3.04e+22, Vector3(-0.43, -8.24, -0.81)),
           SceneTemporalData(), SceneUI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 3.04e+22, Vector3(-0.43, -8.24, -0.81)),
-          SceneTemporalData(), SceneUI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0})), 20.0),
+          SceneTemporalData(), SceneUI({"Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0, "Labels2":1.0})), 20.0, "Local Group"),
     # Illustris
     Transition(Scene(SceneSpatialData(Universe, 0.2e+25, Vector3(-0.43, -8.24, -0.81)),
           SceneTemporalData(), SceneUI({"IllustrisTNG":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 0.2e+25, Vector3(-0.43, -8.24, -0.81)),
-          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0})), 20.0),
+          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0})), 20.0, "IllustrisTNG"),
     # SDSS distant
     Transition(Scene(SceneSpatialData(Universe, 2.0e+26, Vector3(-0.43, -8.24, -0.81)),
           SceneTemporalData(), SceneUI({"SDSS":1.0})), 10.0),
     Transition(Scene(SceneSpatialData(Universe, 2.0e+26, Vector3(-0.43, -8.24, -0.81)),
-          SceneTemporalData(), SceneUI({"SDSS":1.0})), 35.0),
+          SceneTemporalData(), SceneUI({"SDSS":1.0})), 35.0, "SDSS"),
     Transition(Scene(SceneSpatialData(Universe, 2.0e+26, Vector3(-0.43, -8.24, -0.81)),
-          SceneTemporalData(), SceneUI({"SDSS":1.0})), 1.0, "end", "end"),
+          SceneTemporalData(), SceneUI({"SDSS":1.0})), 1.0, "", "end"),
 
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend", "black"),
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "", "black"),
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
-          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "fooend2", "black")
+          SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0, "", "black")
 ]
 
 def initScene():
