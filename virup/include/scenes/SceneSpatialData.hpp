@@ -57,6 +57,8 @@ class SceneSpatialData
 
 	QString getPythonRepresentation() const;
 
+	static void setForceDirectInterpolation(bool forced);
+
   private:
 	static SceneSpatialData
 	    noFrameChangeInterpolate(SceneSpatialData const& sd0,
@@ -69,6 +71,8 @@ class SceneSpatialData
 	double scale = 1.0;
 	QString systemName;
 	QString bodyName;
+
+	static bool& directInterpolationForced();
 };
 
 /* PYTHONQT */
@@ -155,6 +159,10 @@ class SceneSpatialDataWrapper : public PythonQtWrapper
 	    SceneSpatialData const& sd0, SceneSpatialData const& sd1, float t)
 	{
 		return SceneSpatialData::interpolate(sd0, sd1, t);
+	}
+	void static_SceneSpatialData_setForceDirectInterpolation(bool forced)
+	{
+		SceneSpatialData::setForceDirectInterpolation(forced);
 	}
 };
 

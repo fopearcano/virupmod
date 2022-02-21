@@ -18,6 +18,12 @@
 
 #include "scenes/SceneSpatialData.hpp"
 
+bool& SceneSpatialData::directInterpolationForced()
+{
+	static bool directInterpolationForced = false;
+	return directInterpolationForced;
+}
+
 SceneSpatialData::SceneSpatialData(Universe const& universe, double invScale,
                                    Vector3 position)
     : universe(&universe)
@@ -101,6 +107,17 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 		{
 			auto ancestor = sd1.universe->getClosestCommonAncestorName(
 			    sd0.bodyName, sd1.bodyName);
+			if(directInterpolationForced())
+			{
+				if(sd0.scale < sd1.scale)
+				{
+					ancestor = sd1.bodyName;
+				}
+				else
+				{
+					ancestor = sd0.bodyName;
+				}
+			}
 			auto start
 			    = sd1.universe->getCelestialBodyPosition(
 			          sd0.bodyName, ancestor, sd0.universe->getSimulationTime())
@@ -220,12 +237,17 @@ SceneSpatialData
 	// if position change will look insignificant (less than a cm in VR), then
 	// go directly ; or if scale doesn't change, don't travel more than 1.1
 	// meter in VR
-	if(dist * sd0.scale < 0.01 || dist * sd1.scale < 0.01
+	if(directInterpolationForced() || dist * sd0.scale < 0.01
+	   || dist * sd1.scale < 0.01
 	   || (sd0.scale == sd1.scale && dist * sd0.scale <= 1.1))
 	{
 		// avoid change of position at low scales, but go linearly if scale
 		// change is small
 		float posT(sd0.scale < sd1.scale ? t * 100.f : 100.f * (t - 99.f));
+		if(directInterpolationForced())
+		{
+			posT = sd0.scale < sd1.scale ? pow(t, 0.05) : pow(t, 20);
+		}
 		if(posT < 0.f)
 		{
 			posT = 0.f;
@@ -285,4 +307,9 @@ SceneSpatialData
 		return noFrameChangeInterpolate(sd0, inter, t * 2);
 	}
 	return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
+}
+
+void SceneSpatialData::setForceDirectInterpolation(bool forced)
+{
+	directInterpolationForced() = forced;
 }

@@ -70,6 +70,7 @@ bool Transition::updateUniverse(
 
 	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
 
+	SceneSpatialData::setForceDirectInterpolation(false);
 	// apply custom function
 	custom(t, t_harsh);
 
