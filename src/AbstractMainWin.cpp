@@ -617,9 +617,16 @@ void AbstractMainWin::setupPythonScripts()
 {
 	setupPythonAPI();
 
-	QString mainScriptPath("./data/" + QString(PROJECT_DIRECTORY) + "/scripts/"
-	                       + QSettings().value("scripting/rootdir").toString()
-	                       + "/main.py");
+	QString mainScriptRootDir(
+	    "./data/" + QString(PROJECT_DIRECTORY) + "/scripts/"
+	    + QSettings().value("scripting/rootdir").toString());
+
+	if(!QSettings().value("scripting/customdir").toString().isEmpty())
+	{
+		mainScriptRootDir = QSettings().value("scripting/customdir").toString();
+	}
+
+	QString mainScriptPath(mainScriptRootDir + "/main.py");
 	if(QFile(mainScriptPath).exists())
 	{
 		PythonQtHandler::evalFile(mainScriptPath);

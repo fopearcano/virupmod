@@ -124,6 +124,7 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addGroup("scripting", tr("Scripting"));
 	addStringAmongListSetting("rootdir", dirList, dirList,
 	                          tr("Scripts Root Directory"));
+	addDirPathSetting("customdir", "", tr("Custom Root Directory"));
 
 	addGroup("debugcamera", tr("Debug Camera"));
 	addBoolSetting("enabled", false, tr("Enable Debug Camera"));
