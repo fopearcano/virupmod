@@ -34,12 +34,14 @@ class Interpolation
 	static QDateTime interpolateLinear(QDateTime const& dt0,
 	                                   QDateTime const& dt1, float t)
 	{
-		return (!dt0.isValid() || !dt1.isValid())
-		           ? QDateTime()
-		           : QDateTime::fromMSecsSinceEpoch(
-		                 interpolateLinear(dt0.toMSecsSinceEpoch(),
-		                                   dt1.toMSecsSinceEpoch(), t),
-		                 Qt::UTC);
+		if(!dt0.isValid() || !dt1.isValid())
+		{
+			return {};
+		}
+		qint64 msecs
+		    = static_cast<double>(t) * dt1.toMSecsSinceEpoch()
+		      + (1.0 - static_cast<double>(t)) * dt0.toMSecsSinceEpoch();
+		return QDateTime::fromMSecsSinceEpoch(msecs);
 	}
 	template <typename T>
 	static T interpolateLog(T const& x0, T const& x1, float t);
