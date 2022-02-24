@@ -299,7 +299,7 @@ void MainWin::initScene()
 	lenseDistortionMap
 	    = new GLTexture("data/virup/images/pointmass-distortion.png", false);
 
-	renderer.appendPostProcessingShader("lensing", "lensing");
+	// renderer.appendPostProcessingShader("lensing", "lensing");
 
 	// UI
 	if(networkManager->isServer())
