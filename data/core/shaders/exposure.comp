@@ -12,6 +12,10 @@ uniform float dynamicrange       = 10000.0;
 uniform float screendynamicrange = 255.0;
 uniform float purkinje           = 1.0;
 
+#ifndef BLOOM
+#include <finalpostproc.glsl>
+#endif
+
 // technically tone mapping
 void main()
 {
@@ -43,16 +47,9 @@ void main()
 		result.rgb = pow(result.rgb, vec3(b));
 	}
 
-	if(result.r < 0.5 / 255.0 && result.g < 0.5 / 255.0
-	   && result.b < 0.5 / 255.0)
-	{
-		imageStore(dataOut, pixel_coords, result);
-		return;
-	}
-
-	/*float screenminvalue=0.0/255.0;
-	result.rgb *= 1.0 - screenminvalue;
-	result.rgb +=screenminvalue;*/
+#ifndef BLOOM
+	result.rgb = finalpostproc(result.rgb);
+#endif
 
 	imageStore(dataOut, pixel_coords, result);
 }

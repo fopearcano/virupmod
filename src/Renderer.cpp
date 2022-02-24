@@ -326,9 +326,12 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 	mainRenderTarget->sceneTarget.blitColorBufferTo(
 	    mainRenderTarget->postProcessingTargets[0]);
 
-	lastFrameAverageLuminance += mainRenderTarget->postProcessingTargets[0]
-	                                 .getColorAttachmentTexture()
-	                                 .getAverageLuminance();
+	if(computeAverageLuminance)
+	{
+		lastFrameAverageLuminance += mainRenderTarget->postProcessingTargets[0]
+		                                 .getColorAttachmentTexture()
+		                                 .getAverageLuminance();
+	}
 
 	// do all postprocesses including last one
 	int i(0);
@@ -552,9 +555,13 @@ void Renderer::renderFrame()
 		}
 
 		// compute average luminance
-		lastFrameAverageLuminance = mainRenderTarget->postProcessingTargets[0]
-		                                .getColorAttachmentTexture()
-		                                .getAverageLuminance();
+		if(computeAverageLuminance)
+		{
+			lastFrameAverageLuminance
+			    = mainRenderTarget->postProcessingTargets[0]
+			          .getColorAttachmentTexture()
+			          .getAverageLuminance();
+		}
 
 		// postprocess
 		int i(0);

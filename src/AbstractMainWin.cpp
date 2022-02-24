@@ -466,6 +466,7 @@ void AbstractMainWin::applyPostProcShaderParams(
 		shader.setUniform("exposure", toneMappingModel->exposure);
 		shader.setUniform("dynamicrange", toneMappingModel->dynamicrange);
 		shader.setUniform("purkinje", toneMappingModel->purkinje ? 1.f : 0.f);
+		shader.setUniform("gamma", gamma);
 	}
 	else if(id == "colors")
 	{
@@ -572,17 +573,20 @@ void AbstractMainWin::initializeGL()
 	// Init Python engine
 	setupPythonScripts();
 
-	renderer.appendPostProcessingShader("exposure", "exposure");
-	renderer.appendPostProcessingShader("bloom", "bloom");
-	// make sure gamma correction is applied last
+	QMap<QString, QString> defines;
 	if(QSettings().value("graphics/dithering").toBool())
 	{
-		renderer.appendPostProcessingShader("colors", "colors",
-		                                    {{"DITHERING", "0"}});
+		defines["DITHERING"] = "0";
 	}
-	else
+	if(bloom)
 	{
-		renderer.appendPostProcessingShader("colors", "colors");
+		defines["BLOOM"] = "0";
+	}
+	renderer.appendPostProcessingShader("exposure", "exposure", defines);
+	if(bloom)
+	{
+		renderer.appendPostProcessingShader("bloom", "bloom");
+		renderer.appendPostProcessingShader("colors", "colors", defines);
 	}
 
 	frameTimer.start();
@@ -732,6 +736,7 @@ void AbstractMainWin::paintGL()
 	}
 
 	// Render frame
+	renderer.computeAverageLuminance = toneMappingModel->autoexposure;
 	renderer.renderFrame();
 
 	// garbage collect some resources
@@ -853,7 +858,7 @@ AbstractMainWin::~AbstractMainWin()
 
 void AbstractMainWin::reloadBloomTargets()
 {
-	if(!initialized)
+	if(!initialized || !bloom)
 	{
 		return;
 	}

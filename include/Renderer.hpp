@@ -174,6 +174,7 @@ class Renderer
 
 	bool renderControllersBeforeScene  = true;
 	QString pathIdRenderingControllers = "default";
+	bool computeAverageLuminance       = false;
 
 	bool wireframe = false;
 
