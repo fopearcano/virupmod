@@ -95,6 +95,7 @@ add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_DIRECTORY="${PROJECT_DIRECTORY}")
 add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 add_definitions(-DBUILD_SRC_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_definitions(-DQT_MESSAGELOGCONTEXT)
 
 message(STATUS "Project name: ${PROJECT_NAME}")
 message(STATUS "Project version: ${PROJECT_VERSION}")

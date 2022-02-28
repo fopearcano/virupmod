@@ -500,6 +500,10 @@ class BasicCamera : public QObject
 	std::array<Plane, 6> clippingPlanes;
 
 	QSize windowSize;
+
+  private:
+	// compute on update
+	float pixVertFOV = 0.f;
 };
 
 #include "vr/VRHandler.hpp"
