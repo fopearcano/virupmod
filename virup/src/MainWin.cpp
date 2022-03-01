@@ -397,12 +397,12 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		universe->updateClock(videomode, frameTiming);
 
+		universe->updatePlanetarySystem();
+
 		if(!universe->planetSystems->renderSystem())
 		{
 			return;
 		}
-		universe->updatePlanetarySystem();
-
 		timeSinceTextUpdate += frameTiming;
 		std::string targetName(cam.target->getName());
 		if(targetName != lastTargetName)

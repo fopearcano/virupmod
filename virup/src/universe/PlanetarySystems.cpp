@@ -168,6 +168,8 @@ void PlanetarySystems::update(Camera const& camera)
 			neighborDist = d;
 		}
 	}
+	// put max neighborDist
+	neighborDist                     = neighborDist > 2 ? 2 : neighborDist;
 	PlanetRenderer::currentSystemDir = directories[closestId];
 	CSVOrbit::currentSystemDir       = directories[closestId];
 

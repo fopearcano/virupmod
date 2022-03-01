@@ -485,10 +485,13 @@ void Universe::updatePlanetarySystem()
 	lastCurrentUt  = currentUt;
 	if(!planetSystems->renderSystem())
 	{
+		delete systemRenderer;
+		systemRenderer = nullptr;
 		return;
 	}
 	const double mtokpc = 3.24078e-20;
-	if(lastData != planetSystems->getClosestSystemPosition())
+	if(lastData != planetSystems->getClosestSystemPosition()
+	   || systemRenderer == nullptr)
 	{
 		loadClosestSystem();
 	}
