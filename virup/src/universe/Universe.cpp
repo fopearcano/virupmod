@@ -119,7 +119,7 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 	progress.setValue(0);
 
 	bool cont(true);
-	for(unsigned int lvlToLoad(0); cont && lvlToLoad < 10; ++lvlToLoad)
+	for(unsigned int lvlToLoad(0); cont && lvlToLoad < 100; ++lvlToLoad)
 	{
 		for(int i(0); cont && i < cosmoSims.size(); ++i)
 		{
