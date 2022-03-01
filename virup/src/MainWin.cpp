@@ -139,15 +139,16 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 		}
 		return;
 	}
-	float dx = (static_cast<float>(width()) / 2 - e->globalX()) / width();
-	float dy = (static_cast<float>(height()) / 2 - e->globalY()) / height();
+	float dx = (x() + static_cast<float>(width()) / 2 - e->globalX()) / width();
+	float dy
+	    = (y() + static_cast<float>(height()) / 2 - e->globalY()) / height();
 	auto& cam(renderer.getCamera<Camera>("cosmo"));
 	cam.yaw += dx * 3.14f / 3.f;
 	cam.pitch += dy * 3.14f / 3.f;
 	auto& cam2(renderer.getCamera<OrbitalSystemCamera>("planet"));
 	cam2.yaw += dx * 3.14f / 3.f;
 	cam2.pitch += dy * 3.14f / 3.f;
-	QCursor::setPos(width() / 2, height() / 2);
+	QCursor::setPos(x() + width() / 2, y() + height() / 2);
 }
 
 void MainWin::wheelEvent(QWheelEvent* e)
