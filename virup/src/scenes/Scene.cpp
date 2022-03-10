@@ -47,3 +47,18 @@ Scene Scene::interpolate(Scene const& s0, Scene const& s1, float t)
 	        SceneTemporalData::interpolate(s0.td, s1.td, t),
 	        SceneUI::interpolate(s0.ui, s1.ui, t)};
 }
+
+QString Scene::getPythonRepresentation() const
+{
+	QString result("Scene(");
+	result += sd.getPythonRepresentation() + ",\n    ";
+	result += td.getPythonRepresentation() + ", ";
+	result += ui.getPythonRepresentation();
+	if(name != "")
+	{
+		result += ", \"" + name + "\"";
+	}
+	result += ')';
+
+	return result;
+}

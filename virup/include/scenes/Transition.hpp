@@ -53,6 +53,8 @@ class Transition
 	                      std::function<Vector3()> const& getCosmoShift,
 	                      std::function<Vector3()> const& getPlanetShift) const;
 
+	QString getPythonRepresentation() const;
+
   private:
 	Scene toScene;
 	float duration = 10.f;

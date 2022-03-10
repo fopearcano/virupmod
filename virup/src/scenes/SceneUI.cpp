@@ -99,7 +99,7 @@ SceneUI SceneUI::interpolate(SceneUI const& ui0, SceneUI const& ui1, float t)
 
 QString SceneUI::getPythonRepresentation() const
 {
-	QString result("UI({");
+	QString result("SceneUI({");
 
 	for(auto const& pair : visibilities)
 	{

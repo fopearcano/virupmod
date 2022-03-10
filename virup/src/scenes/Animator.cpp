@@ -277,3 +277,28 @@ void Animator::stopVoiceover()
 		PythonQtHandler::evalScript("del voiceover");
 	}
 }
+
+QString Animator::getPythonRepresentation() const
+{
+	QString result
+	    = "from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone\n"
+	      "from PythonQt.QtMultimedia import QSound\n"
+	      "from PythonQt.libplanet import Vector3\n"
+	      "from PythonQt.virup import Transition, Scene, SceneSpatialData, "
+	      "SceneTemporalData, SceneUI\n"
+	      "transitions = [\n";
+	for(auto const& t : transitions)
+	{
+		result += "    ";
+		result += t.getPythonRepresentation().replace('\n', "\n    ");
+		result += ",\n";
+	}
+
+	result += "]\n"
+	          "def initScene():\n"
+	          "    Animator.removeAllTransitions()\n"
+	          "    for t in transitions:\n"
+	          "        Animator.appendTransition(t)\n"
+	          "    Animator.restart()\n";
+	return result;
+}

@@ -127,3 +127,20 @@ void Transition::applyDestination(
 		                          + getCosmoShift());
 	}
 }
+
+QString Transition::getPythonRepresentation() const
+{
+	QString result("Transition(");
+	result += toScene.getPythonRepresentation();
+	result += ", " + QString::number(duration);
+	if(name != "" || customPythonFunction != "")
+	{
+		result += ", \"" + name + "\"";
+	}
+	if(customPythonFunction != "")
+	{
+		result += ", \"" + customPythonFunction + "\"";
+	}
+	result += ")";
+	return result;
+}

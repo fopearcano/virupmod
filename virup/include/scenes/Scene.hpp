@@ -47,6 +47,8 @@ class Scene
 
 	static Scene interpolate(Scene const& s0, Scene const& s1, float t);
 
+	QString getPythonRepresentation() const;
+
   private:
 	SceneSpatialData sd;
 	SceneTemporalData td;

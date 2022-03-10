@@ -91,6 +91,8 @@ class Animator : public QObject
 	void stop();
 	void stopVoiceover();
 
+	QString getPythonRepresentation() const;
+
   signals:
 	void resumed();
 	void paused();
