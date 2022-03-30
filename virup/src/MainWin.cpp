@@ -310,10 +310,10 @@ void MainWin::initScene()
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 		scenes          = new SceneSelector(*animator);
 
-		dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
+		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
-		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);
+		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);*/
 
 		auto tools(menuBar->addMenu(tr("Tools")));
 		tools->addAction(tr("Scenes"), this,
