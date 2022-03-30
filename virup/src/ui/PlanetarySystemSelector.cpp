@@ -194,7 +194,7 @@ void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
 	                  .radius;
 
 	auto scene = animator.getCurrentScene();
-	SceneSpatialData sd(universe, rootItem->text(column), name, 2.3f * radius);
+	SceneSpatialData sd(universe, rootItem->text(column), name, 1.5f * radius);
 	animator.executeTransition(Transition(
 	    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
 	          scene.getUI()),
