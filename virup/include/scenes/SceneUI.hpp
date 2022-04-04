@@ -21,6 +21,13 @@
 
 #include "universe/Universe.hpp"
 
+/*! \ingroup pywrap
+ *
+ * To use this class in a Python script :
+ * \code{.py}
+ * from PythonQt.virup import SceneUI
+ * \endcode
+ */
 class SceneUI
 {
   public:

@@ -23,6 +23,13 @@
 #include "SceneTemporalData.hpp"
 #include "SceneUI.hpp"
 
+/*! \ingroup pywrap
+ *
+ * To use this class in a Python script :
+ * \code{.py}
+ * from PythonQt.virup import Scene
+ * \endcode
+ */
 class Scene
 {
   public:

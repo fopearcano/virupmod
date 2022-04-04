@@ -23,6 +23,10 @@
 #include "Transition.hpp"
 #include "universe/Universe.hpp"
 
+/** @ingroup pycall
+ *
+ * Callable in Python as the "Animator" object.
+ */
 class Animator : public QObject
 {
 	Q_OBJECT

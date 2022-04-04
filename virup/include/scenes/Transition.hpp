@@ -21,6 +21,13 @@
 
 #include "Scene.hpp"
 
+/*! \ingroup pywrap
+ *
+ * To use this class in a Python script :
+ * \code{.py}
+ * from PythonQt.virup import Transition
+ * \endcode
+ */
 class Transition
 {
   public:

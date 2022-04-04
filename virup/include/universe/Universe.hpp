@@ -30,6 +30,10 @@
 #include "universe/PlanetarySystems.hpp"
 #include "universe/TexturedSphere.hpp"
 
+/** @ingroup pycall
+ *
+ * Callable in Python as the "Universe" object.
+ */
 class Universe : public QObject
 {
 	Q_OBJECT
