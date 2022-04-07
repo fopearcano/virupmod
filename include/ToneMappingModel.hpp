@@ -74,6 +74,13 @@ class ToneMappingModel : public QObject
 	 * seconds to fully adapt to bright conditions.
 	 */
 	Q_PROPERTY(float autoexposuretimecoeff MEMBER autoexposuretimecoeff)
+	/**
+	 * @brief Contrast correction multiplier term. Default := 1.0.
+	 *
+	 * Increase to incrase contrast, decrease to decrease contrast. 1.5 is
+	 * already a large increase.
+	 */
+	Q_PROPERTY(float contrast MEMBER contrast)
 
   public:
 	class State : public AbstractState
@@ -87,17 +94,20 @@ class ToneMappingModel : public QObject
 			stream >> exposure;
 			stream >> dynamicrange;
 			stream >> purkinje;
+			stream >> contrast;
 		};
 		virtual void writeInDataStream(QDataStream& stream) override
 		{
 			stream << exposure;
 			stream << dynamicrange;
 			stream << purkinje;
+			stream << contrast;
 		};
 
 		float exposure     = 0.f;
 		float dynamicrange = 0.f;
 		bool purkinje      = false;
+		float contrast     = 1.f;
 	};
 
 	ToneMappingModel(VRHandler const& vrHandler);
@@ -106,6 +116,7 @@ class ToneMappingModel : public QObject
 	float exposure     = 1.f;
 	float dynamicrange = 1.f;
 	bool purkinje      = false;
+	float contrast     = 1.f;
 
 	bool autoexposure           = false;
 	float autoexposurecoeff     = 1.f;
@@ -117,6 +128,7 @@ class ToneMappingModel : public QObject
 		exposure          = state.exposure;
 		dynamicrange      = state.dynamicrange;
 		purkinje          = state.purkinje;
+		contrast          = state.contrast;
 	};
 	void writeState(AbstractState& s) const
 	{
@@ -124,6 +136,7 @@ class ToneMappingModel : public QObject
 		state.exposure     = exposure;
 		state.dynamicrange = dynamicrange;
 		state.purkinje     = purkinje;
+		state.contrast     = contrast;
 	};
 
   private:

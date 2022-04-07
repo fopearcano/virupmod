@@ -469,10 +469,12 @@ void AbstractMainWin::applyPostProcShaderParams(
 		shader.setUniform("dynamicrange", toneMappingModel->dynamicrange);
 		shader.setUniform("purkinje", toneMappingModel->purkinje ? 1.f : 0.f);
 		shader.setUniform("gamma", gamma);
+		shader.setUniform("contrast", toneMappingModel->contrast);
 	}
 	else if(id == "colors")
 	{
 		shader.setUniform("gamma", gamma);
+		shader.setUniform("contrast", toneMappingModel->contrast);
 	}
 	else
 	{

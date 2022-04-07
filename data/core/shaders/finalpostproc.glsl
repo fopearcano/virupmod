@@ -1,6 +1,6 @@
 
 uniform float gamma;
-// uniform float contrast = 1.0;
+uniform float contrast = 1.0;
 
 #ifdef DITHERING
 
@@ -41,11 +41,9 @@ vec3 finalpostproc(vec3 color)
 	color += dither();
 #endif
 
-	/*
 	// contrast
-	result
-	    = clamp(contrast * (result - 0.5) + 0.5, vec3(0.0), vec3(1.0));
-	*/
+	color.rgb
+	    = clamp(contrast * (color.rgb - 0.5) + 0.5, vec3(0.0), vec3(1.0));
 
 	return color;
 }

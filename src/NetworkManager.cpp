@@ -63,11 +63,11 @@ NetworkManager::NetworkManager(AbstractState* networkedState)
 						        c.frameTiming      = ft;
 						        c.clientId         = cid;
 						        c.lastReceivedTime = netTimerPtr->elapsed();
-						        qDebug() << "Update client :";
+						        /*qDebug() << "Update client :";
 						        qDebug() << c.addr;
 						        qDebug() << c.port;
 						        qDebug() << c.lastReceivedTime;
-						        qDebug() << c.clientId;
+						        qDebug() << c.clientId;*/
 						        exists = true;
 						        break;
 					        }
