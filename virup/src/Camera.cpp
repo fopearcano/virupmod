@@ -58,7 +58,7 @@ void Camera::updateTargetFPS()
 	setView(QVector3D(0.f, 0.f, 0.f), getLookDirection(),
 	        QVector3D(0.f, 0.f, 1.f));
 
-	if(vrHandler.isEnabled())
+	if(vrHandler.isEnabled() && vrHandler.getDriverName() == "OpenVR")
 	{
 		targetFPS = 100.f; // small margin to avoid frame drops
 	}
