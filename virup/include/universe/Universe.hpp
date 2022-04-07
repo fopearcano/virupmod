@@ -233,7 +233,7 @@ class Universe : public QObject
 		{
 			visibilities.clear();
 			double foo;
-			for(unsigned int i(0); i < elementsSize + 2; ++i)
+			for(unsigned int i(0); i < elementsSize + 3; ++i)
 			{
 				stream >> foo;
 				visibilities.push_back(foo);
@@ -265,7 +265,7 @@ class Universe : public QObject
 	void readState(AbstractState const& s)
 	{
 		auto const& state = dynamic_cast<State const&>(s);
-		if(state.visibilities.size() != elements.size() + 2)
+		if(state.visibilities.size() != elements.size() + 3)
 		{
 			return;
 		}
@@ -276,7 +276,8 @@ class Universe : public QObject
 			++i;
 		}
 		setVisibility("Constellations", state.visibilities[elements.size()]);
-		setVisibility("Debris", state.visibilities[elements.size()]);
+		setVisibility("Debris", state.visibilities[elements.size() + 1]);
+		setVisibility("Asteroids", state.visibilities[elements.size() + 2]);
 		clock.setCurrentUt(state.ut);
 		CelestialBodyRenderer::renderLabelsOrbitsOnly
 		    = state.renderLabelsOrbitsOnly;
@@ -291,6 +292,7 @@ class Universe : public QObject
 		}
 		state.visibilities.push_back(getVisibility("Constellations"));
 		state.visibilities.push_back(getVisibility("Debris"));
+		state.visibilities.push_back(getVisibility("Asteroids"));
 		state.ut = clock.getCurrentUt();
 		state.renderLabelsOrbitsOnly
 		    = CelestialBodyRenderer::renderLabelsOrbitsOnly;

@@ -344,6 +344,10 @@ double Universe::getVisibility(QString const& name) const
 	{
 		return DebrisRenderer::opacity;
 	}
+	if(name == "Asteroids")
+	{
+		return DebrisRenderer::asteroids;
+	}
 
 	if(elements.count(name) == 0)
 	{
@@ -398,6 +402,15 @@ void Universe::setVisibility(QString const& name, double visibility)
 		if(DebrisRenderer::opacity != visibility)
 		{
 			DebrisRenderer::opacity = visibility;
+			emit nonElementVisibilityChanged(name, visibility);
+		}
+		return;
+	}
+	if(name == "Asteroids")
+	{
+		if(DebrisRenderer::asteroids != visibility)
+		{
+			DebrisRenderer::asteroids = visibility;
 			emit nonElementVisibilityChanged(name, visibility);
 		}
 		return;

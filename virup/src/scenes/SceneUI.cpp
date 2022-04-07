@@ -44,7 +44,7 @@ void SceneUI::setVisibility(QString const& name, float vis)
 
 SceneUI SceneUI::getCurrentState(Universe const& universe)
 {
-	QStringList n = {"Constellations", "Orbits", "PlanetsLabels", "Debris"};
+	QStringList n = {"Constellations", "Orbits", "PlanetsLabels", "Debris", "Asteroids"};
 	n.append(universe.getUniverseElementsNames());
 
 	std::map<QString, float> vis;
@@ -58,7 +58,7 @@ SceneUI SceneUI::getCurrentState(Universe const& universe)
 
 void SceneUI::setAsUniverseState(Universe& universe) const
 {
-	QStringList n = {"Constellations", "Orbits", "PlanetsLabels", "Debris"};
+	QStringList n = {"Constellations", "Orbits", "PlanetsLabels", "Debris", "Asteroids"};
 	n.append(universe.getUniverseElementsNames());
 
 	for(auto const& name : n)
