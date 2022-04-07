@@ -164,7 +164,7 @@ void Animator::update()
 				              < 0.03))
 				{
 					planetdPos = Vector3() - universe.getPlanetPosition();
-					cosmodPos = Vector3() - universe.getCosmoPosition();
+					cosmodPos  = Vector3() - universe.getCosmoPosition();
 				}
 				currentTransition->updateUniverse(
 				    universe, t_harsh, transitions[i - 2].getDestination(),
@@ -178,7 +178,9 @@ void Animator::update()
 					planetdPos += universe.getPlanetPosition();
 					cosmodPos += universe.getCosmoPosition();
 					float dt = t_secs - t_secsBAK;
-					qDebug() << id << currentTransition->getName() << planetdPos.length() / dt << cosmodPos.length() / dt;
+					qDebug()
+					    << id << currentTransition->getName()
+					    << planetdPos.length() / dt << cosmodPos.length() / dt;
 				}
 			}
 			tmm.exposure *= fadeFactor;

@@ -111,9 +111,11 @@ class TransitionWrapper : public PythonQtWrapper
 	{
 		return new Transition(std::move(s), d, std::move(n), std::move(c), v0);
 	}
-	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0, float v1)
+	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0,
+	                           float v1)
 	{
-		return new Transition(std::move(s), d, std::move(n), std::move(c), v0, v1);
+		return new Transition(std::move(s), d, std::move(n), std::move(c), v0,
+		                      v1);
 	}
 
 	void delete_Transition(Transition* t) { delete t; }
