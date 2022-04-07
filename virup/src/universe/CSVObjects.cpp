@@ -137,7 +137,7 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 {
 	init(csvFile, "");
 	containsConstellations = true;
-	conShader.setUniform("color", QColor(255, 0, 0));
+	conShader.setUniform("color", QColor(0, 128, 255));
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> elements;
@@ -158,7 +158,7 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 					// average position
 					currentPosSum /= posNumber;
 					auto labelText = new LabelRenderer(
-					    currentName, QColor(255, 0, 0), false);
+					    currentName, QColor(0, 230, 255), false);
 					conLabels.emplace_back(currentPosSum, labelText);
 				}
 				currentName   = line.simplified();
