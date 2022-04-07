@@ -56,12 +56,12 @@ class Animator : public QObject
 		this->animationsDisabled = animationsDisabled;
 	};
 	float getShiftHorizontalAngle() const { return shiftHorizontalAngle; };
-	void setShiftHorizontalAngle(int shiftHorizontalAngle)
+	void setShiftHorizontalAngle(float shiftHorizontalAngle)
 	{
 		this->shiftHorizontalAngle = shiftHorizontalAngle;
 	};
 	float getShiftVerticalAngle() const { return shiftVerticalAngle; };
-	void setShiftVerticalAngle(int shiftVerticalAngle)
+	void setShiftVerticalAngle(float shiftVerticalAngle)
 	{
 		this->shiftVerticalAngle = shiftVerticalAngle;
 	};
