@@ -40,6 +40,7 @@ class Animator : public QObject
 	               setAnimationsDisabled)
 	Q_PROPERTY(bool autoIdScrolling MEMBER autoIdScrolling)
 	Q_PROPERTY(Scene currentScene READ getCurrentScene)
+	Q_PROPERTY(bool debug MEMBER debug)
   public:
 	Animator(Universe& universe, VRHandler const& vrHandler,
 	         ToneMappingModel& tmm)
@@ -74,6 +75,8 @@ class Animator : public QObject
 	{
 		return transitions;
 	};
+
+	bool debug = false;
 
   public slots:
 	Vector3 getCosmoShift() const;
@@ -126,6 +129,8 @@ class Animator : public QObject
 
 	QElapsedTimer timer;
 	float pausedAt = 0.f;
+
+	float t_secsBAK = 0.f;
 };
 
 #endif // ANIMATOR_HPP

@@ -157,10 +157,29 @@ void Animator::update()
 			}
 			else
 			{
+				Vector3 planetdPos, cosmodPos;
+				if(debug
+				   && (t_harsh * currentTransition->getDuration() < 0.03
+				       || (1.0 - t_harsh) * currentTransition->getDuration()
+				              < 0.03))
+				{
+					planetdPos = Vector3() - universe.getPlanetPosition();
+					cosmodPos = Vector3() - universe.getCosmoPosition();
+				}
 				currentTransition->updateUniverse(
 				    universe, t_harsh, transitions[i - 2].getDestination(),
 				    fadeFactor, [this]() { return getCosmoShift(); },
 				    [this]() { return getPlanetShift(); });
+				if(debug
+				   && (t_harsh * currentTransition->getDuration() < 0.1
+				       || (1.0 - t_harsh) * currentTransition->getDuration()
+				              < 0.1))
+				{
+					planetdPos += universe.getPlanetPosition();
+					cosmodPos += universe.getCosmoPosition();
+					float dt = t_secs - t_secsBAK;
+					qDebug() << id << currentTransition->getName() << planetdPos.length() / dt << cosmodPos.length() / dt;
+				}
 			}
 			tmm.exposure *= fadeFactor;
 		}
@@ -173,6 +192,8 @@ void Animator::update()
 	{
 		stop();
 	}
+
+	t_secsBAK = t_secs;
 }
 
 void Animator::removeAllTransitions()
