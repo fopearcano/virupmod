@@ -19,11 +19,13 @@
 #include "scenes/Transition.hpp"
 
 Transition::Transition(Scene toScene, float duration, QString name,
-                       QString customPythonFunction)
+                       QString customPythonFunction, float v0, float v1)
     : toScene(std::move(toScene))
     , duration(duration)
     , name(std::move(name))
     , customPythonFunction(std::move(customPythonFunction))
+    , v0(v0)
+    , v1(v1)
 {
 }
 
@@ -42,9 +44,9 @@ bool Transition::updateUniverse(
     std::function<Vector3()> const& getCosmoShift,
     std::function<Vector3()> const& getPlanetShift) const
 {
-	float t(t_harsh);
+	float t(smoothstep(t_harsh, v0, v1));
 	bool returnedVal = true;
-	if(t > 1.0 || t < 0.0)
+	if(t_harsh > 1.0 || t_harsh < 0.0)
 	{
 		t_harsh     = 1.0;
 		t           = 1.0;
@@ -143,4 +145,22 @@ QString Transition::getPythonRepresentation() const
 	}
 	result += ")";
 	return result;
+}
+
+float Transition::smoothstep(float t, float v0, float v1)
+{
+	if(t < 0.0)
+	{
+		return 0.0;
+	}
+	if(t > 1.0)
+	{
+		return 1.00001;
+	}
+	const float t2 = t * t;
+	const float t3 = t2 * t;
+	const float t4 = t3 * t;
+	const float t5 = t4 * t;
+	return (6 * t5 - 15 * t4 + 10 * t3 + 0.5 * (v1 - v0) * t2 + v0 * t)
+	       / (1.0 + 0.5 * (v1 + v0));
 }

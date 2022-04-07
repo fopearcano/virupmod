@@ -35,7 +35,8 @@ class Transition
 	Transition(Transition const& other) = default;
 	Transition(Transition&& other)      = default;
 	Transition(Scene toScene, float duration = 10.f, QString name = "",
-	           QString customPythonFunction = "");
+	           QString customPythonFunction = "", float v0 = 0.f,
+	           float v1 = 0.f);
 	Transition& operator=(Transition const& other) = default;
 	Transition& operator=(Transition&& other) = default;
 
@@ -67,6 +68,10 @@ class Transition
 	float duration = 10.f;
 	QString name;
 	QString customPythonFunction;
+	float v0 = 0.f;
+	float v1 = 0.f;
+
+	static float smoothstep(float t, float v0 = 0.f, float v1 = 0.f);
 };
 
 /* PYTHONQT */
@@ -101,6 +106,14 @@ class TransitionWrapper : public PythonQtWrapper
 	Transition* new_Transition(Scene s, float d, QString n, QString c)
 	{
 		return new Transition(std::move(s), d, std::move(n), std::move(c));
+	}
+	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0)
+	{
+		return new Transition(std::move(s), d, std::move(n), std::move(c), v0);
+	}
+	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0, float v1)
+	{
+		return new Transition(std::move(s), d, std::move(n), std::move(c), v0, v1);
 	}
 
 	void delete_Transition(Transition* t) { delete t; }
