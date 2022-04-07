@@ -77,6 +77,68 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	QCursor::setPos(width() / 2, height() / 2);
 }
 
+void MainWin::gamepadEvent(GamepadHandler::Event const& e)
+{
+	if(e.type == GamepadHandler::EventType::BUTTON_PRESSED)
+	{
+		switch(e.button)
+		{
+			case GamepadHandler::Button::UP:
+				if(toneMappingModel->autoexposure)
+				{
+					toneMappingModel->autoexposurecoeff *= 1.5f;
+				}
+				else
+				{
+					toneMappingModel->exposure *= 1.5f;
+				}
+				break;
+			case GamepadHandler::Button::DOWN:
+				if(toneMappingModel->autoexposure)
+				{
+					toneMappingModel->autoexposurecoeff /= 1.5f;
+				}
+				else
+				{
+					toneMappingModel->exposure /= 1.5f;
+				}
+				break;
+			case GamepadHandler::Button::LEFT:
+				if(toneMappingModel->dynamicrange > 1.f)
+				{
+					toneMappingModel->dynamicrange /= 10.f;
+					if(toneMappingModel->autoexposure)
+					{
+						toneMappingModel->autoexposurecoeff /= 10.f;
+					}
+					else
+					{
+						toneMappingModel->exposure /= 10.f;
+					}
+				}
+				break;
+			case GamepadHandler::Button::RIGHT:
+				if(toneMappingModel->dynamicrange < 1e37)
+				{
+					toneMappingModel->dynamicrange *= 10.f;
+					if(toneMappingModel->autoexposure)
+					{
+						toneMappingModel->autoexposurecoeff *= 10.f;
+					}
+					else
+					{
+						toneMappingModel->exposure *= 10.f;
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
+	AbstractMainWin::gamepadEvent(e);
+}
+
 void MainWin::initScene()
 {
 	// SKYBOX
@@ -203,9 +265,31 @@ void MainWin::initScene()
 
 void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 {
+	if(gamepadHandler.isEnabled())
+	{
+		auto leftJoystick(gamepadHandler.getJoystick(Side::LEFT));
+		auto rightJoystick(gamepadHandler.getJoystick(Side::RIGHT));
+		yaw -= 2.0 * rightJoystick.x() * frameTiming;
+		pitch += 2.0 * rightJoystick.y() * frameTiming;
+
+		QVector3D lookDir(-cosf(yaw) * cosf(pitch), -sinf(yaw) * cosf(pitch),
+		                  sinf(pitch));
+		QVector3D up(0.0, 0.0, 1.0);
+		QVector3D left(QVector3D::crossProduct(up, lookDir));
+		up = QVector3D::crossProduct(lookDir, left);
+
+		campos -= 2.0 * leftJoystick.x() * left * frameTiming;
+		campos -= 2.0 * leftJoystick.y() * lookDir * frameTiming;
+
+		campos
+		    -= 2.0 * gamepadHandler.getTrigger(Side::LEFT) * up * frameTiming;
+		campos
+		    += 2.0 * gamepadHandler.getTrigger(Side::RIGHT) * up * frameTiming;
+	}
 	QVector3D lookDir(-cosf(yaw) * cosf(pitch), -sinf(yaw) * cosf(pitch),
 	                  sinf(pitch));
-	camera.setView({1, 1, 1}, lookDir, {0, 0, 1});
+
+	camera.setView(campos, lookDir, {0, 0, 1});
 
 	Controller const* cont(vrHandler->getController(Side::LEFT));
 	if(cont == nullptr)

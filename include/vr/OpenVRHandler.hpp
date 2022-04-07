@@ -41,7 +41,7 @@ class OpenVRHandler : public VRHandler
 	virtual void renderControllers() const override;
 	virtual void renderHands() const override;
 	virtual void submitRendering(GLFramebufferObject const& fbo) override;
-	virtual bool pollEvent(Event* e) override;
+	virtual bool pollEvent(Event& e) override;
 	virtual void close() override;
 	~OpenVRHandler() { close(); };
 

@@ -68,7 +68,7 @@ void StereoBeamerHandler::renderHands() const {}
 
 void StereoBeamerHandler::submitRendering(GLFramebufferObject const& /*fbo*/) {}
 
-bool StereoBeamerHandler::pollEvent(Event* /*e*/)
+bool StereoBeamerHandler::pollEvent(Event& /*e*/)
 {
 	return false;
 }

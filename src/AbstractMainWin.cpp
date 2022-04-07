@@ -452,6 +452,8 @@ void AbstractMainWin::vrEvent(VRHandler::Event const& e)
 	    + QString::number(static_cast<int>(e.button)) + ")");
 }
 
+void AbstractMainWin::gamepadEvent(GamepadHandler::Event const& /*e*/) {}
+
 void AbstractMainWin::setupPythonAPI()
 {
 	PythonQtHandler::addObject("HydrogenVR", this);
@@ -712,12 +714,20 @@ void AbstractMainWin::paintGL()
 	// handle VR events if any
 	if(vrHandler->isEnabled())
 	{
-		auto e = new VRHandler::Event;
+		VRHandler::Event e{};
 		while(vrHandler->pollEvent(e))
 		{
-			vrEvent(*e);
+			vrEvent(e);
 		}
-		delete e;
+	}
+	// handle gamepad events if any
+	if(gamepadHandler.isEnabled())
+	{
+		GamepadHandler::Event e;
+		while(gamepadHandler.pollEvent(e))
+		{
+			gamepadEvent(e);
+		}
 	}
 	// let user update before rendering
 	for(auto const& pair : renderer.sceneRenderPipeline)

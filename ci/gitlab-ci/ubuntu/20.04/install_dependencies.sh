@@ -13,5 +13,5 @@ make -j 8 ;
 make install ;
 cd ../../..
 # install openvr
-apt-get install -y libopenvr-dev
+apt-get install -y libopenvr-dev libqt5gamepad5-dev
 rm -rf /deps

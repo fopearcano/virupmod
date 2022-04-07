@@ -102,7 +102,7 @@ test:focal:
         expire_in: 1h
 
 checkcode:
-    image: $CI_REGISTRY_IMAGE:bionic
+    image: $CI_REGISTRY_IMAGE:focal
     stage: test
     only:
         refs:

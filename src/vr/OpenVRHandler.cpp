@@ -351,62 +351,58 @@ void OpenVRHandler::submitRendering(GLFramebufferObject const& fbo)
 	}
 }
 
-bool OpenVRHandler::pollEvent(Event* e)
+bool OpenVRHandler::pollEvent(Event& e)
 {
 	vr::VREvent_t vrevent = {};
 
-	e->type   = EventType::NONE;
-	e->side   = Side::NONE;
-	e->button = Button::NONE;
-	if(vr_pointer->PollNextEvent(&vrevent, sizeof(vrevent)))
+	e.type   = EventType::NONE;
+	e.side   = Side::NONE;
+	e.button = Button::NONE;
+	if(!vr_pointer->PollNextEvent(&vrevent, sizeof(vrevent)))
 	{
-		switch(vrevent.eventType)
-		{
-			case vr::VREvent_ButtonPress:
-				e->type = EventType::BUTTON_PRESSED;
-				if(leftController != nullptr)
-				{
-					if(leftController->getNDevice()
-					   == vrevent.trackedDeviceIndex)
-					{
-						e->side = Side::LEFT;
-					}
-				}
-				if(rightController != nullptr)
-				{
-					if(rightController->getNDevice()
-					   == vrevent.trackedDeviceIndex)
-					{
-						e->side = Side::RIGHT;
-					}
-				}
-				e->button = getButton(vrevent.data.controller.button);
-				return true;
-			case vr::VREvent_ButtonUnpress:
-				e->type = EventType::BUTTON_UNPRESSED;
-				if(leftController != nullptr)
-				{
-					if(leftController->getNDevice()
-					   == vrevent.trackedDeviceIndex)
-					{
-						e->side = Side::LEFT;
-					}
-				}
-				if(rightController != nullptr)
-				{
-					if(rightController->getNDevice()
-					   == vrevent.trackedDeviceIndex)
-					{
-						e->side = Side::RIGHT;
-					}
-				}
-				e->button = getButton(vrevent.data.controller.button);
-				return true;
-			default:
-				return false;
-		}
+		return false;
 	}
-	return false;
+	switch(vrevent.eventType)
+	{
+		case vr::VREvent_ButtonPress:
+			e.type = EventType::BUTTON_PRESSED;
+			if(leftController != nullptr)
+			{
+				if(leftController->getNDevice() == vrevent.trackedDeviceIndex)
+				{
+					e.side = Side::LEFT;
+				}
+			}
+			if(rightController != nullptr)
+			{
+				if(rightController->getNDevice() == vrevent.trackedDeviceIndex)
+				{
+					e.side = Side::RIGHT;
+				}
+			}
+			e.button = getButton(vrevent.data.controller.button);
+			return true;
+		case vr::VREvent_ButtonUnpress:
+			e.type = EventType::BUTTON_UNPRESSED;
+			if(leftController != nullptr)
+			{
+				if(leftController->getNDevice() == vrevent.trackedDeviceIndex)
+				{
+					e.side = Side::LEFT;
+				}
+			}
+			if(rightController != nullptr)
+			{
+				if(rightController->getNDevice() == vrevent.trackedDeviceIndex)
+				{
+					e.side = Side::RIGHT;
+				}
+			}
+			e.button = getButton(vrevent.data.controller.button);
+			return true;
+		default:
+			return false;
+	}
 }
 
 void OpenVRHandler::close()

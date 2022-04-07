@@ -27,6 +27,7 @@ function(copy_Qt5_deps target_dir)
         Qt5XmlPatterns$<$<CONFIG:Debug>:d>.*
         Qt5Qml$<$<CONFIG:Debug>:d>.*
         Qt5Xml$<$<CONFIG:Debug>:d>.*
+        Qt5Gamepad$<$<CONFIG:Debug>:d>.*
     )
 
     windows_copy_files(${target_dir} ${Qt5_PLATFORMS_DIR} ${PLATFORMS} qwindows$<$<CONFIG:Debug>:d>.*)

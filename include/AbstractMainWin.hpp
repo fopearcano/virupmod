@@ -20,6 +20,7 @@
 #include "BasicCamera.hpp"
 #include "DebugCamera.hpp"
 #include "Dialog3DWheel.hpp"
+#include "GamepadHandler.hpp"
 #include "InputManager.hpp"
 #include "NetworkManager.hpp"
 #include "PythonQtHandler.hpp"
@@ -334,6 +335,13 @@ class AbstractMainWin : public QWindow
 	 */
 	virtual void vrEvent(VRHandler::Event const& e);
 	/**
+	 * @brief Captures an event polled from @ref GamepadHandler.
+	 *
+	 * Make sure you call @ref AbstractMainWin#gamepadEvent if you override
+	 * it.
+	 */
+	virtual void gamepadEvent(GamepadHandler::Event const& e);
+	/**
 	 * @brief Adds an @ref AbstractMainWin object to the Python API.
 	 *
 	 * Override this to create your own MainWindow python object.
@@ -435,6 +443,8 @@ class AbstractMainWin : public QWindow
 	    = QSettings().value("vr/handler").toString() == "openvr"
 	          ? static_cast<VRHandler*>(new OpenVRHandler)
 	          : static_cast<VRHandler*>(new StereoBeamerHandler);
+
+	GamepadHandler gamepadHandler;
 	/**
 	 * @brief The engine's only @ref Renderer.
 	 */

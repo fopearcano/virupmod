@@ -60,6 +60,7 @@ class MainWin : public AbstractMainWin
 	virtual void mousePressEvent(QMouseEvent* e) override;
 	virtual void mouseReleaseEvent(QMouseEvent* e) override;
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
+	virtual void gamepadEvent(GamepadHandler::Event const& e) override;
 
 	// declare drawn resources
 	virtual void initScene() override;
@@ -137,6 +138,7 @@ class MainWin : public AbstractMainWin
 	QPoint cursorPosBackup;
 	float yaw = 0.f;
 	float pitch = 0.f;
+	QVector3D campos = QVector3D(1, 1, 1);
 
 	QElapsedTimer timer;
 };

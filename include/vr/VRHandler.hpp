@@ -93,7 +93,7 @@ class VRHandler : public QObject
 	virtual void renderHands() const                             = 0;
 	virtual void submitRendering(GLFramebufferObject const& fbo) = 0;
 
-	virtual bool pollEvent(Event* e) = 0;
+	virtual bool pollEvent(Event& e) = 0;
 	virtual void close()             = 0;
 	virtual ~VRHandler(){};
 

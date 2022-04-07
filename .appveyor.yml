@@ -2,24 +2,24 @@ branches:
   except:
     - /draft/
 image:
-- Visual Studio 2015
+- Visual Studio 2017
 build:
     verbosity: detailed
 environment:
   matrix:
     - BUILD_TYPE: 64bit
-      QTPATH: 'C:\Qt\5.11\msvc2015_64'
+      QTPATH: 'C:\Qt\5.13.2\msvc2017_64'
       PYTHON_PATH: 'C:\Python37-x64'
       PYTHON_LIB: 'C:\Python37-x64\libs'
-      GENERATOR: '"Visual Studio 14 2015 Win64"'
+      GENERATOR: '"Visual Studio 15 2017 Win64"'
       VCREDIST13: vcredist_x64.exe
       VCREDIST15: vc_redist.x64.exe
       PYTHON_URL: "https://www.python.org/ftp/python/3.7.4/python-3.7.4-amd64.exe"
     - BUILD_TYPE: 32bit
-      QTPATH: 'C:\Qt\5.11\msvc2015'
+      QTPATH: 'C:\Qt\5.13.2\msvc2017'
       PYTHON_PATH: 'C:\Python37'
       PYTHON_LIB: 'C:\Python37\libs'
-      GENERATOR: '"Visual Studio 14 2015"'
+      GENERATOR: '"Visual Studio 15 2017"'
       VCREDIST13: vcredist_x86.exe
       VCREDIST15: vc_redist.x86.exe
       PYTHON_URL: "https://www.python.org/ftp/python/3.7.4/python-3.7.4.exe"
@@ -74,6 +74,7 @@ after_build:
     - mkdir imageformats
     - mkdir audio
     - mkdir mediaservice
+    - mkdir gamepads
     - cd ..
     - copy %PROJECT_NAME%.exe %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Core.dll %RELEASE_DIR%
@@ -92,10 +93,12 @@ after_build:
     - copy %QTPATH%\bin\Qt5Qml.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Network.dll %RELEASE_DIR%
     - copy %QTPATH%\bin\Qt5Xml.dll %RELEASE_DIR%
+    - copy %QTPATH%\bin\Qt5Gamepad.dll %RELEASE_DIR%
     - copy %QTPATH%\plugins\platforms\qwindows.dll %RELEASE_DIR%\platforms
     - copy %QTPATH%\plugins\imageformats\*.dll %RELEASE_DIR%\imageformats
     - copy %QTPATH%\plugins\audio\*.dll %RELEASE_DIR%\audio
     - copy %QTPATH%\plugins\mediaservice\*.dll %RELEASE_DIR%\mediaservice
+    - copy %QTPATH%\plugins\gamepads\*.dll %RELEASE_DIR%\gamepads
     - copy %OPENVR_SHARED% %RELEASE_DIR%
     - copy %ASSIMP_SHARED% %RELEASE_DIR%
     - copy %LEAPMOTION_SHARED% %RELEASE_DIR%

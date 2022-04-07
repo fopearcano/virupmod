@@ -18,6 +18,8 @@
 
 #include "SettingsWidget.hpp"
 
+#include "GamepadHandler.hpp"
+
 SettingsWidget::SettingsWidget(QWidget* parent)
     : QTabWidget(parent)
 {
@@ -64,6 +66,43 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	InputManager inputManager;
 	addGroup("controls", tr("Controls"));
 	currentForm->addRow(tr("ENGINE"), new QWidget());
+
+	QStringList vals   = {"-1"};
+	QStringList labels = {tr("None")};
+	unsigned int defaultIndex(0);
+	for(auto const& pair : GamepadHandler::getConnectedGamepads(true))
+	{
+		vals << QString::number(pair.first);
+		labels << pair.second;
+		defaultIndex = 1;
+	}
+	auto comboBox = addStringAmongListSetting("gamepad", vals, labels,
+	                                          tr("Gamepad"), defaultIndex);
+
+	auto refresh = new QPushButton(tr("Refresh"), this);
+	connect(refresh, &QPushButton::pressed, [this, comboBox]() {
+		QStringList vals   = {"-1"};
+		QStringList labels = {tr("None")};
+		for(auto const& pair : GamepadHandler::getConnectedGamepads(true))
+		{
+			vals << QString::number(pair.first);
+			labels << pair.second;
+		}
+
+		QString currentVal(settings.value("controls/gamepad", "-1").toString());
+		int currentIndex(vals.indexOf(currentVal));
+
+		comboBox->clear();
+		for(int i(0); i < labels.size(); ++i)
+		{
+			auto const& label(labels[i]);
+			auto const& val(vals[i]);
+			comboBox->addItem(label, val);
+		}
+		comboBox->setCurrentIndex(currentIndex);
+	});
+	currentForm->addRow("", refresh);
+
 	for(auto const& key : inputManager.getOrderedEngineKeys())
 	{
 		addKeySequenceSetting(inputManager[key].id, key,
@@ -310,11 +349,10 @@ void SettingsWidget::addStringSetting(QString const& name,
 	currentForm->addRow(label + " :", lineEdit);
 }
 
-void SettingsWidget::addStringAmongListSetting(QString const& name,
-                                               QStringList const& values,
-                                               QStringList const& strLabels,
-                                               QString const& label,
-                                               unsigned int defaultIndex)
+QComboBox* SettingsWidget::addStringAmongListSetting(
+    QString const& name, QStringList const& values,
+    QStringList const& strLabels, QString const& label,
+    unsigned int defaultIndex)
 {
 	QString fullName(currentGroup + '/' + name);
 
@@ -327,15 +365,29 @@ void SettingsWidget::addStringAmongListSetting(QString const& name,
 	int currentIndex(values.indexOf(currentVal));
 
 	auto comboBox = new QComboBox(this);
-	comboBox->addItems(strLabels);
+	for(int i(0); i < strLabels.size(); ++i)
+	{
+		auto const& label(strLabels[i]);
+		auto const& val(values[i]);
+		comboBox->addItem(label, val);
+	}
 	comboBox->setCurrentIndex(currentIndex);
 
-	connect(comboBox, &QComboBox::currentTextChanged, this,
-	        [this, fullName, values, strLabels](QString const& t) {
-		        updateValue(fullName, values[strLabels.indexOf(t)]);
-	        });
+	connect(
+	    comboBox,
+	    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+	    this, [this, fullName, comboBox](int index) {
+		    auto str = comboBox->itemData(index).toString();
+		    if(str.isEmpty())
+		    {
+			    return;
+		    }
+		    updateValue(fullName, str);
+	    });
 
 	currentForm->addRow(label + " : ", comboBox);
+
+	return comboBox;
 }
 
 void SettingsWidget::addFilePathSetting(QString const& name,
