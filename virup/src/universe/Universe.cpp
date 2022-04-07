@@ -455,7 +455,7 @@ void Universe::updateCosmo()
 	OctreeLOD::updateTanAngleLimit(camCosmo);
 	for(auto pair : elements)
 	{
-		if(pair.second->getVisibility() < 0.001)
+		if(pair.second->getVisibility() < 0.0001)
 		{
 			continue;
 		}
@@ -523,7 +523,7 @@ void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 	{
 		// only used by CosmologicalLabels for now
 		// pair.second->setVisibility(CelestialBodyRenderer::renderLabels);
-		if(pair.second->getVisibility() < 0.001)
+		if(pair.second->getVisibility() < 0.0001)
 		{
 			continue;
 		}
