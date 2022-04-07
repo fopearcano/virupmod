@@ -23,6 +23,7 @@
 
 #include "BaseInputManager.hpp"
 #include "Camera.hpp"
+#include "GamepadHandler.hpp"
 #include "vr/VRHandler.hpp"
 
 #include "methods/OctreeLOD.hpp"
@@ -48,7 +49,9 @@ class MovementControls
 	void vrEvent(VRHandler::Event const& e,
 	             QMatrix4x4 const& trackedSpaceToWorldTransform,
 	             bool renderPlanetarySystem);
-	void update(double frameTiming, bool renderPlanetarySystem);
+	void gamepadEvent(GamepadHandler::Event const& e);
+	void update(double frameTiming, bool renderPlanetarySystem,
+	            GamepadHandler const& gamepadHandler);
 	void renderGuides();
 
   private:
@@ -64,6 +67,11 @@ class MovementControls
 	QVector3D posVel;
 	QVector3D negVel;
 	float initControllersDistance = 0.f;
+
+	/* GAMEPAD */
+	QVector3D gamepadVel;
+	float scaleIncreaseFactor = 1.f;
+	float scaleDecreaseFactor = 1.f;
 
 	static void rescale(double newScale, Vector3 const& scaleCenter,
 	                    Vector3& position, double& scale);

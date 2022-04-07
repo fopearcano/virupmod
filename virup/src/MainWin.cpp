@@ -240,6 +240,15 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 	AbstractMainWin::vrEvent(e);
 }
 
+void MainWin::gamepadEvent(GamepadHandler::Event const& e)
+{
+	if(loaded)
+	{
+		movementControls->gamepadEvent(e);
+	}
+	AbstractMainWin::gamepadEvent(e);
+}
+
 void MainWin::setupPythonAPI()
 {
 	PythonQtHandler::addObject("VIRUP", this);
@@ -362,8 +371,17 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		universe->updateCosmo();
 
-		movementControls->update(frameTiming,
-		                         universe->isPlanetarySystemRendered());
+		if(gamepadHandler.isEnabled())
+		{
+			auto rightJoystick(gamepadHandler.getJoystick(Side::RIGHT));
+			float yaw(universe->getCamYaw()), pitch(universe->getCamPitch());
+			yaw -= 2.0 * rightJoystick.x() * frameTiming;
+			pitch += 2.0 * rightJoystick.y() * frameTiming;
+			universe->setCamYaw(yaw);
+			universe->setCamPitch(pitch);
+		}
+		movementControls->update(
+		    frameTiming, universe->isPlanetarySystemRendered(), gamepadHandler);
 
 		if(networkManager->isServer())
 		{

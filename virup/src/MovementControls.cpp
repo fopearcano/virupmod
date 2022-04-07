@@ -340,8 +340,62 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 	}
 }
 
-void MovementControls::update(double frameTiming, bool renderPlanetarySystem)
+void MovementControls::gamepadEvent(GamepadHandler::Event const& e)
 {
+	const float factor = 5.f;
+	switch(e.type)
+	{
+		case GamepadHandler::EventType::BUTTON_PRESSED:
+			switch(e.button)
+			{
+				case GamepadHandler::Button::L1:
+					scaleDecreaseFactor = factor;
+					break;
+				case GamepadHandler::Button::R1:
+					scaleIncreaseFactor = factor;
+					break;
+				default:
+					break;
+			}
+			break;
+		case GamepadHandler::EventType::BUTTON_UNPRESSED:
+			switch(e.button)
+			{
+				case GamepadHandler::Button::L1:
+					scaleDecreaseFactor = 1.f;
+					break;
+				case GamepadHandler::Button::R1:
+					scaleIncreaseFactor = 1.f;
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+}
+void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
+                              GamepadHandler const& gamepadHandler)
+{
+	// set gamepad input
+	if(gamepadHandler.isEnabled())
+	{
+		float yVal = gamepadHandler.getTrigger(Side::RIGHT)
+		             - gamepadHandler.getTrigger(Side::LEFT);
+		gamepadVel = {gamepadHandler.getJoystick(Side::LEFT).x(), yVal,
+		              gamepadHandler.getJoystick(Side::LEFT).y()};
+
+		float fI((scaleIncreaseFactor - 1.f) * frameTiming + 1.f);
+		float fD((scaleDecreaseFactor - 1.f) * frameTiming + 1.f);
+		cosmoCam->scale *= fI / fD;
+		CelestialBodyRenderer::overridenScale *= fI / fD;
+	}
+	else
+	{
+		gamepadVel = {};
+	}
+
 	updateCube(frameTiming);
 	if(renderPlanetarySystem)
 	{
@@ -409,12 +463,12 @@ void MovementControls::updateCube(double frameTiming)
 		        scaleCenterCube, cosmoCam->position, cosmoCam->scale);
 	}
 
-	// apply keyboard controls
+	// apply gamepad and keyboard controls
 	if(!vrHandler.isEnabled())
 	{
 		cosmoCam->position += frameTiming
 		                      * Utils::fromQt(cosmoCam->getView().inverted()
-		                                      * (posVel + negVel))
+		                                      * (posVel + negVel + gamepadVel))
 		                      / cosmoCam->scale;
 	}
 }
@@ -457,12 +511,13 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 		        CelestialBodyRenderer::overridenScale);
 	}
 
-	// apply keyboard controls
+	// apply gamepad and keyboard controls
 	for(unsigned int i(0); i < 3; ++i)
 	{
 		planetCam->relativePosition[i]
 		    += frameTiming
-		       * (planetCam->getView().inverted() * (negVel + posVel))[i]
+		       * (planetCam->getView().inverted()
+		          * (negVel + posVel + gamepadVel))[i]
 		       / CelestialBodyRenderer::overridenScale;
 	}
 }

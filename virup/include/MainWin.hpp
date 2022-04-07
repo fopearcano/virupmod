@@ -182,6 +182,7 @@ class MainWin : public AbstractMainWin
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
 	virtual void wheelEvent(QWheelEvent* e) override;
 	virtual void vrEvent(VRHandler::Event const& e) override;
+	virtual void gamepadEvent(GamepadHandler::Event const& e) override;
 
 	virtual void setupPythonAPI() override;
 	virtual void initLibraries() override;
