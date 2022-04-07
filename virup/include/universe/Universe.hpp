@@ -241,6 +241,9 @@ class Universe : public QObject
 			double dut;
 			stream >> dut;
 			ut = dut;
+			QStringList l;
+			stream >> l;
+			renderLabelsOrbitsOnly = l;
 		};
 		virtual void writeInDataStream(QDataStream& stream) override
 		{
@@ -250,11 +253,13 @@ class Universe : public QObject
 			}
 			double dut(ut);
 			stream << dut;
+			stream << renderLabelsOrbitsOnly;
 		};
 
 		std::vector<double> visibilities;
 		static unsigned int elementsSize;
 		UniversalTime ut;
+		QStringList renderLabelsOrbitsOnly;
 	};
 
 	void readState(AbstractState const& s)
@@ -273,6 +278,8 @@ class Universe : public QObject
 		setVisibility("Constellations", state.visibilities[elements.size()]);
 		setVisibility("Debris", state.visibilities[elements.size()]);
 		clock.setCurrentUt(state.ut);
+		CelestialBodyRenderer::renderLabelsOrbitsOnly
+		    = state.renderLabelsOrbitsOnly;
 	};
 	void writeState(AbstractState& s) const
 	{
@@ -285,6 +292,8 @@ class Universe : public QObject
 		state.visibilities.push_back(getVisibility("Constellations"));
 		state.visibilities.push_back(getVisibility("Debris"));
 		state.ut = clock.getCurrentUt();
+		state.renderLabelsOrbitsOnly
+		    = CelestialBodyRenderer::renderLabelsOrbitsOnly;
 	};
 
 	Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet);
