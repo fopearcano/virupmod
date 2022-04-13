@@ -23,8 +23,8 @@
 #include "GamepadHandler.hpp"
 #include "InputManager.hpp"
 #include "NetworkManager.hpp"
-#include "PythonQtHandler.hpp"
 #include "Renderer.hpp"
+#include "RenderingWindow.hpp"
 #include "ShaderProgram.hpp"
 #include "ToneMappingModel.hpp"
 #include "gl/GLHandler.hpp"
@@ -93,24 +93,12 @@
  * * Alt+Return : Toggles fullscreen
  * * Escape : Quit
  */
-class AbstractMainWin : public QWindow
+class AbstractMainWin : public RenderingWindow
 {
 	Q_OBJECT
 	Q_PROPERTY(float horizontalFOV READ getHorizontalFOV()
 	               WRITE setHorizontalFOV)
 	Q_PROPERTY(float verticalFOV READ getVerticalFOV() WRITE setVerticalFOV)
-	/**
-	 * @brief Horizontal angle shift in degrees compared to server if current
-	 * instance is a network client.
-	 */
-	Q_PROPERTY(double horizontalAngleShift READ getHorizontalAngleShift WRITE
-	               setHorizontalAngleShift)
-	/**
-	 * @brief Vertical angle shift in degrees compared to server if current
-	 * instance is a network client.
-	 */
-	Q_PROPERTY(double verticalAngleShift READ getVerticalAngleShift WRITE
-	               setVerticalAngleShift)
 	/**
 	 * @brief For Stereo Beamer VR mode. Shifts camera's frustum tip. In case
 	 * the user's head is not aligned with the screen's center, this can fix
@@ -122,12 +110,6 @@ class AbstractMainWin : public QWindow
 	 * @brief Compass tilt around the 0->180deg axis.
 	 */
 	Q_PROPERTY(float compassTilt READ getCompassTilt WRITE setCompassTilt)
-	/**
-	 * @brief Wether the window is displayed in full screen or not.
-	 *
-	 * @accessors isFullscreen(), setFullscreen()
-	 */
-	Q_PROPERTY(bool fullscreen READ isFullscreen WRITE setFullscreen)
 	/**
 	 * @brief Wether the engine renders all meshes as wireframes or not.
 	 *
@@ -179,22 +161,6 @@ class AbstractMainWin : public QWindow
 	 */
 	void setVerticalFOV(double fov);
 	/**
-	 * @getter{horizontalAngleShift}
-	 */
-	double getHorizontalAngleShift() const;
-	/**
-	 * @getter{verticalAngleShift}
-	 */
-	double getVerticalAngleShift() const;
-	/**
-	 * @setter{horizontalAngleShift}
-	 */
-	void setHorizontalAngleShift(double angleShift);
-	/**
-	 * @setter{verticalAngleShift}
-	 */
-	void setVerticalAngleShift(double angleShift);
-	/**
 	 * @getter{virtualCamShift}
 	 */
 	QVector3D getVirtualCamShift() const;
@@ -210,14 +176,6 @@ class AbstractMainWin : public QWindow
 	 * @setter{compasstilt}
 	 */
 	void setCompassTilt(float tilt) { CalibrationCompass::tilt() = tilt; };
-	/**
-	 * @getter{fullscreen}
-	 */
-	bool isFullscreen() const;
-	/**
-	 * @setter{fullscreen, fullscreen}
-	 */
-	void setFullscreen(bool fullscreen);
 	/**
 	 * @getter{wireframe}
 	 */
@@ -245,10 +203,6 @@ class AbstractMainWin : public QWindow
 	void close() { QWindow::close(); };
 	void reloadPythonEngine();
 	void sendPythonScript(unsigned int toClientId, QString const& script) const;
-	/**
-	 * @toggle{fullscreen}
-	 */
-	void toggleFullscreen();
 	/**
 	 * @toggle{wireframe}
 	 */
@@ -298,33 +252,11 @@ class AbstractMainWin : public QWindow
 	virtual bool event(QEvent* e) override;
 	virtual void resizeEvent(QResizeEvent* ev) override;
 	/**
-	 * @brief Captures a Qt keyboard press event.
-	 *
-	 * See <a
-	 * href="https://doc.qt.io/qt-5/qwidget.html#keyPressEvent">QWidget::keyPressEvent</a>.
-	 * Make sure you call @ref AbstractMainWin#keyPressEvent if you override
-	 * it.
-	 *
-	 * Also calls the Python function @e keyPressEvent.
-	 */
-	virtual void keyPressEvent(QKeyEvent* e) override;
-	/**
-	 * @brief Captures a Qt keyboard release event.
-	 *
-	 * See <a
-	 * href="https://doc.qt.io/qt-5/qwidget.html#keyReleaseEvent">QWidget::keyReleaseEvent</a>.
-	 * Make sure you call @ref AbstractMainWin#keyReleaseEvent if you override
-	 * it.
-	 *
-	 * Also calls the Python function @e keyReleaseEvent.
-	 */
-	virtual void keyReleaseEvent(QKeyEvent* e) override;
-	/**
 	 * @brief Captures a @e BaseInputManager Action triggered by a QKeySequence.
 	 *
 	 * For a key press, @p pressed is true, for a key release, it is false.
 	 */
-	virtual void actionEvent(BaseInputManager::Action a, bool pressed);
+	virtual void actionEvent(BaseInputManager::Action a, bool pressed) override;
 	/**
 	 * @brief Captures an event polled from @ref VRHandler.
 	 *
@@ -433,10 +365,6 @@ class AbstractMainWin : public QWindow
 
   protected:
 	/**
-	 * @brief The engine's only @ref BaseInputManager.
-	 */
-	InputManager inputManager;
-	/**
 	 * @brief The engine's only @ref VRHandler.
 	 */
 	VRHandler* vrHandler
@@ -504,6 +432,8 @@ class AbstractMainWin : public QWindow
 	bool bloom = QSettings().value("graphics/bloom").toBool();
 	std::array<GLFramebufferObject*, 2> bloomTargets = {{nullptr, nullptr}};
 	void reloadBloomTargets();
+	// SECONDARY WINDOWS
+	std::vector<RenderingWindow*> secondaryWindows;
 };
 
 template <class T>

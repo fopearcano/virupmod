@@ -146,7 +146,6 @@ class Renderer
 	 */
 	void reloadPostProcessingTargets();
 	void updateFOV();
-	void updateAngleShiftMat();
 	bool getCalibrationCompass() const { return renderCompass; };
 	CalibrationCompass* getCalibrationCompassPtr() { return compass; };
 	CalibrationCompass const* getCalibrationCompassPtr() const
@@ -168,7 +167,7 @@ class Renderer
 	};
 
 	void renderVRControls() const;
-	void renderFrame();
+	void renderFrame(QMatrix4x4 angleShiftMat = QMatrix4x4());
 	void clean();
 	~Renderer();
 

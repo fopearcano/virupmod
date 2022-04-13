@@ -25,15 +25,12 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 {
 	qDebug() << QString("Config file :") + QSettings().fileName();
 	addGroup("window", tr("Window"));
-	addUIntSetting("width", 1500, tr("Window Width"), 0, 17000);
-	addUIntSetting("height", 800, tr("Window Height"), 0, 17000);
-	addBoolSetting("fullscreen", false, tr("Window Fullscreen"));
+	addWindowsDefinitionSettings();
 	addBoolSetting("vsync", false, tr("Enable VSYNC"));
 	addBoolSetting("forcerenderresolution", false,
 	               tr("Force Rendering Resolution"));
 	addUIntSetting("forcewidth", 1500, tr("Forced Rendering Width"), 0, 17000);
 	addUIntSetting("forceheight", 800, tr("Forced Rendering Height"), 0, 17000);
-	addScreenNameSetting();
 	addStringAmongListSetting("projection",
 	                          {"default", "panorama360", "vr180l", "vr180r",
 	                           "vr180", "domemaster180"},
@@ -141,12 +138,6 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addStringSetting("ip", "127.0.0.1", tr("IP address of server (if client)"));
 	addUIntSetting("port", 5000, tr("UDP port"), 1025, 49999);
 	addUIntSetting("tcpport", 5001, tr("TCP port"), 1025, 49999);
-	addDoubleSetting("angleshift", 0.0,
-	                 tr("Horizontal angle shift compared to server (degrees)"),
-	                 -180.0, 180.0);
-	addDoubleSetting("vangleshift", 0.0,
-	                 tr("Vertical angle shift compared to server (degrees)"),
-	                 -180.0, 180.0);
 
 	QString scriptsDir("./data/" + QString(PROJECT_DIRECTORY) + "/scripts/");
 	QDirIterator it(scriptsDir, QStringList() << "main.py", QDir::Files,
@@ -448,7 +439,7 @@ void SettingsWidget::addDirPathSetting(QString const& name,
 
 	auto lineEdit = new QLineEdit(this);
 	lineEdit->setText(settings.value(fullName).toString());
-	lineEdit->setMinimumWidth(400);
+	lineEdit->setFixedWidth(350);
 
 	auto dirModel = new QFileSystemModel(this);
 	dirModel->setRootPath(QDir::currentPath());
@@ -587,6 +578,129 @@ void SettingsWidget::addDateTimeSetting(QString const& name,
 	currentForm->addRow(label + " :", w);
 }
 
+void SettingsWidget::addWindowsDefinitionSettings(
+    QString const& name, QList<RenderingWindow::Parameters> const& defaultVal,
+    QString const& label)
+{
+	// def useful lambdas
+	auto valToVariant = [](QList<RenderingWindow::Parameters> const& val) {
+		QStringList variantList;
+		for(auto const& v : val)
+		{
+			variantList << v.toStr();
+		}
+		return variantList;
+	};
+	auto variantToVal = [](QStringList const& variantList) {
+		QList<RenderingWindow::Parameters> val;
+		for(auto const& var : variantList)
+		{
+			RenderingWindow::Parameters p;
+			p.fromStr(var);
+			val << p;
+		}
+		return val;
+	};
+	// end of lambdas
+
+	QString fullName(currentGroup + '/' + name);
+
+	if(!settings.contains(fullName))
+	{
+		settings.setValue(fullName, valToVariant(defaultVal));
+	}
+
+	windowsParams = variantToVal(settings.value(fullName).toStringList());
+	if(windowsParams.isEmpty())
+	{
+		windowsParams << RenderingWindow::Parameters{};
+	}
+
+	auto tab = new QTabWidget(this);
+	tab->setMaximumWidth(400);
+	tab->setTabsClosable(windowsParams.size() > 1);
+	for(int i(0); i < windowsParams.size(); ++i)
+	{
+		auto windowParamsSelector
+		    = new WindowParametersSelector(this, windowsParams.at(i));
+		RenderingWindow::Parameters* p = &windowsParams[i];
+
+		connect(windowParamsSelector,
+		        &WindowParametersSelector::parametersChanged,
+		        [this, fullName, p,
+		         &valToVariant](RenderingWindow::Parameters const& params) {
+			        *p = params;
+			        updateValue(fullName, valToVariant(windowsParams));
+		        });
+
+		if(i == 0)
+		{
+			tab->addTab(windowParamsSelector, tr("Main"));
+		}
+		else
+		{
+			tab->addTab(windowParamsSelector,
+			            tr("Subwindow ") + QString::number(i));
+		}
+	}
+
+	connect(tab, &QTabWidget::tabCloseRequested,
+	        [this, tab, fullName, &valToVariant](int index) {
+		        tab->setCurrentIndex(index);
+		        if(QMessageBox::question(
+		               this, tr("Remove Window"),
+		               tr("Are you sure about removing this window ?"))
+		           != QMessageBox::StandardButton::Yes)
+		        {
+			        return;
+		        }
+
+		        tab->removeTab(index);
+		        windowsParams.removeAt(index);
+		        tab->setTabsClosable(windowsParams.size() > 1);
+		        updateValue(fullName, valToVariant(windowsParams));
+
+		        for(int i(0); i < tab->count(); ++i)
+		        {
+			        if(i == 0)
+			        {
+				        tab->setTabText(i, tr("Main"));
+			        }
+			        else
+			        {
+				        tab->setTabText(i,
+				                        tr("Subwindow ") + QString::number(i));
+			        }
+		        }
+	        });
+
+	auto button = new QPushButton(this);
+	button->setText("+");
+	connect(button, &QPushButton::pressed,
+	        [this, fullName, &valToVariant, tab]() {
+		        auto windowParamsSelector = new WindowParametersSelector(this);
+		        windowsParams.append(RenderingWindow::Parameters{});
+		        tab->setTabsClosable(windowsParams.size() > 1);
+		        updateValue(fullName, valToVariant(windowsParams));
+		        RenderingWindow::Parameters* p = &windowsParams.last();
+
+		        connect(windowParamsSelector,
+		                &WindowParametersSelector::parametersChanged,
+		                [this, fullName, p, &valToVariant](
+		                    RenderingWindow::Parameters const& params) {
+			                *p = params;
+			                updateValue(fullName, valToVariant(windowsParams));
+		                });
+
+		        tab->addTab(windowParamsSelector,
+		                    tr("Subwindow ")
+		                        + QString::number(windowsParams.size() - 1));
+	        });
+	tab->setCornerWidget(button);
+
+	currentForm->addRow(label + " :", tab);
+}
+
 void SettingsWidget::addKeySequenceSetting(QString const& name,
                                            QKeySequence const& defaultVal,
                                            QString const& label)
@@ -655,95 +769,4 @@ void SettingsWidget::addLanguageSetting(QString const& name,
 	        });
 
 	currentForm->addRow(label + " :", comboBox);
-}
-
-void SettingsWidget::addScreenNameSetting(QString const& name,
-                                          QString const& defaultVal,
-                                          QString const& label)
-{
-	QString fullName(currentGroup + '/' + name);
-
-	if(!settings.contains(fullName))
-	{
-		settings.setValue(fullName, defaultVal);
-	}
-
-	auto stored(settings.value(fullName).toString());
-
-	auto w      = new QWidget(this);
-	auto layout = new QHBoxLayout(w);
-
-	auto qlabel = new QLabel(this);
-	qlabel->setText(stored == "" ? "AUTO" : stored);
-
-	auto button = new QPushButton(this);
-	button->setText("...");
-
-	connect(button, &QPushButton::clicked, this,
-	        [this, fullName, qlabel](bool) {
-		        updateValue(fullName, ScreenSelector::selectScreen(this));
-		        auto stored(settings.value(fullName).toString());
-		        qlabel->setText(stored == "" ? "AUTO" : stored);
-	        });
-
-	layout->setAlignment(Qt::AlignLeft);
-	layout->addWidget(qlabel);
-	layout->addWidget(button);
-	currentForm->addRow(label + " :", w);
-}
-
-// SCREENSELECTOR
-
-QString& ScreenSelector::retValue()
-{
-	static QString retValue = "";
-	return retValue;
-}
-
-QString ScreenSelector::selectScreen(QWidget* parent)
-{
-	retValue() = "";
-	ScreenSelector select(parent);
-	select.exec();
-	return retValue();
-}
-
-ScreenSelector::ScreenSelector(QWidget* parent)
-    : QDialog(parent)
-{
-	float aspectRatio(static_cast<float>(desktopGeometry.width())
-	                  / desktopGeometry.height());
-	h = static_cast<int>(w / aspectRatio);
-
-	this->setFixedSize(QSize(w, h));
-	for(auto const& s : getScreens())
-	{
-		auto button = new QPushButton(this);
-		button->setGeometry(s.second);
-		button->setText(s.first);
-
-		connect(button, &QPushButton::clicked, this, [this, s](bool) {
-			retValue() = s.first;
-			this->close();
-		});
-	}
-}
-
-QList<QPair<QString, QRect>> ScreenSelector::getScreens() const
-{
-	QList<QPair<QString, QRect>> result;
-	QList<QScreen*> screens(QGuiApplication::screens());
-	for(auto s : screens)
-	{
-		QRect geom(s->geometry());
-		geom.setX((s->geometry().x() - desktopGeometry.x()) * w
-		          / desktopGeometry.width());
-		geom.setWidth(s->geometry().width() * w / desktopGeometry.width());
-		geom.setY((s->geometry().y() - desktopGeometry.y()) * h
-		          / desktopGeometry.height());
-		geom.setHeight(s->geometry().height() * h / desktopGeometry.height());
-
-		result.append({s->name(), geom});
-	}
-	return result;
 }

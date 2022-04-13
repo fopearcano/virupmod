@@ -47,7 +47,6 @@ void Renderer::init(Dialog3DWheel* dialog3dWheel)
 
 	reloadPostProcessingTargets();
 	updateFOV();
-	updateAngleShiftMat();
 
 	initialized = true;
 }
@@ -59,11 +58,6 @@ void Renderer::updateRenderTargets()
 		return;
 	}
 
-	if(!QSettings().value("window/fullscreen").toBool())
-	{
-		QSettings().setValue("window/width", window.size().width());
-		QSettings().setValue("window/height", window.size().height());
-	}
 	updateFOV();
 	reloadPostProcessingTargets();
 }
@@ -228,19 +222,6 @@ void Renderer::updateFOV()
 	CalibrationCompass::serverRenderTargetWidth() = getSize().width();
 }
 
-void Renderer::updateAngleShiftMat()
-{
-	angleShiftMat = QMatrix4x4();
-	if(!QSettings().value("network/server").toBool())
-	{
-		angleShiftMat.rotate(
-		    QSettings().value("network/vangleshift").toDouble(),
-		    QVector3D(-1.f, 0.f, 0.f));
-		angleShiftMat.rotate(QSettings().value("network/angleshift").toDouble(),
-		                     QVector3D(0.f, 1.f, 0.f));
-	}
-}
-
 void Renderer::toggleCalibrationCompass()
 {
 	if(!renderCompass)
@@ -384,8 +365,9 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 	}
 }
 
-void Renderer::renderFrame()
+void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 {
+	this->angleShiftMat = angleShiftMat;
 	bool debug(dbgCamera->isEnabled());
 	bool debugInHeadset(dbgCamera->debugInHeadset());
 	bool renderingCamIsDebug(debug

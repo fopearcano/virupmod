@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
 	MainWin w;
 	w.setTitle(PROJECT_NAME + QString(" - Loading..."));
-	w.setFullscreen(QSettings().value("window/fullscreen").toBool());
+	w.setFullscreen(w.isFullscreen());
 	// start event loop
 	QCoreApplication::postEvent(&w, new QEvent(QEvent::UpdateRequest));
 	return QApplication::exec();

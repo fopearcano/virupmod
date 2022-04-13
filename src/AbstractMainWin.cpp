@@ -3,19 +3,16 @@
 AbstractMainWin::AbstractMainWin()
     : renderer(*this, *vrHandler)
 {
-	setSurfaceType(QSurface::OpenGLSurface);
-
-	QSurfaceFormat format;
-	format.setDepthBufferSize(24);
-	format.setStencilBufferSize(8);
-	format.setVersion(gl::majorVersion, gl::minorVersion);
-	format.setProfile(gl::profile);
-	format.setSwapInterval(QSettings().value("window/vsync").toBool() ? 1 : 0);
-	format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
-	setFormat(format);
-
-	m_context.setFormat(format);
+	m_context.setFormat(this->format());
 	m_context.create();
+
+	const unsigned int secondariesNb(
+	    QSettings().value("window/windefinitions").toStringList().size() - 1);
+	for(unsigned int i(0); i < secondariesNb; ++i)
+	{
+		secondaryWindows.push_back(new RenderingWindow(i + 1));
+		secondaryWindows[i]->setFullscreen(secondaryWindows[i]->isFullscreen());
+	}
 }
 
 double AbstractMainWin::getHorizontalFOV() const
@@ -40,28 +37,6 @@ void AbstractMainWin::setVerticalFOV(double fov)
 	renderer.updateFOV();
 }
 
-double AbstractMainWin::getHorizontalAngleShift() const
-{
-	return QSettings().value("network/angleshift").toDouble();
-}
-
-double AbstractMainWin::getVerticalAngleShift() const
-{
-	return QSettings().value("network/vangleshift").toDouble();
-}
-
-void AbstractMainWin::setHorizontalAngleShift(double angleShift)
-{
-	QSettings().setValue("network/angleshift", angleShift);
-	renderer.updateAngleShiftMat();
-}
-
-void AbstractMainWin::setVerticalAngleShift(double angleShift)
-{
-	QSettings().setValue("network/vangleshift", angleShift);
-	renderer.updateAngleShiftMat();
-}
-
 QVector3D AbstractMainWin::getVirtualCamShift() const
 {
 	return QSettings().value("vr/virtualcamshift").value<QVector3D>();
@@ -70,40 +45,6 @@ QVector3D AbstractMainWin::getVirtualCamShift() const
 void AbstractMainWin::setVirtualCamShift(QVector3D const& virtualCamShift)
 {
 	QSettings().setValue("vr/virtualcamshift", virtualCamShift);
-}
-
-bool AbstractMainWin::isFullscreen() const
-{
-	return QSettings().value("window/fullscreen").toBool();
-}
-
-void AbstractMainWin::setFullscreen(bool fullscreen)
-{
-	QSettings().setValue("window/fullscreen", fullscreen);
-	if(fullscreen)
-	{
-		QRect screenGeometry(screen()->geometry());
-		QString screenStr(QSettings().value("window/screenname").toString());
-		if(screenStr != "")
-		{
-			for(auto s : QGuiApplication::screens())
-			{
-				if(s->name() == screenStr)
-				{
-					screenGeometry = s->geometry();
-					break;
-				}
-			}
-		}
-		setGeometry(screenGeometry);
-		showFullScreen();
-	}
-	else
-	{
-		show();
-		resize(QSettings().value("window/width").toUInt(),
-		       QSettings().value("window/height").toUInt());
-	}
 }
 
 void AbstractMainWin::reloadPythonEngine()
@@ -116,11 +57,6 @@ void AbstractMainWin::sendPythonScript(unsigned int toClientId,
                                        QString const& script) const
 {
 	networkManager->sendPythonScript(toClientId, script);
-}
-
-void AbstractMainWin::toggleFullscreen()
-{
-	setFullscreen(!isFullscreen());
 }
 
 bool AbstractMainWin::vrIsEnabled() const
@@ -192,127 +128,25 @@ bool AbstractMainWin::event(QEvent* e)
 		menuBar->close();
 		dialog3dWheel->close();
 		PythonQtHandler::closeConsole();
+		for(auto w : secondaryWindows)
+		{
+			w->close();
+		}
 	}
 	return QWindow::event(e);
 }
 
-void AbstractMainWin::resizeEvent(QResizeEvent* /*ev*/)
+void AbstractMainWin::resizeEvent(QResizeEvent* ev)
 {
+	RenderingWindow::resizeEvent(ev);
 	renderer.updateRenderTargets();
 	reloadBloomTargets();
 }
 
-void AbstractMainWin::keyPressEvent(QKeyEvent* e)
-{
-	QString modifier;
-	QString key;
-
-	if((e->modifiers() & Qt::ShiftModifier) != 0u)
-	{
-		modifier += "Shift+";
-	}
-	if((e->modifiers() & Qt::ControlModifier) != 0u)
-	{
-		modifier += "Ctrl+";
-	}
-	if((e->modifiers() & Qt::AltModifier) != 0u)
-	{
-		modifier += "Alt+";
-	}
-	if((e->modifiers() & Qt::MetaModifier) != 0u)
-	{
-		modifier += "Meta+";
-	}
-
-	key = QKeySequence(e->key()).toString();
-
-	QKeySequence ks(modifier + key);
-	actionEvent(inputManager[ks], true);
-
-	if(!PythonQtHandler::isSupported())
-	{
-		return;
-	}
-
-	QString pyKeyEvent("QKeyEvent(");
-	pyKeyEvent += QString::number(e->type()) + ",";
-	pyKeyEvent += QString::number(e->key()) + ",";
-	pyKeyEvent += QString::number(e->modifiers()) + ",";
-	pyKeyEvent += QString::number(e->nativeScanCode()) + ",";
-	pyKeyEvent += QString::number(e->nativeVirtualKey()) + ",";
-	pyKeyEvent += QString::number(e->nativeModifiers()) + ",";
-	if(e->key() != Qt::Key_Return && e->key() != Qt::Key_Enter)
-	{
-		pyKeyEvent += "\"" + e->text().replace('"', "\\\"") + "\",";
-	}
-	else
-	{
-		pyKeyEvent += R"("\n",)";
-	}
-	pyKeyEvent += e->isAutoRepeat() ? "True," : "False,";
-	pyKeyEvent += QString::number(e->count()) + ")";
-
-	PythonQtHandler::evalScript(
-	    "if \"keyPressEvent\" in dir():\n\tkeyPressEvent(" + pyKeyEvent + ")");
-}
-
-void AbstractMainWin::keyReleaseEvent(QKeyEvent* e)
-{
-	QString modifier;
-	QString key;
-
-	if((e->modifiers() & Qt::ShiftModifier) != 0u)
-	{
-		modifier += "Shift+";
-	}
-	if((e->modifiers() & Qt::ControlModifier) != 0u)
-	{
-		modifier += "Ctrl+";
-	}
-	if((e->modifiers() & Qt::AltModifier) != 0u)
-	{
-		modifier += "Alt+";
-	}
-	if((e->modifiers() & Qt::MetaModifier) != 0u)
-	{
-		modifier += "Meta+";
-	}
-
-	key = QKeySequence(e->key()).toString();
-
-	QKeySequence ks(modifier + key);
-	actionEvent(inputManager[ks], false);
-
-	if(!PythonQtHandler::isSupported())
-	{
-		return;
-	}
-
-	QString pyKeyEvent("QKeyEvent(");
-	pyKeyEvent += QString::number(e->type()) + ",";
-	pyKeyEvent += QString::number(e->key()) + ",";
-	pyKeyEvent += QString::number(e->modifiers()) + ",";
-	pyKeyEvent += QString::number(e->nativeScanCode()) + ",";
-	pyKeyEvent += QString::number(e->nativeVirtualKey()) + ",";
-	pyKeyEvent += QString::number(e->nativeModifiers()) + ",";
-	if(e->key() != Qt::Key_Return && e->key() != Qt::Key_Enter)
-	{
-		pyKeyEvent += "\"" + e->text().replace('"', "\\\"") + "\",";
-	}
-	else
-	{
-		pyKeyEvent += R"("\n",)";
-	}
-	pyKeyEvent += e->isAutoRepeat() ? "True," : "False,";
-	pyKeyEvent += QString::number(e->count()) + ")";
-
-	PythonQtHandler::evalScript(
-	    "if \"keyReleaseEvent\" in dir():\n\tkeyReleaseEvent(" + pyKeyEvent
-	    + ")");
-}
-
 void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 {
+	RenderingWindow::actionEvent(a, pressed);
+
 	if(!pressed)
 	{
 		return;
@@ -341,10 +175,6 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 	else if(a.id == "screenshot")
 	{
 		takeScreenshot();
-	}
-	else if(a.id == "togglefullscreen")
-	{
-		toggleFullscreen();
 	}
 	else if(a.id == "autoexposure")
 	{
@@ -406,10 +236,6 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
 				toneMappingModel->exposure /= 10.f;
 			}
 		}
-	}
-	else if(a.id == "quit")
-	{
-		close();
 	}
 }
 
@@ -749,7 +575,14 @@ void AbstractMainWin::paintGL()
 
 	// Render frame
 	renderer.computeAverageLuminance = toneMappingModel->autoexposure;
-	renderer.renderFrame();
+	renderer.renderFrame(getAngleShiftMatrix());
+	for(auto w : secondaryWindows)
+	{
+		m_context.makeCurrent(w);
+		renderer.renderFrame(w->getAngleShiftMatrix());
+		w->show();
+	}
+	m_context.makeCurrent(this);
 
 	// garbage collect some resources
 	AsyncTexture::garbageCollect();
@@ -844,6 +677,10 @@ void AbstractMainWin::paintGL()
 
 	// Trigger a repaint immediatly
 	m_context.swapBuffers(this);
+	for(auto w : secondaryWindows)
+	{
+		m_context.swapBuffers(w);
+	}
 }
 
 AbstractMainWin::~AbstractMainWin()
@@ -866,6 +703,11 @@ AbstractMainWin::~AbstractMainWin()
 	PythonQtHandler::clean();
 	delete dialog3dWheel;
 	delete vrHandler;
+
+	for(auto w : secondaryWindows)
+	{
+		delete w;
+	}
 }
 
 void AbstractMainWin::reloadBloomTargets()
@@ -876,19 +718,8 @@ void AbstractMainWin::reloadBloomTargets()
 	}
 	delete bloomTargets[0];
 	delete bloomTargets[1];
-	if(!vrHandler->isEnabled())
-	{
-		bloomTargets[0] = new GLFramebufferObject(
-		    GLTexture::Tex2DProperties(width(), height(), GL_RGBA32F));
-		bloomTargets[1] = new GLFramebufferObject(
-		    GLTexture::Tex2DProperties(width(), height(), GL_RGBA32F));
-	}
-	else
-	{
-		QSize size(vrHandler->getEyeRenderTargetSize());
-		bloomTargets[0] = new GLFramebufferObject(GLTexture::Tex2DProperties(
-		    size.width(), size.height(), GL_RGBA32F));
-		bloomTargets[1] = new GLFramebufferObject(GLTexture::Tex2DProperties(
-		    size.width(), size.height(), GL_RGBA32F));
-	}
+	bloomTargets[0] = new GLFramebufferObject(GLTexture::Tex2DProperties(
+	    renderer.getSize().width(), renderer.getSize().height(), GL_RGBA32F));
+	bloomTargets[1] = new GLFramebufferObject(GLTexture::Tex2DProperties(
+	    renderer.getSize().width(), renderer.getSize().height(), GL_RGBA32F));
 }
