@@ -124,6 +124,10 @@ class Camera : public BasicCamera
 	float getTargetFPS() const { return targetFPS; };
 	void setTargetFPS(float targetFPS) { this->targetFPS = targetFPS; };
 	float getCurrentFrameTiming() const { return currentFrameTiming; };
+
+  private:
+	bool shouldBeCulled(QString const& angleShift, BBox const& bbox,
+	                    QMatrix4x4 const& model, bool depthClamp) const;
 };
 
 #endif // CAMERA_H

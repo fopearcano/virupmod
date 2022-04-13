@@ -124,9 +124,23 @@ Vector3 Camera::getTruePosition() const
     return result;
 }*/
 
-// sphere culling
 bool Camera::shouldBeCulled(BBox const& bbox, QMatrix4x4 const& model,
                             bool depthClamp) const
+{
+	for(auto const& angleShift : clippingPlanes.keys())
+	{
+		if(!shouldBeCulled(angleShift, bbox, model, depthClamp))
+		{
+			return false;
+		}
+	}
+	// update(angleShifts.at(0));
+	return true;
+}
+
+// sphere culling
+bool Camera::shouldBeCulled(QString const& angleShift, BBox const& bbox,
+                            QMatrix4x4 const& model, bool depthClamp) const
 {
 	if(currentProjection != MainRenderTarget::Projection::DEFAULT)
 	{
@@ -144,7 +158,7 @@ bool Camera::shouldBeCulled(BBox const& bbox, QMatrix4x4 const& model,
 		{
 			continue;
 		}
-		if(QVector4D::dotProduct(clippingPlanes.at(i), center)
+		if(QVector4D::dotProduct(clippingPlanes[angleShift].at(i), center)
 		   < negBoundingSphereRad)
 		{
 			return true;
