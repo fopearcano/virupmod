@@ -84,6 +84,7 @@ def forceDirectTransitionAndAngle(t, t_harsh):
     forceHorizontalPiOver2(t, t_harsh)
 
 def sdss(t, t_harsh):
+    ToneMappingModel.contrast = 1.3 - t*0.3
     if t < 0.1:
         Universe.setVisibility("IllustrisTNG", 1.0 - (10*t))
     else:
@@ -116,7 +117,6 @@ def mw(t, t_harsh):
         Universe.setVisibility("Exoplanets", (0.99-t)**1.2)
     else:
         Universe.setVisibility("Exoplanets", 0.0)
-    print(t)
 
 def wait(t, t_harsh):
     Animator.shiftHorizontalAngle = 20*t**0.7
@@ -124,6 +124,11 @@ def wait(t, t_harsh):
 def asteroids(t, t_harsh):
     forceDirectTransitionAndAngle(t, t_harsh)
     Universe.setVisibility("Asteroids", t**0.1)
+
+def lg(t, t_harsh):
+    Universe.setVisibility("Volumetric AGORA", (1-t)**2)
+    Universe.setVisibility("LG Dwarves", (1-t)**2)
+    ToneMappingModel.contrast = 1.0 + t*0.3
 
 # END CUSTOM
 
@@ -171,7 +176,7 @@ transitions = [
           SceneTemporalData(), SceneUI({"LG Dwarves":5.0, "Volumetric AGORA":1.0})), 40.0, "Milky Way", "mw"),
     # Local Group
     Transition(Scene(SceneSpatialData(Universe, 3.04e+22),
-          SceneTemporalData(), SceneUI({"IllustrisTNG":0.1, "Volumetric AGORA":1.0, "Andromeda":2.0, "M33":2.0, "LG Dwarves":5.0})), 50.0, "Local Group", "", 0.0, 0.2),
+          SceneTemporalData(), SceneUI({"IllustrisTNG":0.1, "Volumetric AGORA":0.0, "LG Dwarves":0.0})), 50.0, "Local Group", "lg", 0.0, 0.2),
     # Illustris
     Transition(Scene(SceneSpatialData(Universe, 0.9e+24),
           SceneTemporalData(), SceneUI({"IllustrisTNG":1.0})), 125.0, "IllustrisTNG", "", 100.0, 100.0),
@@ -183,7 +188,7 @@ transitions = [
     Transition(Scene(SceneSpatialData(Universe, 1.0e+27),
           SceneTemporalData(), SceneUI({"SDSS":1.0, "CMB":1.0})), 60.0, "CMB", "end", 10.0, 0.0),
     Transition(Scene(SceneSpatialData(Universe, 1.0e+27),
-          SceneTemporalData(), SceneUI({"SDSS":1.0, "CMB":1.0})), 197.0, "", "wait", 0.0, 10000.0),
+          SceneTemporalData(), SceneUI({"SDSS":1.0, "CMB":1.0})), 247.0, "", "wait", 0.0, 10000.0),
 
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":0.1})), 1.0, "", ""),
@@ -200,6 +205,7 @@ def initScene():
     for t in transitions:
         foo += t.getDuration()
     print(foo)
-
-    #Animator.setFirstScene()
+    Animator.debug = False
+    ToneMappingModel.contrast = 1.0
+    Animator.setFirstScene()
     #Animator.restart()
