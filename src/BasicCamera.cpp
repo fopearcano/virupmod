@@ -107,7 +107,7 @@ void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 		pixVertFOV
 		    = atan(1.0f / projLeft.column(1)[1]) * 2.0 / windowSize.height();
 
-		updateClippingPlanes();
+		updateClippingPlanes(angleShiftMat);
 
 		return;
 	}
@@ -128,7 +128,7 @@ void BasicCamera::update2D(QMatrix4x4 const& angleShiftMat)
 
 	pixVertFOV = atan(1.0f / proj.column(1)[1]) * 2.0 / windowSize.height();
 
-	updateClippingPlanes();
+	updateClippingPlanes(angleShiftMat);
 }
 
 void BasicCamera::uploadMatrices() const
@@ -139,25 +139,26 @@ void BasicCamera::uploadMatrices() const
 	    fullHmdSpaceTransform, fullSkyboxSpaceTransform);
 }
 
-void BasicCamera::updateClippingPlanes()
+void BasicCamera::updateClippingPlanes(QMatrix4x4 const& angleShiftMat)
 {
+	auto k = toStr(angleShiftMat);
 	// update clipping planes
 	// Gribb, G., & Hartmann, K. (2001). Fast extraction of viewing frustum
 	// planes from the world-view-projection matrix.
 	// http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
-	clippingPlanes[LEFT_PLANE]
+	clippingPlanes[k][LEFT_PLANE]
 	    = (fullTransform.row(3) + fullTransform.row(0)).normalized();
-	clippingPlanes[RIGHT_PLANE]
+	clippingPlanes[k][RIGHT_PLANE]
 	    = (fullTransform.row(3) - fullTransform.row(0)).normalized();
 
-	clippingPlanes[BOTTOM_PLANE]
+	clippingPlanes[k][BOTTOM_PLANE]
 	    = (fullTransform.row(3) + fullTransform.row(1)).normalized();
-	clippingPlanes[TOP_PLANE]
+	clippingPlanes[k][TOP_PLANE]
 	    = (fullTransform.row(3) - fullTransform.row(1)).normalized();
 
-	clippingPlanes[NEAR_PLANE]
+	clippingPlanes[k][NEAR_PLANE]
 	    = (fullTransform.row(3) + fullTransform.row(2)).normalized();
-	clippingPlanes[FAR_PLANE]
+	clippingPlanes[k][FAR_PLANE]
 	    = (fullTransform.row(3) - fullTransform.row(2)).normalized();
 }
 

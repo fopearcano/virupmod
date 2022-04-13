@@ -156,6 +156,7 @@ class BasicCamera : public QObject
 	 * The plane Ax+By+Cz+D=0 is stored as QVector4D(A,B,C,D).
 	 */
 	typedef QVector4D Plane;
+	typedef std::array<Plane, 6> ClippingPlanes;
 
   public:
 	/**
@@ -354,10 +355,10 @@ class BasicCamera : public QObject
 	 */
 	float eyeDistanceFactor;
 	/**
-	 * @brief Updates @ref clippingPlanes taking into account the current @ref
-	 * fullTransform.
+	 * @brief Updates @ref clippingPlanes for the current angle shift matrix
+	 * taking into account the current @ref fullTransform.
 	 */
-	void updateClippingPlanes();
+	void updateClippingPlanes(QMatrix4x4 const& angleShiftMat);
 
 	// See TRANSFORMS beyond here
 
@@ -489,7 +490,8 @@ class BasicCamera : public QObject
 	// For culling. Normals point Inside i.e. clippingPlanes[i]*v >= 0 <=>
 	// v is at the inner side of clippingPlanes[i]
 	/**
-	 * @brief Static array holding the six clipping planes of the camera.
+	 * @brief Static array holding the six clipping planes of the camera. Stored
+	 * in a map indexed by angleShiftMatrix as a string.
 	 *
 	 * For consistency, please use @ref ClippingPlane values as access indices.
 	 *
@@ -497,13 +499,35 @@ class BasicCamera : public QObject
 	 * the frustum volume (let v be a QVector4D, <code>clippingPlanes[i] * v >=
 	 * 0</code> if and only if v is at the inner side of clippingPlanes[i]).
 	 */
-	std::array<Plane, 6> clippingPlanes;
+	QHash<QString, std::array<Plane, 6>> clippingPlanes;
 
 	QSize windowSize;
 
   private:
 	// compute on update
 	float pixVertFOV = 0.f;
+
+	QString toStr(QMatrix4x4 const& m)
+	{
+		QString res;
+		res += QString::number(m(0, 0));
+		res += QString::number(m(0, 1));
+		res += QString::number(m(0, 2));
+		res += QString::number(m(0, 3));
+		res += QString::number(m(1, 0));
+		res += QString::number(m(1, 1));
+		res += QString::number(m(1, 2));
+		res += QString::number(m(1, 3));
+		res += QString::number(m(2, 0));
+		res += QString::number(m(2, 1));
+		res += QString::number(m(2, 2));
+		res += QString::number(m(2, 3));
+		res += QString::number(m(3, 0));
+		res += QString::number(m(3, 1));
+		res += QString::number(m(3, 2));
+		res += QString::number(m(3, 3));
+		return res;
+	};
 };
 
 #include "vr/VRHandler.hpp"

@@ -25,6 +25,10 @@
 RenderingWindow::RenderingWindow(unsigned int id)
     : id(id)
 {
+	if(id > 0)
+	{
+		setTitle(PROJECT_NAME + tr(" - Subwindow ") + QString::number(id));
+	}
 	params.fromStr(
 	    QSettings().value("window/windefinitions").toStringList().at(id));
 

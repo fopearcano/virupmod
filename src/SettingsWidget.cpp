@@ -24,6 +24,33 @@ SettingsWidget::SettingsWidget(QWidget* parent)
     : QTabWidget(parent)
 {
 	qDebug() << QString("Config file :") + QSettings().fileName();
+
+	// update settings file if needed
+	if(!QSettings().contains("window/windefinitions")
+	   && QSettings().contains("window/width"))
+	{
+		QStringList windef;
+		RenderingWindow::Parameters p;
+		p.width      = QSettings().value("window/width").toUInt();
+		p.height     = QSettings().value("window/height").toUInt();
+		p.fullscreen = QSettings().value("window/fullscreen").toBool();
+		p.screenname = QSettings().value("window/screenname").toString();
+		p.horizontalAngleShift
+		    = QSettings().value("network/angleshift").toDouble();
+		p.verticalAngleShift
+		    = QSettings().value("network/vangleshift").toDouble();
+
+		QSettings().remove("window/width");
+		QSettings().remove("window/height");
+		QSettings().remove("window/fullscreen");
+		QSettings().remove("window/screenname");
+		QSettings().remove("network/angleshift");
+		QSettings().remove("network/vangleshift");
+		windef << p.toStr();
+		QSettings().setValue("window/windefinitions", windef);
+	}
+	// end update
+
 	addGroup("window", tr("Window"));
 	addWindowsDefinitionSettings();
 	addBoolSetting("vsync", false, tr("Enable VSYNC"));
