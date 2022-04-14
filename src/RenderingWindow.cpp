@@ -68,11 +68,13 @@ void RenderingWindow::setFullscreen(bool fullscreen)
 				}
 			}
 		}
+		setFlags(flags() | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
 		setGeometry(screenGeometry);
 		showFullScreen();
 	}
 	else
 	{
+		setFlags(flags() & ~Qt::CustomizeWindowHint & ~Qt::FramelessWindowHint);
 		show();
 		resize(params.width, params.height);
 	}
