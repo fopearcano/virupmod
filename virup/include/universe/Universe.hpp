@@ -114,6 +114,13 @@ class Universe : public QObject
 	 * @accessors getCamYaw(), setCamYaw()
 	 */
 	Q_PROPERTY(float camYaw READ getCamYaw WRITE setCamYaw)
+
+	/**
+	 * @brief Debris GL_POINT size.
+	 *
+	 * @accessors getDebrisSize(), setDebrisSize()
+	 */
+	Q_PROPERTY(unsigned int debrisSize READ getDebrisSize WRITE setDebrisSize)
   public:
 	// SPACE
 
@@ -222,6 +229,17 @@ class Universe : public QObject
 	 * @setter{camYaw, camYaw}
 	 */
 	void setCamYaw(float yaw);
+
+	// MISC
+
+	/**
+	 * @getter{debrisSize}
+	 */
+	unsigned int getDebrisSize() const { return DebrisRenderer::size; }
+	/**
+	 * @setter{debrisSize}
+	 */
+	void setDebrisSize(unsigned int size) const { DebrisRenderer::size = size; }
 
 	class State : public AbstractState
 	{
