@@ -209,3 +209,7 @@ def initScene():
     ToneMappingModel.contrast = 1.0
     Animator.setFirstScene()
     #Animator.restart()
+
+    # display tweaks
+    Universe.debrisSize=2
+    Universe.setCosmoSimForcedQuality("Volumetric AGORA", 3)
