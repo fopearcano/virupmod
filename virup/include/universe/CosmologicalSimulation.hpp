@@ -40,6 +40,11 @@ class CosmologicalSimulation : public UniverseElement
 	uint64_t getOctreesTotalDataSize() const;
 	bool preloadOctreesLevel(unsigned int level,
 	                         QProgressDialog* progress = nullptr);
+	int getForcedQuality() const { return forcedQuality; };
+	void setForcedQuality(int forcedQuality)
+	{
+		this->forcedQuality = forcedQuality;
+	};
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
@@ -64,6 +69,7 @@ class CosmologicalSimulation : public UniverseElement
 
 	QMatrix4x4 model;
 	QVector3D campos;
+	int forcedQuality = -1;
 
 	std::map<unsigned int, QString> cosmoFilesGas;
 	std::map<unsigned int, QString> cosmoFilesStars;

@@ -187,7 +187,9 @@ void CosmologicalSimulation::update(Camera const& camera)
 		}
 	}
 
+	OctreeLOD::forceQuality() = forcedQuality;
 	trees.update(camera, model, campos);
+	OctreeLOD::forceQuality() = -1;
 }
 
 void CosmologicalSimulation::render(Camera const& camera,

@@ -452,6 +452,38 @@ void Universe::setLabelsOrbitsOnly(QStringList const& nameList)
 	CelestialBodyRenderer::renderLabelsOrbitsOnly = nameList;
 }
 
+int Universe::getCosmoSimForcedQuality(QString const& name) const
+{
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return -1;
+	}
+	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	if(!cosmoSims.contains(cosmoSim))
+	{
+		qWarning() << name + " is not a valid CosmologicalSimulation";
+		return -1;
+	}
+	return cosmoSim->getForcedQuality();
+}
+
+void Universe::setCosmoSimForcedQuality(QString const& name, int forcedQuality)
+{
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return;
+	}
+	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	if(!cosmoSims.contains(cosmoSim))
+	{
+		qWarning() << name + " is not a valid CosmologicalSimulation";
+		return;
+	}
+	cosmoSim->setForcedQuality(forcedQuality);
+}
+
 void Universe::dumpOctreesStates()
 {
 	for(auto cosmoSim : cosmoSims)

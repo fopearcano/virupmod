@@ -376,6 +376,8 @@ class Universe : public QObject
 	Vector3 getSolarSystemPosition(QString const& name) const;
 	void setSolarSystemPosition(QString const& name, Vector3 const& pos);
 	void setLabelsOrbitsOnly(QStringList const& nameList);
+	int getCosmoSimForcedQuality(QString const& name) const;
+	void setCosmoSimForcedQuality(QString const& name, int forcedQuality);
 	void unlockTanAngleLimit() const
 	{
 		OctreeLOD::unsetCurrentTanAngleLimit();
