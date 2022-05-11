@@ -17,6 +17,7 @@
 */
 
 #include "RenderingWindow.hpp"
+#include "gl/glfunctions.hpp"
 
 #include <QGuiApplication>
 #include <QKeyEvent>
@@ -37,9 +38,10 @@ RenderingWindow::RenderingWindow(unsigned int id)
 	QSurfaceFormat format;
 	format.setDepthBufferSize(24);
 	format.setStencilBufferSize(8);
-	format.setVersion(4, 2);
+	format.setVersion(gl::majorVersion, gl::minorVersion);
 	format.setSwapInterval(QSettings().value("window/vsync").toBool() ? 1 : 0);
 	format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
+	format.setProfile(gl::profile);
 	setFormat(format);
 
 	updateAngleShiftMat();
