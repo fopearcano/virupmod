@@ -69,7 +69,11 @@ class WorkerThread : public QThread
 			return;
 		}
 		img = img.convertToFormat(QImage::Format_RGBA8888);
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 		std::memcpy(data, img.bits(), std::size_t(img.byteCount()));
+#else
+		std::memcpy(data, img.bits(), std::size_t(img.sizeInBytes()));
+#endif
 	}
 };
 

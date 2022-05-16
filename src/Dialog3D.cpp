@@ -196,21 +196,21 @@ void Dialog3D::mousePress(QPointF const& relativePosition)
 {
 	QPoint p(static_cast<int>(relativePosition.x() * size().width()),
 	         static_cast<int>(relativePosition.y() * size().height()));
-	QTest::mousePress(windowHandle(), Qt::LeftButton, nullptr, p, -1);
+	QTest::mousePress(windowHandle(), Qt::LeftButton, {}, p, -1);
 }
 
 void Dialog3D::mouseRelease(QPointF const& relativePosition)
 {
 	QPoint p(static_cast<int>(relativePosition.x() * size().width()),
 	         static_cast<int>(relativePosition.y() * size().height()));
-	QTest::mouseRelease(windowHandle(), Qt::LeftButton, nullptr, p, -1);
+	QTest::mouseRelease(windowHandle(), Qt::LeftButton, {}, p, -1);
 }
 
 void Dialog3D::mouseClick(QPointF const& relativePosition)
 {
 	QPoint p(static_cast<int>(relativePosition.x() * size().width()),
 	         static_cast<int>(relativePosition.y() * size().height()));
-	QTest::mouseClick(windowHandle(), Qt::LeftButton, nullptr, p, -1);
+	QTest::mouseClick(windowHandle(), Qt::LeftButton, {}, p, -1);
 }
 
 bool Dialog3D::eventFilter(QObject* obj, QEvent* event)

@@ -32,7 +32,7 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 				cmd += '/';
 			}
 			cmd += "bin/vrstartup.sh";
-			vrstartup.start(cmd);
+			vrstartup.start(cmd, QStringList());
 			QThread::sleep(7);
 		}
 	}

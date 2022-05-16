@@ -24,14 +24,14 @@
 void startProfiling()
 {
 	QProcess p;
-	p.start("callgrind_control -i on");
+	p.start("callgrind_control -i on", QStringList());
 	p.waitForFinished();
 }
 
 void stopProfiling(bool close)
 {
 	QProcess p;
-	p.start("callgrind_control -i off");
+	p.start("callgrind_control -i off", QStringList());
 	p.waitForFinished();
 	if(close)
 	{

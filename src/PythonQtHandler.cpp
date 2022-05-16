@@ -44,7 +44,7 @@ void PythonQtHandler::init()
 	// get the __main__ python module
 	mainModule = new PythonQtObjectPtr(PythonQt::self()->getMainModule());
 
-	console = new PythonQtScriptingConsole(nullptr, *mainModule);
+	console = new PythonQtScriptingConsole(nullptr, *mainModule, {});
 #endif
 }
 
