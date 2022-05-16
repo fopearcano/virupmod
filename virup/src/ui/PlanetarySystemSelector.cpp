@@ -112,14 +112,14 @@ QTreeWidgetItem*
 				item->setText(0, QString::fromStdString(orbitable.getName())
 				                     + "\n(" + beginDate + "\n->" + endDate
 				                     + ")");
-				item->setTextColor(0, QColor("green"));
+				item->setForeground(0, QColor("green"));
 			}
 			else
 			{
 				item->setText(0, QString::fromStdString(orbitable.getName())
 				                     + "\n(" + beginDate + "\n->" + endDate
 				                     + ")");
-				item->setTextColor(0, QColor("red"));
+				item->setForeground(0, QColor("red"));
 			}
 		}
 		else
@@ -180,13 +180,13 @@ void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
 	{
 		if(body->getOrbitableType() == Orbitable::Type::SPACECRAFT)
 		{
-			item->setTextColor(0, QColor("red"));
+			item->setForeground(0, QColor("red"));
 		}
 		return;
 	}
 	if(body->getOrbitableType() == Orbitable::Type::SPACECRAFT)
 	{
-		item->setTextColor(0, QColor("green"));
+		item->setForeground(0, QColor("green"));
 	}
 
 	auto radius = dynamic_cast<CelestialBody const*>(body)

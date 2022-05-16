@@ -9,6 +9,7 @@ endif()
 
 find_package (Threads)
 
+cmake_policy(SET CMP0057 NEW)
 find_package(Boost REQUIRED)
 find_package(Qt5 COMPONENTS Concurrent REQUIRED)
 
