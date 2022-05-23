@@ -18,10 +18,14 @@
 
 #include "VIRUPSettings.hpp"
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
 {
-	insertCustomGroup("data", tr("Data"), 0, new DataListWidget);
+	auto dlw = new DataListWidget;
+	insertCustomGroup("data", tr("Data"), 0, dlw);
 
 	insertGroup("simulation", tr("Simulation"), 1);
 	addDateTimeSetting("starttime", QDateTime::currentDateTimeUtc(),
@@ -53,6 +57,129 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addFilePathSetting("customfont", "", tr("Custom font file"));
 
 	setCurrentIndex(0);
+
+	// DOWNLOADER
+	if(!QSettings().value("data/rootdir").toString().isEmpty())
+	{
+		return;
+	}
+	auto yesOrNo = QMessageBox::question(
+	    this, tr("Data Download"),
+	    tr("No data detected. Do you want to download the default data (3.5GB "
+	       "download/7.1GB uncompressed) ? (Data is required to visualize "
+	       "anything, press No if you already have some data to visualize on "
+	       "hand.)"));
+
+	if(yesOrNo != QMessageBox::StandardButton::Yes)
+	{
+		return;
+	}
+
+	bool ok(false);
+	QString downloadDir;
+	do
+	{
+		downloadDir = QFileDialog::getExistingDirectory(
+		    this, tr("Select a data storage directory (>= 10.7GB capacity)"),
+		    "/media/florian/Archive");
+		if(downloadDir.isEmpty())
+		{
+			return;
+		}
+		QStorageInfo info(downloadDir);
+		if(info.bytesAvailable() <= 10.7 * 1024 * 1024 * 1024) // 10.7GB
+		{
+			QString avail
+			    = QString::number(info.bytesAvailable() / 1024.0 / 1024 / 1024);
+			QMessageBox::warning(this, tr("Not enough storage space"),
+			                     avail + tr(" GB available, 10.7GB needed."));
+		}
+		else
+		{
+			ok = true;
+		}
+	} while(!ok);
+
+	QFile downloadedFile(downloadDir + "/VIRUP-DATA.zip");
+	downloadedFile.open(QIODevice::WriteOnly);
+
+	QUrl url("ftp://obsftp.unige.ch/pub/cabot/VIRUP-DATA.zip");
+
+	QNetworkAccessManager nam;
+	auto rep = nam.get(QNetworkRequest(url));
+
+	QProgressDialog progress;
+	progress.setWindowTitle(tr("Downloading..."));
+	progress.show();
+
+	QElapsedTimer timer;
+	timer.start();
+
+	qint64 downloaded(0);
+
+	connect(rep, &QNetworkReply::downloadProgress,
+	        [&downloadedFile, rep, &progress, &timer, &downloaded](qint64 recv,
+	                                                               qint64 tot) {
+		        QByteArray b = rep->readAll();
+		        downloadedFile.write(b);
+		        progress.setMaximum(tot / 1024 / 1024);
+		        progress.setValue(recv / 1024 / 1024);
+		        auto dt              = timer.restart() / 1000.0;
+		        auto speedInMBPerSec = b.size() / dt / (1024 * 1024);
+		        downloaded += b.size();
+		        int remaining = static_cast<int>(round(
+		            (tot - downloaded) / (speedInMBPerSec * 1024 * 1024)));
+		        progress.setLabelText(
+		            QString::number(recv / 1024.0 / 1024 / 1024, 'g', 2) + "GB/"
+		            + QString::number(tot / 1024.0 / 1024 / 1024, 'g', 2)
+		            + "GB " + QString::number(speedInMBPerSec, 'g', 3)
+		            + " MB/s ETA: "
+		            + QTime(0, 0).addSecs(remaining).toString("hh:mm:ss")
+		            + " secs");
+	        });
+
+	bool keepDownloading = true;
+	connect(&progress, &QProgressDialog::canceled,
+	        [&keepDownloading]() { keepDownloading = false; });
+
+	while(rep->isRunning() && keepDownloading)
+	{
+		QCoreApplication::processEvents();
+		QThread::usleep(100000);
+	}
+	rep->deleteLater();
+
+	if(!keepDownloading)
+	{
+		return;
+	}
+
+	progress.setWindowTitle(tr("Extracting..."));
+	progress.setLabelText(tr("Waiting for data archive to be extracted..."));
+	progress.setMaximum(9);
+	progress.show();
+	QProcess unzipProcess;
+#ifdef Q_OS_WIN
+	QString cmd("powershell -command \"Expand-Archive ");
+	cmd += downloadDir + "\\VIRUP-DATA.zip ";
+	cmd += downloadDir + "\"";
+	unzipProcess.start(cmd);
+#else
+	QString cmd("unzip ");
+	cmd += downloadDir + "/VIRUP-DATA.zip -d ";
+	cmd += downloadDir;
+	unzipProcess.start(cmd);
+#endif
+	while(unzipProcess.state() != QProcess::NotRunning)
+	{
+		QDir d(downloadDir + "/VIRUP-DATA/");
+		d.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
+		progress.setValue(d.count() - 2);
+		QCoreApplication::processEvents();
+		QThread::usleep(100000);
+	}
+
+	dlw->importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo-cmb.json");
 }
 
 DataListWidget::DataListWidget()
@@ -266,7 +393,11 @@ void DataListWidget::importJson()
 	auto path(QFileDialog::getOpenFileName(this, tr("Import data profile"),
 	                                       QDir::home().absolutePath(),
 	                                       tr("JSON Files (*.json)")));
+	importJsonFromPath(path);
+}
 
+void DataListWidget::importJsonFromPath(QString const& path)
+{
 	QFile in(path);
 	if(!in.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
