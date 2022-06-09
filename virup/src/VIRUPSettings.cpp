@@ -168,7 +168,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	QString cmd("unzip ");
 	cmd += downloadDir + "/VIRUP-DATA.zip -d ";
 	cmd += downloadDir;
-	unzipProcess.start(cmd);
+	unzipProcess.start(cmd, QStringList{});
 #endif
 	while(unzipProcess.state() != QProcess::NotRunning)
 	{
