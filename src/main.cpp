@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
 	if(!QDir("./data/core").exists())
 	{
 		// if no data/core in application dir, search in
-		// INSTALL_PREFIX/share/PROJECT_NAME
-		QString path(QString(INSTALL_PREFIX) + "/share/" + PROJECT_NAME);
+		// ../share/PROJECT_NAME
+		QString path(QString("../share/") + PROJECT_NAME);
 		if(!QDir(path).exists())
 		{
 			// else let it be /usr/share/PROJECT_NAME
@@ -112,6 +112,13 @@ int main(int argc, char* argv[])
 			return EXIT_SUCCESS;
 		}
 	}
+
+// set PYTHONPATH
+#ifdef Q_OS_WIN
+	qputenv(
+	    "PYTHONPATH",
+	    (QCoreApplication::applicationDirPath() + "\\python").toLocal8Bit());
+#endif
 
 	MainWin w;
 	w.setTitle(PROJECT_NAME + QString(" - Loading..."));

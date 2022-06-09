@@ -177,6 +177,10 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 		path.replace("/main.py", "");
 		dirList << path;
 	}
+	if(dirList.empty())
+	{
+		dirList << "";
+	}
 	dirList.sort();
 	addGroup("scripting", tr("Scripting"));
 	addStringAmongListSetting("rootdir", dirList, dirList,
