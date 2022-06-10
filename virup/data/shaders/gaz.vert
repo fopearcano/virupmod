@@ -11,6 +11,14 @@ uniform float scale;
 
 out float fragAlpha;
 
+out gl_PerVertex
+{
+	vec4 gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[1];
+};
+
+
 void main()
 {
 	gl_Position = camera * vec4(position, 1.0);
