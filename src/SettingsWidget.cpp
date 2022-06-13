@@ -46,6 +46,8 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 		QSettings().remove("window/screenname");
 		QSettings().remove("network/angleshift");
 		QSettings().remove("network/vangleshift");
+		QSettings().remove("vr/forceleft");
+		QSettings().remove("vr/forceright");
 		windef << p.toStr();
 		QSettings().setValue("window/windefinitions", windef);
 	}
@@ -153,8 +155,6 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	    tr("Force 2D render on screen\n(will decrease performance !)"));
 	addDoubleSetting("stereomultiplier", 1.0,
 	                 tr("Stereo multiplier (if applicable)"), 0.0, 1000.0);
-	addBoolSetting("forceleft", false, tr("Force left eye rendering only"));
-	addBoolSetting("forceright", false, tr("Force right eye rendering only"));
 	addVector3DSetting("virtualcamshift", {},
 	                   "Virtual Camera Shift\n(1.0 = screen physical height)",
 	                   {"x", "y", "z"}, 0.f, 100.f);

@@ -102,6 +102,22 @@ WindowParametersSelector::WindowParametersSelector(
 		        emit parametersChanged(value);
 	        });
 	mainLayout->addRow(tr("Vertical Shift Angle :"), vAngleShiftSpinBox);
+
+	forceLeftCBox = new QCheckBox(this);
+	forceLeftCBox->setChecked(initialValue.forceleft);
+	connect(forceLeftCBox, &QCheckBox::stateChanged, [this](int s) {
+		value.forceleft = (s != Qt::Unchecked);
+		emit parametersChanged(value);
+	});
+	mainLayout->addRow(tr("Force left eye rendering only :"), forceLeftCBox);
+
+	forceRightCBox = new QCheckBox(this);
+	forceRightCBox->setChecked(initialValue.forceright);
+	connect(forceRightCBox, &QCheckBox::stateChanged, [this](int s) {
+		value.forceright = (s != Qt::Unchecked);
+		emit parametersChanged(value);
+	});
+	mainLayout->addRow(tr("Force right eye rendering only :"), forceRightCBox);
 }
 
 void WindowParametersSelector::setParameters(

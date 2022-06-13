@@ -60,6 +60,8 @@ class RenderingWindow : public QWindow
 		QString screenname          = "";
 		double horizontalAngleShift = 0.0;
 		double verticalAngleShift   = 0.0;
+		bool forceleft              = false;
+		bool forceright             = false;
 
 		QString toStr() const
 		{
@@ -70,17 +72,23 @@ class RenderingWindow : public QWindow
 			resultList << screenname;
 			resultList << QString::number(horizontalAngleShift);
 			resultList << QString::number(verticalAngleShift);
+			resultList << (forceleft ? "true" : "false");
+			resultList << (forceright ? "true" : "false");
 			return resultList.join(';');
 		};
 		void fromStr(QString const& str)
 		{
 			QStringList strList(str.split(';'));
-			width                = strList[0].toUInt();
-			height               = strList[1].toUInt();
-			fullscreen           = strList[2] == "true";
-			screenname           = strList[3];
-			horizontalAngleShift = strList[4].toDouble();
-			verticalAngleShift   = strList[5].toDouble();
+			width      = strList.size() >= 1 ? strList[0].toUInt() : 1920;
+			height     = strList.size() >= 2 ? strList[1].toUInt() : 1080;
+			fullscreen = strList.size() >= 3 ? strList[2] == "true" : false;
+			screenname = strList.size() >= 4 ? strList[3] : "";
+			horizontalAngleShift
+			    = strList.size() >= 5 ? strList[4].toDouble() : 0.0;
+			verticalAngleShift
+			    = strList.size() >= 6 ? strList[5].toDouble() : 0.0;
+			forceleft  = strList.size() >= 7 ? strList[6] == "true" : false;
+			forceright = strList.size() >= 8 ? strList[7] == "true" : false;
 		}
 	};
 
@@ -113,6 +121,8 @@ class RenderingWindow : public QWindow
 	 * and @ref verticalAngleShift
 	 */
 	QMatrix4x4 getAngleShiftMatrix() const { return angleShiftMat; };
+	bool isForcedLeft() const { return params.forceleft; };
+	bool isForcedRight() const { return params.forceright; };
 
   public slots:
 	/**

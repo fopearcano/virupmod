@@ -575,9 +575,19 @@ void AbstractMainWin::paintGL()
 
 	// Render frame
 	renderer.computeAverageLuminance = toneMappingModel->autoexposure;
+	if(vrHandler->isEnabled())
+	{
+		vrHandler->forceLeft  = isForcedLeft();
+		vrHandler->forceRight = isForcedRight();
+	}
 	renderer.renderFrame(getAngleShiftMatrix());
 	for(auto w : secondaryWindows)
 	{
+		if(vrHandler->isEnabled())
+		{
+			vrHandler->forceLeft  = w->isForcedLeft();
+			vrHandler->forceRight = w->isForcedRight();
+		}
 		m_context.makeCurrent(w);
 		renderer.renderFrame(w->getAngleShiftMatrix());
 		w->show();

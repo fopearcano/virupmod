@@ -51,6 +51,8 @@ class WindowParametersSelector : public QWidget
 	QLabel* screenLabel;
 	QDoubleSpinBox* hAngleShiftSpinBox;
 	QDoubleSpinBox* vAngleShiftSpinBox;
+	QCheckBox* forceLeftCBox;
+	QCheckBox* forceRightCBox;
 };
 
 #endif // WINDOWPARAMETERSSELECTOR_HPP

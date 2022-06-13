@@ -97,8 +97,8 @@ class VRHandler : public QObject
 	virtual void close()             = 0;
 	virtual ~VRHandler(){};
 
-	const bool forceLeft  = QSettings().value("vr/forceleft").toBool();
-	const bool forceRight = QSettings().value("vr/forceright").toBool();
+	bool forceLeft  = false;
+	bool forceRight = false;
 
   public slots:
 	virtual QMatrix4x4 getEyeViewMatrix(Side eye) const                    = 0;
