@@ -252,15 +252,21 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 		{
 			case GamepadHandler::Button::A:
 				animator->recenter();
+				QSound::play(
+				    getAbsoluteDataPath("sounds/buttons/recenter.wav"));
 				break;
 			case GamepadHandler::Button::B:
 				animator->next();
+				QSound::play(getAbsoluteDataPath("sounds/buttons/next.wav"));
 				break;
 			case GamepadHandler::Button::X:
 				animator->previous();
+				QSound::play(
+				    getAbsoluteDataPath("sounds/buttons/previous.wav"));
 				break;
 			case GamepadHandler::Button::Y:
 				animator->home();
+				QSound::play(getAbsoluteDataPath("sounds/buttons/home.wav"));
 				break;
 			default:
 				break;

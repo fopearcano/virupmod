@@ -11,10 +11,10 @@ find_package (Threads)
 
 cmake_policy(SET CMP0057 NEW)
 find_package(Boost REQUIRED)
-find_package(Qt5 COMPONENTS Concurrent REQUIRED)
+find_package(Qt5 COMPONENTS Multimedia REQUIRED)
 
-set(PROJECT_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
-set(PROJECT_LIBRARIES ${Boost_LIBRARIES} -lquadmath Qt5::Concurrent)
+set(PROJECT_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS})
+set(PROJECT_LIBRARIES ${Boost_LIBRARIES} -lquadmath Qt5::Multimedia)
 
 set(PROJECT_INCLUDE_DIRS ${PROJECT_INCLUDE_DIRS} ${OCTREE_INCLUDE_DIR})
 set(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${OCTREE_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
