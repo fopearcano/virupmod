@@ -98,6 +98,7 @@ void Animator::setTransition(int newid)
 		return;
 	}
 	executeTransition(transitions[newid]);
+	setId(newid);
 }
 
 void Animator::update()
@@ -139,7 +140,7 @@ void Animator::update()
 		{
 			durationSum += currentTransition->getDuration();
 			currentTransition = &transitions[i];
-			id                = i;
+			setId(i);
 			++i;
 		}
 		if(t_secs <= currentTransition->getDuration() + durationSum)
@@ -179,7 +180,8 @@ void Animator::update()
 					cosmodPos += universe.getCosmoPosition();
 					float dt = t_secs - t_secsBAK;
 					qDebug()
-					    << id << currentTransition->getName()
+					    << getCurrentTransitionId()
+					    << currentTransition->getName()
 					    << planetdPos.length() / dt << cosmodPos.length() / dt;
 				}
 			}
@@ -283,7 +285,7 @@ void Animator::pause()
 
 void Animator::stop()
 {
-	id                                      = -1;
+	setId(-1);
 	OrbitalSystemRenderer::autoCameraTarget = true;
 	playCustom                              = false;
 	pausedAt                                = 0.f;

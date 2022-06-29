@@ -91,6 +91,12 @@ class Animator : public QObject
 	float getWholeAnimationPercentage() const;
 	void setWholeAnimationPercentage(float percentage);
 
+	// typical controller inputs
+	void recenter() { setTransition(idBackup); };
+	void home() { setTransition(0); };
+	void previous() { setTransition(idBackup - 1); };
+	void next() { setTransition(idBackup + 1); };
+
 	void setFirstScene();
 	void restart();
 	void play();
@@ -108,12 +114,21 @@ class Animator : public QObject
 
   private:
 	Vector3 getShift(double coeff = 1.0) const;
+	void setId(int id)
+	{
+		this->id = id;
+		if(id >= 0 && id < static_cast<int>(transitions.size()))
+		{
+			idBackup = id;
+		}
+	};
 
 	Universe& universe;
 	VRHandler const& vrHandler;
 	ToneMappingModel& tmm;
 
 	int id                     = 0;
+	int idBackup               = 0;
 	bool animationsDisabled    = false;
 	float personHeight         = 1.5f;
 	float shiftHorizontalAngle = 0.f;

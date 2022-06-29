@@ -246,6 +246,26 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 	{
 		movementControls->gamepadEvent(e);
 	}
+	if(e.type == GamepadHandler::EventType::BUTTON_PRESSED)
+	{
+		switch(e.button)
+		{
+			case GamepadHandler::Button::A:
+				animator->recenter();
+				break;
+			case GamepadHandler::Button::B:
+				animator->next();
+				break;
+			case GamepadHandler::Button::X:
+				animator->previous();
+				break;
+			case GamepadHandler::Button::Y:
+				animator->home();
+				break;
+			default:
+				break;
+		}
+	}
 	AbstractMainWin::gamepadEvent(e);
 }
 
