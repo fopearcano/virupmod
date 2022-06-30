@@ -195,22 +195,3 @@ begin
   Result := not (VCVersionInstalled(VC_2015_REDIST_X86_MIN) or VCVersionInstalled(VC_2017_REDIST_X86_MIN) or VCVersionInstalled(VC_2019_REDIST_X86_MIN));
 #endif
 end;
-
-function VCRedist15NeedsInstall: Boolean;
-begin
-  { here the Result must be True when you need to install your VCRedist }
-  { or False when you don't need to, so now it's upon you how you build }
-  { this statement, the following won't install your VC redist only when }
-  { the Visual C++ 2010 Redist (x86) and Visual C++ 2010 SP1 Redist(x86) }
-  { are installed for the current user }
-#ifdef X64
-  Result := not (VCVersionInstalled(VC_2015_REDIST_X64_MIN) or VCVersionInstalled(VC_2017_REDIST_X64_MIN) or VCVersionInstalled(VC_2019_REDIST_X64_MIN));
-#else
-  Result := not (VCVersionInstalled(VC_2015_REDIST_X86_MIN) or VCVersionInstalled(VC_2017_REDIST_X86_MIN) or VCVersionInstalled(VC_2019_REDIST_X86_MIN));
-#endif
-end;
-
-function PythonNeedsInstall: Boolean;
-begin
-  Result := not RegKeyExists(HKEY_CURRENT_USER, 'Software\Python')
-end;
