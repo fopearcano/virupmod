@@ -464,7 +464,7 @@ void MovementControls::updateCube(double frameTiming)
 	}
 
 	// apply gamepad and keyboard controls
-	if(!vrHandler.isEnabled())
+	// if(!vrHandler.isEnabled())
 	{
 		cosmoCam->position += frameTiming
 		                      * Utils::fromQt(cosmoCam->getView().inverted()
