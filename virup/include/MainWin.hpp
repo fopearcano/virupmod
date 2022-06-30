@@ -276,8 +276,8 @@ class MainWin : public AbstractMainWin
 	MovementControls* movementControls = nullptr;
 
 	/* TEXT */
-	Text3D* debugText         = nullptr;
-	float timeSinceTextUpdate = FLT_MAX;
+	Text3D* debugText          = nullptr;
+	double timeSinceTextUpdate = DBL_MAX;
 
 	// TEMP
 	const int textWidth  = 225;

@@ -248,6 +248,7 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 	}
 	if(e.type == GamepadHandler::EventType::BUTTON_PRESSED)
 	{
+		bool sceneChanged = true;
 		switch(e.button)
 		{
 			case GamepadHandler::Button::A:
@@ -269,7 +270,23 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 				QSound::play(getAbsoluteDataPath("sounds/buttons/home.wav"));
 				break;
 			default:
+				sceneChanged = false;
 				break;
+		}
+		if(sceneChanged)
+		{
+			auto id(animator->getCurrentTransitionId());
+			if(id >= 0
+			   && static_cast<unsigned int>(id)
+			          < animator->getTransitions().size())
+			{
+				timeSinceTextUpdate = 0.0;
+				debugText->setText(
+				    QString(tr("Going to : "))
+				    + animator
+				          ->getTransitions()[animator->getCurrentTransitionId()]
+				          .getName());
+			}
 		}
 	}
 	AbstractMainWin::gamepadEvent(e);
@@ -313,8 +330,10 @@ void MainWin::initScene()
 	// PLANETS LOADING
 	debugText = new Text3D(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
-	debugText->setColor(QColor(255, 0, 0));
+	debugText->setColor(
+	    QSettings().value("misc/uilabelscolor").value<QColor>());
 	debugText->setText("");
+	debugText->setSuperSampling(2.f);
 
 	movementControls = new MovementControls(
 	    *vrHandler, universe->getBoundingBox(), cam, camPlanet);
@@ -419,8 +438,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
 		if(vrHandler->isEnabled())
 		{
+			QVector3D pos(0.f, -0.15f, -0.4f);
+			pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
 			debugText->getModel() = cam.hmdSpaceToWorldTransform();
-			debugText->getModel().translate(QVector3D(0.0f, -0.075f, -0.20f));
+			debugText->getModel().translate(pos);
 			debugText->getModel().scale(
 			    1.5 * static_cast<float>(textWidth) / width(),
 			    1.5 * static_cast<float>(textHeight) / height());
@@ -449,12 +470,14 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		timeSinceTextUpdate += frameTiming;
 		std::string targetName(cam.target->getName());
+		/*
 		if(targetName != lastTargetName)
 		{
-			debugText->setText(QString("Locked to ") + targetName.c_str());
-			timeSinceTextUpdate = 0.f;
-			lastTargetName      = targetName;
+		    debugText->setText(QString("Locked to ") + targetName.c_str());
+		    timeSinceTextUpdate = 0.0;
+		    lastTargetName      = targetName;
 		}
+		*/
 	}
 }
 
@@ -469,9 +492,9 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	{
 		if(!universe->isPlanetarySystemRendered())
 		{
-			if(timeSinceTextUpdate < 5.f)
+			if(timeSinceTextUpdate < 5.0)
 			{
-				// debugText->render();
+				debugText->render();
 			}
 		}
 		else
@@ -479,9 +502,9 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 			universe->renderPlanetarySystem();
 			renderer.renderVRControls();
 			universe->renderPlanetarySystemTransparent();
-			if(timeSinceTextUpdate < 5.f)
+			if(timeSinceTextUpdate < 5.0)
 			{
-				// debugText->render();
+				debugText->render();
 			}
 		}
 		if(showGrid)
