@@ -51,12 +51,12 @@ AsyncMesh::AsyncMesh(QString const& path, GLMesh&& defaultMesh)
 
 void AsyncMesh::updateMesh(GLShaderProgram const& shader)
 {
-	if(emptyPath)
+	if(emptyPath || loaded)
 	{
 		return;
 	}
 
-	if(loaded || !future.isFinished())
+	if(!future.isFinished())
 	{
 		if(forceSync())
 		{

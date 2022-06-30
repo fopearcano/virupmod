@@ -47,7 +47,8 @@ class OpenVRHandler : public VRHandler
 
   public slots:
 	virtual QMatrix4x4 getEyeViewMatrix(Side eye) const override;
-	virtual QMatrix4x4 getProjectionMatrix(Side eye, float nearPlan,
+	virtual QMatrix4x4 getProjectionMatrix(QMatrix4x4 const& angleShiftMat,
+	                                       Side eye, float nearPlan,
 	                                       float farPlan) const override;
 	virtual void resetPos() override;
 

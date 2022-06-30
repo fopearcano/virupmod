@@ -87,13 +87,16 @@ QMatrix4x4 StereoBeamerHandler::getEyeViewMatrix(Side eye) const
 	return res;
 }
 
-QMatrix4x4 StereoBeamerHandler::getProjectionMatrix(Side /*eye*/,
-                                                    float nearPlan,
-                                                    float farPlan) const
+QMatrix4x4
+    StereoBeamerHandler::getProjectionMatrix(QMatrix4x4 const& angleShiftMat,
+                                             Side /*eye*/, float nearPlan,
+                                             float farPlan) const
 {
 	QVector3D deltaRel(QSettings()
 	                       .value("vr/virtualcamshift")
 	                       .value<QVector3D>()); // move cam in height units
+	deltaRel = angleShiftMat * deltaRel;
+
 	float vFOV(renderer->getVerticalFOV() * 3.1415 / 180.0),
 	    a(renderer->getAspectRatioFromFOV());
 	float l(-nearPlan * a * tan(vFOV / 2.0)), t(nearPlan * tan(vFOV / 2.0));

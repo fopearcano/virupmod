@@ -285,7 +285,7 @@ if (CONAN_REQUIRED_LIBS)
 
 	# Now that we've installed what we are missing, try to locate them again
 	hydrogenvr_find_packages(FORCE_REQUIRED)
-	find_package(Qt5 REQUIRED COMPONENTS Widgets Concurrent Test Network OpenGLExtensions Gamepad)
+	find_package(Qt5 REQUIRED COMPONENTS Widgets Concurrent Test Network OpenGLExtensions)
 	find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
 endif()
 
