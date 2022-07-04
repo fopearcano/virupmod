@@ -449,7 +449,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	if(pathId == "planet")
 	{
 		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
-		if(vrHandler->isEnabled())
+		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
 		{
 			QVector3D pos(0.f, -0.15f, -0.4f);
 			pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
@@ -461,9 +461,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		else
 		{
-			debugText->getModel() = cam.screenToWorldTransform();
-			// debugText->getModel().translate(QVector3D(-0.88f, 0.88f,
-			// 0.f));
+			QVector3D pos(0.f, -0.15f, -0.5f);
+			pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
+			debugText->getModel() = cam.cameraSpaceToWorldTransform();
+			debugText->getModel().translate(pos);
 			debugText->getModel().scale(
 			    2 * static_cast<float>(textWidth) / width(),
 			    2 * static_cast<float>(textWidth) / height());
