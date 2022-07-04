@@ -143,9 +143,6 @@ transitions = [
     #Solar System
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Sun', 1.65181e+12),
       SceneTemporalData(10000000.0), SceneUI({"Hipparcos":0.1, "Constellations":0.0, "Orbits":1.0, "PlanetsLabels":1.0, "Asteroids":1.0, "Constellations":1.0})), 10.0, "Solar System", "forceDirectTransitionAndAngle"),
-    # Kepler-11
-    Transition(Scene(SceneSpatialData(Universe, 'Kepler-11', 'Kepler-11', 1e11, Vector3(0.0, 0.0, 0.0)),
-          SceneTemporalData(20000.0), SceneUI({"Hipparcos":0.1, "Constellations":0.0, "Orbits":1.0, "PlanetsLabels":1.0})), 10.0, "Kepler-11", "forceHorizontalPiOver2"),
     # Milky Way
     Transition(Scene(SceneSpatialData(Universe, 6.171e+20),#, Vector3(-0.43, -8.24, -0.81)),
           SceneTemporalData(), SceneUI({"LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "Milky Way", "mw"),
