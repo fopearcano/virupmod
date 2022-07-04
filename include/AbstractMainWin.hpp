@@ -434,6 +434,11 @@ class AbstractMainWin : public RenderingWindow
 	void reloadBloomTargets();
 	// SECONDARY WINDOWS
 	std::vector<RenderingWindow*> secondaryWindows;
+
+#ifdef Q_OS_WIN
+	// FULLSCREEN HACK
+	QElapsedTimer fullScreenTimer;
+#endif
 };
 
 template <class T>

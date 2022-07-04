@@ -117,6 +117,7 @@ class RenderingWindow : public QWindow
 	 * @setter{verticalAngleShift}
 	 */
 	void setVerticalAngleShift(double angleShift);
+	QString getScreenName() const { return params.screenname; };
 	/** @brief Transformation matrix combining both @ref horizontalAngleShift
 	 * and @ref verticalAngleShift
 	 */
