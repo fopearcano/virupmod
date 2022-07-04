@@ -327,12 +327,25 @@ void MainWin::initScene()
 	// COSMO LOADING
 	universe = new Universe(*cam, *camPlanet);
 
-	// PLANETS LOADING
+	// DEBUG TEXT
 	debugText = new Text3D(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
 	debugText->setColor(
 	    QSettings().value("misc/uilabelscolor").value<QColor>());
 	debugText->setText("");
+
+	QString fontPath(QSettings().value("misc/uilabelsfont").toString());
+	if(!fontPath.isEmpty())
+	{
+		auto id         = QFontDatabase::addApplicationFont(fontPath);
+		auto fontFamily = QFontDatabase::applicationFontFamilies(id)[0];
+		if(!fontFamily.isEmpty())
+		{
+			QFont f = debugText->getFont();
+			f.setFamily(fontFamily);
+			debugText->setFont(f);
+		}
+	}
 	debugText->setSuperSampling(2.f);
 
 	movementControls = new MovementControls(
