@@ -28,10 +28,8 @@ Billboard::Billboard(QImage const& image)
 }
 
 Billboard::Billboard(const char* texPath, GLShaderProgram&& shader)
-    : tex(texPath)
-    , shader(std::move(shader))
+    : Billboard(QImage(texPath).mirrored(), std::move(shader))
 {
-	Primitives::setAsQuad(quad, this->shader, PrimitiveType::TRIANGLE_STRIP);
 }
 
 Billboard::Billboard(QImage const& image, GLShaderProgram&& shader)
@@ -39,6 +37,18 @@ Billboard::Billboard(QImage const& image, GLShaderProgram&& shader)
     , shader(std::move(shader))
 {
 	Primitives::setAsQuad(quad, this->shader, PrimitiveType::TRIANGLE_STRIP);
+
+	if(tex.getSize().width() > tex.getSize().height())
+	{
+		aspectratio.scale(1.f, static_cast<float>(tex.getSize().height())
+		                           / tex.getSize().width());
+	}
+	else
+	{
+		aspectratio.scale(static_cast<float>(tex.getSize().width())
+		                      / tex.getSize().height(),
+		                  1.f);
+	}
 }
 
 void Billboard::render(BasicCamera const& camera)
@@ -49,7 +59,8 @@ void Billboard::render(BasicCamera const& camera)
 	model.scale(width / camera.getEyeDistanceFactor());
 	GLHandler::beginTransparent();
 	GLHandler::useTextures({&tex});
-	GLHandler::setUpRender(shader, model, GLHandler::GeometricSpace::HMD);
+	GLHandler::setUpRender(shader, model * aspectratio,
+	                       GLHandler::GeometricSpace::HMD);
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::endTransparent();
 }

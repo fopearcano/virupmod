@@ -30,6 +30,7 @@ class Billboard
 	explicit Billboard(QImage const& image);
 	Billboard(const char* texPath, GLShaderProgram&& shader);
 	Billboard(QImage const& image, GLShaderProgram&& shader);
+	GLShaderProgram const& getShader() { return shader; };
 	void render(BasicCamera const& camera);
 
 	QVector3D position = QVector3D();
@@ -39,6 +40,8 @@ class Billboard
 	GLTexture tex;
 	GLMesh quad;
 	GLShaderProgram shader;
+
+	QMatrix4x4 aspectratio;
 };
 
 #endif // BILLBOARD_H
