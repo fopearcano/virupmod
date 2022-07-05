@@ -39,8 +39,9 @@
 // 0.15ly is the closest two stars have been observed in ED
 // #define SCALE_LIMIT 326157.860404
 
-class MovementControls
+class MovementControls : public QObject
 {
+	Q_OBJECT
   public:
 	MovementControls(VRHandler const& vrHandler, BBox dataBBox,
 	                 Camera* cosmoCam, OrbitalSystemCamera* cam);
@@ -53,6 +54,9 @@ class MovementControls
 	void update(double frameTiming, bool renderPlanetarySystem,
 	            GamepadHandler const& gamepadHandler);
 	void renderGuides();
+
+  signals:
+	void gamepadVelocityChanged(QVector3D const& newVelocity);
 
   private:
 	void vrEventCube(VRHandler::Event const& e,

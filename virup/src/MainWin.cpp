@@ -350,6 +350,10 @@ void MainWin::initScene()
 
 	movementControls = new MovementControls(
 	    *vrHandler, universe->getBoundingBox(), cam, camPlanet);
+	connect(movementControls, &MovementControls::gamepadVelocityChanged,
+	        [](QVector3D const& /*newVel*/) {
+		        QSound::play(getAbsoluteDataPath("sounds/thruster/thrust.wav"));
+	        });
 
 	renderer.removeSceneRenderPath("default");
 

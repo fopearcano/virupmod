@@ -381,10 +381,25 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 	// set gamepad input
 	if(gamepadHandler.isEnabled())
 	{
+		auto oldGamepadVel = gamepadVel;
+		oldGamepadVel.setX((oldGamepadVel.x() > 0) - (oldGamepadVel.x() < 0));
+		oldGamepadVel.setY((oldGamepadVel.y() > 0) - (oldGamepadVel.y() < 0));
+		oldGamepadVel.setZ((oldGamepadVel.z() > 0) - (oldGamepadVel.z() < 0));
 		float yVal = gamepadHandler.getTrigger(Side::RIGHT)
 		             - gamepadHandler.getTrigger(Side::LEFT);
 		gamepadVel = {gamepadHandler.getJoystick(Side::LEFT).x(), yVal,
 		              gamepadHandler.getJoystick(Side::LEFT).y()};
+		auto signOfGamepadVel = gamepadVel;
+		signOfGamepadVel.setX((signOfGamepadVel.x() > 0)
+		                      - (signOfGamepadVel.x() < 0));
+		signOfGamepadVel.setY((signOfGamepadVel.y() > 0)
+		                      - (signOfGamepadVel.y() < 0));
+		signOfGamepadVel.setZ((signOfGamepadVel.z() > 0)
+		                      - (signOfGamepadVel.z() < 0));
+		if(oldGamepadVel != signOfGamepadVel)
+		{
+			emit gamepadVelocityChanged(gamepadVel);
+		}
 
 		float fI((scaleIncreaseFactor - 1.f) * frameTiming + 1.f);
 		float fD((scaleDecreaseFactor - 1.f) * frameTiming + 1.f);
