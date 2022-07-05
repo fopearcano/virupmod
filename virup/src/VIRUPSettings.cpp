@@ -43,6 +43,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	                tr("UI Labels Color"));
 	addFilePathSetting("uilabelsfont", "", tr("UI Labels Font file"));
 	addDoubleSetting("uilabelsdistmul", 1.0, tr("UI Labels Distance Mult."));
+	addBoolSetting("halfcavehelper", false, tr("Show Half-Cave helper"));
 	addBoolSetting("showgrid", false, tr("Show Grid"));
 	addColorSetting("gridcolor", QColor(255, 255, 255), tr("Grid Color"));
 	addDoubleSetting("mintanangle", 0.05,

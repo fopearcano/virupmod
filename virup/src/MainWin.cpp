@@ -327,7 +327,10 @@ void MainWin::initScene()
 	// COSMO LOADING
 	universe = new Universe(*cam, *camPlanet);
 
-	// DEBUG TEXT
+	// UI
+	helperBillboard = new Billboard(
+	    getAbsoluteDataPath("images/halfcave_helper.png").toLatin1().data());
+
 	debugText = new Text3D(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
 	debugText->setColor(
@@ -453,10 +456,18 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	if(pathId == "planet")
 	{
 		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
+		QVector3D pos(0.f, -0.3f, -0.4f);
+		pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
+
+		auto billboardPos = pos;
+		billboardPos.setY(-pos.y());
+		helperBillboard->width = 0.4f;
+
 		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
 		{
-			QVector3D pos(0.f, -0.15f, -0.4f);
-			pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
+			helperBillboard->position
+			    = cam.hmdSpaceToWorldTransform() * billboardPos;
+
 			debugText->getModel() = cam.hmdSpaceToWorldTransform();
 			debugText->getModel().translate(pos);
 			debugText->getModel().scale(
@@ -465,14 +476,19 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		else
 		{
-			QVector3D pos(0.f, -0.15f, -0.5f);
-			pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
+			helperBillboard->position
+			    = cam.cameraSpaceToWorldTransform() * billboardPos;
+
 			debugText->getModel() = cam.cameraSpaceToWorldTransform();
 			debugText->getModel().translate(pos);
 			debugText->getModel().scale(
 			    2 * static_cast<float>(textWidth) / width(),
 			    2 * static_cast<float>(textWidth) / height());
 		}
+		helperBillboard->getShader().setUniform("exposure",
+		                                        toneMappingModel->exposure);
+		helperBillboard->getShader().setUniform("dynamicrange",
+		                                        toneMappingModel->dynamicrange);
 		debugText->getShader().setUniform("exposure",
 		                                  toneMappingModel->exposure);
 		debugText->getShader().setUniform("dynamicrange",
@@ -512,6 +528,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		{
 			if(timeSinceTextUpdate < 5.0)
 			{
+				helperBillboard->render(camera);
 				debugText->render();
 			}
 		}
@@ -522,6 +539,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 			universe->renderPlanetarySystemTransparent();
 			if(timeSinceTextUpdate < 5.0)
 			{
+				helperBillboard->render(camera);
 				debugText->render();
 			}
 		}
@@ -671,6 +689,7 @@ MainWin::~MainWin()
 	delete univElemSelect;
 	delete lenseDistortionMap;
 	delete debugText;
+	delete helperBillboard;
 	delete movementControls;
 	delete universe;
 	delete grid;

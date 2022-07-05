@@ -276,6 +276,7 @@ class MainWin : public AbstractMainWin
 	MovementControls* movementControls = nullptr;
 
 	/* TEXT */
+	Billboard* helperBillboard = nullptr;
 	Text3D* debugText          = nullptr;
 	double timeSinceTextUpdate = DBL_MAX;
 
