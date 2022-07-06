@@ -299,6 +299,7 @@ class MainWin : public AbstractMainWin
 
 	// scenes
 	Animator* animator = nullptr;
+	QSound ambiance{getAbsoluteDataPath("sounds/music/00.wav"), nullptr};
 };
 
 #endif // MAINWIN_H

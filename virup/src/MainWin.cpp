@@ -402,6 +402,11 @@ void MainWin::initScene()
 		                 [this]() { this->visibilities->show(); });
 	}
 	cursorTimer.start();
+
+	// AMBIANCE
+
+	ambiance.setLoops(QSound::Infinite);
+	ambiance.play();
 }
 
 void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
