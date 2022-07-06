@@ -301,6 +301,7 @@ void MainWin::setupPythonAPI()
 	PythonQtHandler::addWrapper<SceneTemporalDataWrapper>();
 	PythonQtHandler::addWrapper<SceneUIWrapper>();
 	PythonQtHandler::addWrapper<SceneCameraDataWrapper>();
+	PythonQtHandler::addWrapper<SceneToneMappingDataWrapper>();
 }
 
 void MainWin::initLibraries()

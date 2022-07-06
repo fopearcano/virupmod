@@ -52,12 +52,13 @@ class Transition
 	 * - the transition wasn't being played
 	 * - the transition finished and is stopping by itself
 	 */
-	bool updateUniverse(Universe& universe, float t_harsh,
-	                    Scene const& fromScene, float fadeFactor,
+	bool updateUniverse(Universe& universe, ToneMappingModel& tmm,
+	                    float t_harsh, Scene const& fromScene, float fadeFactor,
 	                    std::function<Vector3()> const& getCosmoShift,
 	                    std::function<Vector3()> const& getPlanetShift) const;
 
-	void applyDestination(Universe& universe, float fadeFactor,
+	void applyDestination(Universe& universe, ToneMappingModel& tmm,
+	                      float fadeFactor,
 	                      std::function<Vector3()> const& getCosmoShift,
 	                      std::function<Vector3()> const& getPlanetShift) const;
 

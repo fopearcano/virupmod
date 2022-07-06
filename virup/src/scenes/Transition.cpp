@@ -40,7 +40,8 @@ void Transition::custom(float t, float t_harsh) const
 }
 
 bool Transition::updateUniverse(
-    Universe& universe, float t_harsh, Scene const& fromScene, float fadeFactor,
+    Universe& universe, ToneMappingModel& tmm, float t_harsh,
+    Scene const& fromScene, float fadeFactor,
     std::function<Vector3()> const& getCosmoShift,
     std::function<Vector3()> const& getPlanetShift) const
 {
@@ -68,7 +69,7 @@ bool Transition::updateUniverse(
 	}
 	scene.setUI(ui);
 
-	scene.setAsUniverseState(universe);
+	scene.setAsUniverseState(universe, tmm);
 
 	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
 
@@ -92,7 +93,7 @@ bool Transition::updateUniverse(
 }
 
 void Transition::applyDestination(
-    Universe& universe, float fadeFactor,
+    Universe& universe, ToneMappingModel& tmm, float fadeFactor,
     std::function<Vector3()> const& getCosmoShift,
     std::function<Vector3()> const& getPlanetShift) const
 {
@@ -110,7 +111,7 @@ void Transition::applyDestination(
 	}
 	scene.setUI(ui);
 
-	scene.setAsUniverseState(universe);
+	scene.setAsUniverseState(universe, tmm);
 
 	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
 

@@ -19,28 +19,32 @@
 #include "scenes/Scene.hpp"
 
 Scene::Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
-             SceneCameraData cd)
+             SceneCameraData cd, SceneToneMappingData tmd)
     : sd(std::move(sd))
     , td(std::move(td))
     , ui(std::move(ui))
     , cd(std::move(cd))
+    , tmd(std::move(tmd))
 {
 }
 
-Scene Scene::getCurrentState(Universe const& universe)
+Scene Scene::getCurrentState(Universe const& universe,
+                             ToneMappingModel const& tmm)
 {
 	return {SceneSpatialData::getCurrentState(universe),
 	        SceneTemporalData::getCurrentState(universe),
 	        SceneUI::getCurrentState(universe),
-	        SceneCameraData::getCurrentState(universe)};
+	        SceneCameraData::getCurrentState(universe),
+	        SceneToneMappingData::getCurrentState(tmm)};
 }
 
-void Scene::setAsUniverseState(Universe& universe)
+void Scene::setAsUniverseState(Universe& universe, ToneMappingModel& tmm)
 {
 	sd.setAsUniverseState(universe);
 	td.setAsUniverseState(universe);
 	ui.setAsUniverseState(universe);
 	cd.setAsUniverseState(universe);
+	tmd.setAsState(tmm);
 }
 
 Scene Scene::interpolate(Scene const& s0, Scene const& s1, float t)
@@ -48,7 +52,8 @@ Scene Scene::interpolate(Scene const& s0, Scene const& s1, float t)
 	return {SceneSpatialData::interpolate(s0.sd, s1.sd, t),
 	        SceneTemporalData::interpolate(s0.td, s1.td, t),
 	        SceneUI::interpolate(s0.ui, s1.ui, t),
-	        SceneCameraData::interpolate(s0.cd, s1.cd, t)};
+	        SceneCameraData::interpolate(s0.cd, s1.cd, t),
+	        SceneToneMappingData::interpolate(s0.tmd, s1.tmd, t)};
 }
 
 QString Scene::getPythonRepresentation() const
@@ -57,7 +62,8 @@ QString Scene::getPythonRepresentation() const
 	result += sd.getPythonRepresentation() + ",\n    ";
 	result += td.getPythonRepresentation() + ", ";
 	result += ui.getPythonRepresentation() + ",\n    ";
-	result += cd.getPythonRepresentation();
+	result += cd.getPythonRepresentation() + ", ";
+	result += tmd.getPythonRepresentation();
 	result += ')';
 
 	return result;

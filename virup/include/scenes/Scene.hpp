@@ -22,6 +22,7 @@
 #include "SceneCameraData.hpp"
 #include "SceneSpatialData.hpp"
 #include "SceneTemporalData.hpp"
+#include "SceneToneMappingData.hpp"
 #include "SceneUI.hpp"
 
 /*! \ingroup pywrap
@@ -38,7 +39,7 @@ class Scene
 	Scene(Scene const& other) = default;
 	Scene(Scene&& other)      = default;
 	Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
-	      SceneCameraData cd = {});
+	      SceneCameraData cd = {}, SceneToneMappingData tm = {});
 	Scene& operator=(Scene const& other) = default;
 
 	SceneSpatialData const& getSpatialData() const { return sd; };
@@ -49,9 +50,12 @@ class Scene
 	void setUI(SceneUI ui) { this->ui = ui; };
 	SceneCameraData const& getCameraData() const { return cd; };
 	void setCameraData(SceneCameraData cd) { this->cd = cd; };
+	SceneToneMappingData const& getToneMappingData() const { return tmd; };
+	void setToneMappingData(SceneToneMappingData tmd) { this->tmd = tmd; };
 
-	static Scene getCurrentState(Universe const& universe);
-	void setAsUniverseState(Universe& universe);
+	static Scene getCurrentState(Universe const& universe,
+	                             ToneMappingModel const& tmm);
+	void setAsUniverseState(Universe& universe, ToneMappingModel& tmm);
 
 	static Scene interpolate(Scene const& s0, Scene const& s1, float t);
 
@@ -62,6 +66,7 @@ class Scene
 	SceneTemporalData td;
 	SceneUI ui;
 	SceneCameraData cd;
+	SceneToneMappingData tmd;
 };
 
 /* PYTHONQT */
@@ -87,6 +92,13 @@ class SceneWrapper : public PythonQtWrapper
 	{
 		return new Scene(std::move(sd), std::move(td), std::move(ui),
 		                 std::move(cd));
+	}
+	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
+	                 SceneUI const& ui, SceneCameraData const& cd,
+	                 SceneToneMappingData const& tm)
+	{
+		return new Scene(std::move(sd), std::move(td), std::move(ui),
+		                 std::move(cd), std::move(tm));
 	}
 
 	void delete_Scene(Scene* s) { delete s; }
@@ -116,14 +128,24 @@ class SceneWrapper : public PythonQtWrapper
 		return s->getCameraData();
 	};
 	void setCameraData(Scene* s, SceneCameraData cd) { s->setCameraData(cd); };
-
-	Scene static_Scene_getCurrentState(Universe const& universe)
+	SceneToneMappingData getToneMappingData(Scene* s) const
 	{
-		return Scene::getCurrentState(universe);
+		return s->getToneMappingData();
 	};
-	void setAsUniverseState(Scene* s, Universe& universe) const
+	void setToneMappingData(Scene* s, SceneToneMappingData tm)
 	{
-		s->setAsUniverseState(universe);
+		s->setToneMappingData(tm);
+	};
+
+	Scene static_Scene_getCurrentState(Universe const& universe,
+	                                   ToneMappingModel const& tmm)
+	{
+		return Scene::getCurrentState(universe, tmm);
+	};
+	void setAsUniverseState(Scene* s, Universe& universe,
+	                        ToneMappingModel& tmm) const
+	{
+		s->setAsUniverseState(universe, tmm);
 	};
 	Scene static_Scene_interpolate(Scene const& s0, Scene const& s1, float t)
 	{

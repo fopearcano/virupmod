@@ -20,7 +20,7 @@
 
 Scene Animator::getCurrentScene() const
 {
-	auto result = Scene::getCurrentState(universe);
+	auto result = Scene::getCurrentState(universe, tmm);
 	auto sd     = result.getSpatialData();
 	if(sd.getSystemName() == "" && sd.getBodyName() == "")
 	{
@@ -122,8 +122,8 @@ void Animator::update()
 		tmm.exposure = 0.3;
 		fadeFactor   = 1.0;
 		if(!customTransition.updateUniverse(
-		       universe, t_secs / customTransition.getDuration(), currentScene,
-		       fadeFactor, [this]() { return getCosmoShift(); },
+		       universe, tmm, t_secs / customTransition.getDuration(),
+		       currentScene, fadeFactor, [this]() { return getCosmoShift(); },
 		       [this]() { return getPlanetShift(); }))
 		{
 			stop();
@@ -152,7 +152,7 @@ void Animator::update()
 			if(currentTransition == &transitions[0])
 			{
 				currentTransition->updateUniverse(
-				    universe, t_harsh, currentTransition->getDestination(),
+				    universe, tmm, t_harsh, currentTransition->getDestination(),
 				    fadeFactor, [this]() { return getCosmoShift(); },
 				    [this]() { return getPlanetShift(); });
 			}
@@ -168,7 +168,7 @@ void Animator::update()
 					cosmodPos  = Vector3() - universe.getCosmoPosition();
 				}
 				currentTransition->updateUniverse(
-				    universe, t_harsh, transitions[i - 2].getDestination(),
+				    universe, tmm, t_harsh, transitions[i - 2].getDestination(),
 				    fadeFactor, [this]() { return getCosmoShift(); },
 				    [this]() { return getPlanetShift(); });
 				if(debug
