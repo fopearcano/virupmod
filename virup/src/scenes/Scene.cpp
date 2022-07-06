@@ -19,11 +19,11 @@
 #include "scenes/Scene.hpp"
 
 Scene::Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
-             QString name)
+             SceneCameraData cd)
     : sd(std::move(sd))
     , td(std::move(td))
     , ui(std::move(ui))
-    , name(std::move(name))
+    , cd(std::move(cd))
 {
 }
 
@@ -31,7 +31,8 @@ Scene Scene::getCurrentState(Universe const& universe)
 {
 	return {SceneSpatialData::getCurrentState(universe),
 	        SceneTemporalData::getCurrentState(universe),
-	        SceneUI::getCurrentState(universe)};
+	        SceneUI::getCurrentState(universe),
+	        SceneCameraData::getCurrentState(universe)};
 }
 
 void Scene::setAsUniverseState(Universe& universe)
@@ -39,13 +40,15 @@ void Scene::setAsUniverseState(Universe& universe)
 	sd.setAsUniverseState(universe);
 	td.setAsUniverseState(universe);
 	ui.setAsUniverseState(universe);
+	cd.setAsUniverseState(universe);
 }
 
 Scene Scene::interpolate(Scene const& s0, Scene const& s1, float t)
 {
 	return {SceneSpatialData::interpolate(s0.sd, s1.sd, t),
 	        SceneTemporalData::interpolate(s0.td, s1.td, t),
-	        SceneUI::interpolate(s0.ui, s1.ui, t)};
+	        SceneUI::interpolate(s0.ui, s1.ui, t),
+	        SceneCameraData::interpolate(s0.cd, s1.cd, t)};
 }
 
 QString Scene::getPythonRepresentation() const
@@ -53,11 +56,8 @@ QString Scene::getPythonRepresentation() const
 	QString result("Scene(");
 	result += sd.getPythonRepresentation() + ",\n    ";
 	result += td.getPythonRepresentation() + ", ";
-	result += ui.getPythonRepresentation();
-	if(name != "")
-	{
-		result += ", \"" + name + "\"";
-	}
+	result += ui.getPythonRepresentation() + ",\n    ";
+	result += cd.getPythonRepresentation();
 	result += ')';
 
 	return result;

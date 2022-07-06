@@ -19,6 +19,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include "SceneCameraData.hpp"
 #include "SceneSpatialData.hpp"
 #include "SceneTemporalData.hpp"
 #include "SceneUI.hpp"
@@ -37,7 +38,7 @@ class Scene
 	Scene(Scene const& other) = default;
 	Scene(Scene&& other)      = default;
 	Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
-	      QString name = "");
+	      SceneCameraData cd = {});
 	Scene& operator=(Scene const& other) = default;
 
 	SceneSpatialData const& getSpatialData() const { return sd; };
@@ -46,8 +47,8 @@ class Scene
 	void setTemporalData(SceneTemporalData td) { this->td = td; };
 	SceneUI const& getUI() const { return ui; };
 	void setUI(SceneUI ui) { this->ui = ui; };
-	QString const& getName() const { return name; };
-	void setName(QString name) { this->name = name; };
+	SceneCameraData const& getCameraData() const { return cd; };
+	void setCameraData(SceneCameraData cd) { this->cd = cd; };
 
 	static Scene getCurrentState(Universe const& universe);
 	void setAsUniverseState(Universe& universe);
@@ -60,7 +61,7 @@ class Scene
 	SceneSpatialData sd;
 	SceneTemporalData td;
 	SceneUI ui;
-	QString name;
+	SceneCameraData cd;
 };
 
 /* PYTHONQT */
@@ -82,10 +83,10 @@ class SceneWrapper : public PythonQtWrapper
 		return new Scene(std::move(sd), std::move(td), std::move(ui));
 	}
 	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
-	                 SceneUI const& ui, QString name)
+	                 SceneUI const& ui, SceneCameraData const& cd)
 	{
 		return new Scene(std::move(sd), std::move(td), std::move(ui),
-		                 std::move(name));
+		                 std::move(cd));
 	}
 
 	void delete_Scene(Scene* s) { delete s; }
@@ -110,8 +111,11 @@ class SceneWrapper : public PythonQtWrapper
 	};
 	SceneUI getUI(Scene* s) const { return s->getUI(); };
 	void setUI(Scene* s, SceneUI ui) { s->setUI(ui); };
-	QString getName(Scene* s) const { return s->getName(); };
-	void setName(Scene* s, QString name) { s->setName(name); };
+	SceneCameraData getCameraData(Scene* s) const
+	{
+		return s->getCameraData();
+	};
+	void setCameraData(Scene* s, SceneCameraData cd) { s->setCameraData(cd); };
 
 	Scene static_Scene_getCurrentState(Universe const& universe)
 	{
