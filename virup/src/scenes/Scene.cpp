@@ -23,8 +23,8 @@ Scene::Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
     : sd(std::move(sd))
     , td(std::move(td))
     , ui(std::move(ui))
-    , cd(std::move(cd))
-    , tmd(std::move(tmd))
+    , cd(cd)
+    , tmd(tmd)
 {
 }
 
