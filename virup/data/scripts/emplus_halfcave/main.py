@@ -87,7 +87,6 @@ def forceDirectTransitionAndAngle(t, t_harsh):
     forceHorizontalPiOver2(t, t_harsh)
 
 def sdss(t, t_harsh):
-    ToneMappingModel.contrast = 1.3 - t*0.3
     if t < 0.1:
         Universe.setVisibility("IllustrisTNG", 1.0 - (10*t))
     else:
@@ -105,8 +104,6 @@ def saturn1(t, t_harsh):
         showOrbitsWhileTraveling(0.5, 0.5)
     l=["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Mimas", "Enceladus", "Dione", "Tethys", "Rhea", "Hyperion", "Titan", "Iapetus"]
     Universe.setLabelsOrbitsOnly(l)
-    ToneMappingModel.exposure=0.3+2.7*t
-    Universe.setVisibility("Hipparcos", 0.1 * 0.3 / ToneMappingModel.exposure)
 
 def mw(t, t_harsh):
     SceneSpatialData.setForceDirectInterpolation(True)
@@ -117,9 +114,6 @@ def wait(t, t_harsh):
 def asteroids(t, t_harsh):
     forceDirectTransitionAndAngle(t, t_harsh)
     Universe.setVisibility("Asteroids", t**0.1)
-
-def illustris(t, t_harsh):
-    ToneMappingModel.contrast = 1.0 + t*0.3
 
 # END CUSTOM
 
@@ -139,7 +133,8 @@ transitions = [
           SceneTemporalData(1000.0), SceneUI({"Gaia":1.0, "Hipparcos":0.1, "Debris":1.0})), 10.0, "Debris", "debris", 10000.0, 10000.0),
     # Saturn
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Saturn', 300000000),
-       SceneTemporalData(1000.0), SceneUI({"Hipparcos":0.1, "Orbits":1.0, "PlanetsLabels":1.0})), 10.0, 'Saturn', 'saturn1'),
+       SceneTemporalData(1000.0), SceneUI({"Hipparcos":0.01, "Orbits":1.0, "PlanetsLabels":1.0}),
+       SceneCameraData(), SceneToneMappingData(3.0)), 10.0, 'Saturn', 'saturn1'),
     #Solar System
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Sun', 1.65181e+12),
       SceneTemporalData(10000000.0), SceneUI({"Hipparcos":0.1, "Constellations":0.0, "Orbits":1.0, "PlanetsLabels":1.0, "Asteroids":1.0, "Constellations":1.0})), 10.0, "Solar System", "forceDirectTransitionAndAngle"),
@@ -148,7 +143,8 @@ transitions = [
           SceneTemporalData(), SceneUI({"LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "Milky Way", "mw"),
     # Illustris
     Transition(Scene(SceneSpatialData(Universe, 0.2e+25),
-          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0})), 10.0, "IllustrisTNG", "illustris", 100.0, 100.0),
+          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0}),
+          SceneCameraData(), SceneToneMappingData(0.3, 1.3)), 10.0, "IllustrisTNG", "", 100.0, 100.0),
     # SDSS distant
     Transition(Scene(SceneSpatialData(Universe, 1.0e+26),
           SceneTemporalData(), SceneUI({"SDSS":1.0})), 10.0, "SDSS", "sdss", 10000, 10000),
@@ -167,7 +163,6 @@ def initScene():
         foo += t.getDuration()
     print(foo)
     Animator.debug = False
-    ToneMappingModel.contrast = 1.0
     Animator.setFirstScene()
     #Animator.restart()
 
