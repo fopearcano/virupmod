@@ -18,6 +18,13 @@
 
 #include "scenes/Animator.hpp"
 
+void Animator::setPersonHeight(float personHeight)
+{
+	this->personHeight = personHeight;
+	QSettings().setValue("misc/disttoorigin", personHeight);
+	emit personHeightChanged(personHeight);
+}
+
 Scene Animator::getCurrentScene() const
 {
 	auto result = Scene::getCurrentState(universe, tmm);

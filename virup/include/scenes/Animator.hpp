@@ -31,6 +31,7 @@ class Animator : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(float personheight READ getPersonHeight WRITE setPersonHeight)
 	Q_PROPERTY(float fadeFactor READ getFadeFactor WRITE setFadeFactor)
 	Q_PROPERTY(float shiftHorizontalAngle READ getShiftHorizontalAngle WRITE
 	               setShiftHorizontalAngle)
@@ -69,6 +70,8 @@ class Animator : public QObject
 	};
 	float getFadeFactor() const { return fadeFactor; };
 	void setFadeFactor(float fadeFactor) { this->fadeFactor = fadeFactor; };
+	float getPersonHeight() const { return personHeight; };
+	void setPersonHeight(float personHeight);
 	int getCurrentTransitionId() const { return this->id; };
 	Scene getCurrentScene() const;
 
@@ -114,6 +117,7 @@ class Animator : public QObject
 	void paused();
 	void stopped();
 	void transitionsModified();
+	void personHeightChanged(float personHeight);
 
   private:
 	Vector3 getShift(double coeff = 1.0) const;
@@ -130,10 +134,10 @@ class Animator : public QObject
 	VRHandler const& vrHandler;
 	ToneMappingModel& tmm;
 
-	int id                     = 0;
-	int idBackup               = 0;
-	bool animationsDisabled    = false;
-	float personHeight         = 1.5f;
+	int id                  = 0;
+	int idBackup            = 0;
+	bool animationsDisabled = false;
+	float personHeight      = QSettings().value("misc/disttoorigin").toDouble();
 	float shiftHorizontalAngle = 0.f;
 	float shiftVerticalAngle   = 0.05f;
 	float fadeFactor           = 1.f;

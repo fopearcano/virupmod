@@ -74,6 +74,19 @@ SceneSelector::SceneSelector(Animator& animator)
 	        [&animator]() { animator.stopVoiceover(); });
 	hl->addWidget(b);
 
+	hl->addWidget(new QLabel(tr("User height : ")));
+	auto sb = new QDoubleSpinBox(this);
+	sb->setValue(animator.getPersonHeight());
+	connect(sb,
+	        static_cast<void (QDoubleSpinBox::*)(double)>(
+	            &QDoubleSpinBox::valueChanged),
+	        [&animator](double v) { animator.setPersonHeight(v); });
+	connect(&animator, &Animator::personHeightChanged, [sb](float v) {
+		QSignalBlocker blocker{sb};
+		sb->setValue(v);
+	});
+	hl->addWidget(sb);
+
 	slider.setMaximum(1000);
 	connect(&slider, &QSlider::sliderPressed,
 	        [this]() { animateSlider = false; });

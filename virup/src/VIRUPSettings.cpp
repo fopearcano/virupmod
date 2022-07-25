@@ -39,6 +39,8 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	                  tr("Exoplanetary Systems Root Directory"));
 
 	insertGroup("misc", tr("Miscellaneous"), 3);
+	addDoubleSetting("disttoorigin", 1.5,
+	                 tr("Default object distance to origin (in m)"));
 	addColorSetting("uilabelscolor", QColor(255, 165, 0),
 	                tr("UI Labels Color"));
 	addFilePathSetting("uilabelsfont", "", tr("UI Labels Font file"));
