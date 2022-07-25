@@ -413,6 +413,8 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 	{
 		gamepadVel = {};
 	}
+	auto multiplier = QSettings().value("controls/translationspeed").toDouble();
+	gamepadVel *= multiplier;
 
 	updateCube(frameTiming);
 	if(renderPlanetarySystem)

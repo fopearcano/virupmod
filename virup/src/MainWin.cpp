@@ -458,10 +458,12 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(gamepadHandler.isEnabled())
 		{
+			auto multiplier
+			    = QSettings().value("controls/rotationspeed").toDouble();
 			auto rightJoystick(gamepadHandler.getJoystick(Side::RIGHT));
 			float yaw(universe->getCamYaw()), pitch(universe->getCamPitch());
-			yaw -= 2.0 * rightJoystick.x() * frameTiming;
-			pitch += 2.0 * rightJoystick.y() * frameTiming;
+			yaw -= 2.0 * rightJoystick.x() * frameTiming * multiplier;
+			pitch += 2.0 * rightJoystick.y() * frameTiming * multiplier;
 			universe->setCamYaw(yaw);
 			universe->setCamPitch(pitch);
 			// handle idle mode

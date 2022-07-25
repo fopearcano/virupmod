@@ -66,6 +66,12 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	               tr("Maximum number of light casters per object"), 1, 2);
 	addFilePathSetting("customfont", "", tr("Custom font file"));
 
+	editGroup("controls");
+	addDoubleSetting("translationspeed", 1.0,
+	                 tr("Gamepad Translation Speed Multiplier"));
+	addDoubleSetting("rotationspeed", 1.0,
+	                 tr("Gamepad Rotation Speed Multiplier"));
+
 	setCurrentIndex(0);
 
 	// DOWNLOADER
