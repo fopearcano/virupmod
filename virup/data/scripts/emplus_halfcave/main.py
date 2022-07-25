@@ -17,7 +17,27 @@ def showOrbitsWhileTraveling(t, t_harsh):
         Universe.setVisibility("Orbits", (1.0 - (t_harsh-0.7)*3)**5)
         Universe.setVisibility("PlanetsLabels", (1.0 - (t_harsh-0.7)*3)**5)
 
-def saturn1(t, t_harsh):
+def earth(t, t_harsh):
+    l=["Earth", "Moon", "Sun"]
+    Universe.setLabelsOrbitsOnly(l)
+
+def phobos(t, t_harsh):
+    if t < 0.5:
+        showOrbitsWhileTraveling(t, t_harsh)
+    else:
+        showOrbitsWhileTraveling(0.5, 0.5)
+    l=["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Phobos", "Deimos"]
+    Universe.setLabelsOrbitsOnly(l)
+
+def jupiter(t, t_harsh):
+    if t < 0.5:
+        showOrbitsWhileTraveling(t, t_harsh)
+    else:
+        showOrbitsWhileTraveling(0.5, 0.5)
+    l=["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Io", "Europa", "Ganymede", "Callisto"]
+    Universe.setLabelsOrbitsOnly(l)
+
+def saturn(t, t_harsh):
     if t < 0.5:
         showOrbitsWhileTraveling(t, t_harsh)
     else:
@@ -28,7 +48,7 @@ def saturn1(t, t_harsh):
 
 #2021-06-26T01:52:07Z
 #2021-06-25T22:00:07Z
-startdt = QDateTime(QDate(2022, 3, 19), QTime(10, 45, 00), QTimeZone(0))
+startdt = QDateTime(QDate(2016, 3, 24), QTime(10, 45, 00), QTimeZone(0))
 isspos = Vector3(-48, 37, 20) # -50 0 30
 
 
@@ -36,14 +56,22 @@ transitions = [
 # Intro
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 30000000),
-          SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1})), 10.0, "Earth"),
+        SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "Earth", "earth"),
     # Debris
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 40000000),
-          SceneTemporalData(1000.0), SceneUI({"Gaia":1.0, "Hipparcos":0.1, "Debris":1.0})), 10.0, "Debris"),
+          SceneTemporalData(1000.0), SceneUI({"Gaia":1.0, "Hipparcos":0.1, "Debris":1.0})), 10.0, "Debris", "earth"),
+    # Phobos
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Phobos', 30000),
+       SceneTemporalData(500.0), SceneUI({"Hipparcos":0.1*0.3/0.5, "Orbits":1.0, "PlanetsLabels":1.0}),
+       SceneCameraData(), SceneToneMappingData(0.5)), 10.0, 'Phobos', 'phobos'),
+    # Jupiter
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Jupiter', 300000000),
+       SceneTemporalData(1000.0), SceneUI({"Hipparcos":0.1*0.3/1.0, "Orbits":1.0, "PlanetsLabels":1.0}),
+       SceneCameraData(), SceneToneMappingData(1.0)), 10.0, 'Jupiter', 'jupiter'),
     # Saturn
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Saturn', 300000000),
        SceneTemporalData(1000.0), SceneUI({"Hipparcos":0.01, "Orbits":1.0, "PlanetsLabels":1.0}),
-       SceneCameraData(), SceneToneMappingData(3.0)), 10.0, 'Saturn', 'saturn1'),
+       SceneCameraData(), SceneToneMappingData(3.0)), 10.0, 'Saturn', 'saturn'),
     #Solar System
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Sun', 1.65181e+12),
       SceneTemporalData(10000000.0), SceneUI({"Hipparcos":0.1, "Constellations":0.0, "Orbits":1.0, "PlanetsLabels":1.0, "Asteroids":1.0, "Constellations":1.0})), 10.0, "Solar System"),
