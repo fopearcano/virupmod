@@ -486,11 +486,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	if(pathId == "planet")
 	{
 		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
-		QVector3D pos(0.f, -0.3f, -0.4f);
+		QVector3D pos(-0.3f, 0.25f, -0.4f);
 		pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
 
 		auto billboardPos = pos;
-		billboardPos.setY(-pos.y());
+		billboardPos.setY(pos.y() + 0.06);
 		helperBillboard->width = 0.4f;
 
 		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
