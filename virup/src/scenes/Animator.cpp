@@ -103,6 +103,18 @@ void Animator::setTransition(int newid)
 
 void Animator::update()
 {
+	if(idleMode && !playCustom)
+	{
+		if(idBackup + 1 < static_cast<int>(transitions.size()))
+		{
+			next();
+		}
+		else
+		{
+			home();
+		}
+	}
+
 	if(!timer.isValid())
 	{
 		return;
@@ -121,9 +133,14 @@ void Animator::update()
 	{
 		tmm.exposure = 0.3;
 		fadeFactor   = 1.0;
+		float d      = customTransition.getDuration();
+		if(idleMode)
+		{
+			d *= 5.f;
+		}
 		if(!customTransition.updateUniverse(
-		       universe, tmm, t_secs / customTransition.getDuration(),
-		       currentScene, fadeFactor, [this]() { return getCosmoShift(); },
+		       universe, tmm, t_secs / d, currentScene, fadeFactor,
+		       [this]() { return getCosmoShift(); },
 		       [this]() { return getPlanetShift(); }))
 		{
 			stop();
@@ -248,6 +265,23 @@ void Animator::setWholeAnimationPercentage(float percentage)
 	stop();
 	pausedAt = time;
 	play();
+}
+
+void Animator::setIdleMode(bool idleMode)
+{
+	if(QSettings().value("misc/idlemode").toBool())
+	{
+		this->idleMode = idleMode;
+	}
+	else
+	{
+		this->idleMode = false;
+	}
+
+	if(!this->idleMode)
+	{
+		home();
+	}
 }
 
 void Animator::setFirstScene()

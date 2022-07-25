@@ -248,6 +248,7 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 	}
 	if(e.type == GamepadHandler::EventType::BUTTON_PRESSED)
 	{
+		stopIdle();
 		bool sceneChanged = true;
 		switch(e.button)
 		{
@@ -407,6 +408,9 @@ void MainWin::initScene()
 
 	ambiance.setLoops(QSound::Infinite);
 	ambiance.play();
+
+	// IDLE
+	idleTimer.start();
 }
 
 void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
@@ -443,6 +447,15 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		universe->updateCosmo();
 
+		// handle idle mode
+		if(idleTimer.isValid()
+		   && (idleTimer.elapsed() / 1000.0)
+		          >= QSettings().value("misc/idlemodewaittime").toDouble())
+		{
+			idleTimer.invalidate();
+			animator->setIdleMode(true);
+		}
+
 		if(gamepadHandler.isEnabled())
 		{
 			auto rightJoystick(gamepadHandler.getJoystick(Side::RIGHT));
@@ -451,6 +464,14 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			pitch += 2.0 * rightJoystick.y() * frameTiming;
 			universe->setCamYaw(yaw);
 			universe->setCamPitch(pitch);
+			// handle idle mode
+			if(rightJoystick != QVector2D{}
+			   || gamepadHandler.getJoystick(Side::LEFT) != QVector2D{}
+			   || gamepadHandler.getTrigger(Side::LEFT) != 0.0
+			   || gamepadHandler.getTrigger(Side::RIGHT) != 0.0)
+			{
+				stopIdle();
+			}
 		}
 		movementControls->update(
 		    frameTiming, universe->isPlanetarySystemRendered(), gamepadHandler);

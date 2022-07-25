@@ -44,6 +44,9 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addFilePathSetting("uilabelsfont", "", tr("UI Labels Font file"));
 	addDoubleSetting("uilabelsdistmul", 1.0, tr("UI Labels Distance Mult."));
 	addBoolSetting("halfcavehelper", false, tr("Show Half-Cave helper"));
+	addBoolSetting("idlemode", false, tr("Allow Idle Mode"));
+	addDoubleSetting("idlemodewaittime", 60.0,
+	                 tr("Time to trigger idle mode (in s)"));
 	addBoolSetting("showgrid", false, tr("Show Grid"));
 	addColorSetting("gridcolor", QColor(255, 255, 255), tr("Grid Color"));
 	addDoubleSetting("mintanangle", 0.05,

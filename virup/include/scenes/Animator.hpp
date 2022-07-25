@@ -41,6 +41,7 @@ class Animator : public QObject
 	Q_PROPERTY(bool autoIdScrolling MEMBER autoIdScrolling)
 	Q_PROPERTY(Scene currentScene READ getCurrentScene)
 	Q_PROPERTY(bool debug MEMBER debug)
+	Q_PROPERTY(bool idlemode READ getIdleMode WRITE setIdleMode)
   public:
 	Animator(Universe& universe, VRHandler const& vrHandler,
 	         ToneMappingModel& tmm)
@@ -90,6 +91,8 @@ class Animator : public QObject
 	float getTotalDuration() const;
 	float getWholeAnimationPercentage() const;
 	void setWholeAnimationPercentage(float percentage);
+	bool getIdleMode() const { return idleMode; };
+	void setIdleMode(bool idleMode);
 
 	// typical controller inputs
 	void recenter() { setTransition(idBackup); };
@@ -146,6 +149,8 @@ class Animator : public QObject
 	float pausedAt = 0.f;
 
 	float t_secsBAK = 0.f;
+
+	bool idleMode = false;
 };
 
 #endif // ANIMATOR_HPP

@@ -300,6 +300,16 @@ class MainWin : public AbstractMainWin
 	// scenes
 	Animator* animator = nullptr;
 	QSound ambiance{getAbsoluteDataPath("sounds/music/00.wav"), nullptr};
+	// idle
+	QElapsedTimer idleTimer;
+	void stopIdle()
+	{
+		idleTimer.restart();
+		if(animator->getIdleMode())
+		{
+			animator->setIdleMode(false);
+		}
+	}
 };
 
 #endif // MAINWIN_H
