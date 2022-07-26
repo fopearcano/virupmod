@@ -44,7 +44,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addColorSetting("uilabelscolor", QColor(255, 165, 0),
 	                tr("UI Labels Color"));
 	addFilePathSetting("uilabelsfont", "", tr("UI Labels Font file"));
-	addVector3DSetting("uilabelspos", {-0.3f, 0.25f, -0.4f}, tr("UI Labels Position (cam space)"), {"x", "y", "z"});
+	addVector3DSetting("uilabelspos", {-0.3f, 0.25f, -0.4f}, tr("UI Labels Position (cam space)"), {"x", "y", "z"}, -5.f, 5.f);
 	addDoubleSetting("uilabelsdistmul", 1.0, tr("UI Labels Distance Mult."));
 	addBoolSetting("halfcavehelper", false, tr("Show Half-Cave helper"));
 	addBoolSetting("idlemode", false, tr("Allow Idle Mode"));
