@@ -530,8 +530,6 @@ void Universe::updatePlanetarySystem()
 	lastCurrentUt  = currentUt;
 	if(!planetSystems->renderSystem())
 	{
-		delete systemRenderer;
-		systemRenderer = nullptr;
 		return;
 	}
 	const double mtokpc = 3.24078e-20;
@@ -614,6 +612,12 @@ void Universe::updateBoundingBox(BBox const& elementBoundingbox)
 
 void Universe::loadClosestSystem()
 {
+	// don't reload if already loaded
+	if(orbitalSystem == planetSystems->getClosestSystem())
+	{
+		return;
+	}
+
 	delete systemRenderer;
 
 	orbitalSystem  = planetSystems->getClosestSystem();
