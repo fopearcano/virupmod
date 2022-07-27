@@ -276,6 +276,10 @@ class MainWin : public AbstractMainWin
 	MovementControls* movementControls = nullptr;
 
 	/* TEXT */
+	bool showHelperBillboard
+	    = QSettings().value("misc/halfcavehelper").toBool();
+	double uiLabelsSizeMul
+	    = QSettings().value("misc/uilabelssizemul").toDouble();
 	Billboard* helperBillboard = nullptr;
 	Text3D* debugText          = nullptr;
 	double timeSinceTextUpdate = DBL_MAX;

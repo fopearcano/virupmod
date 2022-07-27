@@ -485,13 +485,15 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	}
 	if(pathId == "planet")
 	{
-		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
-		QVector3D pos = QSettings().value("misc/uilabelspos").value<QVector3D>();//(-0.3f, 0.25f, -0.4f);
+		auto& cam     = dynamic_cast<OrbitalSystemCamera&>(camera);
+		QVector3D pos = QSettings()
+		                    .value("misc/uilabelspos")
+		                    .value<QVector3D>(); //(-0.3f, 0.25f, -0.4f);
 		pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
 
 		auto billboardPos = pos;
-		billboardPos.setY(pos.y() + 0.06);
-		helperBillboard->width = 0.4f;
+		billboardPos.setY(pos.y() + (0.06 * uiLabelsSizeMul));
+		helperBillboard->width = 0.4f * uiLabelsSizeMul;
 
 		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
 		{
@@ -499,10 +501,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			    = cam.hmdSpaceToWorldTransform() * billboardPos;
 
 			debugText->getModel() = cam.hmdSpaceToWorldTransform();
-			debugText->getModel().translate(pos);
+			/*debugText->getModel().translate(pos);
 			debugText->getModel().scale(
 			    1.5 * static_cast<float>(textWidth) / width(),
-			    1.5 * static_cast<float>(textHeight) / height());
+			    1.5 * static_cast<float>(textHeight) / height());*/
 		}
 		else
 		{
@@ -510,11 +512,13 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			    = cam.cameraSpaceToWorldTransform() * billboardPos;
 
 			debugText->getModel() = cam.cameraSpaceToWorldTransform();
-			debugText->getModel().translate(pos);
-			debugText->getModel().scale(
-			    2 * static_cast<float>(textWidth) / width(),
-			    2 * static_cast<float>(textWidth) / height());
 		}
+		auto scaleFactor = 4 * uiLabelsSizeMul;
+		debugText->getModel().translate(pos);
+		debugText->getModel().scale(
+		    scaleFactor * static_cast<float>(textWidth) / width(),
+		    scaleFactor * static_cast<float>(textWidth) / height());
+
 		helperBillboard->getShader().setUniform("exposure",
 		                                        toneMappingModel->exposure);
 		helperBillboard->getShader().setUniform("dynamicrange",
@@ -558,7 +562,10 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		{
 			if(timeSinceTextUpdate < 5.0)
 			{
-				helperBillboard->render(camera);
+				if(showHelperBillboard)
+				{
+					helperBillboard->render(camera);
+				}
 				debugText->render();
 			}
 		}
@@ -569,7 +576,10 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 			universe->renderPlanetarySystemTransparent();
 			if(timeSinceTextUpdate < 5.0)
 			{
-				helperBillboard->render(camera);
+				if(showHelperBillboard)
+				{
+					helperBillboard->render(camera);
+				}
 				debugText->render();
 			}
 		}
