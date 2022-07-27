@@ -203,7 +203,7 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 			// average position
 			currentPosSum /= posNumber;
 			auto labelText
-			    = new LabelRenderer(currentName, QColor(255, 0, 0), false);
+			    = new LabelRenderer(currentName, QColor(0, 230, 255), false);
 			conLabels.emplace_back(currentPosSum, labelText);
 		}
 		file.close();
