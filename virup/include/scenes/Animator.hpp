@@ -154,7 +154,8 @@ class Animator : public QObject
 
 	float t_secsBAK = 0.f;
 
-	bool idleMode = false;
+	bool idleMode        = false;
+	bool idleModeForward = true;
 };
 
 #endif // ANIMATOR_HPP

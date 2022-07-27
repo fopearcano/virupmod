@@ -112,13 +112,29 @@ void Animator::update()
 {
 	if(idleMode && !playCustom)
 	{
-		if(idBackup + 1 < static_cast<int>(transitions.size()))
+		if(idleModeForward)
 		{
-			next();
+			if(idBackup + 1 < static_cast<int>(transitions.size()))
+			{
+				next();
+			}
+			else
+			{
+				previous();
+				idleModeForward = false;
+			}
 		}
 		else
 		{
-			home();
+			if(idBackup - 1 >= 0)
+			{
+				previous();
+			}
+			else
+			{
+				next();
+				idleModeForward = true;
+			}
 		}
 	}
 
@@ -276,6 +292,7 @@ void Animator::setWholeAnimationPercentage(float percentage)
 
 void Animator::setIdleMode(bool idleMode)
 {
+	idleModeForward = true;
 	if(QSettings().value("misc/idlemode").toBool())
 	{
 		this->idleMode = idleMode;
