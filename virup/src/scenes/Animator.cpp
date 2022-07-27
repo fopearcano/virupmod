@@ -296,15 +296,14 @@ void Animator::setIdleMode(bool idleMode)
 	if(QSettings().value("misc/idlemode").toBool())
 	{
 		this->idleMode = idleMode;
+		if(!this->idleMode)
+		{
+			stop();
+		}
 	}
 	else
 	{
 		this->idleMode = false;
-	}
-
-	if(!this->idleMode)
-	{
-		home();
 	}
 }
 
