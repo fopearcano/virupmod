@@ -312,6 +312,8 @@ class MainWin : public AbstractMainWin
 		if(animator->getIdleMode())
 		{
 			animator->setIdleMode(false);
+			timeSinceTextUpdate = 0.0;
+			debugText->setText("");
 		}
 	}
 };
