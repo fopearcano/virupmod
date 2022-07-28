@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSound>
 #include <QSoundEffect>
 #include <QVBoxLayout>
 
