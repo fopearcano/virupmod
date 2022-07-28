@@ -62,6 +62,10 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addDirPathSetting("octreestatesdir", QDir::homePath() + "/octree_states/",
 	                  tr("Octree states (OBJ) save directory"));
 
+	insertGroup("sound", tr("Sound"), 4);
+	addDoubleSetting("ambiancevolume", 1.0,
+	                 tr("Ambiant music volume (0.0-1.0)"), 0.0, 1.0);
+
 	editGroup("graphics");
 	addUIntSetting("texmaxsize", 8, tr("Textures max size (x2048)"), 1, 11);
 	addUIntSetting("gentexload", 1, tr("Texture generation GPU load"), 1, 4);

@@ -406,7 +406,10 @@ void MainWin::initScene()
 
 	// AMBIANCE
 
-	ambiance.setLoops(QSound::Infinite);
+	ambiance.setSource(
+	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/music/00.wav")));
+	ambiance.setVolume(QSettings().value("sound/ambiancevolume").toDouble());
+	ambiance.setLoopCount(QSoundEffect::Infinite);
 	ambiance.play();
 
 	// IDLE
