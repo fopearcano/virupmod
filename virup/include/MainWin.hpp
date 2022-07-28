@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QSound>
 #include <QSoundEffect>
 #include <QVBoxLayout>
 
@@ -305,6 +304,9 @@ class MainWin : public AbstractMainWin
 	// scenes
 	Animator* animator = nullptr;
 	QSoundEffect ambiance;
+	QSoundEffect inSound;
+	QSoundEffect thrustSound;
+	QSoundEffect outSound;
 	// idle
 	QElapsedTimer idleTimer;
 	void stopIdle()

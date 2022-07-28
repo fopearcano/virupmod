@@ -356,9 +356,31 @@ void MainWin::initScene()
 
 	movementControls = new MovementControls(
 	    *vrHandler, universe->getBoundingBox(), cam, camPlanet);
-	connect(movementControls, &MovementControls::gamepadVelocityChanged,
-	        [](QVector3D const& /*newVel*/) {
-		        QSound::play(getAbsoluteDataPath("sounds/thruster/thrust.wav"));
+
+	inSound.setSource(
+	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/in.wav")));
+	thrustSound.setSource(
+	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/thrust.wav")));
+	outSound.setSource(
+	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/out.wav")));
+	thrustSound.setLoopCount(QSoundEffect::Infinite);
+	connect(&inSound, &QSoundEffect::playingChanged, [this]() {
+		if(!inSound.isPlaying())
+		{
+			thrustSound.play();
+		}
+	});
+	connect(movementControls, &MovementControls::gamepadIsMovingChanged,
+	        [this](bool isMoving) {
+		        if(isMoving)
+		        {
+			        inSound.play();
+		        }
+		        else
+		        {
+			        thrustSound.stop();
+			        outSound.play();
+		        }
 	        });
 
 	renderer.removeSceneRenderPath("default");
@@ -476,6 +498,12 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			   || gamepadHandler.getTrigger(Side::RIGHT) != 0.0)
 			{
 				stopIdle();
+			}
+
+			if(movementControls->getGamepadVelocity().isNull()
+			   && thrustSound.isPlaying())
+			{
+				thrustSound.stop();
 			}
 		}
 		movementControls->update(
