@@ -51,11 +51,13 @@ class MovementControls : public QObject
 	             QMatrix4x4 const& trackedSpaceToWorldTransform,
 	             bool renderPlanetarySystem);
 	void gamepadEvent(GamepadHandler::Event const& e);
+	QVector3D getGamepadVelocity() const { return gamepadVel; };
 	void update(double frameTiming, bool renderPlanetarySystem,
 	            GamepadHandler const& gamepadHandler);
 	void renderGuides();
 
   signals:
+	void gamepadIsMovingChanged(bool isMoving);
 	void gamepadVelocityChanged(QVector3D const& newVelocity);
 
   private:

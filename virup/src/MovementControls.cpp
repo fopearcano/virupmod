@@ -392,6 +392,10 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 		             - gamepadHandler.getTrigger(Side::LEFT);
 		gamepadVel = {gamepadHandler.getJoystick(Side::LEFT).x(), yVal,
 		              gamepadHandler.getJoystick(Side::LEFT).y()};
+		if(gamepadVel.isNull() != oldGamepadVel.isNull())
+		{
+			emit gamepadIsMovingChanged(!gamepadVel.isNull());
+		}
 		auto signOfGamepadVel = gamepadVel;
 		signOfGamepadVel.setX(static_cast<int>(signOfGamepadVel.x() > 0)
 		                      - static_cast<int>(signOfGamepadVel.x() < 0));
