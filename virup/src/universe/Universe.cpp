@@ -554,6 +554,10 @@ void Universe::updatePlanetarySystem()
 	}
 	sysInWorld = camCosmo.dataToWorldPosition(lastData);
 	planetSystems->getClosestSystem()->update(currentUt);
+	// somehow clang-tidy thinks this pointer can be nullptr
+	// but if it was, loadClosestSystem would have been called (20 lines above)
+	// and systemRenderer would have been set
+	// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
 	systemRenderer->updateMesh(currentUt, camPlanet);
 }
 
