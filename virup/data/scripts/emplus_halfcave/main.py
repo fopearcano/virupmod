@@ -80,14 +80,14 @@ transitions = [
           SceneTemporalData(), SceneUI({"LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "Milky Way"),
     # Illustris
     Transition(Scene(SceneSpatialData(Universe, 0.2e+25),
-          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0}),
+          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0}),
           SceneCameraData(), SceneToneMappingData(0.3, 1.3)), 10.0, "IllustrisTNG"),
     # SDSS distant
     Transition(Scene(SceneSpatialData(Universe, 1.0e+26),
-          SceneTemporalData(), SceneUI({"SDSS":1.0})), 10.0, "SDSS"),
+          SceneTemporalData(), SceneUI({"SDSS":1.0, "IllustrisTNG":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "SDSS"),
     #CMB
     Transition(Scene(SceneSpatialData(Universe, 1.0e+27),
-          SceneTemporalData(), SceneUI({"SDSS":1.0, "CMB":1.0})), 10.0, "CMB"),
+          SceneTemporalData(), SceneUI({"SDSS":1.0, "IllustrisTNG":1.0, "CMB":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "CMB"),
 ]
 
 def initScene():
