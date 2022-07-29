@@ -101,7 +101,6 @@ void Animator::setTransition(int newid)
 {
 	if(newid < 0 || newid >= static_cast<int>(transitions.size()))
 	{
-		stop();
 		return;
 	}
 	executeTransition(transitions[newid]);
