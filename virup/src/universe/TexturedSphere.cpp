@@ -53,17 +53,18 @@ QList<QPair<QString, QWidget*>>
 	QList<QPair<QString, QWidget*>> result;
 
 	auto pathSelector = new PathSelector(parent, QObject::tr("Texture path"));
-	QObject::connect(
-	    pathSelector, &PathSelector::pathChanged,
-	    [jsonObj](QString const& path) { (*jsonObj)["file"] = path; });
+	QObject::connect(pathSelector, &PathSelector::pathChanged,
+	                 [jsonObj](QString const& path)
+	                 { (*jsonObj)["file"] = path; });
 	pathSelector->setPath((*jsonObj)["file"].toString());
 
 	result.append({QObject::tr("Texture Path:"), pathSelector});
 
 	auto cbox = new QCheckBox(parent);
-	QObject::connect(cbox, &QCheckBox::stateChanged, [jsonObj](int state) {
-		(*jsonObj)["cullfrontfaces"] = (state == Qt::Checked);
-	});
+	QObject::connect(cbox, &QCheckBox::stateChanged,
+	                 [jsonObj](int state) {
+		                 (*jsonObj)["cullfrontfaces"] = (state == Qt::Checked);
+	                 });
 	cbox->setCheckState((*jsonObj)["cullfrontfaces"].toBool() ? Qt::Checked
 	                                                          : Qt::Unchecked);
 

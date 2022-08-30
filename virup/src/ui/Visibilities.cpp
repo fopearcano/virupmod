@@ -44,12 +44,11 @@ Visibilities::Visibilities(Universe& universe)
 		slider->setMaximum(100);
 		layout->addWidget(slider);
 		connect(universe.getElement(name), &UniverseElement::visibilityChanged,
-		        [slider](float visibility) {
-			        slider->setValue(static_cast<int>(visibility * 100));
-		        });
-		connect(slider, &QSlider::valueChanged, [&universe, name](int val) {
-			universe.setVisibility(name, val / 100.f);
-		});
+		        [slider](float visibility)
+		        { slider->setValue(static_cast<int>(visibility * 100)); });
+		connect(slider, &QSlider::valueChanged,
+		        [&universe, name](int val)
+		        { universe.setVisibility(name, val / 100.f); });
 	}
 
 	QStringList nonElementsVisibilities = {
@@ -66,15 +65,16 @@ Visibilities::Visibilities(Universe& universe)
 		slider->setMaximum(100);
 		layout->addWidget(slider);
 		connect(&universe, &Universe::nonElementVisibilityChanged,
-		        [slider, name](QString const& n, float visibility) {
+		        [slider, name](QString const& n, float visibility)
+		        {
 			        if(n == name)
 			        {
 				        slider->setValue(static_cast<int>(visibility * 100));
 			        }
 		        });
-		connect(slider, &QSlider::valueChanged, [&universe, name](int val) {
-			universe.setVisibility(name, val / 100.f);
-		});
+		connect(slider, &QSlider::valueChanged,
+		        [&universe, name](int val)
+		        { universe.setVisibility(name, val / 100.f); });
 	}
 
 	installEventFilters();

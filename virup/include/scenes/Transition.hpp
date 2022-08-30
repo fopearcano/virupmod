@@ -38,7 +38,7 @@ class Transition
 	           QString customPythonFunction = "", float v0 = 0.f,
 	           float v1 = 0.f);
 	Transition& operator=(Transition const& other) = default;
-	Transition& operator=(Transition&& other) = default;
+	Transition& operator=(Transition&& other)      = default;
 
 	Scene getDestination() const { return toScene; };
 	float getDuration() const { return duration; };

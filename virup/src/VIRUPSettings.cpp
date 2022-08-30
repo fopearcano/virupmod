@@ -143,7 +143,8 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 
 	connect(rep, &QNetworkReply::downloadProgress,
 	        [&downloadedFile, rep, &progress, &timer, &downloaded](qint64 recv,
-	                                                               qint64 tot) {
+	                                                               qint64 tot)
+	        {
 		        QByteArray b = rep->readAll();
 		        downloadedFile.write(b);
 		        progress.setMaximum(tot / 1024 / 1024);
@@ -233,9 +234,8 @@ void DataListWidget::loadMainLayout()
 	                                PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
 	connect(pathSelector, &PathSelector::pathChanged, this,
-	        [](QString const& t) {
-		        QSettings().setValue("data/rootdir", t + '/');
-	        });
+	        [](QString const& t)
+	        { QSettings().setValue("data/rootdir", t + '/'); });
 	l->addWidget(label);
 	l->addWidget(pathSelector);
 	layout->addWidget(w);
@@ -331,39 +331,43 @@ void DataListWidget::addPushButtons(QJsonObject const& entry)
 	}
 	layout->insertWidget(index, w);
 
-	connect(b0, &QPushButton::clicked, [this, b0]() {
-		QString name(b0->text().section('|', 0, 0));
-		DataDialog dd(entries, entriesIds,
-		              dataJsonRepresentation["entries"]
-		                  .toArray()[getIndexInArray(name)]
-		                  .toObject());
-		QJsonObject jsonEntry = dd.getDataDefinition();
-		if(jsonEntry.keys().empty())
-		{
-			return;
-		}
-		QString newName(jsonEntry["name"].toString());
-		QString newType(jsonEntry["type"].toString());
-		newType = entries[entriesIds.indexOf(newType)];
-		b0->setText(newName + "|" + newType);
-		updateEntry(name, jsonEntry);
-	});
+	connect(b0, &QPushButton::clicked,
+	        [this, b0]()
+	        {
+		        QString name(b0->text().section('|', 0, 0));
+		        DataDialog dd(entries, entriesIds,
+		                      dataJsonRepresentation["entries"]
+		                          .toArray()[getIndexInArray(name)]
+		                          .toObject());
+		        QJsonObject jsonEntry = dd.getDataDefinition();
+		        if(jsonEntry.keys().empty())
+		        {
+			        return;
+		        }
+		        QString newName(jsonEntry["name"].toString());
+		        QString newType(jsonEntry["type"].toString());
+		        newType = entries[entriesIds.indexOf(newType)];
+		        b0->setText(newName + "|" + newType);
+		        updateEntry(name, jsonEntry);
+	        });
 
-	connect(b1, &QPushButton::clicked, [this, b0, w]() {
-		QString name(b0->text().section('|', 0, 0));
-		if(QMessageBox::question(
-		       this, tr("Removing data"),
-		       tr("Do you really want to remove %1 ?").arg(name))
-		   != QMessageBox::Yes)
-		{
-			return;
-		}
+	connect(b1, &QPushButton::clicked,
+	        [this, b0, w]()
+	        {
+		        QString name(b0->text().section('|', 0, 0));
+		        if(QMessageBox::question(
+		               this, tr("Removing data"),
+		               tr("Do you really want to remove %1 ?").arg(name))
+		           != QMessageBox::Yes)
+		        {
+			        return;
+		        }
 
-		layout->removeWidget(w);
-		w->hide();
-		delete w;
-		removeEntry(name);
-	});
+		        layout->removeWidget(w);
+		        w->hide();
+		        delete w;
+		        removeEntry(name);
+	        });
 }
 
 int DataListWidget::getIndexInArray(QString const& name) const
@@ -461,9 +465,8 @@ DataDialog::DataDialog(QStringList const& entries,
 		typeEdit->addItem(entry);
 	}
 	connect(typeEdit, &QComboBox::currentTextChanged,
-	        [this, entries, entriesIds](QString const& text) {
-		        this->result["type"] = entriesIds[entries.indexOf(text)];
-	        });
+	        [this, entries, entriesIds](QString const& text)
+	        { this->result["type"] = entriesIds[entries.indexOf(text)]; });
 	if(result.keys().indexOf("type") >= 0)
 	{
 		typeEdit->setCurrentText(
@@ -490,9 +493,8 @@ DataDialog::DataDialog(QStringList const& entries,
 
 	setType(result["type"].toString());
 	connect(typeEdit, &QComboBox::currentTextChanged,
-	        [this, entries, entriesIds](QString const& text) {
-		        setType(entriesIds[entries.indexOf(text)]);
-	        });
+	        [this, entries, entriesIds](QString const& text)
+	        { setType(entriesIds[entries.indexOf(text)]); });
 }
 
 QJsonObject DataDialog::getDataDefinition()

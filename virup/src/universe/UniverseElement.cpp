@@ -164,7 +164,8 @@ QList<QPair<QString, QWidget*>>
 		QObject::connect(sbox,
 		                 static_cast<void (QDoubleSpinBox::*)(double)>(
 		                     &QDoubleSpinBox::valueChanged),
-		                 [jsonObj, sboxes](double) {
+		                 [jsonObj, sboxes](double)
+		                 {
 			                 (*jsonObj)["solarsyslocalpos"]
 			                     = Vector3(sboxes[0]->value(),
 			                               sboxes[1]->value(),
@@ -194,7 +195,8 @@ QList<QPair<QString, QWidget*>>
 		QObject::connect(sbox,
 		                 static_cast<void (QDoubleSpinBox::*)(double)>(
 		                     &QDoubleSpinBox::valueChanged),
-		                 [jsonObj, sboxes](double) {
+		                 [jsonObj, sboxes](double)
+		                 {
 			                 (*jsonObj)["customzaxis"]
 			                     = Vector3(sboxes[0]->value(),
 			                               sboxes[1]->value(),

@@ -70,7 +70,7 @@ void PlanetarySystemSelector::setVisibleItems(QString const& match)
 	{
 		if(match == ""
 		   || item->text(0).replace('-', ' ').contains(
-		          QString(match).replace('-', ' '), Qt::CaseInsensitive))
+		       QString(match).replace('-', ' '), Qt::CaseInsensitive))
 		{
 			item->setHidden(false);
 		}

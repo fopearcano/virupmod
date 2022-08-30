@@ -200,7 +200,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 										debugText->setText(
 										    ("Time coeff. : "
 										     + std::to_string(
-										           static_cast<int>(tc / 10.f))
+										         static_cast<int>(tc / 10.f))
 										     + "x")
 										        .c_str());
 										timeSinceTextUpdate = 0.f;
@@ -215,7 +215,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 										debugText->setText(
 										    ("Time coeff. : "
 										     + std::to_string(
-										           static_cast<int>(tc * 10.f))
+										         static_cast<int>(tc * 10.f))
 										     + "x")
 										        .c_str());
 										timeSinceTextUpdate = 0.f;
@@ -364,14 +364,17 @@ void MainWin::initScene()
 	outSound.setSource(
 	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/out.wav")));
 	thrustSound.setLoopCount(QSoundEffect::Infinite);
-	connect(&inSound, &QSoundEffect::playingChanged, [this]() {
-		if(!inSound.isPlaying())
-		{
-			thrustSound.play();
-		}
-	});
+	connect(&inSound, &QSoundEffect::playingChanged,
+	        [this]()
+	        {
+		        if(!inSound.isPlaying())
+		        {
+			        thrustSound.play();
+		        }
+	        });
 	connect(movementControls, &MovementControls::gamepadIsMovingChanged,
-	        [this](bool isMoving) {
+	        [this](bool isMoving)
+	        {
 		        if(isMoving)
 		        {
 			        inSound.play();

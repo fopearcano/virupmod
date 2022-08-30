@@ -81,10 +81,12 @@ SceneSelector::SceneSelector(Animator& animator)
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
 	            &QDoubleSpinBox::valueChanged),
 	        [&animator](double v) { animator.setPersonHeight(v); });
-	connect(&animator, &Animator::personHeightChanged, [sb](float v) {
-		QSignalBlocker blocker{sb};
-		sb->setValue(v);
-	});
+	connect(&animator, &Animator::personHeightChanged,
+	        [sb](float v)
+	        {
+		        QSignalBlocker blocker{sb};
+		        sb->setValue(v);
+	        });
 	hl->addWidget(sb);
 
 	slider.setMaximum(1000);
@@ -92,9 +94,9 @@ SceneSelector::SceneSelector(Animator& animator)
 	        [this]() { animateSlider = false; });
 	connect(&slider, &QSlider::sliderReleased,
 	        [this]() { animateSlider = true; });
-	connect(&slider, &QSlider::sliderMoved, [&animator](int value) {
-		animator.setWholeAnimationPercentage(value / 10.f);
-	});
+	connect(&slider, &QSlider::sliderMoved,
+	        [&animator](int value)
+	        { animator.setWholeAnimationPercentage(value / 10.f); });
 	layout->addWidget(&slider);
 
 	layout->addWidget(new QLabel("Scenes :"));

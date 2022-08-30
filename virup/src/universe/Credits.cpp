@@ -55,9 +55,9 @@ QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget* parent,
 	QList<QPair<QString, QWidget*>> result;
 
 	auto pathSelector = new PathSelector(parent, QObject::tr("Textures path"));
-	QObject::connect(
-	    pathSelector, &PathSelector::pathChanged,
-	    [jsonObj](QString const& path) { (*jsonObj)["file"] = path; });
+	QObject::connect(pathSelector, &PathSelector::pathChanged,
+	                 [jsonObj](QString const& path)
+	                 { (*jsonObj)["file"] = path; });
 	pathSelector->setPath((*jsonObj)["file"].toString());
 
 	result.append({QObject::tr("Textures Path:"), pathSelector});

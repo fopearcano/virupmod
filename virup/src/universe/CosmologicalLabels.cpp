@@ -122,17 +122,17 @@ QList<QPair<QString, QWidget*>>
 	QList<QPair<QString, QWidget*>> result;
 
 	auto pathSelector = new PathSelector(parent, QObject::tr("File path"));
-	QObject::connect(
-	    pathSelector, &PathSelector::pathChanged,
-	    [jsonObj](QString const& path) { (*jsonObj)["file"] = path; });
+	QObject::connect(pathSelector, &PathSelector::pathChanged,
+	                 [jsonObj](QString const& path)
+	                 { (*jsonObj)["file"] = path; });
 	pathSelector->setPath((*jsonObj)["file"].toString());
 
 	result.append({QObject::tr("File Path:"), pathSelector});
 
 	auto colorSelector = new ColorSelector(parent, QObject::tr("Color"));
-	QObject::connect(
-	    colorSelector, &ColorSelector::colorChanged,
-	    [jsonObj](QColor const& color) { (*jsonObj)["color"] = color.name(); });
+	QObject::connect(colorSelector, &ColorSelector::colorChanged,
+	                 [jsonObj](QColor const& color)
+	                 { (*jsonObj)["color"] = color.name(); });
 	colorSelector->setColor((*jsonObj)["color"].toString("#FF0000"));
 
 	result.append({QObject::tr("Color:"), colorSelector});
