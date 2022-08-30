@@ -32,7 +32,7 @@ GLPixelBufferObject::GLPixelBufferObject(QSize const& size)
 	++instancesCount();
 
 	buff       = new GLBuffer(GL_PIXEL_UNPACK_BUFFER,
-                        size.width() * size.height() * 4, GL_STREAM_DRAW);
+	                          size.width() * size.height() * 4, GL_STREAM_DRAW);
 	mappedData = static_cast<unsigned char*>(buff->map(GL_WRITE_ONLY));
 	buff->unbind();
 }

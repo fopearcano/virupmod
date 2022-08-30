@@ -220,7 +220,8 @@ void RenderingWindow::keyReleaseEvent(QKeyEvent* e)
 	    + ")");
 }
 
-void RenderingWindow::actionEvent(BaseInputManager::Action a, bool pressed)
+void RenderingWindow::actionEvent(BaseInputManager::Action const& a,
+                                  bool pressed)
 {
 	if(!pressed)
 	{

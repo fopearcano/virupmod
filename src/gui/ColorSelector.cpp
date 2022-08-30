@@ -22,14 +22,17 @@ ColorSelector::ColorSelector(QWidget* parent, QString const& caption)
     : QPushButton(parent)
 {
 	setObjectName("mainbutton");
-	connect(this, &QPushButton::clicked, this, [this, caption](bool) {
-		QColor result(QColorDialog::getColor(currentColor, this, caption));
-		if(!result.isValid())
-		{
-			return;
-		}
-		setColor(result);
-	});
+	connect(this, &QPushButton::clicked, this,
+	        [this, caption](bool)
+	        {
+		        QColor result(
+		            QColorDialog::getColor(currentColor, this, caption));
+		        if(!result.isValid())
+		        {
+			        return;
+		        }
+		        setColor(result);
+	        });
 }
 
 void ColorSelector::setColor(QColor const& color)

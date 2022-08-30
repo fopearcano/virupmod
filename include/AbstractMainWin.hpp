@@ -256,7 +256,8 @@ class AbstractMainWin : public RenderingWindow
 	 *
 	 * For a key press, @p pressed is true, for a key release, it is false.
 	 */
-	virtual void actionEvent(BaseInputManager::Action a, bool pressed) override;
+	virtual void actionEvent(BaseInputManager::Action const& a,
+	                         bool pressed) override;
 	/**
 	 * @brief Captures an event polled from @ref VRHandler.
 	 *

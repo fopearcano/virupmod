@@ -62,7 +62,7 @@ class GLMesh
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLMesh(GLMesh const& other) = delete;
+	GLMesh(GLMesh const& other)            = delete;
 	GLMesh& operator=(GLMesh const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL meshes .

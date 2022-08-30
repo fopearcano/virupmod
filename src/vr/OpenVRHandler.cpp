@@ -72,7 +72,7 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 
 	currentTargetSize = getEyeRenderTargetSize();
 	submitFBO         = new GLFramebufferObject(GLTexture::Tex2DProperties(
-        currentTargetSize.width(), currentTargetSize.height(), GL_RGB8));
+	            currentTargetSize.width(), currentTargetSize.height(), GL_RGB8));
 	submitFBO->bind();
 
 #ifdef LEAP_MOTION

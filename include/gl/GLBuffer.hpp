@@ -30,7 +30,7 @@ class GLBuffer
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLBuffer(GLBuffer const& other) = delete;
+	GLBuffer(GLBuffer const& other)            = delete;
 	GLBuffer& operator=(GLBuffer const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL textures.

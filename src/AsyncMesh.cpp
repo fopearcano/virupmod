@@ -44,9 +44,9 @@ AsyncMesh::AsyncMesh(QString const& path, GLMesh&& defaultMesh)
 
 	this->meshDescriptors    = new std::vector<AssetLoader::MeshDescriptor>;
 	auto thisMeshDescriptors = this->meshDescriptors;
-	future                   = QtConcurrent::run([path, thisMeshDescriptors]() {
-        return AssetLoader::loadFile(path, *thisMeshDescriptors);
-    });
+	future                   = QtConcurrent::run(
+        [path, thisMeshDescriptors]()
+        { return AssetLoader::loadFile(path, *thisMeshDescriptors); });
 }
 
 void AsyncMesh::updateMesh(GLShaderProgram const& shader)

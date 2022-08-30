@@ -86,7 +86,6 @@ void AbstractMainWin::setVR(bool vr)
 		PythonQtHandler::evalScript(
 		    "if \"VRHandler\" in dir():\n\tdel VRHandler");
 	}
-	QSettings().setValue("vr/enabled", vrIsEnabled());
 
 	renderer.updateRenderTargets();
 	reloadBloomTargets();
@@ -143,7 +142,8 @@ void AbstractMainWin::resizeEvent(QResizeEvent* ev)
 	reloadBloomTargets();
 }
 
-void AbstractMainWin::actionEvent(BaseInputManager::Action a, bool pressed)
+void AbstractMainWin::actionEvent(BaseInputManager::Action const& a,
+                                  bool pressed)
 {
 	RenderingWindow::actionEvent(a, pressed);
 
@@ -389,9 +389,11 @@ void AbstractMainWin::initializeGL()
 	file->addAction(tr("Close"), this, [this]() { this->close(); });
 
 	auto engine(menuBar->addMenu(tr("HydrogenVR")));
-	engine->addAction(tr("Explore Shaders..."), this, [this]() {
-		this->shaderSelector->setVisible(!this->shaderSelector->isVisible());
-	});
+	engine->addAction(tr("Explore Shaders..."), this,
+	                  [this]() {
+		                  this->shaderSelector->setVisible(
+		                      !this->shaderSelector->isVisible());
+	                  });
 
 	menuBar->show();
 

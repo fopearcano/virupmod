@@ -30,7 +30,8 @@ WindowParametersSelector::WindowParametersSelector(
 	widthSpinBox->setValue(initialValue.width);
 	connect(widthSpinBox,
 	        static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
-	        [this](unsigned int v) {
+	        [this](unsigned int v)
+	        {
 		        value.width = v;
 		        emit parametersChanged(value);
 	        });
@@ -41,7 +42,8 @@ WindowParametersSelector::WindowParametersSelector(
 	heightSpinBox->setValue(initialValue.height);
 	connect(heightSpinBox,
 	        static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
-	        [this](unsigned int v) {
+	        [this](unsigned int v)
+	        {
 		        value.height = v;
 		        emit parametersChanged(value);
 	        });
@@ -49,10 +51,12 @@ WindowParametersSelector::WindowParametersSelector(
 
 	fullscreenCBox = new QCheckBox(this);
 	fullscreenCBox->setChecked(initialValue.fullscreen);
-	connect(fullscreenCBox, &QCheckBox::stateChanged, [this](int s) {
-		value.fullscreen = (s != Qt::Unchecked);
-		emit parametersChanged(value);
-	});
+	connect(fullscreenCBox, &QCheckBox::stateChanged,
+	        [this](int s)
+	        {
+		        value.fullscreen = (s != Qt::Unchecked);
+		        emit parametersChanged(value);
+	        });
 	mainLayout->addRow(tr("Fullscreen :"), fullscreenCBox);
 
 	auto w      = new QWidget(this);
@@ -65,12 +69,14 @@ WindowParametersSelector::WindowParametersSelector(
 	auto button = new QPushButton(this);
 	button->setText("...");
 
-	connect(button, &QPushButton::clicked, this, [this](bool) {
-		QString screen   = ScreenSelector::selectScreen(this);
-		value.screenname = screen;
-		emit parametersChanged(value);
-		screenLabel->setText(screen == "" ? "AUTO" : screen);
-	});
+	connect(button, &QPushButton::clicked, this,
+	        [this](bool)
+	        {
+		        QString screen   = ScreenSelector::selectScreen(this);
+		        value.screenname = screen;
+		        emit parametersChanged(value);
+		        screenLabel->setText(screen == "" ? "AUTO" : screen);
+	        });
 
 	layout->setAlignment(Qt::AlignLeft);
 	layout->addWidget(screenLabel);
@@ -84,7 +90,9 @@ WindowParametersSelector::WindowParametersSelector(
 	connect(hAngleShiftSpinBox,
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
 	            &QDoubleSpinBox::valueChanged),
-	        this, [this](double v) {
+	        this,
+	        [this](double v)
+	        {
 		        value.horizontalAngleShift = v;
 		        emit parametersChanged(value);
 	        });
@@ -97,7 +105,9 @@ WindowParametersSelector::WindowParametersSelector(
 	connect(vAngleShiftSpinBox,
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
 	            &QDoubleSpinBox::valueChanged),
-	        this, [this](double v) {
+	        this,
+	        [this](double v)
+	        {
 		        value.verticalAngleShift = v;
 		        emit parametersChanged(value);
 	        });
@@ -105,18 +115,22 @@ WindowParametersSelector::WindowParametersSelector(
 
 	forceLeftCBox = new QCheckBox(this);
 	forceLeftCBox->setChecked(initialValue.forceleft);
-	connect(forceLeftCBox, &QCheckBox::stateChanged, [this](int s) {
-		value.forceleft = (s != Qt::Unchecked);
-		emit parametersChanged(value);
-	});
+	connect(forceLeftCBox, &QCheckBox::stateChanged,
+	        [this](int s)
+	        {
+		        value.forceleft = (s != Qt::Unchecked);
+		        emit parametersChanged(value);
+	        });
 	mainLayout->addRow(tr("Force left eye rendering only :"), forceLeftCBox);
 
 	forceRightCBox = new QCheckBox(this);
 	forceRightCBox->setChecked(initialValue.forceright);
-	connect(forceRightCBox, &QCheckBox::stateChanged, [this](int s) {
-		value.forceright = (s != Qt::Unchecked);
-		emit parametersChanged(value);
-	});
+	connect(forceRightCBox, &QCheckBox::stateChanged,
+	        [this](int s)
+	        {
+		        value.forceright = (s != Qt::Unchecked);
+		        emit parametersChanged(value);
+	        });
 	mainLayout->addRow(tr("Force right eye rendering only :"), forceRightCBox);
 }
 

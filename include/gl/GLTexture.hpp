@@ -208,7 +208,7 @@ class GLTexture
 
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLTexture(GLTexture const& other) = delete;
+	GLTexture(GLTexture const& other)            = delete;
 	GLTexture& operator=(GLTexture const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL textures.

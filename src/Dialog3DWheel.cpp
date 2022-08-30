@@ -32,16 +32,18 @@ void Dialog3DWheel::addDialog3D(QString const& name, Dialog3D& dialog3D)
 	auto b = new QPushButton(this);
 	b->setText(name);
 	b->setAutoDefault(false);
-	connect(b, &QPushButton::pressed, [this, index]() {
-		if(dialog3Ds[index]->isHidden())
-		{
-			dialog3Ds[index]->showFromHeadset(vrHandler);
-		}
-		else
-		{
-			dialog3Ds[index]->hide();
-		}
-	});
+	connect(b, &QPushButton::pressed,
+	        [this, index]()
+	        {
+		        if(dialog3Ds[index]->isHidden())
+		        {
+			        dialog3Ds[index]->showFromHeadset(vrHandler);
+		        }
+		        else
+		        {
+			        dialog3Ds[index]->hide();
+		        }
+	        });
 
 	dialog3Ds.push_back(&dialog3D);
 

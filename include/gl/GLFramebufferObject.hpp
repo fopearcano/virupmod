@@ -47,7 +47,7 @@ class GLFramebufferObject
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLFramebufferObject(GLFramebufferObject const& other) = delete;
+	GLFramebufferObject(GLFramebufferObject const& other)            = delete;
 	GLFramebufferObject& operator=(GLFramebufferObject const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL textures.

@@ -33,7 +33,8 @@ NetworkManager::NetworkManager(AbstractState* networkedState)
 		auto clientsPtr(&clients);
 		auto netTimerPtr(&networkTimer);
 		connect(socketPtr, &QUdpSocket::readyRead,
-		        [socketPtr, clientsPtr, netTimerPtr]() {
+		        [socketPtr, clientsPtr, netTimerPtr]()
+		        {
 			        while(socketPtr->hasPendingDatagrams())
 			        {
 				        QNetworkDatagram datagram(socketPtr->receiveDatagram());
@@ -96,7 +97,8 @@ NetworkManager::NetworkManager(AbstractState* networkedState)
 		auto socketPtr(&udpDownSocket);
 		auto netStatePtr(networkedState);
 		connect(socketPtr, &QAbstractSocket::readyRead,
-		        [socketPtr, netStatePtr]() {
+		        [socketPtr, netStatePtr]()
+		        {
 			        QNetworkDatagram datagram(socketPtr->receiveDatagram());
 
 			        QByteArray buf(datagram.data());
@@ -107,17 +109,20 @@ NetworkManager::NetworkManager(AbstractState* networkedState)
 		tcpServer = new QTcpServer(this);
 		tcpServer->listen(QHostAddress::Any,
 		                  QSettings().value("network/tcpport").toUInt());
-		connect(tcpServer, &QTcpServer::newConnection, [this]() {
-			tcpSocket = tcpServer->nextPendingConnection();
-			if(!tcpSocket->peerAddress().isEqual(
-			       QHostAddress(QSettings().value("network/ip").toString())))
-			{
-				return;
-			}
-			connect(tcpSocket, &QTcpSocket::readyRead, [this]() {
-				PythonQtHandler::evalScript(tcpSocket->readAll());
-			});
-		});
+		connect(tcpServer, &QTcpServer::newConnection,
+		        [this]()
+		        {
+			        tcpSocket = tcpServer->nextPendingConnection();
+			        if(!tcpSocket->peerAddress().isEqual(QHostAddress(
+			               QSettings().value("network/ip").toString())))
+			        {
+				        return;
+			        }
+			        connect(
+			            tcpSocket, &QTcpSocket::readyRead,
+			            [this]()
+			            { PythonQtHandler::evalScript(tcpSocket->readAll()); });
+		        });
 	}
 	networkTimer.start();
 }
@@ -180,9 +185,9 @@ void NetworkManager::update(float frameTiming)
 			QByteArray buf;
 			QDataStream stream(&buf, QIODevice::WriteOnly);
 			stream << QString(PROJECT_NAME);
-			stream << quint16(udpDownSocket.localPort());
-			stream << qreal(frameTiming);
-			stream << quint16(clientId);
+			stream << udpDownSocket.localPort();
+			stream << static_cast<qreal>(frameTiming);
+			stream << static_cast<quint16>(clientId);
 			udpUpSocket.writeDatagram(
 			    buf, QHostAddress(QSettings().value("network/ip").toString()),
 			    QSettings().value("network/port").toUInt());

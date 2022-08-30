@@ -80,12 +80,14 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 		(void) new GlslSyntaxHighlighter(text->document());
 
 		auto b = new QPushButton(tr("Save"), this);
-		connect(b, &QPushButton::pressed, [text, f]() {
-			QFile::remove(f);
-			QFile file(f);
-			file.open(QIODevice::WriteOnly | QFile::Text);
-			file.write(text->toPlainText().toLatin1());
-		});
+		connect(b, &QPushButton::pressed,
+		        [text, f]()
+		        {
+			        QFile::remove(f);
+			        QFile file(f);
+			        file.open(QIODevice::WriteOnly | QFile::Text);
+			        file.write(text->toPlainText().toLatin1());
+		        });
 		tabLayout->addWidget(b);
 
 		t->addTab(w, f);

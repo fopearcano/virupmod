@@ -46,10 +46,12 @@ ScreenSelector::ScreenSelector(QWidget* parent)
 		button->setGeometry(s.second);
 		button->setText(s.first);
 
-		connect(button, &QPushButton::clicked, this, [this, s](bool) {
-			retValue() = s.first;
-			this->close();
-		});
+		connect(button, &QPushButton::clicked, this,
+		        [this, s](bool)
+		        {
+			        retValue() = s.first;
+			        this->close();
+		        });
 	}
 }
 

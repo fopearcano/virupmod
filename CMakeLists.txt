@@ -15,7 +15,7 @@
 #  51 Franklin Street, Fifth Floor, Boston, MA 02110 - 1301 USA.
 
 # INIT
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 # READ CONFIG FILE AND SET VARIABLES
 set(BUILD_CONF "${CMAKE_CURRENT_SOURCE_DIR}/build.conf")

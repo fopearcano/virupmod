@@ -31,7 +31,7 @@ class GLPixelBufferObject
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLPixelBufferObject(GLPixelBufferObject const& other) = delete;
+	GLPixelBufferObject(GLPixelBufferObject const& other)            = delete;
 	GLPixelBufferObject& operator=(GLPixelBufferObject const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL textures.

@@ -28,7 +28,7 @@ Text3D::Text3D(unsigned int width, unsigned int height,
     : shader(std::move(shader))
     , originalSize(width, height)
 {
-	Primitives::setAsQuad(quad, shader);
+	Primitives::setAsQuad(quad, this->shader);
 	if(width > height)
 	{
 		aspectratio.scale(1.f, static_cast<float>(height) / width);

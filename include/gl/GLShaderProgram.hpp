@@ -47,8 +47,8 @@ class GLShaderProgram
 
 	// implement those in protected if and only if they're needed for the Python
 	// API
-	GLShaderProgram()                             = delete;
-	GLShaderProgram(GLShaderProgram const& other) = delete;
+	GLShaderProgram()                                        = delete;
+	GLShaderProgram(GLShaderProgram const& other)            = delete;
 	GLShaderProgram& operator=(GLShaderProgram const& other) = delete;
 	/**
 	 * @brief Returns the number of allocated OpenGL shader programs (not the

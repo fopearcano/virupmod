@@ -44,8 +44,8 @@ BaseInputManager::BaseInputManager()
 }
 
 // NOLINTNEXTLINE(fuchsia-overloaded-operator)
-BaseInputManager::Action BaseInputManager::
-    operator[](QKeySequence const& key) const
+BaseInputManager::Action
+    BaseInputManager::operator[](QKeySequence const& key) const
 {
 	return mapping[key.toString()];
 }

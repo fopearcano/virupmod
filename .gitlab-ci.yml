@@ -162,7 +162,7 @@ test:jammy:
         expire_in: 1h
 
 checkcode:
-    image: $CI_REGISTRY_IMAGE:focal
+    image: $CI_REGISTRY_IMAGE:jammy
     stage: test
     only:
         refs:

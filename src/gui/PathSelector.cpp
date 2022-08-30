@@ -28,12 +28,14 @@ PathSelector::PathSelector(QWidget* parent, QString const& caption, Type type)
 	auto browsePb = new QPushButton(parent);
 	browsePb->setText("...");
 	QObject::connect(
-	    browsePb, &QPushButton::clicked, [this, caption, type](bool) {
+	    browsePb, &QPushButton::clicked,
+	    [this, caption, type](bool)
+	    {
 		    QString result(type == Type::FILE
 		                       ? QFileDialog::getOpenFileName(this, caption,
 		                                                      fileEdit->text())
 		                       : QFileDialog::getExistingDirectory(
-		                             this, caption, fileEdit->text()));
+		                           this, caption, fileEdit->text()));
 		    if(result != "")
 		    {
 			    setPath(result);

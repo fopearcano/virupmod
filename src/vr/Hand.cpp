@@ -24,8 +24,6 @@ Hand::Hand(Side side)
     , _isValid(false)
     , _isFlat(false)
     , _isClosed(false)
-    , _palmNormal()
-    , _direction()
 {
 	shaderProgram.setUniform("alpha", 1.f);
 	std::vector<unsigned int> ebo = {

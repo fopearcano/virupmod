@@ -400,8 +400,9 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 	// if no VR or debug not in headset, render 2D
 	if((!vrHandler.isEnabled() || thirdRender) || (debug && !debugInHeadset))
 	{
-		auto renderFunc = [=](bool overrideCamera, QMatrix4x4 overrView,
-		                      QMatrix4x4 overrProj) {
+		auto renderFunc =
+		    [=](bool overrideCamera, QMatrix4x4 overrView, QMatrix4x4 overrProj)
+		{
 			for(auto pair : sceneRenderPipeline_)
 			{
 				auto renderSize(mainRenderTarget->sceneTarget.getSize());

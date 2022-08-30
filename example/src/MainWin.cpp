@@ -1,6 +1,6 @@
 #include "MainWin.hpp"
 
-void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
+void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(!pressed)
 	{

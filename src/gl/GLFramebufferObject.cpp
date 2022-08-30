@@ -247,9 +247,13 @@ QImage GLFramebufferObject::copyColorBufferToQImage() const
 	GLHandler::glf().glReadPixels(0, 0, width, height, GL_RGBA,
 	                              GL_UNSIGNED_BYTE, static_cast<GLvoid*>(data));
 
-	return QImage(data, width, height, width * 4,
-	              QImage::Format::Format_RGBA8888,
-	              [](void* data) { delete static_cast<uchar*>(data); }, data);
+	return {data,
+	        static_cast<int>(width),
+	        static_cast<int>(height),
+	        static_cast<int>(width * 4),
+	        QImage::Format::Format_RGBA8888,
+	        [](void* data) { delete static_cast<uchar*>(data); },
+	        data};
 }
 
 void GLFramebufferObject::cleanUp()

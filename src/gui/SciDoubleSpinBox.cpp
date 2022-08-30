@@ -28,7 +28,8 @@ SciDoubleSpinBox::SciDoubleSpinBox(QWidget* parent)
 	connect(this,
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
 	            &QDoubleSpinBox::valueChanged),
-	        [this](double val) {
+	        [this](double val)
+	        {
 		        int tenPow(floor(log10(abs(val))));
 		        setSingleStep(pow(10, tenPow - 1));
 	        });

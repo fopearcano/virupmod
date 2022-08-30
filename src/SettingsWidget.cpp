@@ -106,27 +106,31 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	                                          tr("Gamepad"), defaultIndex);
 
 	auto refresh = new QPushButton(tr("Refresh"), this);
-	connect(refresh, &QPushButton::pressed, [this, comboBox]() {
-		QStringList vals   = {"-1"};
-		QStringList labels = {tr("None")};
-		for(auto const& pair : GamepadHandler::getConnectedGamepads(true))
-		{
-			vals << QString::number(pair.first);
-			labels << pair.second;
-		}
+	connect(refresh, &QPushButton::pressed,
+	        [this, comboBox]()
+	        {
+		        QStringList vals   = {"-1"};
+		        QStringList labels = {tr("None")};
+		        for(auto const& pair :
+		            GamepadHandler::getConnectedGamepads(true))
+		        {
+			        vals << QString::number(pair.first);
+			        labels << pair.second;
+		        }
 
-		QString currentVal(settings.value("controls/gamepad", "-1").toString());
-		int currentIndex(vals.indexOf(currentVal));
+		        QString currentVal(
+		            settings.value("controls/gamepad", "-1").toString());
+		        int currentIndex(vals.indexOf(currentVal));
 
-		comboBox->clear();
-		for(int i(0); i < labels.size(); ++i)
-		{
-			auto const& label(labels[i]);
-			auto const& val(vals[i]);
-			comboBox->addItem(label, val);
-		}
-		comboBox->setCurrentIndex(currentIndex);
-	});
+		        comboBox->clear();
+		        for(int i(0); i < labels.size(); ++i)
+		        {
+			        auto const& label(labels[i]);
+			        auto const& val(vals[i]);
+			        comboBox->addItem(label, val);
+		        }
+		        comboBox->setCurrentIndex(currentIndex);
+	        });
 	currentForm->addRow("", refresh);
 
 	for(auto const& key : inputManager.getOrderedEngineKeys())
@@ -276,9 +280,9 @@ void SettingsWidget::addBoolSetting(QString const& name, bool defaultVal,
 	auto checkBox = new QCheckBox(this);
 	checkBox->setCheckState(settings.value(fullName).toBool() ? Qt::Checked
 	                                                          : Qt::Unchecked);
-	connect(checkBox, &QCheckBox::stateChanged, this, [this, fullName](int s) {
-		updateValue(fullName, s != Qt::Unchecked);
-	});
+	connect(checkBox, &QCheckBox::stateChanged, this,
+	        [this, fullName](int s)
+	        { updateValue(fullName, s != Qt::Unchecked); });
 
 	currentForm->addRow(label + " :", checkBox);
 }
@@ -398,7 +402,9 @@ QComboBox* SettingsWidget::addStringAmongListSetting(
 	connect(
 	    comboBox,
 	    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-	    this, [this, fullName, comboBox](int index) {
+	    this,
+	    [this, fullName, comboBox](int index)
+	    {
 		    auto str = comboBox->itemData(index).toString();
 		    if(str.isEmpty())
 		    {
@@ -437,7 +443,8 @@ void SettingsWidget::addFilePathSetting(QString const& name,
 	auto browsePb = new QPushButton(this);
 	browsePb->setText("...");
 	connect(browsePb, &QPushButton::clicked, this,
-	        [this, label, lineEdit](bool) {
+	        [this, label, lineEdit](bool)
+	        {
 		        QString result(QFileDialog::getOpenFileName(this, label,
 		                                                    lineEdit->text()));
 		        if(result != "")
@@ -482,7 +489,8 @@ void SettingsWidget::addDirPathSetting(QString const& name,
 	auto browsePb = new QPushButton(this);
 	browsePb->setText("...");
 	connect(browsePb, &QPushButton::clicked, this,
-	        [this, label, lineEdit](bool) {
+	        [this, label, lineEdit](bool)
+	        {
 		        QString result(QFileDialog::getExistingDirectory(
 		            this, label, lineEdit->text()));
 		        if(result != "")
@@ -536,7 +544,9 @@ void SettingsWidget::addVector3DSetting(QString const& name,
 		connect(sbox,
 		        static_cast<void (QDoubleSpinBox::*)(double)>(
 		            &QDoubleSpinBox::valueChanged),
-		        this, [this, fullName, sboxes](double) {
+		        this,
+		        [this, fullName, sboxes](double)
+		        {
 			        updateValue(fullName, QVector3D(sboxes[0]->value(),
 			                                        sboxes[1]->value(),
 			                                        sboxes[2]->value()));
@@ -568,9 +578,8 @@ void SettingsWidget::addColorSetting(QString const& name,
     }");
 
 	connect(colorSelector, &ColorSelector::colorChanged, this,
-	        [this, fullName](QColor const& color) {
-		        updateValue(fullName, color);
-	        });
+	        [this, fullName](QColor const& color)
+	        { updateValue(fullName, color); });
 
 	currentForm->addRow(label + " :", colorSelector);
 }
@@ -597,12 +606,13 @@ void SettingsWidget::addDateTimeSetting(QString const& name,
 	dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
 
 	connect(dtEdit, &QDateTimeEdit::dateTimeChanged, this,
-	        [this, fullName](QDateTime dt) { updateValue(fullName, dt); });
+	        [this, fullName](QDateTime dt)
+	        { updateValue(fullName, std::move(dt)); });
 
 	auto now = new QPushButton(tr("Now"), this);
-	connect(now, &QPushButton::clicked, this, [dtEdit]() {
-		dtEdit->setDateTime(QDateTime::currentDateTimeUtc());
-	});
+	connect(now, &QPushButton::clicked, this,
+	        [dtEdit]()
+	        { dtEdit->setDateTime(QDateTime::currentDateTimeUtc()); });
 
 	layout->addWidget(dtEdit);
 	layout->addWidget(now);
@@ -614,7 +624,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
     QString const& label)
 {
 	// def useful lambdas
-	auto valToVariant = [](QList<RenderingWindow::Parameters> const& val) {
+	auto valToVariant = [](QList<RenderingWindow::Parameters> const& val)
+	{
 		QStringList variantList;
 		for(auto const& v : val)
 		{
@@ -622,7 +633,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
 		}
 		return variantList;
 	};
-	auto variantToVal = [](QStringList const& variantList) {
+	auto variantToVal = [](QStringList const& variantList)
+	{
 		QList<RenderingWindow::Parameters> val;
 		for(auto const& var : variantList)
 		{
@@ -659,7 +671,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
 		connect(windowParamsSelector,
 		        &WindowParametersSelector::parametersChanged,
 		        [this, fullName, p,
-		         &valToVariant](RenderingWindow::Parameters const& params) {
+		         &valToVariant](RenderingWindow::Parameters const& params)
+		        {
 			        *p = params;
 			        updateValue(fullName, valToVariant(windowsParams));
 		        });
@@ -676,7 +689,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
 	}
 
 	connect(tab, &QTabWidget::tabCloseRequested,
-	        [this, tab, fullName, &valToVariant](int index) {
+	        [this, tab, fullName, &valToVariant](int index)
+	        {
 		        tab->setCurrentIndex(index);
 		        if(QMessageBox::question(
 		               this, tr("Remove Window"),
@@ -708,7 +722,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
 	auto button = new QPushButton(this);
 	button->setText("+");
 	connect(button, &QPushButton::pressed,
-	        [this, fullName, &valToVariant, tab]() {
+	        [this, fullName, &valToVariant, tab]()
+	        {
 		        auto windowParamsSelector = new WindowParametersSelector(this);
 		        windowsParams.append(RenderingWindow::Parameters{});
 		        tab->setTabsClosable(windowsParams.size() > 1);
@@ -718,7 +733,8 @@ void SettingsWidget::addWindowsDefinitionSettings(
 		        connect(windowParamsSelector,
 		                &WindowParametersSelector::parametersChanged,
 		                [this, fullName, p, &valToVariant](
-		                    RenderingWindow::Parameters const& params) {
+		                    RenderingWindow::Parameters const& params)
+		                {
 			                *p = params;
 			                updateValue(fullName, valToVariant(windowsParams));
 		                });
@@ -750,9 +766,9 @@ void SettingsWidget::addKeySequenceSetting(QString const& name,
 	                           this);
 	keyseqEdit->setMinimumWidth(100);
 
-	connect(
-	    keyseqEdit, &QKeySequenceEdit::keySequenceChanged, this,
-	    [this, fullName](QKeySequence const& t) { updateValue(fullName, t); });
+	connect(keyseqEdit, &QKeySequenceEdit::keySequenceChanged, this,
+	        [this, fullName](QKeySequence const& t)
+	        { updateValue(fullName, t); });
 
 	currentForm->addRow(label + " :", keyseqEdit);
 }
@@ -795,9 +811,8 @@ void SettingsWidget::addLanguageSetting(QString const& name,
 	void (QComboBox::*indexChangedSignal)(int)
 	    = &QComboBox::currentIndexChanged;
 	connect(comboBox, indexChangedSignal, this,
-	        [this, fullName, available](int index) {
-		        updateValue(fullName, available[index].first);
-	        });
+	        [this, fullName, available](int index)
+	        { updateValue(fullName, available[index].first); });
 
 	currentForm->addRow(label + " :", comboBox);
 }

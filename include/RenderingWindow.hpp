@@ -159,7 +159,7 @@ class RenderingWindow : public QWindow
 	 *
 	 * For a key press, @p pressed is true, for a key release, it is false.
 	 */
-	virtual void actionEvent(BaseInputManager::Action a, bool pressed);
+	virtual void actionEvent(BaseInputManager::Action const& a, bool pressed);
 	virtual void resizeEvent(QResizeEvent* ev) override;
 
   private:

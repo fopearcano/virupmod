@@ -52,8 +52,8 @@ void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 	{
 		// proj
 		projLeft  = vrHandler.getProjectionMatrix(angleShiftMat, Side::LEFT,
-                                                 0.1f * eyeDistanceFactor,
-                                                 10000.f * eyeDistanceFactor);
+		                                          0.1f * eyeDistanceFactor,
+		                                          10000.f * eyeDistanceFactor);
 		projRight = vrHandler.getProjectionMatrix(angleShiftMat, Side::RIGHT,
 		                                          0.1f * eyeDistanceFactor,
 		                                          10000.f * eyeDistanceFactor);

@@ -36,8 +36,7 @@ GLShaderProgram::GLShaderProgram(QString const& vertexName,
                                  QString const& fragmentName,
                                  QMap<QString, QString> const& defines)
     : GLShaderProgram(
-          {{vertexName, Stage::VERTEX}, {fragmentName, Stage::FRAGMENT}},
-          defines)
+        {{vertexName, Stage::VERTEX}, {fragmentName, Stage::FRAGMENT}}, defines)
 {
 }
 
