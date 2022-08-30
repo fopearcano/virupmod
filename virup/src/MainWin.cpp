@@ -5,7 +5,7 @@ MainWin::MainWin()
 	srand(time(nullptr));
 }
 
-void MainWin::actionEvent(BaseInputManager::Action a, bool pressed)
+void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(loaded)
 	{
