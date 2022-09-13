@@ -6,6 +6,7 @@ else
 	. ./build.conf
 fi
 
+rm -rf build || true
 mkdir build
 cd build
 
