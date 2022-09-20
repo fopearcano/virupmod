@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ ! -f "./build.conf" ]; then
 	. ./build.conf.example
 else

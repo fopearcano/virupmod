@@ -5,10 +5,11 @@ cd deps;
 git clone https://github.com/Orochimarufan/PythonQt ;
 cd PythonQt ;
 git checkout 18d4c249ca9b0003cfb10ad711c60fb7f9d5f79b ;
-sed -i "s/PythonQt_init_QtQml(0);//" ./extensions/PythonQt_QtAll/PythonQt_QtAll.cpp ;
-sed -i "s/PythonQt_init_QtQuick(0);//" ./extensions/PythonQt_QtAll/PythonQt_QtAll.cpp ;
+# Python >= 10
+sed -i "s/pydebug.h/cpython\/pydebug.h/" ./src/PythonQt.cpp
+sed -i "s/#undef _POSIX_THREADS//" ./src/PythonQtPythonInclude.h
 cd build ;
-cmake .. -DBUILD_SHARED_LIBS=ON ;
+cmake .. -DBUILD_SHARED_LIBS=ON -DPythonQt_Python3=ON;
 make -j 8 ;
 make install ;
 cd ../../..
