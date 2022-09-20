@@ -51,7 +51,8 @@ MovementControls::MovementControls(VRHandler const& vrHandler, BBox dataBBox,
 	Primitives::setAsUnitSphere(guideMesh, guideShader, 20, 20);
 }
 
-void MovementControls::actionEvent(BaseInputManager::Action a, bool pressed)
+void MovementControls::actionEvent(BaseInputManager::Action const& a,
+                                   bool pressed)
 {
 	if(pressed)
 	{

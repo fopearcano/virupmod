@@ -34,7 +34,7 @@ Checks:          "abseil-string-find-startswith, \
     bugprone-misplaced-widening-cast, \
     bugprone-move-forwarding-reference, \
     bugprone-multiple-statement-macro, \
-    bugprone-narrowing-conversions, \
+    -bugprone-narrowing-conversions, \ # too restrictive for now
     bugprone-parent-virtual-call, \
     bugprone-sizeof-container, \
     bugprone-sizeof-expression, \
@@ -164,7 +164,7 @@ Checks:          "abseil-string-find-startswith, \
     cppcoreguidelines-avoid-goto, \
     cppcoreguidelines-c-copy-assignment-signature, \
     cppcoreguidelines-interfaces-global-init, \
-    cppcoreguidelines-narrowing-conversions, \
+    -cppcoreguidelines-narrowing-conversions, \ # too restrictive for now
     cppcoreguidelines-no-malloc, \
     -cppcoreguidelines-owning-memory, \ # not planning to use GSL as of now
     cppcoreguidelines-pro-bounds-array-to-pointer-decay, \
@@ -418,7 +418,7 @@ CheckOptions:
   - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
     value:           ''
   - key:             cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
-    value:           '0'
+    value:           llvm
   - key:             cppcoreguidelines-pro-type-member-init.IgnoreArrays
     value:           '0'
   - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
@@ -554,7 +554,7 @@ CheckOptions:
   - key:             modernize-make-shared.IgnoreMacros
     value:           '1'
   - key:             modernize-make-shared.IncludeStyle
-    value:           '0'
+    value:           llvm
   - key:             modernize-make-shared.MakeSmartPtrFunction
     value:           'std::make_shared'
   - key:             modernize-make-shared.MakeSmartPtrFunctionHeader
@@ -562,7 +562,7 @@ CheckOptions:
   - key:             modernize-make-unique.IgnoreMacros
     value:           '1'
   - key:             modernize-make-unique.IncludeStyle
-    value:           '0'
+    value:           llvm
   - key:             modernize-make-unique.MakeSmartPtrFunction
     value:           'std::make_unique'
   - key:             modernize-make-unique.MakeSmartPtrFunctionHeader

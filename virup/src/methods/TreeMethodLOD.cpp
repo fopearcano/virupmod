@@ -405,7 +405,8 @@ void TreeMethodLOD::setShaderColor(QColor const& color)
 {
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color",
-	      {float(color.redF()), float(color.greenF()), float(color.blueF())}}});
+	      {static_cast<float>(color.redF()), static_cast<float>(color.greenF()),
+	       static_cast<float>(color.blueF())}}});
 }
 
 TreeMethodLOD::~TreeMethodLOD()

@@ -264,7 +264,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 		conShader.setUniform("exposure", tmm.exposure);
 		conShader.setUniform("dynamicrange", tmm.dynamicrange);
 		conShader.setUniform("camPos", Utils::toQt(camera.position));
-		conShader.setUniform("unit", float(unit));
+		conShader.setUniform("unit", static_cast<float>(unit));
 
 		GLHandler::setUpRender(conShader, model);
 		conMesh.render(PrimitiveType::LINE_STRIP);

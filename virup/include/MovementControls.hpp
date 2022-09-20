@@ -45,7 +45,7 @@ class MovementControls : public QObject
   public:
 	MovementControls(VRHandler const& vrHandler, BBox dataBBox,
 	                 Camera* cosmoCam, OrbitalSystemCamera* cam);
-	void actionEvent(BaseInputManager::Action a, bool pressed);
+	void actionEvent(BaseInputManager::Action const& a, bool pressed);
 	void wheelEvent(QWheelEvent* e);
 	void vrEvent(VRHandler::Event const& e,
 	             QMatrix4x4 const& trackedSpaceToWorldTransform,
