@@ -201,6 +201,7 @@ class AbstractMainWin : public RenderingWindow
 
   public slots:
 	void close() { QWindow::close(); };
+	void refreshFullscreen() { fullScreenTimer.restart(); };
 	void reloadPythonEngine();
 	void sendPythonScript(unsigned int toClientId, QString const& script) const;
 	/**
