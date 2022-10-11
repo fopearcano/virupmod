@@ -71,6 +71,18 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	b->setText(tr("+"));
 	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure *= 1.5f; });
 	hl->addWidget(b);
+
+	b = new QPushButton(this);
+	b->setText(tr("Reset"));
+	connect(b, &QPushButton::pressed,
+	        [this]()
+	        {
+		        this->tmm.exposure                         = 0.3f;
+		        this->tmm.dynamicrange                     = 10000.f;
+		        this->tmm.autoexposure                     = false;
+		        UniverseElement::useBrightnessMultiplier() = true;
+	        });
+	hl->addWidget(b);
 }
 
 void ToneMappingController::update()
