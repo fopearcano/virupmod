@@ -105,6 +105,10 @@ bool MainWin::event(QEvent* e)
 		{
 			scenes->close();
 		}
+		if(presenterHelp != nullptr)
+		{
+			presenterHelp->close();
+		}
 	}
 	return AbstractMainWin::event(e);
 }
@@ -421,6 +425,7 @@ void MainWin::initScene()
 		timeController  = new TimeController(*universe);
 		tmController    = new ToneMappingController(*toneMappingModel);
 		scenes          = new SceneSelector(*animator);
+		presenterHelp   = new PresenterHelp(*this);
 
 		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
@@ -451,6 +456,7 @@ void MainWin::initScene()
 		timeController->show();
 		tmController->show();
 		scenes->show();
+		presenterHelp->show();
 	}
 	cursorTimer.start();
 
@@ -784,6 +790,7 @@ std::vector<float> MainWin::generateVertices(unsigned int number,
 MainWin::~MainWin()
 {
 	delete animator;
+	delete presenterHelp;
 	delete scenes;
 	delete visibilities;
 	delete timeController;

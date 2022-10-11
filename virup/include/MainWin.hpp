@@ -18,6 +18,7 @@
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
+#include "ui/PresenterHelp.hpp"
 #include "ui/SceneSelector.hpp"
 #include "ui/TimeController.hpp"
 #include "ui/ToneMappingController.hpp"
@@ -306,6 +307,7 @@ class MainWin : public AbstractMainWin
 	TimeController* timeController           = nullptr;
 	ToneMappingController* tmController      = nullptr;
 	SceneSelector* scenes                    = nullptr;
+	PresenterHelp* presenterHelp             = nullptr;
 
 	// scenes
 	Animator* animator = nullptr;
