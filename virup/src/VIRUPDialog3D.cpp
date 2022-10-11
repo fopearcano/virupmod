@@ -43,6 +43,8 @@ void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 			break;
 		}
 	}
+	auto flags = window()->windowHandle()->flags() & ~Qt::WindowCloseButtonHint;
+	window()->windowHandle()->setFlags(flags);
 	QRect ownGeometry(geometry());
 	ownGeometry.setX(screenGeometry.x()
 	                 + screenRelPos.x() * screenGeometry.width());
