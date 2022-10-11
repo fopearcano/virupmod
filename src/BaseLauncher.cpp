@@ -28,6 +28,22 @@ void BaseLauncher::init()
 	// SETTINGS TAB WIDGET
 	settingsWidget = newSettingsWidget();
 	mainLayout->addWidget(settingsWidget);
+	connect(settingsWidget, &SettingsWidget::maxWidgetSizeChanged,
+	        [this](QSize const& maxWidgetSize)
+	        {
+		        QSize borders(30, 150);
+
+		        auto newSize = maxWidgetSize;
+		        newSize += borders;
+
+		        auto screen     = this->window()->windowHandle()->screen();
+		        auto screenSize = screen->size();
+		        newSize.setWidth(
+		            fminf(newSize.width(), screenSize.width() * 0.5f));
+		        newSize.setHeight(
+		            fminf(newSize.height(), screenSize.height() * 0.8f));
+		        this->setFixedSize(newSize);
+	        });
 
 	// LAUNCH AND QUIT BUTTONS
 	auto w = new QWidget(this);

@@ -619,6 +619,41 @@ void SettingsWidget::addDateTimeSetting(QString const& name,
 	currentForm->addRow(label + " :", w);
 }
 
+void SettingsWidget::addScreenSetting(QString const& name,
+                                      QString const& defaultVal,
+                                      QString const& label)
+{
+	QString fullName(currentGroup + '/' + name);
+
+	if(!settings.contains(fullName))
+	{
+		settings.setValue(fullName, defaultVal);
+	}
+
+	QString stored(settings.value(fullName).toString());
+
+	auto w      = new QWidget(this);
+	auto layout = new QHBoxLayout(w);
+
+	auto l = new QLabel(this);
+	l->setText(stored == "" ? "AUTO" : stored);
+
+	auto button = new QPushButton(this);
+	button->setText("...");
+
+	connect(button, &QPushButton::clicked, this,
+	        [this, l, fullName](bool)
+	        {
+		        auto screen = ScreenSelector::selectScreen(this);
+		        updateValue(fullName, screen);
+		        l->setText(screen == "" ? "AUTO" : screen);
+	        });
+
+	layout->addWidget(l);
+	layout->addWidget(button);
+	currentForm->addRow(label + " :", w);
+}
+
 void SettingsWidget::addWindowsDefinitionSettings(
     QString const& name, QList<RenderingWindow::Parameters> const& defaultVal,
     QString const& label)
@@ -815,4 +850,21 @@ void SettingsWidget::addLanguageSetting(QString const& name,
 	        { updateValue(fullName, available[index].first); });
 
 	currentForm->addRow(label + " :", comboBox);
+}
+
+void SettingsWidget::showEvent(QShowEvent* /*event*/)
+{
+	maxWidgetSize.setWidth(0);
+	maxWidgetSize.setHeight(0);
+	for(int i(0); i < orderedGroups.size(); ++i)
+	{
+		setCurrentIndex(i);
+		auto w = dynamic_cast<QScrollArea*>(QTabWidget::widget(i))->widget();
+		maxWidgetSize.setWidth(fmaxf(maxWidgetSize.width(), w->size().width()));
+		maxWidgetSize.setHeight(
+		    fmaxf(maxWidgetSize.height(), w->size().height()));
+	}
+	setCurrentIndex(0);
+
+	emit maxWidgetSizeChanged(maxWidgetSize);
 }

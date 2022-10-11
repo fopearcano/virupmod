@@ -44,6 +44,7 @@
 #include <QVector3D>
 
 #include <array>
+#include <cmath>
 
 #include "InputManager.hpp"
 #include "RenderingWindow.hpp"
@@ -56,7 +57,11 @@ class SettingsWidget : public QTabWidget
 	Q_OBJECT
   public:
 	explicit SettingsWidget(QWidget* parent = nullptr);
+	QSize getMaxWidgetSize() const { return maxWidgetSize; };
 	~SettingsWidget() = default;
+
+  signals:
+	void maxWidgetSizeChanged(QSize const& maxWidgetSize);
 
   protected:
 	void addGroup(QString const& name, QString const& label);
@@ -94,6 +99,8 @@ class SettingsWidget : public QTabWidget
 	                     QString const& label);
 	void addDateTimeSetting(QString const& name, QDateTime const& defaultVal,
 	                        QString const& label);
+	void addScreenSetting(QString const& name, QString const& defaultVal,
+	                      QString const& label);
 	void addWindowsDefinitionSettings(
 	    QString const& name                                  = "windefinitions",
 	    QList<RenderingWindow::Parameters> const& defaultVal = {{}},
@@ -107,6 +114,8 @@ class SettingsWidget : public QTabWidget
 	                        QString const& label
 	                        = tr("Language (needs restart)"));
 
+	virtual void showEvent(QShowEvent* event) override;
+
   private:
 	QFormLayout* currentForm = nullptr;
 
@@ -115,6 +124,8 @@ class SettingsWidget : public QTabWidget
 	QStringList orderedGroups;
 
 	QList<RenderingWindow::Parameters> windowsParams;
+
+	QSize maxWidgetSize;
 
 	template <typename T>
 	inline void updateValue(QString const& fullName, T newValue);
