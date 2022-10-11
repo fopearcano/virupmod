@@ -18,6 +18,8 @@
 
 #include "ui/TimeController.hpp"
 
+#include <QCalendarWidget>
+
 TimeController::TimeController(Universe& universe)
     : universe(universe)
 {
@@ -25,10 +27,27 @@ TimeController::TimeController(Universe& universe)
 
 	auto mainLayout = new QVBoxLayout(this);
 
-	timeLabel = new QLabel(this);
-	mainLayout->addWidget(timeLabel);
-
 	auto w = new QWidget(this);
+	mainLayout->addWidget(w);
+	auto dateTimeLayout = new QHBoxLayout(w);
+	dtEdit              = new QDateTimeEdit(this);
+	dtEdit->setCalendarPopup(true);
+	dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+	dtEdit->setDateTime(universe.getSimulationTime());
+	connect(dtEdit, &QDateTimeEdit::dateTimeChanged,
+	        [this](QDateTime const& dt)
+	        {
+		        if(!this->ignoreDTEditUpdate)
+		        {
+			        this->universe.setSimulationTime(dt);
+		        }
+	        });
+	dateTimeLayout->addWidget(dtEdit);
+
+	timeLabel = new QLabel(this);
+	dateTimeLayout->addWidget(timeLabel);
+
+	w = new QWidget(this);
 	mainLayout->addWidget(w);
 	auto buttonsLayout = new QHBoxLayout(w);
 
@@ -113,8 +132,13 @@ void TimeController::update()
 		setFixedSize(size());
 		fixedSize = true;
 	}
+	ignoreDTEditUpdate = true;
+	if(!dtEdit->calendarWidget()->isVisible())
+	{
+		dtEdit->setDateTime(universe.getSimulationTime());
+	}
+	ignoreDTEditUpdate = false;
 	QString text;
-	text += universe.getSimulationTime().toString();
 	text += tr(" x");
 	if(timeCoeffBackup == 0.f)
 	{

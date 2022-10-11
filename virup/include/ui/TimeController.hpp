@@ -19,6 +19,8 @@
 #ifndef TIMECONTROLLER_HPP
 #define TIMECONTROLLER_HPP
 
+#include <QDateTimeEdit>
+
 #include "Dialog3D.hpp"
 #include "universe/Universe.hpp"
 
@@ -34,6 +36,8 @@ class TimeController : public Dialog3D
 
 	Universe& universe;
 
+	QDateTimeEdit* dtEdit;
+	bool ignoreDTEditUpdate = false;
 	QLabel* timeLabel;
 
 	float timeCoeffBackup = 0.f;
