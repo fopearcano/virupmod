@@ -20,7 +20,8 @@
 
 UniverseElementSelector::UniverseElementSelector(Universe const& universe,
                                                  Animator& animator)
-    : universe(universe)
+    : VIRUPDialog3D({0.65f, 0.f})
+    , universe(universe)
     , animator(animator)
     , listWidget(this)
 {

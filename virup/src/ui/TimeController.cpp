@@ -21,7 +21,8 @@
 #include <QCalendarWidget>
 
 TimeController::TimeController(Universe& universe)
-    : universe(universe)
+    : VIRUPDialog3D({0.0f, 0.5f})
+    , universe(universe)
 {
 	setWindowTitle(tr("Time Controller"));
 

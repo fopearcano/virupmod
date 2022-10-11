@@ -19,7 +19,8 @@
 #include "ui/SceneSelector.hpp"
 
 SceneSelector::SceneSelector(Animator& animator)
-    : animator(animator)
+    : VIRUPDialog3D({0.f, 0.f})
+    , animator(animator)
     , slider(Qt::Horizontal, this)
 {
 	show();

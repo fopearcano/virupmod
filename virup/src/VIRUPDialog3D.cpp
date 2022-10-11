@@ -21,12 +21,14 @@
 #include <QScreen>
 #include <QWindow>
 
-VIRUPDialog3D::VIRUPDialog3D() {}
+VIRUPDialog3D::VIRUPDialog3D(QPointF const& screenRelPos)
+    : screenRelPos(screenRelPos)
+{
+}
 
 void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 {
 	auto screenName = QSettings().value("misc/presenterscreen").toString();
-	qDebug() << screenName;
 	if(screenName.isEmpty())
 	{
 		return;
@@ -42,7 +44,9 @@ void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 		}
 	}
 	QRect ownGeometry(geometry());
-	ownGeometry.setX(screenGeometry.x());
-	ownGeometry.setY(screenGeometry.y());
+	ownGeometry.setX(screenGeometry.x()
+	                 + screenRelPos.x() * screenGeometry.width());
+	ownGeometry.setY(screenGeometry.y()
+	                 + screenRelPos.y() * screenGeometry.height());
 	setGeometry(ownGeometry);
 }

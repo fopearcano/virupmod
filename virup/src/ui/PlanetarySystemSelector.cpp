@@ -20,7 +20,8 @@
 
 PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
                                                  Animator& animator)
-    : universe(universe)
+    : VIRUPDialog3D({0.5f, 0.f})
+    , universe(universe)
     , animator(animator)
     , tree(this)
 {

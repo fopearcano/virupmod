@@ -24,10 +24,13 @@
 class VIRUPDialog3D : public Dialog3D
 {
   public:
-	VIRUPDialog3D();
+	VIRUPDialog3D(QPointF const& screenRelPos);
 
   protected:
 	virtual void showEvent(QShowEvent* event) override;
+
+  private:
+	QPointF screenRelPos;
 };
 
 #endif // VIRUPDIALOG3D_HPP

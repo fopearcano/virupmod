@@ -19,7 +19,8 @@
 #include "ui/Visibilities.hpp"
 
 Visibilities::Visibilities(Universe& universe)
-    : universe(universe)
+    : VIRUPDialog3D({0.8f, 0.f})
+    , universe(universe)
 {
 	setFixedSize(200, 600);
 	setWindowTitle(tr("Visibilities List"));
