@@ -21,10 +21,10 @@
 
 #include <QDateTimeEdit>
 
-#include "Dialog3D.hpp"
+#include "VIRUPDialog3D.hpp"
 #include "universe/Universe.hpp"
 
-class TimeController : public Dialog3D
+class TimeController : public VIRUPDialog3D
 {
   public:
 	TimeController(Universe& universe);

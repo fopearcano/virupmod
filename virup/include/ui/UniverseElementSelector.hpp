@@ -21,10 +21,10 @@
 
 #include <QListWidgetItem>
 
-#include "Dialog3D.hpp"
+#include "VIRUPDialog3D.hpp"
 #include "scenes/Animator.hpp"
 
-class UniverseElementSelector : public Dialog3D
+class UniverseElementSelector : public VIRUPDialog3D
 {
   public:
 	UniverseElementSelector(Universe const& universe, Animator& animator);

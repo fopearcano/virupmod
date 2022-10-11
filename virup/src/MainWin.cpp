@@ -443,6 +443,15 @@ void MainWin::initScene()
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
 	}
+	if(!QSettings().value("misc/presenterscreen").toString().isEmpty())
+	{
+		visibilities->show();
+		planetSysSelect->show();
+		univElemSelect->show();
+		timeController->show();
+		tmController->show();
+		scenes->show();
+	}
 	cursorTimer.start();
 
 	// AMBIANCE

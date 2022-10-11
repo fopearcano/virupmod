@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Florian Cabot <florian.cabot@hotmail.fr>
+    Copyright (C) 2022 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,34 +16,32 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef SCENESELECTOR_HPP
-#define SCENESELECTOR_HPP
-
-#include <QMouseEvent>
-
 #include "VIRUPDialog3D.hpp"
-#include "scenes/Animator.hpp"
 
-class SceneSelector : public VIRUPDialog3D
+#include <QScreen>
+
+VIRUPDialog3D::VIRUPDialog3D() {}
+
+void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 {
-	Q_OBJECT
-  public:
-	SceneSelector(Animator& animator);
-	bool voiceOverIsEnglish() const { return english; };
-	void update();
+	auto screenName = QSettings().value("misc/presenterscreen").toString();
+	qDebug() << screenName;
+	if(screenName.isEmpty())
+	{
+		return;
+	}
 
-  private slots:
-	void updateButtons();
-
-  private:
-	Animator& animator;
-
-	bool english = true;
-	QVBoxLayout buttonsLayout;
-	std::vector<QPushButton*> buttons = {};
-	QPushButton* transitionsButton    = nullptr;
-	QSlider slider;
-	bool animateSlider = true;
-};
-
-#endif // SCENESELECTOR_HPP
+	QRect screenGeometry(window()->screen()->geometry());
+	for(auto s : QGuiApplication::screens())
+	{
+		if(s->name() == screenName)
+		{
+			screenGeometry = s->geometry();
+			break;
+		}
+	}
+	QRect ownGeometry(geometry());
+	ownGeometry.setX(screenGeometry.x());
+	ownGeometry.setY(screenGeometry.y());
+	setGeometry(ownGeometry);
+}

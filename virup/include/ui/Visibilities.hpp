@@ -22,10 +22,10 @@
 #include <QScrollArea>
 #include <QSlider>
 
-#include "Dialog3D.hpp"
+#include "VIRUPDialog3D.hpp"
 #include "universe/Universe.hpp"
 
-class Visibilities : public Dialog3D
+class Visibilities : public VIRUPDialog3D
 {
 	Q_OBJECT
   public:

@@ -22,9 +22,9 @@
 #include <QCheckBox>
 #include <QLabel>
 
-#include "Dialog3D.hpp"
+#include "VIRUPDialog3D.hpp"
 
-class ToneMappingController : public Dialog3D
+class ToneMappingController : public VIRUPDialog3D
 {
   public:
 	ToneMappingController(ToneMappingModel& tmm);

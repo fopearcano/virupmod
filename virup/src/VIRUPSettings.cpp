@@ -61,6 +61,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	               1000000);
 	addDirPathSetting("octreestatesdir", QDir::homePath() + "/octree_states/",
 	                  tr("Octree states (OBJ) save directory"));
+	addScreenSetting("presenterscreen", "", tr("Presenter screen"));
 
 	insertGroup("sound", tr("Sound"), 4);
 	addDoubleSetting("ambiancevolume", 1.0,

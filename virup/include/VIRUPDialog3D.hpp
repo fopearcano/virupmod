@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Florian Cabot <florian.cabot@hotmail.fr>
+    Copyright (C) 2022 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,34 +16,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef SCENESELECTOR_HPP
-#define SCENESELECTOR_HPP
+#ifndef VIRUPDIALOG3D_HPP
+#define VIRUPDIALOG3D_HPP
 
-#include <QMouseEvent>
+#include "Dialog3D.hpp"
 
-#include "VIRUPDialog3D.hpp"
-#include "scenes/Animator.hpp"
-
-class SceneSelector : public VIRUPDialog3D
+class VIRUPDialog3D : public Dialog3D
 {
-	Q_OBJECT
   public:
-	SceneSelector(Animator& animator);
-	bool voiceOverIsEnglish() const { return english; };
-	void update();
+	VIRUPDialog3D();
 
-  private slots:
-	void updateButtons();
-
-  private:
-	Animator& animator;
-
-	bool english = true;
-	QVBoxLayout buttonsLayout;
-	std::vector<QPushButton*> buttons = {};
-	QPushButton* transitionsButton    = nullptr;
-	QSlider slider;
-	bool animateSlider = true;
+  protected:
+	virtual void showEvent(QShowEvent* event) override;
 };
 
-#endif // SCENESELECTOR_HPP
+#endif // VIRUPDIALOG3D_HPP
