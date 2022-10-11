@@ -19,6 +19,7 @@
 #include "VIRUPDialog3D.hpp"
 
 #include <QScreen>
+#include <QWindow>
 
 VIRUPDialog3D::VIRUPDialog3D() {}
 
@@ -31,7 +32,7 @@ void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 		return;
 	}
 
-	QRect screenGeometry(window()->screen()->geometry());
+	QRect screenGeometry(window()->windowHandle()->screen()->geometry());
 	for(auto s : QGuiApplication::screens())
 	{
 		if(s->name() == screenName)
