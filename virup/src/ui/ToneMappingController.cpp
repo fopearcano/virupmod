@@ -1,0 +1,87 @@
+/*
+    Copyright (C) 2022 Florian Cabot <florian.cabot@hotmail.fr>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include "ui/ToneMappingController.hpp"
+
+#include <QPushButton>
+#include <QVBoxLayout>
+
+#include "universe/UniverseElement.hpp"
+
+ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
+    : tmm(tmm)
+{
+	setWindowTitle(tr("Tone Mapping Controller"));
+
+	auto mainLayout = new QVBoxLayout(this);
+
+	auto w = new QWidget(this);
+	mainLayout->QLayout::addWidget(w);
+	auto hl = new QHBoxLayout(w);
+	autoCb  = new QCheckBox(this);
+	autoCb->setChecked(tmm.autoexposure);
+	connect(autoCb, &QCheckBox::stateChanged,
+	        [this]() { this->tmm.autoexposure = this->autoCb->isChecked(); });
+	hl->QLayout::addWidget(autoCb);
+	auto l = new QLabel(this);
+	l->setText(tr("Automatic exposure"));
+	hl->addWidget(l);
+
+	w = new QWidget(this);
+	mainLayout->QLayout::addWidget(w);
+	hl   = new QHBoxLayout(w);
+	bmCb = new QCheckBox(this);
+	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
+	connect(bmCb, &QCheckBox::stateChanged,
+	        [this]() {
+		        UniverseElement::useBrightnessMultiplier()
+		            = !this->bmCb->isChecked();
+	        });
+	hl->QLayout::addWidget(bmCb);
+	l = new QLabel(this);
+	l->setText(tr("Realistic luminosities"));
+	hl->addWidget(l);
+
+	w = new QWidget(this);
+	mainLayout->QLayout::addWidget(w);
+	hl            = new QHBoxLayout(w);
+	exposureLabel = new QLabel(this);
+	exposureLabel->setText(tr("Exposure :"));
+	hl->addWidget(exposureLabel);
+	auto b = new QPushButton(this);
+	b->setText(tr("-"));
+	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure /= 1.5f; });
+	hl->addWidget(b);
+	b = new QPushButton(this);
+	b->setText(tr("+"));
+	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure *= 1.5f; });
+	hl->addWidget(b);
+}
+
+void ToneMappingController::update()
+{
+	if(isVisible() && !fixedSize)
+	{
+		setFixedSize(size());
+		fixedSize = true;
+	}
+	autoCb->setChecked(tmm.autoexposure);
+	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
+
+	exposureLabel->setText(tr("Exposure : ") + QString::number(tmm.exposure));
+}

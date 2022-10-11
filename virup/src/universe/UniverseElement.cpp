@@ -222,6 +222,12 @@ QList<QPair<QString, QWidget*>>
 	return result;
 }
 
+bool& UniverseElement::useBrightnessMultiplier()
+{
+	static bool useBrightnessMultiplier(true);
+	return useBrightnessMultiplier;
+}
+
 void UniverseElement::getModelAndCampos(Camera const& camera, QMatrix4x4& model,
                                         QVector3D& campos)
 {

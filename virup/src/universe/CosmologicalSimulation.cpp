@@ -195,7 +195,12 @@ void CosmologicalSimulation::update(Camera const& camera)
 void CosmologicalSimulation::render(Camera const& camera,
                                     ToneMappingModel const& /*tmm*/)
 {
-	trees.setAlpha(getVisibility() * brightnessMultiplier);
+	auto vis = getVisibility();
+	if(useBrightnessMultiplier())
+	{
+		vis *= brightnessMultiplier;
+	}
+	trees.setAlpha(vis);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
 	trees.render(camera, model, campos, unit);
 	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);

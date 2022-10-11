@@ -159,6 +159,8 @@ class UniverseElement : public QObject
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 
+	static bool& useBrightnessMultiplier();
+
   signals:
 	/*! @brief Emitted when visibility is changed.
 	 *

@@ -20,6 +20,7 @@
 #include "ui/PlanetarySystemSelector.hpp"
 #include "ui/SceneSelector.hpp"
 #include "ui/TimeController.hpp"
+#include "ui/ToneMappingController.hpp"
 #include "ui/UniverseElementSelector.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
@@ -303,6 +304,7 @@ class MainWin : public AbstractMainWin
 	PlanetarySystemSelector* planetSysSelect = nullptr;
 	UniverseElementSelector* univElemSelect  = nullptr;
 	TimeController* timeController           = nullptr;
+	ToneMappingController* tmController      = nullptr;
 	SceneSelector* scenes                    = nullptr;
 
 	// scenes

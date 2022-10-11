@@ -89,6 +89,10 @@ bool MainWin::event(QEvent* e)
 		{
 			timeController->close();
 		}
+		if(tmController != nullptr)
+		{
+			tmController->close();
+		}
 		if(planetSysSelect != nullptr)
 		{
 			planetSysSelect->close();
@@ -415,12 +419,14 @@ void MainWin::initScene()
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 		timeController  = new TimeController(*universe);
+		tmController    = new ToneMappingController(*toneMappingModel);
 		scenes          = new SceneSelector(*animator);
 
 		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
 		dialog3dWheel->addDialog3D(tr("Time Controller"), *timeController);
+		dialog3dWheel->addDialog3D(tr("Time Controller"), *tmController);
 		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);*/
 
 		auto tools(menuBar->addMenu(tr("Tools")));
@@ -432,6 +438,8 @@ void MainWin::initScene()
 		                 [this]() { this->planetSysSelect->show(); });
 		tools->addAction(tr("Time Controller"), this,
 		                 [this]() { this->timeController->show(); });
+		tools->addAction(tr("Tone Mapping Controller"), this,
+		                 [this]() { this->tmController->show(); });
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
 	}
@@ -523,6 +531,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		if(networkManager->isServer())
 		{
 			timeController->update();
+			tmController->update();
 			scenes->update();
 		}
 	}
@@ -769,6 +778,7 @@ MainWin::~MainWin()
 	delete scenes;
 	delete visibilities;
 	delete timeController;
+	delete tmController;
 	delete planetSysSelect;
 	delete univElemSelect;
 	delete lenseDistortionMap;
