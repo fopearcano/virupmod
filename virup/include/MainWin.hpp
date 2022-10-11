@@ -19,6 +19,7 @@
 #include "scenes/Animator.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
 #include "ui/SceneSelector.hpp"
+#include "ui/TimeController.hpp"
 #include "ui/UniverseElementSelector.hpp"
 #include "ui/Visibilities.hpp"
 #include "universe/Universe.hpp"
@@ -301,6 +302,7 @@ class MainWin : public AbstractMainWin
 	Visibilities* visibilities               = nullptr;
 	PlanetarySystemSelector* planetSysSelect = nullptr;
 	UniverseElementSelector* univElemSelect  = nullptr;
+	TimeController* timeController           = nullptr;
 	SceneSelector* scenes                    = nullptr;
 
 	// scenes

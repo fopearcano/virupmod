@@ -85,6 +85,10 @@ bool MainWin::event(QEvent* e)
 		{
 			visibilities->close();
 		}
+		if(timeController != nullptr)
+		{
+			timeController->close();
+		}
 		if(planetSysSelect != nullptr)
 		{
 			planetSysSelect->close();
@@ -410,11 +414,13 @@ void MainWin::initScene()
 		visibilities    = new Visibilities(*universe);
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
+		timeController  = new TimeController(*universe);
 		scenes          = new SceneSelector(*animator);
 
 		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
+		dialog3dWheel->addDialog3D(tr("Time Controller"), *timeController);
 		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);*/
 
 		auto tools(menuBar->addMenu(tr("Tools")));
@@ -424,6 +430,8 @@ void MainWin::initScene()
 		                 [this]() { this->univElemSelect->show(); });
 		tools->addAction(tr("Planetary Systems"), this,
 		                 [this]() { this->planetSysSelect->show(); });
+		tools->addAction(tr("Time Controller"), this,
+		                 [this]() { this->timeController->show(); });
 		tools->addAction(tr("Visibilities List"), this,
 		                 [this]() { this->visibilities->show(); });
 	}
@@ -514,6 +522,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(networkManager->isServer())
 		{
+			timeController->update();
 			scenes->update();
 		}
 	}
@@ -759,6 +768,7 @@ MainWin::~MainWin()
 	delete animator;
 	delete scenes;
 	delete visibilities;
+	delete timeController;
 	delete planetSysSelect;
 	delete univElemSelect;
 	delete lenseDistortionMap;
