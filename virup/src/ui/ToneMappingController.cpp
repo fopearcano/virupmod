@@ -60,6 +60,18 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 
 	w = new QWidget(this);
 	mainLayout->QLayout::addWidget(w);
+	hl    = new QHBoxLayout(w);
+	prkCb = new QCheckBox(this);
+	prkCb->setChecked(tmm.purkinje);
+	connect(prkCb, &QCheckBox::stateChanged,
+	        [this]() { this->tmm.purkinje = this->prkCb->isChecked(); });
+	hl->QLayout::addWidget(prkCb);
+	l = new QLabel(this);
+	l->setText(tr("Purkinje Effect"));
+	hl->addWidget(l);
+
+	w = new QWidget(this);
+	mainLayout->QLayout::addWidget(w);
 	hl            = new QHBoxLayout(w);
 	exposureLabel = new QLabel(this);
 	exposureLabel->setText(tr("Exposure :"));
@@ -81,6 +93,7 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 		        this->tmm.exposure                         = 0.3f;
 		        this->tmm.dynamicrange                     = 10000.f;
 		        this->tmm.autoexposure                     = false;
+		        this->tmm.purkinje                         = false;
 		        UniverseElement::useBrightnessMultiplier() = true;
 	        });
 	hl->addWidget(b);
@@ -95,6 +108,7 @@ void ToneMappingController::update()
 	}
 	autoCb->setChecked(tmm.autoexposure);
 	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
+	prkCb->setChecked(tmm.purkinje);
 
 	exposureLabel->setText(tr("Exposure : ") + QString::number(tmm.exposure));
 }

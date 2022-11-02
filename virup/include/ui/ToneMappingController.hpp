@@ -34,6 +34,7 @@ class ToneMappingController : public VIRUPDialog3D
 	ToneMappingModel& tmm;
 	QCheckBox* autoCb;
 	QCheckBox* bmCb;
+	QCheckBox* prkCb;
 	QLabel* exposureLabel;
 
 	bool fixedSize = false;
