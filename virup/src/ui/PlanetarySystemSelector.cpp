@@ -23,12 +23,45 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
     : VIRUPDialog3D({0.5f, 0.f})
     , universe(universe)
     , animator(animator)
-    , tree(this)
+    , solarSystemTree(this)
+    , fullTree(this)
 {
-	setFixedSize(250, 600);
+	setFixedSize(300, 900);
 	setWindowTitle(tr("Orbital Systems List"));
 
 	auto layout = new QVBoxLayout(this);
+
+	auto label = new QLabel(this);
+	label->setText(tr("Solar System"));
+	layout->addWidget(label);
+
+	solarSystemTree.setColumnCount(1);
+	solarSystemTree.setHeaderLabel(QString());
+	connect(&solarSystemTree, &QTreeWidget::itemActivated, this,
+	        &PlanetarySystemSelector::selectOrbitableSolSys);
+	layout->addWidget(&solarSystemTree);
+
+	auto const& sun
+	    = universe.planetSystems->getSystem("Solar System")->getRootOrbitable();
+	auto item = new QTreeWidgetItem(&solarSystemTree);
+	item->setText(0, sun.getName().c_str());
+	for(auto childOrb : sun.getChildren())
+	{
+		item->addChild(
+		    constructItems(*childOrb, item, solarSystemTree, universe));
+	}
+	item->setExpanded(true);
+
+	auto b = new QPushButton(this);
+	b->setText(tr("Go !"));
+	connect(b, &QPushButton::pressed,
+	        [this]()
+	        { selectOrbitableSolSys(solarSystemTree.currentItem(), 0); });
+
+	layout->addWidget(b);
+	label = new QLabel(this);
+	label->setText(tr("Exoplanetary Systems"));
+	layout->addWidget(label);
 
 	auto w            = new QWidget(this);
 	auto layoutSearch = new QHBoxLayout(w);
@@ -42,25 +75,29 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 	layoutSearch->addWidget(searchBar);
 	layout->addWidget(w);
 
-	tree.setColumnCount(1);
-	tree.setHeaderLabel(QString());
-	connect(&tree, &QTreeWidget::itemActivated, this,
-	        &PlanetarySystemSelector::selectOrbitable);
-	layout->addWidget(&tree);
+	fullTree.setColumnCount(1);
+	fullTree.setHeaderLabel(QString());
+	connect(&fullTree, &QTreeWidget::itemActivated, this,
+	        &PlanetarySystemSelector::selectOrbitableFull);
+	layout->addWidget(&fullTree);
 
 	for(auto const& sysName : universe.planetSystems->getSystemsNames())
 	{
-		auto item = new QTreeWidgetItem(&tree);
+		if(sysName == "Solar System")
+		{
+			continue;
+		}
+		auto item = new QTreeWidgetItem(&fullTree);
 		item->setText(0, sysName);
 		item->addChild(constructItems(
 		    universe.planetSystems->getSystem(sysName)->getRootOrbitable(),
-		    item));
+		    item, fullTree, universe));
 		topLevelItems.push_back(item);
 	}
-	auto b = new QPushButton(this);
+	b = new QPushButton(this);
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
-	        [this]() { selectOrbitable(tree.currentItem(), 0); });
+	        [this]() { selectOrbitableFull(fullTree.currentItem(), 0); });
 	layout->addWidget(b);
 	installEventFilters();
 }
@@ -82,9 +119,9 @@ void PlanetarySystemSelector::setVisibleItems(QString const& match)
 	}
 }
 
-QTreeWidgetItem*
-    PlanetarySystemSelector::constructItems(Orbitable const& orbitable,
-                                            QTreeWidgetItem* parent)
+QTreeWidgetItem* PlanetarySystemSelector::constructItems(
+    Orbitable const& orbitable, QTreeWidgetItem* parent, QTreeWidget& tree,
+    Universe const& universe)
 {
 	QTreeWidgetItem* item;
 	if(parent == nullptr)
@@ -136,7 +173,7 @@ QTreeWidgetItem*
 		delete item;
 		for(auto child : orbitable.getChildren())
 		{
-			parent->addChild(constructItems(*child, parent));
+			parent->addChild(constructItems(*child, parent, tree, universe));
 		}
 		return parent;
 	}
@@ -147,13 +184,14 @@ QTreeWidgetItem*
 
 	for(auto child : orbitable.getChildren())
 	{
-		item->addChild(constructItems(*child, item));
+		item->addChild(constructItems(*child, item, tree, universe));
 	}
 
 	return item;
 }
 
-void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
+void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column,
+                                              bool solarSystem)
 {
 	auto rootItem = item;
 	while(rootItem->parent() != nullptr)
@@ -173,8 +211,18 @@ void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
 		name = name.left(pos - 1);
 	}
 
-	auto body = (*universe.planetSystems->getSystem(
-	    rootItem->text(column)))[name.toStdString()];
+	Orbitable const* body;
+
+	if(solarSystem)
+	{
+		body = (*universe.planetSystems->getSystem(
+		    "Solar System"))[name.toStdString()];
+	}
+	else
+	{
+		body = (*universe.planetSystems->getSystem(
+		    rootItem->text(column)))[name.toStdString()];
+	}
 
 	if(body->getOrbit() != nullptr
 	   && !body->getOrbit()->isInRange(universe.getClock().getCurrentUt()))
@@ -195,9 +243,21 @@ void PlanetarySystemSelector::selectOrbitable(QTreeWidgetItem* item, int column)
 	                  .radius;
 
 	auto scene = animator.getCurrentScene();
-	SceneSpatialData sd(universe, rootItem->text(column), name, 3.0f * radius);
-	animator.executeTransition(Transition(
-	    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
-	          scene.getUI()),
-	    10.f));
+	if(solarSystem)
+	{
+		SceneSpatialData sd(universe, "Solar System", name, 3.0f * radius);
+		animator.executeTransition(Transition(
+		    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
+		          scene.getUI()),
+		    10.f));
+	}
+	else
+	{
+		SceneSpatialData sd(universe, rootItem->text(column), name,
+		                    3.0f * radius);
+		animator.executeTransition(Transition(
+		    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
+		          scene.getUI()),
+		    10.f));
+	}
 }

@@ -24,7 +24,7 @@
 #include "universe/UniverseElement.hpp"
 
 ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
-    : VIRUPDialog3D({0.5f, 0.5f})
+    : VIRUPDialog3D({0.3f, 0.5f})
     , tmm(tmm)
 {
 	setWindowTitle(tr("Tone Mapping Controller"));

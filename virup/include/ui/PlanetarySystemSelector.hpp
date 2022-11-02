@@ -32,14 +32,25 @@ class PlanetarySystemSelector : public VIRUPDialog3D
 	PlanetarySystemSelector(Universe const& universe, Animator& animator);
 
   private:
-	QTreeWidgetItem* constructItems(Orbitable const& orbitable,
-	                                QTreeWidgetItem* parent);
-	void selectOrbitable(QTreeWidgetItem* item, int column);
+	static QTreeWidgetItem* constructItems(Orbitable const& orbitable,
+	                                       QTreeWidgetItem* parent,
+	                                       QTreeWidget& tree,
+	                                       Universe const& universe);
+	void selectOrbitableSolSys(QTreeWidgetItem* item, int column)
+	{
+		selectOrbitable(item, column, true);
+	};
+	void selectOrbitableFull(QTreeWidgetItem* item, int column)
+	{
+		selectOrbitable(item, column, false);
+	};
+	void selectOrbitable(QTreeWidgetItem* item, int column, bool solarSystem);
 	void setVisibleItems(QString const& match);
 
 	Universe const& universe;
 	Animator& animator;
-	QTreeWidget tree;
+	QTreeWidget solarSystemTree;
+	QTreeWidget fullTree;
 
 	std::vector<QTreeWidgetItem*> topLevelItems;
 };
