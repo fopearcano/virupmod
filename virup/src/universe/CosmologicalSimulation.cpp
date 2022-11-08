@@ -131,8 +131,10 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	trees.silent = true;
 }
 
+// NOLINTBEGIN(misc-unused-parameters)
 unsigned int CosmologicalSimulation::getClosestId(
     std::map<unsigned int, QString> const& m, unsigned index)
+// NOLINTEND(misc-unused-parameters)
 {
 	if(m.count(index) > 0)
 	{

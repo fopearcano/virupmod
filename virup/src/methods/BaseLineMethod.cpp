@@ -15,9 +15,11 @@ BaseLineMethod::BaseLineMethod(std::string const& vertexShaderPath,
 {
 }
 
+// NOLINTBEGIN(misc-unused-parameters)
 void BaseLineMethod::init(std::vector<float>& gazVertices,
                           std::vector<float>& starsVertices,
                           std::vector<float>& darkMatterVertices)
+// NOLINTEND(misc-unused-parameters)
 {
 	// cleanUp();
 	size_t totalSize(0);

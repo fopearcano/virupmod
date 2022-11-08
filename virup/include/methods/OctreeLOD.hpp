@@ -93,9 +93,9 @@ class OctreeLOD : public Octree
 	void ramToVideo();
 
 	/* PRECISION ENHANCEMENT */
-	std::vector<float> absoluteData; // backup data from file
-	double neighborDist      = 0.0;
-	Vector3 localTranslation = Vector3(0.f, 0.f, 0.f);
+	std::vector<float> absoluteData = {}; // backup data from file
+	double neighborDist             = 0.0;
+	Vector3 localTranslation        = Vector3(0.f, 0.f, 0.f);
 
 	/* PERFORMANCE */
 	Vector3 closestBackup = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);

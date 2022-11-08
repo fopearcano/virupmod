@@ -18,6 +18,7 @@
 
 #include "scenes/Transition.hpp"
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 Transition::Transition(Scene toScene, float duration, QString name,
                        QString customPythonFunction, float v0, float v1)
     : toScene(std::move(toScene))

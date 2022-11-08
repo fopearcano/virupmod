@@ -196,6 +196,7 @@ void PlanetarySystems::render(Camera const& /*camera*/,
 	GLHandler::endTransparent();
 }
 
+// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
 PlanetarySystems::~PlanetarySystems()
 {
 	for(auto sys : systems)

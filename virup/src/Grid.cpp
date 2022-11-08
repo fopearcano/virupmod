@@ -149,8 +149,10 @@ void Grid::renderPlanet(OrbitalSystemCamera const& cam)
     scaleText3D.render();
 } */
 
+// NOLINTBEGIN(misc-unused-parameters)
 void Grid::generateGridVertices(std::vector<float>& vertices,
                                 std::vector<unsigned int>& elements)
+// NOLINTEND(misc-unused-parameters)
 {
 	const unsigned int subdivisions(20);
 

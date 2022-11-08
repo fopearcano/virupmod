@@ -396,8 +396,8 @@ class Universe : public QObject
 	BBox boundingBox
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
-	std::map<QString, UniverseElement*> elements;
-	std::map<UniverseElement*, QString> elementsRev;
+	std::map<QString, UniverseElement*> elements    = {};
+	std::map<UniverseElement*, QString> elementsRev = {};
 	QList<CosmologicalSimulation*> cosmoSims;
 	QList<CSVObjects*> csvObjs;
 

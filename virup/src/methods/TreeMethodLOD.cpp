@@ -19,9 +19,11 @@ TreeMethodLOD::TreeMethodLOD(std::string const& vertexShaderPath,
 	GLHandler::setPointSize(1);
 }
 
+// NOLINTBEGIN(misc-unused-parameters)
 void TreeMethodLOD::init(std::vector<float>& gasVertices,
                          std::vector<float>& starsVertices,
                          std::vector<float>& darkMatterVertices)
+// NOLINTEND(misc-unused-parameters)
 {
 	if(!gasVertices.empty() && gasTree == nullptr)
 	{

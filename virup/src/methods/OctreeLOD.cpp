@@ -67,6 +67,7 @@ OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram,
 {
 }
 
+// NOLINTNEXTLINE(misc-unused-parameters)
 void OctreeLOD::init(std::vector<float>& data)
 {
 	Octree::init(data);

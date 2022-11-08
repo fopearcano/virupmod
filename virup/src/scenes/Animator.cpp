@@ -70,6 +70,7 @@ Vector3 Animator::getShift(double coeff) const
 	return {0, 0, -val};
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 void Animator::appendTransition(Transition t)
 {
 	/*
@@ -245,6 +246,7 @@ void Animator::removeAllTransitions()
 	emit transitionsModified();
 }
 
+// NOLINTNEXTLINE(performance-unnecessary-value-param)
 void Animator::executeTransition(Transition t)
 {
 	stop();
