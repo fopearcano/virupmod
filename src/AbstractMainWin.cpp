@@ -106,7 +106,7 @@ void AbstractMainWin::takeScreenshot(QString path) const
 		    QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
 		    tr("Images (*.png *.xpm *.jpg)"));
 	}
-	screenshot.save(path);
+	screenshot.convertToFormat(QImage::Format_RGB888).save(path);
 }
 
 bool AbstractMainWin::event(QEvent* e)

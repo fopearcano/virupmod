@@ -16,12 +16,52 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-UNBUFFER=""
-if [[ $(command -v unbuffer) ]]; then UNBUFFER="unbuffer" ; fi
-result=$($UNBUFFER $1 ${@:2} 2> /dev/null | tee /dev/tty)
-result=$(echo "$result" | grep -v "warnings generated\.$" | grep -v "^Suppressed " | grep -v "Use -header-filter=.* to display errors from all non-system headers." | grep -v "^$" | wc -l)
-if [ "$result" != "0" ]; then
-	exit 1
-fi
+# parse all files names which are in arguments 2 to first argument starting with -
+files=($2)
+i=3
+while [[ ${i} -lt $# ]]
+do
+	arg=${!i}
+	if [[ ${arg:0:1} == "-" ]]
+	then
+		break
+	fi
+	files+=($arg)
+	i=$((i + 1))
+done
 
-exit 0
+echo "-=-=-=- LAUNCHING CLANG-TIDY -=-=-=-"
+# run all clang-tidies in parallel
+max_parallel=$(nproc)
+j=0
+for f in ${files[@]}
+do
+	# limit to max_parallel
+	if [[ $(($j % $max_parallel)) == "0" ]]; then
+		wait
+	fi
+	j=$(($j + 1))
+	out=/tmp/clang_tidy_$(basename $f).out
+
+	echo $f
+	$1 $f ${@:${i}} 2> /dev/null >> $out &
+done
+
+# wait for them to finish
+wait
+
+echo "-=-=-=- RESULTS -=-=-=-"
+# print report and return
+error=0
+for f in ${files[@]}
+do
+	out=/tmp/clang_tidy_$(basename $f).out
+	result=$(cat $out)
+	rm $out
+
+	if [[ "$result" != "" ]]; then
+		echo $result
+		error=1
+	fi
+done
+exit $error

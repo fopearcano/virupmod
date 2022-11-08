@@ -62,10 +62,11 @@ if(CLANG_TIDY_FOUND)
 		clang-tidy
 		COMMAND ${PROJECT_SOURCE_DIR}/ci/clang-tidy-report.sh
 		${CLANG_TIDY}
-		-p .
 		${ALL_SOURCE_FILES}
+		-p .
 		-system-headers=0
 		-extra-arg=-Wno-unknown-warning-option
+		-extra-arg=-DCLANG_TIDY
 	)
 else()
 	message("clang-tidy executable not found")
