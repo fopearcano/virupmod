@@ -14,7 +14,7 @@ find_package(Boost REQUIRED)
 find_package(Qt5 COMPONENTS Multimedia REQUIRED)
 
 set(PROJECT_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS})
-set(PROJECT_LIBRARIES ${Boost_LIBRARIES} -lquadmath Qt5::Multimedia)
+set(PROJECT_LIBRARIES ${Boost_LIBRARIES} Qt5::Multimedia)
 
 set(PROJECT_INCLUDE_DIRS ${PROJECT_INCLUDE_DIRS} ${OCTREE_INCLUDE_DIR})
 set(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${OCTREE_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
@@ -23,6 +23,7 @@ set(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${OCTREE_LIBRARY} ${CMAKE_THREAD_LIBS
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	message(STATUS "Using g++ float128 for quadruple precision")
 	add_definitions(-DUSE_FLOAT128)
+	set(PROJECT_LIBRARIES ${PROJECT_LIBRARIES} -lquadmath)
 else()
 	message(STATUS "Using boost cpp_dec_float_50 for quadruple precision")
 endif()
