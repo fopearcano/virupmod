@@ -162,6 +162,7 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addVector3DSetting("virtualcamshift", {},
 	                   "Virtual Camera Shift\n(1.0 = screen physical height)",
 	                   {"x", "y", "z"}, 0.f, 100.f);
+	addDoubleSetting("screenheight", 2.0, tr("Screen height (in meters)"));
 
 	addGroup("network", tr("Network"));
 	addBoolSetting("server", true, tr("Server"));

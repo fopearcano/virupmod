@@ -89,12 +89,20 @@ QMatrix4x4 StereoBeamerHandler::getEyeViewMatrix(Side eye) const
 
 QMatrix4x4
     StereoBeamerHandler::getProjectionMatrix(QMatrix4x4 const& angleShiftMat,
-                                             Side /*eye*/, float nearPlan,
+                                             Side eye, float nearPlan,
                                              float farPlan) const
 {
 	QVector3D deltaRel(QSettings()
 	                       .value("vr/virtualcamshift")
 	                       .value<QVector3D>()); // move cam in height units
+
+	// add eye displacement
+	double screenHeight = QSettings().value("vr/screenheight").toDouble(); // m
+	QVector3D eyeDisplacement(eye == Side::LEFT ? 0.03215 : -0.03215, 0.f,
+	                          0.f /*-0.015f*/);
+	eyeDisplacement /= screenHeight; // in height unit
+	deltaRel -= eyeDisplacement;
+
 	deltaRel = angleShiftMat * deltaRel;
 
 	float vFOV(renderer->getVerticalFOV() * 3.1415 / 180.0),
