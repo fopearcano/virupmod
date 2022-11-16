@@ -295,10 +295,9 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 			{
 				timeSinceTextUpdate = 0.0;
 				debugText->setText(
-				    QString(tr("Going to : "))
-				    + animator
-				          ->getTransitions()[animator->getCurrentTransitionId()]
-				          .getName());
+				    animator
+				        ->getTransitions()[animator->getCurrentTransitionId()]
+				        .getName());
 			}
 		}
 	}
