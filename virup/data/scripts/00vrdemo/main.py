@@ -72,38 +72,39 @@ def showOrbitsWhileTraveling(t, t_harsh):
 
 #2021-06-26T01:52:07Z
 #2021-06-25T22:00:07Z
-solareclipsedt = QDateTime(QDate(2021, 6, 26), QTime(1, 51, 30), QTimeZone(0))
+solareclipsedt = QDateTime(QDate(2021, 6, 26), QTime(1, 40, 30), QTimeZone(0))
+isspos=Vector3(50, -50, 30)
 
 transitions = [
 # Intro
     # Earth
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0, solareclipsedt), SceneUI({"Hipparcos":1.0})), 1.0, "", "begin"),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0})), 3.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0})), 1.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Hipparcos":1.0, "Orbits":1.0, "PlanetsLabels":1.0})), 3.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Volumetric AGORA":1.0})), 1.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Volumetric AGORA":1.0})), 3.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"IllustrisTNG":1.0})), 1.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"IllustrisTNG":1.0})), 3.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"SDSS":1.0})), 1.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"SDSS":1.0})), 3.0),
 
 
 
     # International Space Station Real scale
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 1.0),
-    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, Vector3(-50, 0, 30)),
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 1, isspos),
           SceneTemporalData(1.0), SceneUI({"Gaia":1.0, "Hipparcos":1.0})), 19.0, "International Space Station"),
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 15000000),
