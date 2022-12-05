@@ -19,7 +19,7 @@ uniform sampler2D distortionMap;
 
 vec2 Distort(vec2 p)
 {
-	vec4 highpval = texture2D(distortionMap, p * 0.5 + 0.5);
+	vec4 highpval = texture(distortionMap, p * 0.5 + 0.5);
 	float x = highpval.r + (highpval.b / 255.0);
 	float y = highpval.g + (highpval.a / 255.0);
 	return vec2(x, y) * 2.0 - 1.0;
