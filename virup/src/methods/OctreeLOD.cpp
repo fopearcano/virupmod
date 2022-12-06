@@ -673,7 +673,7 @@ void OctreeLOD::updateTanAngleLimit(Camera const& camera)
 	float coeff((dtf - 1000000.0f / camera.targetFPS) / 5000000.0f);
 	coeff = coeff > 1.f / 90.f ? 1.f / 90.f : coeff;
 	tanAngleLimit() += coeff;
-	tanAngleLimit() = tanAngleLimit() > 1.2f ? 1.2f : tanAngleLimit();
+	// tanAngleLimit() = tanAngleLimit() > 1.2f ? 1.2f : tanAngleLimit();
 	tanAngleLimit() = tanAngleLimit() < minTanAngleLimit() ? minTanAngleLimit()
 	                                                       : tanAngleLimit();
 
