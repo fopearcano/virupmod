@@ -28,7 +28,7 @@ namespace AR
 class Thread : public QThread
 {
   public:
-	virtual void run() override;
+	void run() override;
 
 	std::deque<std::queue<OctreeLOD*>> queues;
 
@@ -70,9 +70,8 @@ void Thread::run()
 	while(doRun)
 	{
 		bool allEmpty(true);
-		for(unsigned int i(0); i < queues.size(); ++i)
+		for(auto& queue : queues)
 		{
-			auto& queue(queues[i]);
 			if(queue.empty())
 			{
 				continue;
