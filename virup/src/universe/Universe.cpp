@@ -331,6 +331,7 @@ double Universe::getVisibility(QString const& name) const
 		{
 			return csv->constellationsAlpha;
 		}
+		return 0.0;
 	}
 	if(name == "Orbits")
 	{
