@@ -67,6 +67,11 @@ OctreeLOD::OctreeLOD(GLShaderProgram const& shaderProgram,
 {
 }
 
+bool OctreeLOD::isReady() const
+{
+	return state == AsyncReader::State::IDLE;
+}
+
 // NOLINTNEXTLINE(misc-unused-parameters)
 void OctreeLOD::init(std::vector<float>& data)
 {
@@ -147,6 +152,46 @@ std::vector<float> OctreeLOD::getOwnData() const
 
 void OctreeLOD::unload()
 {
+	if(state == AsyncReader::State::CANCEL)
+	{
+		state = AsyncReader::State::IDLE;
+		data.resize(0);
+		data.shrink_to_fit();
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr)
+			{
+				dynamic_cast<OctreeLOD*>(oct)->unload();
+			}
+		}
+		isLoaded = false;
+	}
+	if(state == AsyncReader::State::WAIT)
+	{
+		state = AsyncReader::State::CANCEL;
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr)
+			{
+				dynamic_cast<OctreeLOD*>(oct)->unload();
+			}
+		}
+		isLoaded = false;
+	}
+	if(state == AsyncReader::State::READ)
+	{
+		data.resize(0);
+		data.shrink_to_fit();
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr)
+			{
+				dynamic_cast<OctreeLOD*>(oct)->unload();
+			}
+		}
+		state    = AsyncReader::State::IDLE;
+		isLoaded = false;
+	}
 	if(isLoaded)
 	{
 		usedMem() -= dataSize * sizeof(float);
@@ -206,6 +251,18 @@ bool OctreeLOD::preloadLevel(unsigned int lvlToLoad)
 void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
                        QVector3D const& globalCampos, float alpha)
 {
+	if(state == AsyncReader::State::READ)
+	{
+		ramToVideo();
+		state = AsyncReader::State::IDLE;
+	}
+
+	if(state == AsyncReader::State::CANCEL)
+	{
+		doRender = false;
+		return;
+	}
+
 	doRender = true;
 	recurse  = false;
 	if(camera.shouldBeCulled(bbox, globalModel, true) && lvl > 0)
@@ -218,12 +275,23 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 		return;
 	}
 
+	if(state == AsyncReader::State::WAIT)
+	{
+		doRender = false;
+		return;
+	}
+
 	if(!isLoaded)
 	{
 		/*if(usedMem() < memLimit())
 		{*/
-		readOwnData(*file);
-		ramToVideo();
+		// SYNC
+		// readOwnData(*file);
+		// ramToVideo();
+		// ASYNC
+		state = AsyncReader::State::WAIT;
+		AsyncReader::load(*this);
+		doRender = false;
 		/*}
 		else
 		{
@@ -256,6 +324,14 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 			{
 				dynamic_cast<OctreeLOD*>(oct)->update(camera, globalModel,
 				                                      globalCampos, alpha);
+			}
+		}
+		for(Octree* oct : children)
+		{
+			if(oct != nullptr && !dynamic_cast<OctreeLOD*>(oct)->isReady())
+			{
+				recurse = false;
+				return;
 			}
 		}
 		return;

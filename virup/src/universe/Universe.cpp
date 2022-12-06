@@ -681,4 +681,5 @@ Universe::~Universe()
 	{
 		delete pair.second;
 	}
+	AsyncReader::clean();
 }

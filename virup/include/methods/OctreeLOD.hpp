@@ -7,6 +7,7 @@
 
 #include "graphics/renderers/OrbitalSystemRenderer.hpp"
 
+#include "AsyncReader.hpp"
 #include "Camera.hpp"
 #include "Primitives.hpp"
 #include "gl/GLHandler.hpp"
@@ -20,6 +21,8 @@ class OctreeLOD : public Octree
 {
   public:
 	OctreeLOD(GLShaderProgram const& shaderProgram);
+	bool isReady() const;
+	unsigned int getLevel() const { return lvl; };
 	virtual void init(std::vector<float>& data) override;
 	virtual void init(std::istream& in) override;
 	virtual void init(int64_t file_addr, std::istream& in) override;
@@ -57,6 +60,8 @@ class OctreeLOD : public Octree
 		forceMaxQuality()  = false;
 		minTanAngleLimit() = QSettings().value("misc/mintanangle").toDouble();
 	}
+
+	volatile AsyncReader::State state = AsyncReader::State::IDLE;
 
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,
