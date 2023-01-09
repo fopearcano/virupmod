@@ -90,8 +90,8 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	}
 	auto yesOrNo = QMessageBox::question(
 	    this, tr("Data Download"),
-	    tr("No data detected. Do you want to download the default data (3.5GB "
-	       "download/7.1GB uncompressed) ? (Data is required to visualize "
+	    tr("No data detected. Do you want to download the default data (11.2GiB"
+	       "download/15.9GiB uncompressed) ? (Data is required to visualize "
 	       "anything, press No if you already have some data to visualize on "
 	       "hand.)"));
 
@@ -105,19 +105,19 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	do
 	{
 		downloadDir = QFileDialog::getExistingDirectory(
-		    this, tr("Select a data storage directory (>= 10.7GB capacity)"),
-		    "/media/florian/Archive");
+		    this, tr("Select a data storage directory (>= 27.1GiB capacity)"),
+		    QStandardPaths::standardLocations(QStandardPaths::HomeLocation)[0]);
 		if(downloadDir.isEmpty())
 		{
 			return;
 		}
 		QStorageInfo info(downloadDir);
-		if(info.bytesAvailable() <= 10.7 * 1024 * 1024 * 1024) // 10.7GB
+		if(info.bytesAvailable() / 1024 <= 27.1 * 1024 * 1024) // 27.1GiB
 		{
 			QString avail
 			    = QString::number(info.bytesAvailable() / 1024.0 / 1024 / 1024);
 			QMessageBox::warning(this, tr("Not enough storage space"),
-			                     avail + tr(" GB available, 10.7GB needed."));
+			                     avail + tr(" GiB available, 27.1GiB needed."));
 		}
 		else
 		{
