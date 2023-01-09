@@ -112,7 +112,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 			return;
 		}
 		QStorageInfo info(downloadDir);
-		if(info.bytesAvailable() / 1024 <= 27.1 * 1024 * 1024) // 27.1GiB
+		if(info.bytesAvailable() / 1024.0 <= 27.1 * 1024 * 1024) // 27.1GiB
 		{
 			QString avail
 			    = QString::number(info.bytesAvailable() / 1024.0 / 1024 / 1024);
@@ -125,13 +125,23 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 		}
 	} while(!ok);
 
-	QFile downloadedFile(downloadDir + "/VIRUP-DATA.zip");
-	downloadedFile.open(QIODevice::WriteOnly);
+	auto downloadedFilePath = downloadDir + "/VIRUP-DATA.zip";
 
 	QUrl url("ftp://obsftp.unige.ch/pub/cabot/VIRUP-DATA.zip");
 
-	QNetworkAccessManager nam;
-	auto rep = nam.get(QNetworkRequest(url));
+	PythonQtHandler::init();
+	PythonQtHandler::evalFile(getAbsoluteDataPath("downloaddata.py"));
+	PythonQtHandler::evalScript(QString("getfilesize(\"") + url.toString()
+	                            + "\")");
+	auto totsize = PythonQtHandler::getVariable("totsize").toLongLong();
+
+	auto future = QtConcurrent::run(
+	    [&url, &downloadedFilePath]
+	    {
+		    PythonQtHandler::evalScript(QString("downloadFtp(\"")
+		                                + url.toString() + "\", \""
+		                                + downloadedFilePath + "\")");
+	    });
 
 	QProgressDialog progress;
 	progress.setWindowTitle(tr("Downloading..."));
@@ -140,72 +150,136 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	QElapsedTimer timer;
 	timer.start();
 
-	qint64 downloaded(0);
-
-	connect(rep, &QNetworkReply::downloadProgress,
-	        [&downloadedFile, rep, &progress, &timer, &downloaded](qint64 recv,
-	                                                               qint64 tot)
-	        {
-		        QByteArray b = rep->readAll();
-		        downloadedFile.write(b);
-		        progress.setMaximum(tot / 1024 / 1024);
-		        progress.setValue(recv / 1024 / 1024);
-		        auto dt              = timer.restart() / 1000.0;
-		        auto speedInMBPerSec = b.size() / dt / (1024 * 1024);
-		        downloaded += b.size();
-		        int remaining = static_cast<int>(round(
-		            (tot - downloaded) / (speedInMBPerSec * 1024 * 1024)));
-		        progress.setLabelText(
-		            QString::number(recv / 1024.0 / 1024 / 1024, 'g', 2) + "GB/"
-		            + QString::number(tot / 1024.0 / 1024 / 1024, 'g', 2)
-		            + "GB " + QString::number(speedInMBPerSec, 'g', 3)
-		            + " MB/s ETA: "
-		            + QTime(0, 0).addSecs(remaining).toString("hh:mm:ss")
-		            + " secs");
-	        });
+	qint64 sizeBack(0);
 
 	bool keepDownloading = true;
 	connect(&progress, &QProgressDialog::canceled,
 	        [&keepDownloading]() { keepDownloading = false; });
 
-	while(rep->isRunning() && keepDownloading)
+	while(!future.isFinished() && keepDownloading)
 	{
+		QFile downloadedFile(downloadedFilePath);
+		auto fileSize(downloadedFile.size());
+
+		progress.setMaximum(totsize / 1024 / 1024);
+		progress.setValue(fileSize / 1024 / 1024);
+		auto dt               = timer.restart() / 1000.0;
+		auto speedInMiBPerSec = (fileSize - sizeBack) / dt / (1024 * 1024);
+		sizeBack              = fileSize;
+		int remaining         = static_cast<int>(
+            round((totsize - fileSize) / (speedInMiBPerSec * 1024 * 1024)));
+		progress.setLabelText(
+		    QString::number(fileSize / 1024.0 / 1024 / 1024, 'g', 2) + "GiB/"
+		    + QString::number(totsize / 1024.0 / 1024 / 1024, 'g', 2) + "GiB "
+		    + QString::number(speedInMiBPerSec, 'g', 3) + " MiB/s ETA: "
+		    + QTime(0, 0).addSecs(remaining).toString("hh:mm:ss") + " secs");
 		QCoreApplication::processEvents();
-		QThread::usleep(100000);
+		QThread::msleep(50);
 	}
-	rep->deleteLater();
 
 	if(!keepDownloading)
 	{
+		qDebug() << "Canceled";
+		QFile downloadedFile(downloadedFilePath);
+		downloadedFile.remove();
+		// forces QtConcurrent to stop, else we need to wait for the end of the
+		// download...
+		exit(0);
+	}
+
+	QFile downloadedFile(downloadedFilePath);
+	auto fileSize(downloadedFile.size());
+	//  if download has somewhat failed
+	if(fileSize != totsize)
+	{
+		QMessageBox::warning(
+		    this, tr("Download failed"),
+		    tr("Download failed: You can retry later by launching VIRUP again. "
+		       "Download will resume to where it was (if you "
+		       "choose the same directory)."));
+		QCoreApplication::quit();
 		return;
 	}
 
+	PythonQtHandler::evalScript("resetextraction()");
+
+	PythonQtHandler::evalScript(QString("getzipfilesize(\"")
+	                            + downloadedFilePath + "\")");
+	totsize = PythonQtHandler::getVariable("totsize").toLongLong();
+
+	PythonQtHandler::evalScript(QString("getzipfilesnumber(\"")
+	                            + downloadedFilePath + "\")");
+	auto total_files_number
+	    = PythonQtHandler::getVariable("total_files_number").toLongLong();
+
 	progress.setWindowTitle(tr("Extracting..."));
 	progress.setLabelText(tr("Waiting for data archive to be extracted..."));
-	progress.setMaximum(9);
+	progress.setMaximum(totsize / 1024 / 1024);
 	progress.show();
-	QProcess unzipProcess;
-#ifdef Q_OS_WIN
-	QString cmd("powershell -command \"Expand-Archive ");
-	cmd += downloadDir + "\\VIRUP-DATA.zip ";
-	cmd += downloadDir + "\"";
-	unzipProcess.start(cmd);
-#else
-	QString cmd("unzip ");
-	cmd += downloadDir + "/VIRUP-DATA.zip -d ";
-	cmd += downloadDir;
-	unzipProcess.start(cmd, QStringList{});
-#endif
-	while(unzipProcess.state() != QProcess::NotRunning)
+
+	qlonglong alreadyExtracted = 0;
+
+	bool keepExtracting(true);
+	for(unsigned int i(0); i < total_files_number && keepExtracting; ++i)
 	{
-		QDir d(downloadDir + "/VIRUP-DATA/");
-		d.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
-		progress.setValue(d.count() - 2);
+		PythonQtHandler::evalScript(QString("preparenextextraction(\"")
+		                            + downloadedFilePath + "\")");
+		auto currentpath
+		    = PythonQtHandler::getVariable("currentfilepath").toString();
+		if(currentpath[currentpath.size() - 1] == '/')
+		{
+			continue;
+		}
+		auto currenttotsize
+		    = PythonQtHandler::getVariable("currentfiletotsize").toLongLong();
+
+		auto future = QtConcurrent::run(
+		    [&downloadedFilePath]
+		    {
+			    PythonQtHandler::evalScript(QString("extract(\"")
+			                                + downloadedFilePath + "\")");
+		    });
+
+		connect(&progress, &QProgressDialog::canceled,
+		        [&keepExtracting]() { keepExtracting = false; });
+
+		while(!future.isFinished() && keepExtracting)
+		{
+			QFile extractedFile(downloadDir + "/" + currentpath);
+			auto extractedSize(extractedFile.size());
+
+			progress.setValue((alreadyExtracted + extractedSize) / 1024 / 1024);
+			progress.setLabelText(
+			    QString("File ") + QString::number(i) + "/"
+			    + QString::number(total_files_number) + "\nTotal:"
+			    + QString::number((alreadyExtracted + extractedSize) / 1024.0
+			                          / 1024 / 1024,
+			                      'g', 2)
+			    + "GiB/"
+			    + QString::number(totsize / 1024.0 / 1024 / 1024, 'g', 2)
+			    + "GiB\n" + currentpath + "\n"
+			    + QString::number(extractedSize / 1024.0 / 1024, 'g', 4)
+			    + "MiB/"
+			    + QString::number(currenttotsize / 1024.0 / 1024, 'g', 4)
+			    + "MiB");
+			QCoreApplication::processEvents();
+			QThread::msleep(50);
+		}
+
+		alreadyExtracted += currenttotsize;
+		progress.setValue(alreadyExtracted / 1024 / 1024);
+
 		QCoreApplication::processEvents();
-		QThread::usleep(100000);
 	}
 
-	dlw->importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo-cmb.json");
+	if(!keepExtracting)
+	{
+		qDebug() << "Cancelled";
+		exit(0);
+	}
+
+	downloadedFile.remove();
+	dlw->importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo.json");
 }
 
 DataListWidget::DataListWidget()
