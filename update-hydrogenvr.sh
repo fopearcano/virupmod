@@ -2,6 +2,9 @@
 
 update() {
 	git fetch --all
+	if ! git remote show hydrogenvr &> /dev/null; then
+		git remote add hydrogenvr https://gitlab.com/Dexter9313/hydrogenvr.git
+	fi
 	if [ $# -eq 0 ]
 	then
 		HASH=$(git ls-remote hydrogenvr -h refs/heads/master | cut -f1)

@@ -35,6 +35,7 @@ bool PythonQtHandler::isSupported()
 void PythonQtHandler::init()
 {
 #ifdef PYTHONQT
+	clean();
 	// init PythonQt and Python
 	PythonQt::init(PythonQt::RedirectStdOut);
 #ifdef PYTHONQT_QTALL
@@ -119,7 +120,9 @@ void PythonQtHandler::clean()
 {
 #ifdef PYTHONQT
 	delete mainModule;
+	mainModule = nullptr;
 	delete console;
+	console = nullptr;
 #endif
 }
 

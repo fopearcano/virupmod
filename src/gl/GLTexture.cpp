@@ -224,6 +224,11 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 	QSize size(getSize(level));
 
 	GLint internalFormat;
+	GLenum target(glTarget);
+	if(target == GL_TEXTURE_CUBE_MAP)
+	{
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+	}
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glGetTexLevelParameteriv(
 	    glTarget, level, GL_TEXTURE_INTERNAL_FORMAT,
@@ -233,7 +238,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 		case GL_RGB:
 		{
 			QImage result(size, QImage::Format::Format_RGB888);
-			GLHandler::glf().glGetTexImage(glTarget, level, GL_RGBA,
+			GLHandler::glf().glGetTexImage(target, level, GL_RGBA,
 			                               GL_UNSIGNED_BYTE, result.bits());
 			return result;
 		}
@@ -241,7 +246,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 		case GL_RGBA:
 		{
 			QImage result(size, QImage::Format::Format_RGBA8888);
-			GLHandler::glf().glGetTexImage(glTarget, level, GL_RGBA,
+			GLHandler::glf().glGetTexImage(target, level, GL_RGBA,
 			                               GL_UNSIGNED_BYTE, result.bits());
 			return result;
 		}
@@ -249,7 +254,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 		case GL_SRGB8_ALPHA8:
 		{
 			QImage result(size, QImage::Format::Format_RGBA8888);
-			GLHandler::glf().glGetTexImage(glTarget, level, GL_RGBA,
+			GLHandler::glf().glGetTexImage(target, level, GL_RGBA,
 			                               GL_UNSIGNED_BYTE, result.bits());
 			return result;
 		}

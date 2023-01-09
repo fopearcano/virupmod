@@ -1,0 +1,14 @@
+PROJECT_NAME=Blank
+PROJECT_ICON=./icon.png
+PROJECT_URL="https://gitlab.com/Dexter9313/hydrogenvr"
+PROJECT_DESCRIPTION="A blank project from which you can create your own."
+PROJECT_MAINTAINER="Florian Cabot <florian.cabot@epfl.ch>"
+PROJECT_DIRECTORY=blank
+PROJECT_CHECK_FORMAT=false
+PROJECT_CHECK_TIDY=false
+PROJECT_DOC=false
+PROJECT_DOC_ENGINE=false
+PROJECT_DOC_THIRDPARTY=false
+PROJECT_TRANSLATE=false
+PROJECT_TRANSLATE_ENGINE=false
+PROJECT_TRANSLATE_THIRDPARTY=false
