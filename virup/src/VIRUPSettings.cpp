@@ -18,9 +18,6 @@
 
 #include "VIRUPSettings.hpp"
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
 {
@@ -90,10 +87,10 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	}
 	auto yesOrNo = QMessageBox::question(
 	    this, tr("Data Download"),
-	    tr("No data detected. Do you want to download the default data (11.2GiB"
-	       "download/15.9GiB uncompressed) ? (Data is required to visualize "
-	       "anything, press No if you already have some data to visualize on "
-	       "hand.)"));
+	    tr("No data detected. Do you want to download the default data "
+	       "(11.2GiB download/15.9GiB uncompressed) ? (Data is required to "
+	       "visualize anything, press No if you already have some data to "
+	       "visualize on hand.)"));
 
 	if(yesOrNo != QMessageBox::StandardButton::Yes)
 	{
