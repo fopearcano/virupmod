@@ -209,6 +209,23 @@ void OctreeLOD::unload()
 	}
 }
 
+void OctreeLOD::waitOnAsyncLoader()
+{
+	for(auto child : children)
+	{
+		auto c(dynamic_cast<OctreeLOD*>(child));
+		if(child != nullptr)
+		{
+			c->waitOnAsyncLoader();
+		}
+	}
+
+	while(state == AsyncReader::State::WAIT)
+	{
+		QThread::usleep(1);
+	}
+}
+
 void OctreeLOD::setFile(std::istream* file)
 {
 	this->file = file;

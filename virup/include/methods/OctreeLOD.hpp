@@ -31,6 +31,7 @@ class OctreeLOD : public Octree
 	virtual void readBBox(std::istream& in) override;
 	virtual std::vector<float> getOwnData() const override;
 	void unload();
+	void waitOnAsyncLoader();
 	void setFile(std::istream* file);
 	std::istream* getFile() { return file; };
 	bool preloadLevel(unsigned int lvlToLoad);

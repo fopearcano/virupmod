@@ -291,6 +291,7 @@ void TreeMethodLOD::cleanUp()
 	hiiModel = nullptr;
 	if(gasTree != nullptr)
 	{
+		gasTree->waitOnAsyncLoader();
 		if(gasTree->getFile() != nullptr)
 		{
 			delete gasTree->getFile();
@@ -300,6 +301,7 @@ void TreeMethodLOD::cleanUp()
 	gasTree = nullptr;
 	if(starsTree != nullptr)
 	{
+		starsTree->waitOnAsyncLoader();
 		if(starsTree->getFile() != nullptr)
 		{
 			delete starsTree->getFile();
@@ -309,6 +311,7 @@ void TreeMethodLOD::cleanUp()
 	starsTree = nullptr;
 	if(darkMatterTree != nullptr)
 	{
+		darkMatterTree->waitOnAsyncLoader();
 		if(darkMatterTree->getFile() != nullptr)
 		{
 			delete darkMatterTree->getFile();
