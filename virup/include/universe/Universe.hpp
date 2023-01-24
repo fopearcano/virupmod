@@ -358,6 +358,10 @@ class Universe : public QObject
 	                               QString const& celestialBodyName1,
 	                               float t) const;
 	Vector3 getCameraCurrentRelPosToBody(QString const& bodyName) const;
+	float getAnimationTime() const
+	{
+		return CosmologicalSimulation::animationTime();
+	}
 	void setAnimationTime(float t)
 	{
 		CosmologicalSimulation::animationTime() = t;
@@ -378,6 +382,8 @@ class Universe : public QObject
 	void setLabelsOrbitsOnly(QStringList const& nameList);
 	int getCosmoSimForcedQuality(QString const& name) const;
 	void setCosmoSimForcedQuality(QString const& name, int forcedQuality);
+	float getCosmoLocalAnimationTime(QString const& name) const;
+	void setCosmoLocalAnimationTime(QString const& name, float animTime);
 	void unlockTanAngleLimit() const
 	{
 		OctreeLOD::unsetCurrentTanAngleLimit();

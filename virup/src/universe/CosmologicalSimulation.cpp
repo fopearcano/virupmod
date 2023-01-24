@@ -172,9 +172,10 @@ void CosmologicalSimulation::update(Camera const& camera)
 	if(cosmoFilesGas.size() > 1 || cosmoFilesStars.size() > 1
 	   || cosmoFilesDM.size() > 1)
 	{
+		float animTime
+		    = localAnimationTime < 0.f ? animationTime() : localAnimationTime;
 		auto oldCurrent(currentIndex);
-		currentIndex
-		    = static_cast<unsigned int>(animationTime() * (maxIndex - 1));
+		currentIndex = static_cast<unsigned int>(animTime * (maxIndex - 1));
 		if(currentIndex != oldCurrent)
 		{
 			trees.cleanUp();

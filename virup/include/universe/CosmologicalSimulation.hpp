@@ -55,6 +55,8 @@ class CosmologicalSimulation : public UniverseElement
 	// normalized from 0 to 1
 	static float& animationTime();
 
+	float localAnimationTime = -1.f;
+
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
 

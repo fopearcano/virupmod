@@ -485,6 +485,38 @@ void Universe::setCosmoSimForcedQuality(QString const& name, int forcedQuality)
 	cosmoSim->setForcedQuality(forcedQuality);
 }
 
+float Universe::getCosmoLocalAnimationTime(QString const& name) const
+{
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return -1;
+	}
+	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	if(!cosmoSims.contains(cosmoSim))
+	{
+		qWarning() << name + " is not a valid CosmologicalSimulation";
+		return -1;
+	}
+	return cosmoSim->localAnimationTime;
+}
+
+void Universe::setCosmoLocalAnimationTime(QString const& name, float animTime)
+{
+	if(elements.count(name) == 0)
+	{
+		qWarning() << name + " is not a valid UniverseElement";
+		return;
+	}
+	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	if(!cosmoSims.contains(cosmoSim))
+	{
+		qWarning() << name + " is not a valid CosmologicalSimulation";
+		return;
+	}
+	cosmoSim->localAnimationTime = animTime;
+}
+
 void Universe::dumpOctreesStates()
 {
 	for(auto cosmoSim : cosmoSims)
