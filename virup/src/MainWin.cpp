@@ -426,7 +426,7 @@ void MainWin::initScene()
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 		timeController  = new TimeController(*universe);
-		animTimeSelect = new AnimationTimeSelector(*universe);
+		animTimeSelect  = new AnimationTimeSelector(*universe);
 		tmController    = new ToneMappingController(*toneMappingModel);
 		scenes          = new SceneSelector(*animator);
 		presenterHelp   = new PresenterHelp(*this);
@@ -435,9 +435,10 @@ void MainWin::initScene()
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
 		dialog3dWheel->addDialog3D(tr("Time Controller"), *timeController);
-		dialog3dWheel->addDialog3D(tr("Animation Time Controller"), *animTimeSelect);
-		dialog3dWheel->addDialog3D(tr("Time Controller"), *tmController);
-		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);*/
+		dialog3dWheel->addDialog3D(tr("Animation Time Controller"),
+		*animTimeSelect); dialog3dWheel->addDialog3D(tr("Time Controller"),
+		*tmController); dialog3dWheel->addDialog3D(tr("Visibilities List"),
+		*visibilities);*/
 
 		auto tools(menuBar->addMenu(tr("Tools")));
 		tools->addAction(tr("Scenes"), this,
