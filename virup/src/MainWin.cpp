@@ -89,6 +89,10 @@ bool MainWin::event(QEvent* e)
 		{
 			timeController->close();
 		}
+		if(animTimeSelect != nullptr)
+		{
+			animTimeSelect->close();
+		}
 		if(tmController != nullptr)
 		{
 			tmController->close();
@@ -422,6 +426,7 @@ void MainWin::initScene()
 		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
 		univElemSelect  = new UniverseElementSelector(*universe, *animator);
 		timeController  = new TimeController(*universe);
+		animTimeSelect = new AnimationTimeSelector(*universe);
 		tmController    = new ToneMappingController(*toneMappingModel);
 		scenes          = new SceneSelector(*animator);
 		presenterHelp   = new PresenterHelp(*this);
@@ -430,6 +435,7 @@ void MainWin::initScene()
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
 		dialog3dWheel->addDialog3D(tr("Time Controller"), *timeController);
+		dialog3dWheel->addDialog3D(tr("Animation Time Controller"), *animTimeSelect);
 		dialog3dWheel->addDialog3D(tr("Time Controller"), *tmController);
 		dialog3dWheel->addDialog3D(tr("Visibilities List"), *visibilities);*/
 
@@ -442,6 +448,8 @@ void MainWin::initScene()
 		                 [this]() { this->planetSysSelect->show(); });
 		tools->addAction(tr("Time Controller"), this,
 		                 [this]() { this->timeController->show(); });
+		tools->addAction(tr("Animation Time Controller"), this,
+		                 [this]() { this->animTimeSelect->show(); });
 		tools->addAction(tr("Tone Mapping Controller"), this,
 		                 [this]() { this->tmController->show(); });
 		tools->addAction(tr("Visibilities List"), this,
@@ -453,6 +461,7 @@ void MainWin::initScene()
 		planetSysSelect->show();
 		univElemSelect->show();
 		timeController->show();
+		animTimeSelect->show();
 		tmController->show();
 		scenes->show();
 		presenterHelp->show();
@@ -545,6 +554,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		if(networkManager->isServer())
 		{
 			timeController->update();
+			animTimeSelect->update();
 			tmController->update();
 			scenes->update();
 		}
@@ -793,6 +803,7 @@ MainWin::~MainWin()
 	delete scenes;
 	delete visibilities;
 	delete timeController;
+	delete animTimeSelect;
 	delete tmController;
 	delete planetSysSelect;
 	delete univElemSelect;

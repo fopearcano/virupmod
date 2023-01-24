@@ -1,0 +1,42 @@
+/*
+    Copyright (C) 2023 Florian Cabot <florian.cabot@hotmail.fr>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include "ui/AnimationTimeSelector.hpp"
+
+AnimationTimeSelector::AnimationTimeSelector(Universe& universe)
+    : VIRUPDialog3D({0.0f, 0.3f})
+    , universe(universe)
+{
+	setWindowTitle(tr("Animation Time Controller"));
+	this->setMinimumWidth(400);
+
+	auto mainLayout = new QVBoxLayout(this);
+
+	slider = new QSlider(Qt::Horizontal, this);
+	slider->setMinimum(0);
+	slider->setMaximum(100);
+	slider->setTickInterval(1);
+	connect(slider, &QSlider::valueChanged,
+	        [this](int v) { this->universe.setAnimationTime(v / 100.f); });
+	mainLayout->addWidget(slider);
+}
+
+void AnimationTimeSelector::update()
+{
+	slider->setValue(100 * universe.getAnimationTime());
+}

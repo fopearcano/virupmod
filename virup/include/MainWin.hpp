@@ -17,6 +17,7 @@
 #include "Grid.hpp"
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
+#include "ui/AnimationTimeSelector.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
 #include "ui/PresenterHelp.hpp"
 #include "ui/SceneSelector.hpp"
@@ -305,6 +306,7 @@ class MainWin : public AbstractMainWin
 	PlanetarySystemSelector* planetSysSelect = nullptr;
 	UniverseElementSelector* univElemSelect  = nullptr;
 	TimeController* timeController           = nullptr;
+	AnimationTimeSelector* animTimeSelect    = nullptr;
 	ToneMappingController* tmController      = nullptr;
 	SceneSelector* scenes                    = nullptr;
 	PresenterHelp* presenterHelp             = nullptr;
