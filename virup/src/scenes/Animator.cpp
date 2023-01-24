@@ -108,8 +108,9 @@ void Animator::setTransition(int newid)
 	setId(newid);
 }
 
-void Animator::update()
+void Animator::update(float frameTiming)
 {
+	timer.update(frameTiming);
 	if(idleMode && !playCustom)
 	{
 		if(idleModeForward)
@@ -142,7 +143,7 @@ void Animator::update()
 	{
 		return;
 	}
-	float t_secs = pausedAt + timer.elapsed() * 0.001f;
+	float t_secs = pausedAt + timer.elapsed();
 
 	OrbitalSystemRenderer::autoCameraTarget = false;
 	universe.setLabelsOrbitsOnly({});
@@ -278,7 +279,7 @@ float Animator::getWholeAnimationPercentage() const
 	float ret(pausedAt);
 	if(timer.isValid())
 	{
-		ret += timer.elapsed() * 0.001f;
+		ret += timer.elapsed();
 	}
 	return 100.f * ret / getTotalDuration();
 }
@@ -335,7 +336,7 @@ void Animator::play()
 
 void Animator::pause()
 {
-	pausedAt += timer.elapsed() / 1000.f;
+	pausedAt += timer.elapsed();
 	timer.invalidate();
 	stopVoiceover();
 	emit paused();

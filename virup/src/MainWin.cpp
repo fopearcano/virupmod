@@ -498,7 +498,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		if(networkManager->isServer())
 		{
-			animator->update();
+			animator->update(frameTiming);
 		}
 
 		auto& cam(dynamic_cast<Camera&>(camera));

@@ -43,6 +43,32 @@ class Animator : public QObject
 	Q_PROPERTY(Scene currentScene READ getCurrentScene)
 	Q_PROPERTY(bool debug MEMBER debug)
 	Q_PROPERTY(bool idlemode READ getIdleMode WRITE setIdleMode)
+
+	class Timer
+	{
+	  public:
+		Timer() = default;
+		bool isValid() const { return el != -1.f; }
+		void invalidate() { el = -1.f; };
+		void update(float frameTiming)
+		{
+			if(isValid())
+			{
+				el += frameTiming;
+			}
+		}
+		float elapsed() const { return el; };
+		float restart()
+		{
+			auto e = el;
+			el     = 0.f;
+			return e;
+		};
+
+	  private:
+		float el = -1.f;
+	};
+
   public:
 	Animator(Universe& universe, VRHandler const& vrHandler,
 	         ToneMappingModel& tmm)
@@ -88,7 +114,7 @@ class Animator : public QObject
 	void toggleAnimations() { animationsDisabled = !animationsDisabled; };
 	void appendTransition(Transition t);
 	void setTransition(int newid);
-	void update();
+	void update(float frameTiming);
 	void removeAllTransitions();
 	void executeTransition(Transition t);
 	float getTotalDuration() const;
@@ -149,7 +175,7 @@ class Animator : public QObject
 	bool playCustom = false;
 	Transition customTransition;
 
-	QElapsedTimer timer;
+	Timer timer;
 	float pausedAt = 0.f;
 
 	float t_secsBAK = 0.f;
