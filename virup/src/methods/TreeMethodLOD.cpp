@@ -15,8 +15,6 @@ TreeMethodLOD::TreeMethodLOD(std::string const& vertexShaderPath,
     : Method(vertexShaderPath, fragmentShaderPath)
 {
 	showdm() = true;
-
-	GLHandler::setPointSize(1);
 }
 
 // NOLINTBEGIN(misc-unused-parameters)
@@ -193,10 +191,8 @@ void TreeMethodLOD::render(Camera const& camera)
 void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
                            QVector3D const& campos, float unitInKpc)
 {
-	if(setPointSize)
-	{
-		GLHandler::setPointSize(1);
-	}
+	GLHandler::glf().glEnable(GL_POINT_SPRITE);
+	GLHandler::glf().glEnable(GL_PROGRAM_POINT_SIZE);
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color", std::vector<float>{1.0f, 1.0f, 1.0f}}});

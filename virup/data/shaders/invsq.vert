@@ -9,6 +9,10 @@ uniform vec3 campos;
 uniform float pixelSolidAngle;
 uniform float unitInKpc = 1.0;
 
+// IllustrisTNG
+// uniform float pointSizeScale = 100000.0;
+uniform float pointSizeScale = 0.0; // disable ; should be an input radius per vertex
+
 uniform mat4 dusttransform;
 uniform float useDust = 0.0;
 
@@ -21,6 +25,7 @@ const float oneOverLog10 = 0.4342944819;
 out gl_PerVertex
 {
 	vec4 gl_Position;
+	float gl_PointSize;
 	float gl_ClipDistance[1];
 };
 
@@ -55,5 +60,10 @@ void main()
 		a = attenuation(campos, position, dusttex, dusttransform);
 	}
 
+	gl_PointSize = max(1.0, pointSizeScale / camdist);
+
 	f_color = a * alpha * luminance;
+
+	// variable size and polynomical
+	f_color /= pow(gl_PointSize, 2.0);
 }
