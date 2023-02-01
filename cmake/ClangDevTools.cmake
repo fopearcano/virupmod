@@ -40,6 +40,12 @@ if(CLANG_FORMAT_FOUND)
 		${CLANG_FORMAT}
 		${ALL_FILES}
 	)
+	add_custom_target(
+		clang-format-inplace
+		COMMAND ${PROJECT_SOURCE_DIR}/ci/clang-format-inplace.sh
+		${CLANG_FORMAT}
+		${ALL_FILES}
+	)
 else()
 	message("clang-format executable not found")
 endif()

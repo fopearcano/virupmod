@@ -19,16 +19,42 @@
 #ifndef GLFUNCTIONS_HPP
 #define GLFUNCTIONS_HPP
 
-#include <QOpenGLFunctions_4_2_Core>
+#ifndef OPENGL_MAJOR_VERSION
+#define OPENGL_MAJOR_VERSION 4
+#endif
 
-typedef QOpenGLFunctions_4_2_Core OpenGLFunctions;
+#ifndef OPENGL_MINOR_VERSION
+#define OPENGL_MINOR_VERSION 2
+#endif
+
+#ifndef OPENGL_PROFILE
+#define OPENGL_PROFILE Core
+#endif
+
+#define CAT(x, y) CAT_(x, y)
+#define CAT_(x, y) x##y
+
+#define QOPENGLFUNCTIONS                                              \
+	CAT(CAT(CAT(CAT(CAT(QOpenGLFunctions_, OPENGL_MAJOR_VERSION), _), \
+	            OPENGL_MINOR_VERSION),                                \
+	        _),                                                       \
+	    OPENGL_PROFILE)
+
+#define QSURFACEFORMATPROFILE CAT(OPENGL_PROFILE, Profile)
+
+#define QUOTEME(M) #M
+#define INCLUDE_FILE(M) QUOTEME(M)
+
+#include INCLUDE_FILE(QOPENGLFUNCTIONS)
+
+typedef QOPENGLFUNCTIONS OpenGLFunctions;
 
 namespace gl
 {
-const unsigned int majorVersion = 4;
-const unsigned int minorVersion = 2;
+const unsigned int majorVersion = OPENGL_MAJOR_VERSION;
+const unsigned int minorVersion = OPENGL_MINOR_VERSION;
 const QSurfaceFormat::OpenGLContextProfile profile
-    = QSurfaceFormat::CoreProfile;
+    = QSurfaceFormat::QSURFACEFORMATPROFILE;
 } // namespace gl
 
 #endif // GLFUNCTIONS_HPP

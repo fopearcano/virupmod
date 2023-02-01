@@ -36,12 +36,20 @@ max_parallel=$(nproc)
 j=0
 for f in ${files[@]}
 do
+	launched=$(ps aux | grep $1 | wc -l)
+	launched=$(($launched - 2)) # why 2 ?
 	# limit to max_parallel
-	if [[ $(($j % $max_parallel)) == "0" ]]; then
-		wait
+	while [[ "$launched" -ge "$max_parallel" ]]; do
+		sleep 1
+		launched=$(ps aux | grep $1 | wc -l)
+		launched=$(($launched - 2)) # why 2 ?
+	done
+	file_name=$(basename $f)
+	if [[ "$file_name" == "main.cpp" ]]; then
+		file_name="$(basename $(dirname $f))_$(basename $f)"
 	fi
 	j=$(($j + 1))
-	out=/tmp/clang_tidy_$(basename $f).out
+	out=/tmp/clang_tidy_${file_name}.out
 
 	echo $f
 	$1 $f ${@:${i}} 2> /dev/null >> $out &
@@ -55,7 +63,11 @@ echo "-=-=-=- RESULTS -=-=-=-"
 error=0
 for f in ${files[@]}
 do
-	out=/tmp/clang_tidy_$(basename $f).out
+	file_name=$(basename $f)
+	if [[ "$file_name" == "main.cpp" ]]; then
+		file_name="$(basename $(dirname $f))_$(basename $f)"
+	fi
+	out=/tmp/clang_tidy_${file_name}.out
 	result=$(cat $out)
 	rm $out
 

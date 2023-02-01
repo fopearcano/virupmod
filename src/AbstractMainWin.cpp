@@ -371,7 +371,7 @@ void AbstractMainWin::initializeGL()
 	networkManager = new NetworkManager(constructNewState());
 
 	qDebug() << "Using OpenGL " << format().majorVersion() << "."
-	         << format().minorVersion() << '\n';
+	         << format().minorVersion() << format().profile() << '\n';
 
 	if(vrHandler->isEnabled())
 	{

@@ -366,6 +366,7 @@ class AbstractMainWin : public RenderingWindow
 	        GLFramebufferObject const& currentTarget) const;
 
   protected:
+	QOpenGLContext& context() { return m_context; };
 	/**
 	 * @brief The engine's only @ref VRHandler.
 	 */
