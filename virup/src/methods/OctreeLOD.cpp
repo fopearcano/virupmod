@@ -303,12 +303,12 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 		/*if(usedMem() < memLimit())
 		{*/
 		// SYNC
-		// readOwnData(*file);
-		// ramToVideo();
+		readOwnData(*file);
+		ramToVideo();
 		// ASYNC
-		state = AsyncReader::State::WAIT;
-		AsyncReader::load(*this);
-		doRender = false;
+		// state = AsyncReader::State::WAIT;
+		// AsyncReader::load(*this);
+		// doRender = false;
 		/*}
 		else
 		{
@@ -607,7 +607,7 @@ void OctreeLOD::ramToVideo()
 	}
 	else
 	{
-		unused.emplace_back("radius", std::vector<float>{1.f});
+		unused.emplace_back("radius", std::vector<float>{0.f});
 	}
 	if((getFlags() & Flags::STORE_LUMINOSITY) != Flags::NONE)
 	{

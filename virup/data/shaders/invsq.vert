@@ -1,6 +1,7 @@
 #version 150 core
 
 in vec3 position;
+in float radius;
 in vec3 color; // in solar luminosity !
 
 uniform mat4 camera;
@@ -9,9 +10,7 @@ uniform vec3 campos;
 uniform float pixelSolidAngle;
 uniform float unitInKpc = 1.0;
 
-// IllustrisTNG
-// uniform float pointSizeScale = 100000.0;
-uniform float pointSizeScale = 0.0; // disable ; should be an input radius per vertex
+uniform float pointSizeScale = 800.0; // empiric
 
 uniform mat4 dusttransform;
 uniform float useDust = 0.0;
@@ -60,7 +59,7 @@ void main()
 		a = attenuation(campos, position, dusttex, dusttransform);
 	}
 
-	gl_PointSize = max(1.0, pointSizeScale / camdist);
+	gl_PointSize = max(1.0, radius * pointSizeScale / camdist);
 
 	f_color = a * alpha * luminance;
 
