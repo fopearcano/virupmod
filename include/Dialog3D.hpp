@@ -21,6 +21,7 @@
 
 #include <QDialog>
 #include <QTest>
+#include <QWheelEvent>
 
 #include "Widget3D.hpp"
 #include "vr/Controller.hpp"
@@ -34,7 +35,12 @@ class Dialog3D : public QDialog
 	void showFromController(Controller const& controller);
 	void triggerPressed(Controller const& controller);
 	void triggerReleased(Controller const& controller);
+	bool intersects(VRHandler const& headset) const;
+	bool intersects(Controller const& controller) const;
+	void click(VRHandler const& headset);
 	void click(Controller const& controller);
+	void triggerWheelEvent(VRHandler const& headset, QWheelEvent* e);
+	void triggerWheelEvent(Controller const& controller, QWheelEvent* e);
 	void render(VRHandler const& vrHandler, ToneMappingModel const& tmm);
 	virtual ~Dialog3D() = default;
 
@@ -44,10 +50,12 @@ class Dialog3D : public QDialog
 	void mousePress(QPointF const& relativePosition);
 	void mouseRelease(QPointF const& relativePosition);
 	void mouseClick(QPointF const& relativePosition);
+	void mouseWheel(QPointF const& relativePosition, QWheelEvent* e);
 	bool eventFilter(QObject* obj, QEvent* event) override;
 	void installEventFilters(QObject* obj);
 
   private:
+	QVector3D intersection(VRHandler const& headset) const;
 	// returned z() := distance from position of controller to dialog
 	QVector3D intersection(Controller const& controller) const;
 
@@ -58,6 +66,29 @@ class Dialog3D : public QDialog
 	Side sidePriority = Side::LEFT;
 
 	const float sqrt2over2 = sqrt(2.f) / 2.f;
+
+	// complete lack from Qt
+	// https://stackoverflow.com/a/68358742
+	static void mouseWheelTurn(
+	    QWidget* widget, // The most top level widget; a MainWindow in our case
+	    QWheelEvent* e,
+	    QPoint pos, // Mouseposition in the moment of scrolling relative to top
+	                // level widget
+	    int delay = 0) // As in other QTest functions
+	{
+		QWidget* toWheelChild = widget->childAt(pos);
+
+		if(toWheelChild == NULL)
+			return;
+
+		pos = widget->mapToGlobal(pos);
+		pos = toWheelChild->mapFromGlobal(pos);
+
+		QTest::mouseMove(toWheelChild, pos);
+
+		QTest::qWait(delay);
+		QApplication::instance()->postEvent(toWheelChild, e);
+	}
 };
 
 #endif // DIALOG3D_HPP

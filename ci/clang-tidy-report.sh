@@ -52,7 +52,7 @@ do
 	out=/tmp/clang_tidy_${file_name}.out
 
 	echo $f
-	$1 $f ${@:${i}} 2> /dev/null >> $out &
+	$1 --use-color $f ${@:${i}} 2> /dev/null > $out &
 done
 
 # wait for them to finish
@@ -69,11 +69,11 @@ do
 	fi
 	out=/tmp/clang_tidy_${file_name}.out
 	result=$(cat $out)
-	rm $out
 
 	if [[ "$result" != "" ]]; then
-		echo $result
+		cat $out
 		error=1
 	fi
+	rm $out
 done
 exit $error

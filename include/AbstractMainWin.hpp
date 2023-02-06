@@ -465,7 +465,10 @@ class ImageWriter : public QRunnable
 	    , img(img)
 	{
 	}
-	void run() override { img.save(filename); }
+	void run() override
+	{
+		img.convertToFormat(QImage::Format_RGB888).save(filename);
+	}
 };
 
 #endif // ABSTRACTMAINWIN_H

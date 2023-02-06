@@ -40,6 +40,9 @@ class Widget3D
 	void render(ToneMappingModel const& tmm,
 	            GLHandler::GeometricSpace geometricSpace
 	            = GLHandler::GeometricSpace::WORLD);
+	void render(ToneMappingModel const& tmm,
+	            GLHandler::GeometricSpace geometricSpace,
+	            QVector2D const& cursorPos);
 	~Widget3D();
 
 	static void paintWidget(QImage& image, QWidget& widget);

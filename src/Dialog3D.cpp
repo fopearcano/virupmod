@@ -102,6 +102,36 @@ void Dialog3D::triggerReleased(Controller const& controller)
 	mouseRelease(localPos2D);
 }
 
+bool Dialog3D::intersects(VRHandler const& headset) const
+{
+	auto inter(intersection(headset));
+	return inter.x() >= 0.f && inter.y() >= 0.f && inter.x() <= 1.f
+	       && inter.y() <= 1.f;
+}
+
+bool Dialog3D::intersects(Controller const& controller) const
+{
+	auto inter(intersection(controller));
+	return inter.x() >= 0.f && inter.y() >= 0.f && inter.x() <= 1.f
+	       && inter.y() <= 1.f;
+}
+
+void Dialog3D::click(VRHandler const& headset)
+{
+	if(!isVisible())
+	{
+		return;
+	}
+	auto inter(intersection(headset));
+	QPointF localPos2D(inter.x(), inter.y());
+	if(localPos2D.x() < 0.f || localPos2D.y() < 0.f || localPos2D.x() > 1.f
+	   || localPos2D.y() > 1.f)
+	{
+		return;
+	}
+	mouseClick(localPos2D);
+}
+
 void Dialog3D::click(Controller const& controller)
 {
 	if(controller.side != sidePriority || !isVisible())
@@ -118,6 +148,37 @@ void Dialog3D::click(Controller const& controller)
 	mouseClick(localPos2D);
 }
 
+void Dialog3D::triggerWheelEvent(VRHandler const& headset, QWheelEvent* e)
+{
+	if(!isVisible())
+	{
+		return;
+	}
+	auto inter(intersection(headset));
+	QPointF localPos2D(inter.x(), inter.y());
+	if(localPos2D.x() < 0.f || localPos2D.y() < 0.f || localPos2D.x() > 1.f
+	   || localPos2D.y() > 1.f)
+	{
+		return;
+	}
+	mouseWheel(localPos2D, e);
+}
+
+void Dialog3D::triggerWheelEvent(Controller const& controller, QWheelEvent* e)
+{
+	if(controller.side != sidePriority || !isVisible())
+	{
+		return;
+	}
+	auto inter(intersection(controller));
+	QPointF localPos2D(inter.x(), inter.y());
+	if(localPos2D.x() < 0.f || localPos2D.y() < 0.f || localPos2D.x() > 1.f
+	   || localPos2D.y() > 1.f)
+	{
+		return;
+	}
+	mouseWheel(localPos2D, e);
+}
 void Dialog3D::render(VRHandler const& vrHandler, ToneMappingModel const& tmm)
 {
 	if(!isVisible() || !vrHandler.isEnabled())
@@ -126,7 +187,8 @@ void Dialog3D::render(VRHandler const& vrHandler, ToneMappingModel const& tmm)
 	}
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
-	widget3d.render(tmm, GLHandler::GeometricSpace::SEATEDTRACKED);
+
+	QVector2D cursor(-1.f, -1.f);
 	if(vrHandler.getController(Side::LEFT) != nullptr
 	   && sidePriority == Side::LEFT)
 	{
@@ -135,6 +197,7 @@ void Dialog3D::render(VRHandler const& vrHandler, ToneMappingModel const& tmm)
 		if(inter.x() >= 0.f && inter.y() >= 0.f && inter.x() <= 1.f
 		   && inter.y() <= 1.f)
 		{
+			cursor = inter.toVector2D();
 			mouseMove({inter.x(), inter.y()});
 			QMatrix4x4 scale;
 			scale.scale(inter.z());
@@ -160,6 +223,7 @@ void Dialog3D::render(VRHandler const& vrHandler, ToneMappingModel const& tmm)
 		if(inter.x() >= 0.f && inter.y() >= 0.f && inter.x() <= 1.f
 		   && inter.y() <= 1.f)
 		{
+			cursor = inter.toVector2D();
 			mouseMove({inter.x(), inter.y()});
 			QMatrix4x4 scale;
 			scale.scale(inter.z());
@@ -177,6 +241,27 @@ void Dialog3D::render(VRHandler const& vrHandler, ToneMappingModel const& tmm)
 	{
 		sidePriority = Side::LEFT;
 	}
+
+	// if no controller, try headset
+	if(vrHandler.getController(Side::LEFT) == nullptr
+	   && vrHandler.getController(Side::RIGHT) == nullptr)
+	{
+		auto inter(intersection(vrHandler));
+		if(inter.x() >= 0.f && inter.y() >= 0.f && inter.x() <= 1.f
+		   && inter.y() <= 1.f)
+		{
+			cursor = inter.toVector2D();
+			mouseMove({inter.x(), inter.y()});
+			QMatrix4x4 scale;
+			scale.scale(inter.z());
+			GLHandler::setUpRender(shader, vrHandler.getHMDPosMatrix() * scale,
+			                       GLHandler::GeometricSpace::SEATEDTRACKED);
+			pointer.render(PrimitiveType::LINES);
+			sidePriority = Side::RIGHT;
+		}
+	}
+
+	widget3d.render(tmm, GLHandler::GeometricSpace::SEATEDTRACKED, cursor);
 }
 
 void Dialog3D::paintEvent(QPaintEvent* event)
@@ -211,6 +296,13 @@ void Dialog3D::mouseClick(QPointF const& relativePosition)
 	QPoint p(static_cast<int>(relativePosition.x() * size().width()),
 	         static_cast<int>(relativePosition.y() * size().height()));
 	QTest::mouseClick(windowHandle(), Qt::LeftButton, {}, p, -1);
+}
+
+void Dialog3D::mouseWheel(QPointF const& relativePosition, QWheelEvent* e)
+{
+	QPoint p(static_cast<int>(relativePosition.x() * size().width()),
+	         static_cast<int>(relativePosition.y() * size().height()));
+	mouseWheelTurn(this, e, p);
 }
 
 bool Dialog3D::eventFilter(QObject* obj, QEvent* event)
@@ -256,6 +348,38 @@ QVector3D Dialog3D::intersection(Controller const& controller) const
 	auto intersectGlobal(widget3d.getModel() * widget3d.getAspectRatioMatrix()
 	                     * intersectLocal);
 	float distGlobal(intersectGlobal.distanceToPoint(controller.getPosition()));
+	result.setZ(distGlobal);
+
+	return result;
+}
+
+QVector3D Dialog3D::intersection(VRHandler const& headset) const
+{
+	QVector3D hmdPos(headset.getHMDPosMatrix().column(3).toVector3D());
+	QMatrix4x4 hmdModel(headset.getHMDPosMatrix());
+
+	QVector3D pos(widget3d.getAspectRatioMatrix().inverted()
+	              * widget3d.getModel().inverted() * hmdPos);
+	QVector3D dir(widget3d.getAspectRatioMatrix().inverted()
+	              * widget3d.getModel().inverted() * hmdModel
+	              * QVector4D(0.f, 0.f, -1.f, 0.f));
+	dir.normalize();
+
+	if((pos.z() > 0.f && dir.z() >= 0.f) || (pos.z() < 0.f && dir.z() <= 0.f))
+	{
+		float inf(std::numeric_limits<float>::infinity());
+		return {inf, inf, inf};
+	}
+
+	float distLocal(-pos.z() / dir.z());
+	auto result(pos + distLocal * dir);
+	result.setX(result.x() + 0.5f);
+	result.setY(0.5f - result.y());
+
+	auto intersectLocal(pos + distLocal * dir);
+	auto intersectGlobal(widget3d.getModel() * widget3d.getAspectRatioMatrix()
+	                     * intersectLocal);
+	float distGlobal(intersectGlobal.distanceToPoint(hmdPos));
 	result.setZ(distGlobal);
 
 	return result;

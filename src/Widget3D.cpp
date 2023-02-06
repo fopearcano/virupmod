@@ -61,6 +61,14 @@ void Widget3D::render(ToneMappingModel const& tmm,
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
+void Widget3D::render(ToneMappingModel const& tmm,
+                      GLHandler::GeometricSpace geometricSpace,
+                      QVector2D const& cursorPos)
+{
+	shader.setUniform("cursorPos", cursorPos);
+	render(tmm, geometricSpace);
+}
+
 void Widget3D::updateTex()
 {
 	delete tex;
