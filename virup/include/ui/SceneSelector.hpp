@@ -22,6 +22,7 @@
 #include <QMouseEvent>
 
 #include "VIRUPDialog3D.hpp"
+#include "gui/TimeProgressSlider.hpp"
 #include "scenes/Animator.hpp"
 
 class SceneSelector : public VIRUPDialog3D
@@ -42,8 +43,7 @@ class SceneSelector : public VIRUPDialog3D
 	QVBoxLayout buttonsLayout;
 	std::vector<QPushButton*> buttons = {};
 	QPushButton* transitionsButton    = nullptr;
-	QSlider slider;
-	bool animateSlider = true;
+	TimeProgressSlider animationTimeSlider;
 };
 
 #endif // SCENESELECTOR_HPP

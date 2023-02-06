@@ -21,7 +21,7 @@
 SceneSelector::SceneSelector(Animator& animator)
     : VIRUPDialog3D({0.f, 0.f})
     , animator(animator)
-    , slider(Qt::Horizontal, this)
+    , animationTimeSlider(Qt::Horizontal, this)
 {
 	show();
 	setWindowTitle(tr("VIRUP Scenes"));
@@ -90,15 +90,15 @@ SceneSelector::SceneSelector(Animator& animator)
 	        });
 	hl->addWidget(sb);
 
-	slider.setMaximum(1000);
-	connect(&slider, &QSlider::sliderPressed,
-	        [this]() { animateSlider = false; });
-	connect(&slider, &QSlider::sliderReleased,
-	        [this]() { animateSlider = true; });
-	connect(&slider, &QSlider::sliderMoved,
+	animationTimeSlider.setMaximum(1000);
+	connect(&animationTimeSlider, &QSlider::sliderPressed,
+	        [&animator]() { animator.pause(); });
+	connect(&animationTimeSlider, &QSlider::sliderReleased,
+	        [&animator]() { animator.play(); });
+	connect(&animationTimeSlider, &TimeProgressSlider::userPickedTime,
 	        [&animator](int value)
 	        { animator.setWholeAnimationPercentage(value / 10.f); });
-	layout->addWidget(&slider);
+	layout->addWidget(&animationTimeSlider);
 
 	layout->addWidget(new QLabel("Scenes :"));
 
@@ -123,11 +123,9 @@ SceneSelector::SceneSelector(Animator& animator)
 
 void SceneSelector::update()
 {
-	if(animateSlider)
-	{
-		slider.setValue(
-		    static_cast<int>(10 * animator.getWholeAnimationPercentage()));
-	}
+	animationTimeSlider.updateTime(
+	    static_cast<int>(10 * animator.getWholeAnimationPercentage()));
+
 	int id(animator.getCurrentTransitionId());
 	QString currentScene
 	    = id < 0 ? "" : animator.getTransitions()[id].getName();
