@@ -43,6 +43,8 @@ CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 		dmPath = rootdir + dmPath;
 	}
 
+	temporalSeries = json["temporalseries"].toBool(true);
+
 	init(gasPath.toStdString(), starsPath.toStdString(),
 	     json["loaddarkmatter"].toBool() ? dmPath.toStdString() : "",
 	     json["gascolor"].toString(), json["starscolor"].toString(),
@@ -124,8 +126,29 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	this->gasColor        = gasColor;
 	this->starsColor      = starsColor;
 	this->darkMatterColor = darkMatterColor;
-	trees.init(cosmoFilesGas[0].toStdString(), cosmoFilesStars[0].toStdString(),
-	           cosmoFilesDM[0].toStdString());
+	if(temporalSeries)
+	{
+		trees.init(cosmoFilesGas[0].toStdString(),
+		           cosmoFilesStars[0].toStdString(),
+		           cosmoFilesDM[0].toStdString());
+	}
+	else
+	{
+		QStringList gasFiles, starsFiles, dmFiles;
+		for(auto const& pair : cosmoFilesGas)
+		{
+			gasFiles << pair.second;
+		}
+		for(auto const& pair : cosmoFilesStars)
+		{
+			starsFiles << pair.second;
+		}
+		for(auto const& pair : cosmoFilesDM)
+		{
+			dmFiles << pair.second;
+		}
+		trees.init(gasFiles, starsFiles, dmFiles);
+	}
 	trees.setColors(gasColor, starsColor, darkMatterColor);
 
 	trees.silent = true;
@@ -248,6 +271,17 @@ QList<QPair<QString, QWidget*>>
 	                                                          : Qt::Unchecked);
 
 	result.append({QObject::tr("Load Dark Matter:"), cbox});
+
+	cbox = new QCheckBox(parent);
+	QObject::connect(cbox, &QCheckBox::stateChanged,
+	                 [jsonObj](int state) {
+		                 (*jsonObj)["temporalseries"] = (state == Qt::Checked);
+	                 });
+	cbox->setCheckState((*jsonObj)["temporalseries"].toBool(true)
+	                        ? Qt::Checked
+	                        : Qt::Unchecked);
+
+	result.append({QObject::tr("Temporal Series:"), cbox});
 
 	auto colorSelector = new ColorSelector(parent, QObject::tr("Gas color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,

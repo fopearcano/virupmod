@@ -23,20 +23,20 @@ void TreeMethodLOD::init(std::vector<float>& gasVertices,
                          std::vector<float>& darkMatterVertices)
 // NOLINTEND(misc-unused-parameters)
 {
-	if(!gasVertices.empty() && gasTree == nullptr)
+	if(!gasVertices.empty() && gasTrees.empty())
 	{
-		gasTree = new OctreeLOD(shaderProgram);
-		gasTree->init(gasVertices);
+		gasTrees.emplace_back(shaderProgram);
+		gasTrees[0].init(gasVertices);
 	}
-	if(!starsVertices.empty() && starsTree == nullptr)
+	if(!starsVertices.empty() && starsTrees.empty())
 	{
-		starsTree = new OctreeLOD(shaderProgram);
-		starsTree->init(starsVertices);
+		starsTrees.emplace_back(shaderProgram);
+		starsTrees[0].init(starsVertices);
 	}
-	if(!darkMatterVertices.empty() && darkMatterTree == nullptr)
+	if(!darkMatterVertices.empty() && darkMatterTrees.empty())
 	{
-		darkMatterTree = new OctreeLOD(shaderProgram);
-		darkMatterTree->init(darkMatterVertices);
+		darkMatterTrees.emplace_back(shaderProgram);
+		darkMatterTrees[0].init(darkMatterVertices);
 	}
 }
 
@@ -46,26 +46,26 @@ void TreeMethodLOD::init(std::string const& gasPath,
 {
 	if(!gasPath.empty())
 	{
-		if(gasPath.find(".dat") == std::string::npos && gasTree == nullptr)
+		if(gasPath.find(".dat") == std::string::npos && gasTrees.empty())
 		{
-			loadOctreeFromFile(gasPath, &gasTree, "Gas", shaderProgram, silent);
+			loadOctreeFromFile(gasPath, gasTrees, "Gas", shaderProgram, silent);
 		}
 		else
 		{
 			dustModel = new VolumetricModel(gasPath.c_str());
 		}
 	}
-	if(!starsPath.empty() && starsTree == nullptr)
+	if(!starsPath.empty() && starsTrees.empty())
 	{
-		loadOctreeFromFile(starsPath, &starsTree, "Stars", shaderProgram,
+		loadOctreeFromFile(starsPath, starsTrees, "Stars", shaderProgram,
 		                   silent);
 	}
 	if(!darkMatterPath.empty())
 	{
 		if(darkMatterPath.find(".dat") == std::string::npos
-		   && darkMatterTree == nullptr)
+		   && darkMatterTrees.empty())
 		{
-			loadOctreeFromFile(darkMatterPath, &darkMatterTree, "Dark matter",
+			loadOctreeFromFile(darkMatterPath, darkMatterTrees, "Dark matter",
 			                   shaderProgram, silent);
 		}
 		else
@@ -77,20 +77,45 @@ void TreeMethodLOD::init(std::string const& gasPath,
 	}
 }
 
+void TreeMethodLOD::init(QStringList const& gasFiles,
+                         QStringList const& starsFiles,
+                         QStringList const& dmFiles)
+{
+	gasTrees.reserve(gasFiles.size());
+	for(auto const& gasFile : gasFiles)
+	{
+		loadOctreeFromFile(gasFile.toStdString(), gasTrees,
+		                   "Gas (" + gasFile.toStdString() + ")", shaderProgram,
+		                   silent);
+	}
+	starsTrees.reserve(starsFiles.size());
+	for(auto const& starsFile : starsFiles)
+	{
+		loadOctreeFromFile(starsFile.toStdString(), starsTrees, "Stars",
+		                   shaderProgram, silent);
+	}
+	darkMatterTrees.reserve(dmFiles.size());
+	for(auto const& dmFile : dmFiles)
+	{
+		loadOctreeFromFile(dmFile.toStdString(), darkMatterTrees, "Dark matter",
+		                   shaderProgram, silent);
+	}
+}
+
 BBox TreeMethodLOD::getDataBoundingBox() const
 {
 	std::vector<BBox> bboxes;
-	if(gasTree != nullptr)
+	for(auto const& gasTree : gasTrees)
 	{
-		bboxes.push_back(gasTree->getBoundingBox());
+		bboxes.push_back(gasTree.getBoundingBox());
 	}
-	if(starsTree != nullptr)
+	for(auto const& starsTree : starsTrees)
 	{
-		bboxes.push_back(starsTree->getBoundingBox());
+		bboxes.push_back(starsTree.getBoundingBox());
 	}
-	if(darkMatterTree != nullptr)
+	for(auto const& darkMatterTree : darkMatterTrees)
 	{
-		bboxes.push_back(darkMatterTree->getBoundingBox());
+		bboxes.push_back(darkMatterTree.getBoundingBox());
 	}
 	return globalBBox(bboxes);
 }
@@ -98,17 +123,17 @@ BBox TreeMethodLOD::getDataBoundingBox() const
 uint64_t TreeMethodLOD::getOctreesTotalDataSize() const
 {
 	uint64_t result(0);
-	if(gasTree != nullptr)
+	for(auto const& gasTree : gasTrees)
 	{
-		result += gasTree->getTotalDataSize();
+		result += gasTree.getTotalDataSize();
 	}
-	if(starsTree != nullptr)
+	for(auto const& starsTree : starsTrees)
 	{
-		result += starsTree->getTotalDataSize();
+		result += starsTree.getTotalDataSize();
 	}
-	if(darkMatterTree != nullptr)
+	for(auto const& darkMatterTree : darkMatterTrees)
 	{
-		result += darkMatterTree->getTotalDataSize();
+		result += darkMatterTree.getTotalDataSize();
 	}
 	return result;
 }
@@ -116,9 +141,9 @@ uint64_t TreeMethodLOD::getOctreesTotalDataSize() const
 bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
                                         QProgressDialog* progress)
 {
-	if(gasTree != nullptr)
+	for(auto& gasTree : gasTrees)
 	{
-		if(!gasTree->preloadLevel(level))
+		if(!gasTree.preloadLevel(level))
 		{
 			return false;
 		}
@@ -128,9 +153,9 @@ bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
 			progress->setValue(OctreeLOD::getUsedMem());
 		}
 	}
-	if(starsTree != nullptr)
+	for(auto& starsTree : starsTrees)
 	{
-		if(!starsTree->preloadLevel(level))
+		if(!starsTree.preloadLevel(level))
 		{
 			return false;
 		}
@@ -140,9 +165,9 @@ bool TreeMethodLOD::preloadOctreesLevel(unsigned int level,
 			progress->setValue(OctreeLOD::getUsedMem());
 		}
 	}
-	if(darkMatterTree != nullptr)
+	for(auto& darkMatterTree : darkMatterTrees)
 	{
-		if(!darkMatterTree->preloadLevel(level))
+		if(!darkMatterTree.preloadLevel(level))
 		{
 			return false;
 		}
@@ -164,17 +189,20 @@ void TreeMethodLOD::update(Camera const& camera)
 void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
                            QVector3D const& campos)
 {
-	if(gasTree != nullptr)
+	for(auto& gasTree : gasTrees)
 	{
-		gasTree->update(camera, model, campos, getAlpha());
+		gasTree.update(camera, model, campos, getAlpha());
 	}
-	if(starsTree != nullptr)
+	for(auto& starsTree : starsTrees)
 	{
-		starsTree->update(camera, model, campos, getAlpha());
+		starsTree.update(camera, model, campos, getAlpha());
 	}
-	if(darkMatterTree != nullptr && showdm())
+	if(showdm())
 	{
-		darkMatterTree->update(camera, model, campos, getAlpha());
+		for(auto& darkMatterTree : darkMatterTrees)
+		{
+			darkMatterTree.update(camera, model, campos, getAlpha());
+		}
 	}
 	if(hiiModel != nullptr)
 	{
@@ -210,33 +238,36 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 		dustTransform = dustModel->getPosToTexCoord();
 	}
 
-	if(gasTree != nullptr)
+	for(auto& gasTree : gasTrees)
 	{
-		if((gasTree->getFlags() & Octree::Flags::STORE_COLOR)
+		if((gasTree.getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)
 		{
 			setShaderColor(gasColor);
 		}
-		gasTree->render(camera, model, campos, getAlpha(), dustTransform);
+		gasTree.render(camera, model, campos, getAlpha(), dustTransform);
 	}
-	if(starsTree != nullptr)
+	for(auto& starsTree : starsTrees)
 	{
-		if((starsTree->getFlags() & Octree::Flags::STORE_COLOR)
+		if((starsTree.getFlags() & Octree::Flags::STORE_COLOR)
 		   == Octree::Flags::NONE)
 		{
 			setShaderColor(starsColor);
 		}
-		starsTree->render(camera, model, campos, getAlpha(), dustTransform);
+		starsTree.render(camera, model, campos, getAlpha(), dustTransform);
 	}
-	if(darkMatterTree != nullptr && showdm())
+	if(showdm())
 	{
-		if((darkMatterTree->getFlags() & Octree::Flags::STORE_COLOR)
-		   == Octree::Flags::NONE)
+		for(auto& darkMatterTree : darkMatterTrees)
 		{
-			setShaderColor(darkMatterColor);
+			if((darkMatterTree.getFlags() & Octree::Flags::STORE_COLOR)
+			   == Octree::Flags::NONE)
+			{
+				setShaderColor(darkMatterColor);
+			}
+			darkMatterTree.render(camera, model, campos, getAlpha(),
+			                      dustTransform);
 		}
-		darkMatterTree->render(camera, model, campos, getAlpha(),
-		                       dustTransform);
 	}
 	GLHandler::endTransparent();
 	if(hiiModel != nullptr)
@@ -248,34 +279,37 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 void TreeMethodLOD::dumpOctreesStates(QString const& dirPath,
                                       QString const& filePathPrefix)
 {
-	if(gasTree != nullptr)
+	for(unsigned int i(0); i < gasTrees.size(); ++i)
 	{
-		gasTree->dumpState(dirPath + "/" + filePathPrefix + "_gas.obj");
+		gasTrees[i].dumpState(dirPath + "/" + filePathPrefix + "_gas_"
+		                      + QString::number(i) + ".obj");
 	}
-	if(starsTree != nullptr)
+	for(unsigned int i(0); i < starsTrees.size(); ++i)
 	{
-		starsTree->dumpState(dirPath + "/" + filePathPrefix + "_stars.obj");
+		starsTrees[i].dumpState(dirPath + "/" + filePathPrefix + "_stars_"
+		                        + QString::number(i) + ".obj");
 	}
-	if(darkMatterTree != nullptr)
+	for(unsigned int i(0); i < darkMatterTrees.size(); ++i)
 	{
-		darkMatterTree->dumpState(dirPath + "/" + filePathPrefix
-		                          + "_darkMatter.obj");
+		darkMatterTrees[i].dumpState(dirPath + "/" + filePathPrefix
+		                             + "_darkMatter_" + QString::number(i)
+		                             + ".obj");
 	}
 }
 
 void TreeMethodLOD::unload()
 {
-	if(gasTree != nullptr)
+	for(auto& gasTree : gasTrees)
 	{
-		gasTree->unload();
+		gasTree.unload();
 	}
-	if(starsTree != nullptr)
+	for(auto& starsTree : starsTrees)
 	{
-		starsTree->unload();
+		starsTree.unload();
 	}
-	if(darkMatterTree != nullptr)
+	for(auto& darkMatterTree : darkMatterTrees)
 	{
-		darkMatterTree->unload();
+		darkMatterTree.unload();
 	}
 }
 
@@ -285,40 +319,37 @@ void TreeMethodLOD::cleanUp()
 	dustModel = nullptr;
 	delete hiiModel;
 	hiiModel = nullptr;
-	if(gasTree != nullptr)
+	for(auto& gasTree : gasTrees)
 	{
-		gasTree->waitOnAsyncLoader();
-		if(gasTree->getFile() != nullptr)
+		gasTree.waitOnAsyncLoader();
+		if(gasTree.getFile() != nullptr)
 		{
-			delete gasTree->getFile();
+			delete gasTree.getFile();
 		}
-		delete gasTree;
 	}
-	gasTree = nullptr;
-	if(starsTree != nullptr)
+	gasTrees.clear();
+	for(auto& starsTree : starsTrees)
 	{
-		starsTree->waitOnAsyncLoader();
-		if(starsTree->getFile() != nullptr)
+		starsTree.waitOnAsyncLoader();
+		if(starsTree.getFile() != nullptr)
 		{
-			delete starsTree->getFile();
+			delete starsTree.getFile();
 		}
-		delete starsTree;
 	}
-	starsTree = nullptr;
-	if(darkMatterTree != nullptr)
+	starsTrees.clear();
+	for(auto& darkMatterTree : darkMatterTrees)
 	{
-		darkMatterTree->waitOnAsyncLoader();
-		if(darkMatterTree->getFile() != nullptr)
+		darkMatterTree.waitOnAsyncLoader();
+		if(darkMatterTree.getFile() != nullptr)
 		{
-			delete darkMatterTree->getFile();
+			delete darkMatterTree.getFile();
 		}
-		delete darkMatterTree;
 	}
-	darkMatterTree = nullptr;
+	darkMatterTrees.clear();
 }
 
 void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
-                                       OctreeLOD** octree,
+                                       std::vector<OctreeLOD>& container,
                                        std::string const& name,
                                        GLShaderProgram const& shaderProgram,
                                        bool silent)
@@ -329,7 +360,9 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	}
 	auto file = new std::ifstream();
 	file->open(path, std::fstream::in | std::fstream::binary);
-	*octree = new OctreeLOD(shaderProgram);
+
+	container.emplace_back(shaderProgram);
+	auto& octree = container[container.size() - 1];
 
 	// Init tree with progress bar
 	int64_t cursor(file->tellg());
@@ -348,7 +381,7 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 		progress->setValue(0);
 	}
 
-	auto future = std::async(std::launch::async, &initOctree, *octree, file);
+	auto future = std::async(std::launch::async, &initOctree, &octree, file);
 
 	float p(0.f);
 	if(!silent)
@@ -377,7 +410,7 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 		Octree::showProgress(1.f);
 	}
 
-	(*octree)->setFile(file);
+	octree.setFile(file);
 	// update bbox
 	if(progress != nullptr)
 	{
@@ -385,7 +418,7 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 		    tr("Loading %1 tree bounding boxes...").arg(name.c_str()));
 	}
 	QCoreApplication::processEvents();
-	(*octree)->readBBoxes(*file);
+	octree.readBBoxes(*file);
 	// (*octree)->readData(*file);
 	if(!silent)
 	{

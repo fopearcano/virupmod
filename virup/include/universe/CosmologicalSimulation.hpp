@@ -73,6 +73,7 @@ class CosmologicalSimulation : public UniverseElement
 	QVector3D campos;
 	int forcedQuality = -1;
 
+	bool temporalSeries = true;
 	std::map<unsigned int, QString> cosmoFilesGas;
 	std::map<unsigned int, QString> cosmoFilesStars;
 	std::map<unsigned int, QString> cosmoFilesDM;

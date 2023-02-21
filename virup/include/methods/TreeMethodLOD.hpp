@@ -26,6 +26,8 @@ class TreeMethodLOD : public Method
 	                  std::vector<float>& darkMatterVertices) override;
 	virtual void init(std::string const& gasPath, std::string const& starsPath,
 	                  std::string const& darkMatterPath) override;
+	void init(QStringList const& gasFiles, QStringList const& starsFiles,
+	          QStringList const& dmFiles);
 	virtual BBox getDataBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
 	bool preloadOctreesLevel(unsigned int level,
@@ -46,15 +48,16 @@ class TreeMethodLOD : public Method
 
   protected:
 	VolumetricModel* dustModel = nullptr;
-	OctreeLOD* gasTree         = nullptr;
-	OctreeLOD* starsTree       = nullptr;
-	OctreeLOD* darkMatterTree  = nullptr;
-	VolumetricModel* hiiModel  = nullptr;
+	std::vector<OctreeLOD> gasTrees;
+	std::vector<OctreeLOD> starsTrees;
+	std::vector<OctreeLOD> darkMatterTrees;
+	VolumetricModel* hiiModel = nullptr;
 
 	// ugly fix for pointSize problems
 	bool setPointSize = true;
 
-	static void loadOctreeFromFile(std::string const& path, OctreeLOD** octree,
+	static void loadOctreeFromFile(std::string const& path,
+	                               std::vector<OctreeLOD>& container,
 	                               std::string const& name,
 	                               GLShaderProgram const& shaderProgram,
 	                               bool silent);
