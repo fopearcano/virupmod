@@ -84,21 +84,32 @@ void TreeMethodLOD::init(QStringList const& gasFiles,
 	gasTrees.reserve(gasFiles.size());
 	for(auto const& gasFile : gasFiles)
 	{
-		loadOctreeFromFile(gasFile.toStdString(), gasTrees,
-		                   "Gas (" + gasFile.toStdString() + ")", shaderProgram,
-		                   silent);
+		if(!gasFile.isEmpty())
+		{
+			loadOctreeFromFile(gasFile.toStdString(), gasTrees,
+			                   "Gas (" + gasFile.toStdString() + ")",
+			                   shaderProgram, silent);
+		}
 	}
 	starsTrees.reserve(starsFiles.size());
 	for(auto const& starsFile : starsFiles)
 	{
-		loadOctreeFromFile(starsFile.toStdString(), starsTrees, "Stars",
-		                   shaderProgram, silent);
+		if(!starsFile.isEmpty())
+		{
+			loadOctreeFromFile(starsFile.toStdString(), starsTrees,
+			                   "Stars (" + starsFile.toStdString() + ")",
+			                   shaderProgram, silent);
+		}
 	}
 	darkMatterTrees.reserve(dmFiles.size());
 	for(auto const& dmFile : dmFiles)
 	{
-		loadOctreeFromFile(dmFile.toStdString(), darkMatterTrees, "Dark matter",
-		                   shaderProgram, silent);
+		if(!dmFile.isEmpty())
+		{
+			loadOctreeFromFile(dmFile.toStdString(), darkMatterTrees,
+			                   "Dark matter (" + dmFile.toStdString() + ")",
+			                   shaderProgram, silent);
+		}
 	}
 }
 

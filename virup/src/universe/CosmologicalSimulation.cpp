@@ -77,7 +77,12 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 		for(auto const& path :
 		    gasDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
 		{
-			unsigned int index(rxNumber.match(path).captured().toInt());
+			auto it = rxNumber.globalMatch(path);
+			unsigned int index;
+			while(it.hasNext())
+			{
+				index = it.next().captured(0).toInt();
+			}
 			cosmoFilesGas[index] = dirPathGas + "/" + path;
 		}
 	}
@@ -87,7 +92,12 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	for(auto const& path :
 	    starsDir.entryList({"*.octree"}, QDir::Files, QDir::Name))
 	{
-		unsigned int index(rxNumber.match(path).captured().toInt());
+		auto it = rxNumber.globalMatch(path);
+		unsigned int index;
+		while(it.hasNext())
+		{
+			index = it.next().captured(0).toInt();
+		}
 		cosmoFilesStars[index] = dirPathStars + "/" + path;
 	}
 
@@ -98,7 +108,12 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 		for(auto const& path :
 		    dmDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
 		{
-			unsigned int index(rxNumber.match(path).captured().toInt());
+			auto it = rxNumber.globalMatch(path);
+			unsigned int index;
+			while(it.hasNext())
+			{
+				index = it.next().captured(0).toInt();
+			}
 			cosmoFilesDM[index] = dirPathDM + "/" + path;
 		}
 	}
