@@ -385,8 +385,8 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 				{
 					readOwnData(*file);
 					absoluteData = getOwnData();
-					data.resize(0);
-					data.shrink_to_fit();
+					data.asVector().resize(0);
+					data.asVector().shrink_to_fit();
 				}
 
 				double dist(FLT_MAX);
