@@ -138,7 +138,7 @@ void OctreeLOD::readBBox(std::istream& in)
 
 std::vector<float> OctreeLOD::getOwnData() const
 {
-	std::vector<float> result(data);
+	std::vector<float> result(data.asVector());
 	for(size_t i(0); i < result.size(); i += commonData.dimPerVertex)
 	{
 		for(unsigned int j(0); j < 3; ++j)
@@ -155,8 +155,8 @@ void OctreeLOD::unload()
 	if(state == AsyncReader::State::CANCEL)
 	{
 		state = AsyncReader::State::IDLE;
-		data.resize(0);
-		data.shrink_to_fit();
+		data.asVector().resize(0);
+		data.asVector().shrink_to_fit();
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
@@ -180,8 +180,8 @@ void OctreeLOD::unload()
 	}
 	if(state == AsyncReader::State::READ)
 	{
-		data.resize(0);
-		data.shrink_to_fit();
+		data.asVector().resize(0);
+		data.asVector().shrink_to_fit();
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
@@ -544,8 +544,8 @@ unsigned int OctreeLOD::dumpRenderedPos(QTextStream& stream)
 	{
 		readOwnData(*file);
 		absoluteData = getOwnData();
-		data.resize(0);
-		data.shrink_to_fit();
+		data.asVector().resize(0);
+		data.asVector().shrink_to_fit();
 	}
 	unsigned int i(0);
 	for(; i < absoluteData.size() / commonData.dimPerVertex; ++i)
@@ -623,11 +623,11 @@ void OctreeLOD::ramToVideo()
 	}
 	shaderProgram->setUnusedAttributesValues(unused);
 	mesh->setVertexShaderMapping(*shaderProgram, mapping);
-	mesh->setVertices(data);
+	mesh->setVertices(data.asVector());
 	dataSize = data.size();
 	usedMem() += dataSize * sizeof(float);
-	data.resize(0);
-	data.shrink_to_fit();
+	data.asVector().resize(0);
+	data.asVector().shrink_to_fit();
 	isLoaded = true;
 }
 
