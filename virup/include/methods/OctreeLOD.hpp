@@ -23,7 +23,8 @@ class OctreeLOD : public Octree
 	OctreeLOD(GLShaderProgram const& shaderProgram);
 	bool isReady() const;
 	unsigned int getLevel() const { return lvl; };
-	virtual void init(std::vector<float>& data) override;
+	virtual void init(std::vector<float>& data,
+	                  unsigned int maxLeafSize = 16000) override;
 	virtual void init(std::istream& in) override;
 	virtual void init(int64_t file_addr, std::istream& in) override;
 	BBox getBoundingBox() const { return bbox; };

@@ -73,9 +73,9 @@ bool OctreeLOD::isReady() const
 }
 
 // NOLINTNEXTLINE(misc-unused-parameters)
-void OctreeLOD::init(std::vector<float>& data)
+void OctreeLOD::init(std::vector<float>& data, unsigned int maxLeafSize)
 {
-	Octree::init(data);
+	Octree::init(data, maxLeafSize);
 	computeBBox();
 	ramToVideo();
 }
