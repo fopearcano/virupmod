@@ -300,21 +300,19 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 
 	if(!isLoaded)
 	{
-		/*if(usedMem() < memLimit())
-		{*/
-		// SYNC
-		// readOwnData(*file);
-		// ramToVideo();
-		// ASYNC
-		state = AsyncReader::State::WAIT;
-		AsyncReader::load(*this);
-		doRender = false;
-		/*}
+		if(forceMaxQuality())
+		{
+			// SYNC
+			readOwnData(*file);
+			ramToVideo();
+		}
 		else
 		{
-		    doRender = false;
-		    return;
-		}*/
+			// ASYNC
+			state = AsyncReader::State::WAIT;
+			AsyncReader::load(*this);
+			doRender = false;
+		}
 	}
 
 	if(!isLeaf())
