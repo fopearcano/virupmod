@@ -26,17 +26,17 @@ void TreeMethodLOD::init(std::vector<float>& gasVertices,
 	if(!gasVertices.empty() && gasTrees.empty())
 	{
 		gasTrees.emplace_back(shaderProgram);
-		gasTrees[0].init(gasVertices);
+		gasTrees[0].init(gasVertices, 16000);
 	}
 	if(!starsVertices.empty() && starsTrees.empty())
 	{
 		starsTrees.emplace_back(shaderProgram);
-		starsTrees[0].init(starsVertices);
+		starsTrees[0].init(starsVertices, 16000);
 	}
 	if(!darkMatterVertices.empty() && darkMatterTrees.empty())
 	{
 		darkMatterTrees.emplace_back(shaderProgram);
-		darkMatterTrees[0].init(darkMatterVertices);
+		darkMatterTrees[0].init(darkMatterVertices, 16000);
 	}
 }
 

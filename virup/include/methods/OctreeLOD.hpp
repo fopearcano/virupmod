@@ -24,7 +24,7 @@ class OctreeLOD : public Octree
 	bool isReady() const;
 	unsigned int getLevel() const { return lvl; };
 	virtual void init(std::vector<float>& data,
-	                  unsigned int maxLeafSize = 16000) override;
+	                  unsigned int maxLeafSize) override;
 	virtual void init(std::istream& in) override;
 	virtual void init(int64_t file_addr, std::istream& in) override;
 	BBox getBoundingBox() const { return bbox; };
