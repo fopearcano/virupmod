@@ -1,5 +1,7 @@
 #include "MainWin.hpp"
 
+#include <QOpenGLPaintDevice>
+
 void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(!pressed)
@@ -398,6 +400,19 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	widget3d->render(*toneMappingModel);
 	bill->render(camera);
 	text->render();
+}
+
+void MainWin::renderGui()
+{
+	QOpenGLPaintDevice d(size());
+	QPainter painter(&d);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
+	QPen pen(Qt::red);
+	painter.setPen(pen);
+	painter.drawText(0, 0, width(), height(), Qt::AlignRight | Qt::AlignBottom,
+	                 QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION));
+	painter.end();
 }
 
 void MainWin::applyPostProcShaderParams(

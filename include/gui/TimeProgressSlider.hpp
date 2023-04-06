@@ -31,6 +31,7 @@ class TimeProgressSlider : public QSlider
 
   signals:
 	void userPickedTime(int time);
+	// requires setMouseTracking(true);
 	void userHoversTime(int time);
 
   protected:

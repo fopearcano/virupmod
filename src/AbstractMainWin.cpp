@@ -640,6 +640,7 @@ void AbstractMainWin::paintGL()
 		w->show();
 	}
 	m_context.makeCurrent(this);
+	renderGui();
 
 	// garbage collect some resources
 	AsyncTexture::garbageCollect();
@@ -727,7 +728,8 @@ void AbstractMainWin::paintGL()
 		QString framePath(QSettings().value("window/viddir").toString() + "/"
 		                  + subdir + "/" + res + "/frame" + number + ".png");
 		qDebug() << "Writing " + framePath + "...";
-		QThreadPool::globalInstance()->start(new ImageWriter(framePath, frame));
+		QThreadPool::globalInstance()->start(new ImageWriter(
+		    framePath, frame.convertToFormat(QImage::Format_RGB888)));
 
 		currentVideoFrame++;
 	}

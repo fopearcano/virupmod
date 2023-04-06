@@ -103,6 +103,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
+	qDebug() << PROJECT_NAME << PROJECT_VERSION;
 #ifdef PYTHONQT
 	// set PYTHONPATH
 	QDir pathDir(QDir::currentPath() + "/python");
@@ -114,7 +115,7 @@ int main(int argc, char* argv[])
 			        (QDir::currentPath() + "/python").toLocal8Bit());
 		}
 	}
-	qDebug() << PROJECT_NAME << "built with Python" << PYTHON_VERSION;
+	qDebug() << "Built with Python" << PYTHON_VERSION;
 #endif
 
 	if(!parser.isSet(noLauncher))

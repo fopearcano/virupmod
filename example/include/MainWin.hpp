@@ -75,6 +75,8 @@ class MainWin : public AbstractMainWin
 	virtual void renderScene(BasicCamera const& camera,
 	                         QString const& pathId) override;
 
+	virtual void renderGui() override;
+
 	virtual void applyPostProcShaderParams(
 	    QString const& id, GLShaderProgram const& shader,
 	    GLFramebufferObject const& currentTarget) const override;

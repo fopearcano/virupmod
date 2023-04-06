@@ -154,6 +154,32 @@ class GLMesh
 	void setVertices(std::vector<float> const& vertices);
 	void setVertices(std::vector<float> const& vertices,
 	                 std::vector<unsigned int> const& elements);
+
+	/**
+	 * @brief Draws a mesh on the current render target.
+	 *
+	 * @attention Make sure you called @ref setUpRender accordingly before
+	 * calling this method.
+	 *
+	 * @attention This rendering will use the last @ref GLShaderProgram passed
+	 * to
+	 * @ref setUpRender to draw the mesh. You can override the used shader
+	 * program by usinga @ref useShader. Just make sure the shader you want to
+	 * use has already been passed to @ref setUpRender with the correct
+	 * parameters before.
+	 *
+	 * @attention This calls glDrawArrays under the hood and not glDrawElements.
+	 *
+	 * This function allows to render a mesh by specifying a subset of vertices.
+	 *
+	 * @param first First vertex index to draw
+	 * @param count How many vertices to draw
+	 * @param primitiveType @ref PrimitiveType of the mesh. If AUTO and the mesh
+	 * doesn't have elements, POINTS will be assumed, but if the mesh has
+	 * elements, TRIANGLES will be assumed.
+	 */
+	void drawArrays(unsigned int first, size_t count,
+	                PrimitiveType primitiveType = PrimitiveType::AUTO) const;
 	/**
 	 * @brief Draws a mesh on the current render target.
 	 *

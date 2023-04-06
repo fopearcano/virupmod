@@ -330,6 +330,7 @@ class AbstractMainWin : public RenderingWindow
 	virtual void renderScene(BasicCamera const& camera, QString const& pathId)
 	    = 0;
 
+	virtual void renderGui(){};
 	/**
 	 * @brief Gets called before applying a specific post-processing shader.
 	 *

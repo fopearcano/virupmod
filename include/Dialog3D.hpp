@@ -41,7 +41,8 @@ class Dialog3D : public QDialog
 	void click(Controller const& controller);
 	void triggerWheelEvent(VRHandler const& headset, QWheelEvent* e);
 	void triggerWheelEvent(Controller const& controller, QWheelEvent* e);
-	void render(VRHandler const& vrHandler, ToneMappingModel const& tmm);
+	virtual void render(VRHandler const& vrHandler,
+	                    ToneMappingModel const& tmm);
 	virtual ~Dialog3D() = default;
 
   protected:
@@ -53,6 +54,8 @@ class Dialog3D : public QDialog
 	void mouseWheel(QPointF const& relativePosition, QWheelEvent* e);
 	bool eventFilter(QObject* obj, QEvent* event) override;
 	void installEventFilters(QObject* obj);
+
+	Widget3D& getWidget3D() { return widget3d; };
 
   private:
 	QVector3D intersection(VRHandler const& headset) const;
@@ -84,10 +87,19 @@ class Dialog3D : public QDialog
 		pos = widget->mapToGlobal(pos);
 		pos = toWheelChild->mapFromGlobal(pos);
 
-		QTest::mouseMove(toWheelChild, pos);
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+		QWheelEvent* ev = new QWheelEvent(
+		    e->posF(), e->globalPosF(), e->pixelDelta(), e->angleDelta(), 0,
+		    Qt::Vertical, e->buttons(), e->modifiers(), e->phase(), e->source(),
+		    e->inverted());
+#else
+		QWheelEvent* ev
+		    = new QWheelEvent(e->position(), e->globalPosition(),
+		                      e->pixelDelta(), e->angleDelta(), e->buttons(),
+		                      e->modifiers(), e->phase(), e->inverted());
+#endif
 		QTest::qWait(delay);
-		QApplication::instance()->postEvent(toWheelChild, e);
+		QApplication::instance()->postEvent(toWheelChild, ev);
 	}
 };
 

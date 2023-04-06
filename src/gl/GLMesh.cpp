@@ -117,6 +117,25 @@ void GLMesh::setVertices(std::vector<float> const& vertices,
 	            elements.size());
 }
 
+void GLMesh::drawArrays(unsigned int first, size_t count,
+                        PrimitiveType primitiveType) const
+{
+	if(vertexSize == 0)
+	{
+		return;
+	}
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = (ebo->getSize() == 0) ? PrimitiveType::POINTS
+		                                      : PrimitiveType::TRIANGLES;
+	}
+
+	GLHandler::glf().glBindVertexArray(vao);
+	GLHandler::glf().glDrawArrays(static_cast<GLenum>(primitiveType), first,
+	                              count);
+	GLHandler::glf().glBindVertexArray(0);
+}
+
 void GLMesh::render(PrimitiveType primitiveType) const
 {
 	if(vertexSize == 0)

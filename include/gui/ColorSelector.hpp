@@ -27,6 +27,7 @@ class ColorSelector : public QPushButton
 	Q_OBJECT
   public:
 	ColorSelector(QWidget* parent, QString const& caption);
+	QColor getCurrentColor() const { return currentColor; };
 
   signals:
 	void colorChanged(QColor const& color);
