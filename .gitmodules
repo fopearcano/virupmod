@@ -1,3 +1,6 @@
 [submodule "virup/thirdparty/libplanet"]
 	path = virup/thirdparty/libplanet
 	url = https://gitlab.com/Dexter9313/libplanet.git
+[submodule "virup/thirdparty/libcolorgradient"]
+	path = virup/thirdparty/libcolorgradient
+	url = https://gitlab.com/Dexter9313/libcolorgradient.git
