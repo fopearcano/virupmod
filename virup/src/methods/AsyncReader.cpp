@@ -69,9 +69,12 @@ void Thread::run()
 {
 	while(doRun)
 	{
+		int i = 0;
 		bool allEmpty(true);
 		for(auto& queue : queues)
 		{
+			// qDebug() << i << queue.size();
+			++i;
 			if(queue.empty())
 			{
 				continue;

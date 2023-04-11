@@ -21,9 +21,9 @@
 PlanetarySystems::PlanetarySystems()
     : shader("default")
 {
+	QString rootdir("/home/florian/git-projects/prograde-data/");
 	QString planetsystemdir(
-	    QSettings().value("data/rootdir").toString()
-	    + QSettings().value("simulation/planetsystemdir").toString());
+	    rootdir + QSettings().value("simulation/planetsystemdir").toString());
 
 	QStringList files;
 	QDirIterator it(planetsystemdir, QStringList() << "*.json", QDir::Files,
@@ -80,8 +80,7 @@ PlanetarySystems::PlanetarySystems()
 		           + pow(bbox.maxz - bbox.minz, 2));
 	}
 	QString solarsystemjson(
-	    QSettings().value("data/rootdir").toString()
-	    + QSettings().value("simulation/solarsystemdir").toString()
+	    rootdir + QSettings().value("simulation/solarsystemdir").toString()
 	    + "/definition.json");
 	QFile jsonFile(solarsystemjson);
 	if(jsonFile.exists())

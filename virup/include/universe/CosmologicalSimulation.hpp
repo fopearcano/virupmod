@@ -23,6 +23,7 @@
 #include <map>
 #include <set>
 
+#include "gradient/GradientSelector.hpp"
 #include "methods/TreeMethodLOD.hpp"
 #include "universe/UniverseElement.hpp"
 
@@ -83,6 +84,9 @@ class CosmologicalSimulation : public UniverseElement
 	QColor gasColor;
 	QColor starsColor;
 	QColor darkMatterColor;
+
+	grd::Gradient gradient;
+	GradientSelector gradientSelector;
 };
 
 #endif // COSMOLOGICALSIMULATION_HPP
