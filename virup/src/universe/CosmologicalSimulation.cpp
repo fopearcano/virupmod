@@ -173,6 +173,7 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 	gradientSelector.show();
 	connect(&gradientSelector, &GradientSelector::gradientChanged,
 	        [this]() { gradient.setShaderUniforms(trees.shaderProgram); });
+	gradient.setShaderUniforms(trees.shaderProgram);
 }
 
 // NOLINTBEGIN(misc-unused-parameters)
