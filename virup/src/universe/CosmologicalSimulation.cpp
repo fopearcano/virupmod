@@ -25,7 +25,8 @@ float& CosmologicalSimulation::animationTime()
 }
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
-    : gradientSelector(gradient)
+    : gradient(json["gradient"].toObject())
+    , gradientSelector(gradient)
 {
 	QString rootdir(QSettings().value("data/rootdir").toString() + '/'),
 	    gasPath(json["gasfile"].toString()),
@@ -45,6 +46,8 @@ CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 	}
 
 	temporalSeries = json["temporalseries"].toBool(true);
+
+	gradient.setJson(json["gradient"].toObject());
 
 	init(gasPath.toStdString(), starsPath.toStdString(),
 	     json["loaddarkmatter"].toBool() ? dmPath.toStdString() : "",
@@ -328,6 +331,15 @@ QList<QPair<QString, QWidget*>>
 	colorSelector->setColor((*jsonObj)["darkmattercolor"].toString("#000000"));
 
 	result.append({QObject::tr("Dark Matter Color:"), colorSelector});
+
+	auto gradient = new grd::Gradient;
+	gradient->setJson((*jsonObj)["gradient"].toObject());
+	auto gradientSelector = new GradientSelector(*gradient);
+	connect(gradientSelector, &GradientSelector::gradientChanged,
+	        [jsonObj, gradient]()
+	        { (*jsonObj)["gradient"] = gradient->getJson(); });
+
+	result.append({QObject::tr("Gradient:"), gradientSelector});
 
 	return result;
 }
