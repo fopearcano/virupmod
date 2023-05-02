@@ -64,6 +64,7 @@ class CSVObjects : public UniverseElement
 	virtual BBox getBoundingBox() const override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
+	void cleanUp();
 	virtual ~CSVObjects();
 
 	float colormix = 0.0f;

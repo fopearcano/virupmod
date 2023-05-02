@@ -423,15 +423,15 @@ CSVObjects::Object
 	return result;
 }
 
-CSVObjects::~CSVObjects()
+void CSVObjects::cleanUp()
 {
 	// TODO don't do that, check if last instance of CSVObjects !
-	if(starTex() != nullptr)
+	if(starTex() != nullptr && !galaxies)
 	{
 		delete starTex();
 		starTex() = nullptr;
 	}
-	if(galTex() != nullptr)
+	if(galTex() != nullptr && galaxies)
 	{
 		delete galTex();
 		galTex() = nullptr;
@@ -444,6 +444,15 @@ CSVObjects::~CSVObjects()
 			delete conLabel.second;
 		}
 	}
+	objects.clear();
+	bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.0, {}};
+	indexByName.clear();
+	conLabels.clear();
+}
+
+CSVObjects::~CSVObjects()
+{
+	cleanUp();
 }
 
 QList<QPair<QString, QWidget*>>
