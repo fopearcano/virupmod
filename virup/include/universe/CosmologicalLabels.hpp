@@ -26,6 +26,8 @@ class CosmologicalLabels : public UniverseElement
 {
   public:
 	CosmologicalLabels(QJsonObject const& json);
+	virtual QJsonObject getJson() const override;
+	virtual void setJson(QJsonObject const& json) override;
 	virtual BBox getBoundingBox() const override { return bbox; };
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
@@ -37,13 +39,15 @@ class CosmologicalLabels : public UniverseElement
 
   private:
 	// in kpc
-	Vector3 solarSystemDataPos = Vector3();
 	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
 
 	QMatrix4x4 model;
 	QVector3D campos;
 
 	BBox bbox;
+
+	QString file;
+	QColor color;
 };
 
 #endif // COSMOLOGICALLABELS_HPP

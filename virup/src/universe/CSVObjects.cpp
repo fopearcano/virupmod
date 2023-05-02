@@ -31,7 +31,8 @@ GLTexture*& CSVObjects::galTex()
 }
 
 CSVObjects::CSVObjects(QJsonObject const& json, bool galaxies)
-    : shader(galaxies ? "galaxies" : "stars")
+    : UniverseElement(json),
+	shader(galaxies ? "galaxies" : "stars")
     , galaxies(galaxies)
     , conShader("constellations")
 {

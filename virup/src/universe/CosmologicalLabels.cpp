@@ -20,9 +20,27 @@
 
 CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 {
-	QString path(QSettings().value("data/rootdir").toString()
-	             + json["file"].toString());
+	setJson(json);
 	setVisibility(0.f);
+}
+
+QJsonObject CosmologicalLabels::getJson() const
+{
+	auto result(UniverseElement::getJson());
+	result["type"] = "cosmolabels";
+	result["file"] = file;
+	result["color"] = color.name();
+	return result;
+}
+
+void CosmologicalLabels::setJson(QJsonObject const& json)
+{
+	UniverseElement::setJson(json);
+	file = json["file"].toString();
+	color = json["color"].toString();
+
+	QString path(QSettings().value("data/rootdir").toString()
+	             + file);
 	QFile f(path);
 	if(!f.open(QFile::ReadOnly | QFile::Text))
 	{
@@ -31,6 +49,13 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 	}
 	else
 	{
+		for(auto cosmoLabel : cosmoLabels)
+		{
+			delete cosmoLabel.second;
+		}
+		cosmoLabels.clear();
+		bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};;
+
 		QTextStream in(&f);
 		while(!in.atEnd())
 		{
@@ -40,8 +65,7 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 			Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
 			                fields[3].toDouble());
 
-			auto labelText
-			    = new LabelRenderer(label, QColor(json["color"].toString()));
+			auto labelText = new LabelRenderer(label, color);
 			cosmoLabels.emplace_back(dataPos, labelText);
 			bbox.minx = std::min(bbox.minx, static_cast<float>(dataPos[0]));
 			bbox.miny = std::min(bbox.miny, static_cast<float>(dataPos[1]));
@@ -94,14 +118,6 @@ void CosmologicalLabels::render(Camera const& /*camera*/,
 	{
 		for(auto cosmoLabel : cosmoLabels)
 		{
-			/*Vector3 posData = Utils::fromQt(this->getRelToAbsTransform()
-			                                * Utils::toQt(cosmoLabel.first));
-			if(posData == solarSystemDataPos && planetSystems->renderSystem()
-			   && planetSystems->getClosestSystem()->getName()
-			          == "Solar System")
-			{
-			    continue;
-			}*/
 			cosmoLabel.second->setAlpha(getVisibility());
 			cosmoLabel.second->render(tmm.exposure, tmm.dynamicrange);
 		}

@@ -28,9 +28,12 @@ class TexturedSphere : public UniverseElement
 {
   public:
 	TexturedSphere(QJsonObject const& json);
-	virtual BBox getBoundingBox() const override { return {}; };
+	virtual QJsonObject getJson() const override;
+	virtual void setJson(QJsonObject const& json) override;
+	virtual BBox getBoundingBox() const override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
+	virtual ~TexturedSphere();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
@@ -38,8 +41,9 @@ class TexturedSphere : public UniverseElement
   private:
 	GLShaderProgram shader;
 	GLMesh mesh;
-	GLTexture tex;
+	GLTexture* tex = nullptr;
 
+	QString file;
 	bool cullFrontFaces = false;
 };
 

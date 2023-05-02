@@ -20,13 +20,36 @@
 
 TexturedSphere::TexturedSphere(QJsonObject const& json)
     : shader("texturedsphere")
-    , tex((QSettings().value("data/rootdir").toString()
-           + json["file"].toString())
-              .toLatin1()
-              .data())
-    , cullFrontFaces(json["cullfrontfaces"].toBool())
 {
 	Primitives::setAsUnitSphere(mesh, shader, 50, 50);
+	setJson(json);
+}
+
+QJsonObject TexturedSphere::getJson() const
+{
+	auto result(UniverseElement::getJson());
+	result["type"]           = "texsphere";
+	result["file"]           = file;
+	result["cullfrontfaces"] = cullFrontFaces;
+	return result;
+}
+
+void TexturedSphere::setJson(QJsonObject const& json)
+{
+	UniverseElement::setJson(json);
+	file           = json["file"].toString();
+	cullFrontFaces = json["cullfrontfaces"].toBool();
+
+	qDebug() << QSettings().value("data/rootdir").toString() + file;
+	delete tex;
+	tex = new GLTexture((QSettings().value("data/rootdir").toString() + file)
+	                        .toLatin1()
+	                        .data());
+}
+
+BBox TexturedSphere::getBoundingBox() const
+{
+	return {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 2.0, {0.0, 0.0, 0.0}};
 }
 
 void TexturedSphere::render(Camera const& camera,
@@ -45,7 +68,7 @@ void TexturedSphere::render(Camera const& camera,
 
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	GLHandler::setBackfaceCulling(cullFrontFaces, GL_FRONT);
-	GLHandler::useTextures({&tex});
+	GLHandler::useTextures({tex});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
 	GLHandler::setBackfaceCulling(true);
@@ -76,4 +99,9 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Cull front faces :"), cbox});
 
 	return result;
+}
+
+TexturedSphere::~TexturedSphere()
+{
+	delete tex;
 }

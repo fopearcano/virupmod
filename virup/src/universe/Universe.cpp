@@ -72,29 +72,9 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 			qWarning() << entryObj;
 			continue;
 		}
-		newElem->unit          = entryObj["unit"].toDouble(1.0);
-		QString referenceFrame = entryObj["referenceframe"].toString();
-		if(referenceFrame == "equatorial")
-		{
-			newElem->referenceFrame
-			    = UniverseElement::ReferenceFrame::EQUATORIAL;
-		}
-		else if(referenceFrame == "galactic")
-		{
-			newElem->referenceFrame = UniverseElement::ReferenceFrame::GALACTIC;
-		}
-		else if(referenceFrame == "ecliptic")
-		{
-			newElem->referenceFrame = UniverseElement::ReferenceFrame::ECLIPTIC;
-		}
-		newElem->solarsystemPosition
-		    = Vector3(entryObj["solarsyslocalpos"].toObject());
-		newElem->setProperRotationFromCustomZAxis(
-		    Utils::toQt(Vector3(entryObj["customzaxis"].toObject())));
-		newElem->brightnessMultiplier = entryObj["brightnessmul"].toDouble(1.0);
 		updateBoundingBox(newElem->getBoundingBox());
-		elements[entryObj["name"].toString()] = newElem;
-		elementsRev[newElem]                  = entryObj["name"].toString();
+		elements[newElem->name] = newElem;
+		elementsRev[newElem]    = newElem->name;
 	}
 
 	planetSystems = new PlanetarySystems;

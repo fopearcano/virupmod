@@ -26,9 +26,12 @@ class Credits : public UniverseElement
 {
   public:
 	Credits(QJsonObject const& json);
+	virtual QJsonObject getJson() const override;
+	virtual void setJson(QJsonObject const& json) override;
 	virtual BBox getBoundingBox() const override { return {}; };
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
+	virtual ~Credits();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
@@ -36,9 +39,9 @@ class Credits : public UniverseElement
   private:
 	GLShaderProgram shader;
 	GLMesh mesh;
-	GLTexture tex;
+	GLTexture* tex = nullptr;
 
-	QString texsFolder;
+	QString file;
 };
 
 #endif // CREDITS_HPP

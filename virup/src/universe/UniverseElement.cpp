@@ -18,6 +18,58 @@
 
 #include "universe/UniverseElement.hpp"
 
+UniverseElement::UniverseElement(QJsonObject const& json)
+{
+	setJson(json);
+}
+
+QJsonObject UniverseElement::getJson() const
+{
+	QJsonObject result;
+	result["name"] = name;
+	result["unit"] = unit;
+	switch(referenceFrame)
+	{
+		case ReferenceFrame::EQUATORIAL:
+			result["referenceframe"] = "equatorial";
+			break;
+		case ReferenceFrame::ECLIPTIC:
+			result["referenceframe"] = "ecliptic";
+			break;
+		case ReferenceFrame::GALACTIC:
+			result["referenceframe"] = "galactic";
+			break;
+	}
+	result["solarsyslocalpos"] = solarsystemPosition.getJSONRepresentation();
+	result["customzaxis"] = Utils::fromQt(properRotation.column(2).toVector3D()).getJSONRepresentation();
+	result["brightnessMultiplier"] = brightnessMultiplier;
+	return result;
+}
+
+void UniverseElement::setJson(QJsonObject const& json)
+{
+	name                   = json["name"].toString();
+	unit                   = json["unit"].toDouble(1.0);
+	QString referenceFrame = json["referenceframe"].toString();
+	if(referenceFrame == "equatorial")
+	{
+		this->referenceFrame = ReferenceFrame::EQUATORIAL;
+	}
+	else if(referenceFrame == "galactic")
+	{
+		this->referenceFrame = ReferenceFrame::GALACTIC;
+	}
+	else if(referenceFrame == "ecliptic")
+	{
+		this->referenceFrame = ReferenceFrame::ECLIPTIC;
+	}
+	solarsystemPosition = Vector3(json["solarsyslocalpos"].toObject());
+	setProperRotationFromCustomZAxis(
+	    Utils::toQt(Vector3(json["customzaxis"].toObject())));
+	brightnessMultiplier = json["brightnessmul"].toDouble(1.0);
+}
+
+
 Vector3 UniverseElement::getAbsoluteBBoxCenter() const
 {
 	return Utils::fromQt(getRelToAbsTransform() * getBoundingBox().mid);

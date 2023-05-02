@@ -25,7 +25,8 @@ float& CosmologicalSimulation::animationTime()
 }
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
-    : gradient(json["gradient"].toObject())
+    : UniverseElement(json)
+    , gradient(json["gradient"].toObject())
     , gradientSelector(gradient)
 {
 	QString rootdir(QSettings().value("data/rootdir").toString() + '/'),

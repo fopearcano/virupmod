@@ -20,13 +20,29 @@
 
 Credits::Credits(QJsonObject const& json)
     : shader("credits")
-    , tex((QSettings().value("data/rootdir").toString()
-           + json["file"].toString())
-              .toLatin1()
-              .data())
-    , texsFolder(json["file"].toString().toLatin1().data())
 {
 	Primitives::setAsUnitCube(mesh, shader);
+
+	setJson(json);
+}
+
+QJsonObject Credits::getJson() const
+{
+	auto result(UniverseElement::getJson());
+	result["type"] = "credits";
+	result["file"] = file;
+	return result;
+}
+
+void Credits::setJson(QJsonObject const& json)
+{
+	UniverseElement::setJson(json);
+	file = json["file"].toString();
+
+	delete tex;
+	tex = new GLTexture((QSettings().value("data/rootdir").toString() + file)
+	                        .toLatin1()
+	                        .data());
 }
 
 void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
@@ -36,14 +52,14 @@ void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
 	shader.setUniform("alpha", 1.f); // visibility * brightnessMultiplier);
 	shader.setUniform("color", QVector3D(10000.0, 0.0, 0.0));
 
-	auto size = tex.getSize();
+	auto size = tex->getSize();
 	shader.setUniform("aspectratio", size.width() / size.height());
 
 	QMatrix4x4 scale;
 	scale.scale(1.f);
 
 	GLHandler::setBackfaceCulling(false);
-	GLHandler::useTextures({&tex});
+	GLHandler::useTextures({tex});
 	GLHandler::setUpRender(shader, scale);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
@@ -63,4 +79,9 @@ QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget* parent,
 	result.append({QObject::tr("Textures Path:"), pathSelector});
 
 	return result;
+}
+
+Credits::~Credits()
+{
+	delete tex;
 }

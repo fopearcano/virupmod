@@ -68,6 +68,15 @@ class UniverseElement : public QObject
 	/*! @brief Default constructor. See members for default values.
 	 */
 	UniverseElement() = default;
+	/*! @brief Constructor from Json object.
+	 */
+	UniverseElement(QJsonObject const& json);
+	/*! @brief Get the element Json representation.
+	 */
+	virtual QJsonObject getJson() const;
+	/*! @brief Get the element Json representation.
+	 */
+	virtual void setJson(QJsonObject const& json);
 	/*! @brief Returns the bounding box of the data in its relative reference
 	 * frame.
 	 */
@@ -124,6 +133,7 @@ class UniverseElement : public QObject
 	 */
 	float brightnessMultiplier = 1.f;
 
+	QString name;
 	/*! @brief Spatial unit of the day in kiloparsecs (kpc).
 	 *
 	 * For example, if the data uses parsecs as a spatial unit, set this member
