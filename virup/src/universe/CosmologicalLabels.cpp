@@ -27,8 +27,8 @@ CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 QJsonObject CosmologicalLabels::getJson() const
 {
 	auto result(UniverseElement::getJson());
-	result["type"] = "cosmolabels";
-	result["file"] = file;
+	result["type"]  = "cosmolabels";
+	result["file"]  = file;
 	result["color"] = color.name();
 	return result;
 }
@@ -36,11 +36,10 @@ QJsonObject CosmologicalLabels::getJson() const
 void CosmologicalLabels::setJson(QJsonObject const& json)
 {
 	UniverseElement::setJson(json);
-	file = json["file"].toString();
+	file  = json["file"].toString();
 	color = json["color"].toString();
 
-	QString path(QSettings().value("data/rootdir").toString()
-	             + file);
+	QString path(QSettings().value("data/rootdir").toString() + file);
 	QFile f(path);
 	if(!f.open(QFile::ReadOnly | QFile::Text))
 	{
@@ -54,7 +53,8 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 			delete cosmoLabel.second;
 		}
 		cosmoLabels.clear();
-		bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};;
+		bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
+		;
 
 		QTextStream in(&f);
 		while(!in.atEnd())

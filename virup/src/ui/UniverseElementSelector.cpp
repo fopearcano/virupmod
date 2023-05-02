@@ -79,59 +79,60 @@ void UniverseElementSelector::selectElement(QListWidgetItem* item)
 
 class UniverseElementEditor : public QDialog
 {
-	public:
-		UniverseElementEditor(UniverseElement* universeElement, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags())
-			: QDialog(parent, f)
-			, json(universeElement->getJson())
+  public:
+	UniverseElementEditor(UniverseElement* universeElement,
+	                      QWidget* parent   = nullptr,
+	                      Qt::WindowFlags f = Qt::WindowFlags())
+	    : QDialog(parent, f)
+	    , json(universeElement->getJson())
+	{
+		auto form = new QFormLayout(this);
+		for(auto const& pair : UniverseElement::getLauncherFields(this, &json))
 		{
-			auto form = new QFormLayout(this);
-			for(auto const& pair : UniverseElement::getLauncherFields(this, &json))
-			{
-				form->addRow(pair.first, pair.second);
-			}
-			auto type = json["type"].toString();
+			form->addRow(pair.first, pair.second);
+		}
+		auto type = json["type"].toString();
 
-			QList<QPair<QString, QWidget*>> fields;
-			if(type == "cosmolabels")
-			{
-				fields = CosmologicalLabels::getLauncherFields(this, &json);
-			}
-			if(type == "csvstars")
-			{
-				fields = CSVObjects::getStarsLauncherFields(this, &json);
-			}
-			if(type == "csvgalaxies")
-			{
-				fields = CSVObjects::getGalaxiesLauncherFields(this, &json);
-			}
-			if(type == "cosmosim")
-			{
-				fields
-					= CosmologicalSimulation::getLauncherFields(this, &json);
-			}
-			if(type == "texsphere")
-			{
-				fields = TexturedSphere::getLauncherFields(this, &json);
-			}
-			if(type == "credits")
-			{
-				fields = Credits::getLauncherFields(this, &json);
-			}
-			for(auto const& pair : fields)
-			{
-				form->addRow(pair.first, pair.second);
-			}
+		QList<QPair<QString, QWidget*>> fields;
+		if(type == "cosmolabels")
+		{
+			fields = CosmologicalLabels::getLauncherFields(this, &json);
+		}
+		if(type == "csvstars")
+		{
+			fields = CSVObjects::getStarsLauncherFields(this, &json);
+		}
+		if(type == "csvgalaxies")
+		{
+			fields = CSVObjects::getGalaxiesLauncherFields(this, &json);
+		}
+		if(type == "cosmosim")
+		{
+			fields = CosmologicalSimulation::getLauncherFields(this, &json);
+		}
+		if(type == "texsphere")
+		{
+			fields = TexturedSphere::getLauncherFields(this, &json);
+		}
+		if(type == "credits")
+		{
+			fields = Credits::getLauncherFields(this, &json);
+		}
+		for(auto const& pair : fields)
+		{
+			form->addRow(pair.first, pair.second);
+		}
 
-			auto b = new QPushButton(this);
-			b->setText(tr("Apply"));
-			form->addRow(b);
-			connect(b, &QPushButton::pressed, this, [this, universeElement](){
-						universeElement->setJson(this->json);
-					});
-		};
+		auto b = new QPushButton(this);
+		b->setText(tr("Apply"));
+		form->addRow(b);
+		connect(b, &QPushButton::pressed, this,
+		        [this, universeElement]()
+		        { universeElement->setJson(this->json); });
+	};
 
-	private:
-		QJsonObject json;
+  private:
+	QJsonObject json;
 };
 
 void UniverseElementSelector::editElement(QListWidgetItem* item)

@@ -41,7 +41,8 @@ QJsonObject UniverseElement::getJson() const
 			break;
 	}
 	result["solarsyslocalpos"] = solarsystemPosition.getJSONRepresentation();
-	result["customzaxis"] = Utils::fromQt(properRotation.column(2).toVector3D()).getJSONRepresentation();
+	result["customzaxis"] = Utils::fromQt(properRotation.column(2).toVector3D())
+	                            .getJSONRepresentation();
 	result["brightnessMultiplier"] = brightnessMultiplier;
 	return result;
 }
@@ -68,7 +69,6 @@ void UniverseElement::setJson(QJsonObject const& json)
 	    Utils::toQt(Vector3(json["customzaxis"].toObject())));
 	brightnessMultiplier = json["brightnessmul"].toDouble(1.0);
 }
-
 
 Vector3 UniverseElement::getAbsoluteBBoxCenter() const
 {
