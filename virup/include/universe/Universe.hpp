@@ -322,6 +322,10 @@ class Universe : public QObject
 	{
 		return elements.at(name);
 	};
+	UniverseElement* getElement(QString const& name)
+	{
+		return elements.at(name);
+	};
 	bool isPlanetarySystemRendered() const
 	{
 		return planetSystems->renderSystem();

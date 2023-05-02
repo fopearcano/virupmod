@@ -27,12 +27,13 @@
 class UniverseElementSelector : public VIRUPDialog3D
 {
   public:
-	UniverseElementSelector(Universe const& universe, Animator& animator);
+	UniverseElementSelector(Universe& universe, Animator& animator);
 
   private:
 	void selectElement(QListWidgetItem* item);
+	void editElement(QListWidgetItem* item);
 
-	Universe const& universe;
+	Universe& universe;
 	Animator& animator;
 	QListWidget listWidget;
 };

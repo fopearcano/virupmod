@@ -18,7 +18,9 @@
 
 #include "ui/UniverseElementSelector.hpp"
 
-UniverseElementSelector::UniverseElementSelector(Universe const& universe,
+#include <QFormLayout>
+
+UniverseElementSelector::UniverseElementSelector(Universe& universe,
                                                  Animator& animator)
     : VIRUPDialog3D({0.65f, 0.f})
     , universe(universe)
@@ -42,6 +44,12 @@ UniverseElementSelector::UniverseElementSelector(Universe const& universe,
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectElement(listWidget.currentItem()); });
+	layout->addWidget(b);
+
+	b = new QPushButton(this);
+	b->setText(tr("Edit"));
+	connect(b, &QPushButton::pressed,
+	        [this]() { editElement(listWidget.currentItem()); });
 	layout->addWidget(b);
 	installEventFilters();
 }
@@ -67,4 +75,68 @@ void UniverseElementSelector::selectElement(QListWidgetItem* item)
 	    Scene(sd, SceneTemporalData(scene.getTemporalData().getTimeCoeff()),
 	          ui),
 	    10.f));
+}
+
+class UniverseElementEditor : public QDialog
+{
+	public:
+		UniverseElementEditor(UniverseElement* universeElement, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags())
+			: QDialog(parent, f)
+			, json(universeElement->getJson())
+		{
+			auto form = new QFormLayout(this);
+			for(auto const& pair : UniverseElement::getLauncherFields(this, &json))
+			{
+				form->addRow(pair.first, pair.second);
+			}
+			auto type = json["type"].toString();
+
+			QList<QPair<QString, QWidget*>> fields;
+			if(type == "cosmolabels")
+			{
+				fields = CosmologicalLabels::getLauncherFields(this, &json);
+			}
+			if(type == "csvstars")
+			{
+				fields = CSVObjects::getStarsLauncherFields(this, &json);
+			}
+			if(type == "csvgalaxies")
+			{
+				fields = CSVObjects::getGalaxiesLauncherFields(this, &json);
+			}
+			if(type == "cosmosim")
+			{
+				fields
+					= CosmologicalSimulation::getLauncherFields(this, &json);
+			}
+			if(type == "texsphere")
+			{
+				fields = TexturedSphere::getLauncherFields(this, &json);
+			}
+			if(type == "credits")
+			{
+				fields = Credits::getLauncherFields(this, &json);
+			}
+			for(auto const& pair : fields)
+			{
+				form->addRow(pair.first, pair.second);
+			}
+
+			auto b = new QPushButton(this);
+			b->setText(tr("Apply"));
+			form->addRow(b);
+			connect(b, &QPushButton::pressed, this, [this, universeElement](){
+						universeElement->setJson(this->json);
+					});
+		};
+
+	private:
+		QJsonObject json;
+};
+
+void UniverseElementSelector::editElement(QListWidgetItem* item)
+{
+	UniverseElement* elem(universe.getElement(item->text()));
+	auto editor = new UniverseElementEditor(elem, this);
+	editor->show();
 }
