@@ -18,12 +18,10 @@
 
 #include "universe/Credits.hpp"
 
-Credits::Credits(QJsonObject const& json)
+Credits::Credits()
     : shader("credits")
 {
 	Primitives::setAsUnitCube(mesh, shader);
-
-	setJson(json);
 }
 
 QJsonObject Credits::getJson() const

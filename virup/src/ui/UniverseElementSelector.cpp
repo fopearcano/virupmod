@@ -80,9 +80,9 @@ void UniverseElementSelector::selectElement(QListWidgetItem* item)
 class UniverseElementEditor : public QDialog
 {
   public:
-	UniverseElementEditor(UniverseElement* universeElement,
-	                      QWidget* parent   = nullptr,
-	                      Qt::WindowFlags f = Qt::WindowFlags())
+	explicit UniverseElementEditor(UniverseElement* universeElement,
+	                               QWidget* parent   = nullptr,
+	                               Qt::WindowFlags f = Qt::WindowFlags())
 	    : QDialog(parent, f)
 	    , json(universeElement->getJson())
 	{

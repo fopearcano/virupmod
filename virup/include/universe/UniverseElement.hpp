@@ -68,9 +68,6 @@ class UniverseElement : public QObject
 	/*! @brief Default constructor. See members for default values.
 	 */
 	UniverseElement() = default;
-	/*! @brief Constructor from Json object.
-	 */
-	UniverseElement(QJsonObject const& json);
 	/*! @brief Get the element Json representation.
 	 */
 	virtual QJsonObject getJson() const;

@@ -18,11 +18,6 @@
 
 #include "universe/UniverseElement.hpp"
 
-UniverseElement::UniverseElement(QJsonObject const& json)
-{
-	setJson(json);
-}
-
 QJsonObject UniverseElement::getJson() const
 {
 	QJsonObject result;

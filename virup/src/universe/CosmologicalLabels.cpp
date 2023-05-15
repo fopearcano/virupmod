@@ -20,9 +20,8 @@
 
 #include <cfloat>
 
-CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
+CosmologicalLabels::CosmologicalLabels()
 {
-	setJson(json);
 	setVisibility(0.f);
 }
 

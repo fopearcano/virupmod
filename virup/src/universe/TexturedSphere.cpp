@@ -18,11 +18,10 @@
 
 #include "universe/TexturedSphere.hpp"
 
-TexturedSphere::TexturedSphere(QJsonObject const& json)
+TexturedSphere::TexturedSphere()
     : shader("texturedsphere")
 {
 	Primitives::setAsUnitSphere(mesh, shader, 50, 50);
-	setJson(json);
 }
 
 QJsonObject TexturedSphere::getJson() const

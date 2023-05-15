@@ -27,7 +27,7 @@
 class TexturedSphere : public UniverseElement
 {
   public:
-	TexturedSphere(QJsonObject const& json);
+	TexturedSphere();
 	virtual QJsonObject getJson() const override;
 	virtual void setJson(QJsonObject const& json) override;
 	virtual BBox getBoundingBox() const override;

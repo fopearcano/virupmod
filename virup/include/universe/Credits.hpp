@@ -25,7 +25,7 @@
 class Credits : public UniverseElement
 {
   public:
-	Credits(QJsonObject const& json);
+	Credits();
 	virtual QJsonObject getJson() const override;
 	virtual void setJson(QJsonObject const& json) override;
 	virtual BBox getBoundingBox() const override { return {}; };

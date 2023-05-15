@@ -37,7 +37,7 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 		UniverseElement* newElem = nullptr;
 		if(entryObj["type"] == "cosmolabels")
 		{
-			newElem = new CosmologicalLabels(entryObj);
+			newElem = new CosmologicalLabels;
 		}
 		else if(entryObj["type"] == "csvstars")
 		{
@@ -59,11 +59,11 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 		}
 		else if(entryObj["type"] == "texsphere")
 		{
-			newElem = new TexturedSphere(entryObj);
+			newElem = new TexturedSphere;
 		}
 		else if(entryObj["type"] == "credits")
 		{
-			newElem = new Credits(entryObj);
+			newElem = new Credits;
 		}
 		else
 		{
@@ -72,6 +72,7 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 			qWarning() << entryObj;
 			continue;
 		}
+		newElem->setJson(entryObj);
 		updateBoundingBox(newElem->getBoundingBox());
 		elements[newElem->name] = newElem;
 		elementsRev[newElem]    = newElem->name;
