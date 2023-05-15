@@ -18,6 +18,8 @@
 
 #include "universe/CSVObjects.hpp"
 
+#include <cfloat>
+
 GLTexture*& CSVObjects::starTex()
 {
 	static GLTexture* starTex = nullptr;

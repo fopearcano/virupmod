@@ -18,6 +18,8 @@
 
 #include "universe/CosmologicalLabels.hpp"
 
+#include <cfloat>
+
 CosmologicalLabels::CosmologicalLabels(QJsonObject const& json)
 {
 	setJson(json);
@@ -54,7 +56,6 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 		}
 		cosmoLabels.clear();
 		bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
-		;
 
 		QTextStream in(&f);
 		while(!in.atEnd())
