@@ -693,7 +693,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 
 	// update here because depends on eye
 	QVector3D pos(
-	    Utils::toQt(cam.dataToWorldPosition(Vector3(0.43, 8.24, 0.81))));
+	    Utils::toQt(cam.dataToWorldPosition(-1 * Vector3(0.43, 8.24, 0.81))));
 	lenseScreenCoord = camera.project(pos);
 	lenseScreenCoord /= lenseScreenCoord.w();
 	lenseDist
