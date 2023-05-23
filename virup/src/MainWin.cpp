@@ -416,8 +416,7 @@ void MainWin::initScene()
 	// LENSING
 	lenseDistortionMap
 	    = new GLTexture("data/virup/images/pointmass-distortion.png", false);
-
-	// renderer.appendPostProcessingShader("lensing", "lensing");
+	lenseDistortionMap->generateMipmap();
 
 	// UI
 	if(networkManager->isServer())
@@ -558,6 +557,22 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 			animTimeSelect->update();
 			tmController->update();
 			scenes->update();
+		}
+
+		if((universe->getCosmoPosition() - Vector3(-0.43, -8.24, -0.81))
+		       .length()
+		   > 3.0e-3)
+		{
+			if(renderer.postProcessingPipeline.front().first == "lensing")
+			{
+				qDebug() << "removing";
+				renderer.removePostProcessingShader("lensing");
+			}
+		}
+		else if(renderer.postProcessingPipeline.front().first != "lensing")
+		{
+			qDebug() << "adding";
+			renderer.insertPostProcessingShader("lensing", "lensing", 0);
 		}
 	}
 	if(pathId == "planet")
@@ -740,7 +755,7 @@ std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
 	}
 	if(id == "lensing")
 	{
-		return {{lenseDistortionMap, GLComputeShader::DataAccessMode::R}};
+		return {{lenseDistortionMap, GLComputeShader::DataAccessMode::SAMPLER}};
 	}
 	return {};
 }
