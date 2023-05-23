@@ -21,6 +21,7 @@
 InputManager::InputManager()
 {
 	addAction(Qt::Key_Home, {"resetvrpos", "Reset VR origin"});
+	addAction(Qt::Key_Space, {"toggleinfotext", "Toggle Info Text"});
 	addAction(Qt::Key_M, {"toggledm", "Toggle Dark Matter"});
 	addAction(Qt::Key_L, {"togglelabels", "Toggle Labels"});
 	addAction(Qt::Key_O, {"toggleorbits", "Toggle Orbits"});

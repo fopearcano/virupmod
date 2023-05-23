@@ -1,5 +1,7 @@
 #include "MainWin.hpp"
 
+#include <QOpenGLPaintDevice>
+
 MainWin::MainWin()
 {
 	srand(time(nullptr));
@@ -18,6 +20,10 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 				{
 					vrHandler->resetPos();
 				}
+			}
+			else if(a.id == "toggleinfotext")
+			{
+				showInfoText = !showInfoText;
 			}
 			else if(a.id == "toggleorbits")
 			{
@@ -714,6 +720,42 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	lenseDist
 	    = ((camera.hmdScaledSpaceToWorldTransform() * QVector3D(0, 0, 0)) - pos)
 	          .length();
+}
+
+void MainWin::renderGui()
+{
+	if(!showInfoText)
+	{
+		return;
+	}
+	QString str(QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION)
+	            + '\n');
+	if(universe->isPlanetarySystemLoaded())
+	{
+		str += tr("Planetary system : ") + universe->getPlanetarySystemName()
+		       + '\n';
+		str += tr("Planet target : ") + universe->getPlanetTarget() + '\n';
+		std::ostringstream stream;
+		stream << universe->getPlanetPosition();
+		str += tr("Planet rel. position (m) : ") + stream.str().c_str() + '\n';
+	}
+	std::ostringstream stream;
+	stream << universe->getCosmoPosition();
+	str += tr("Cosmology position (kpc) : ") + stream.str().c_str() + '\n';
+	str += tr("Scale (real meter / sim meter) : ")
+	       + QString::number(universe->getScale(), 'g', 5) + '\n';
+
+	QOpenGLPaintDevice d(size());
+	QPainter painter(&d);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
+	QPen pen(Qt::red);
+	painter.setPen(pen);
+	painter.drawText(0, 0, width(), height(), Qt::AlignLeft | Qt::AlignTop,
+	                 str);
+	painter.end();
+
+	GLHandler::glf().glEnable(GL_DEPTH_TEST);
 }
 
 void MainWin::applyPostProcShaderParams(

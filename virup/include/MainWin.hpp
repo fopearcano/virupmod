@@ -206,6 +206,8 @@ class MainWin : public AbstractMainWin
 	// (no controllers or hands)
 	virtual void renderScene(BasicCamera const& camera,
 	                         QString const& pathId) override;
+	virtual void renderGui() override;
+
 	virtual void applyPostProcShaderParams(
 	    QString const& id, GLShaderProgram const& shader,
 	    GLFramebufferObject const& currentTarget) const override;
@@ -289,6 +291,7 @@ class MainWin : public AbstractMainWin
 	Billboard* helperBillboard = nullptr;
 	Text3D* debugText          = nullptr;
 	double timeSinceTextUpdate = DBL_MAX;
+	bool showInfoText          = false;
 
 	// TEMP
 	const int textWidth  = 225;
