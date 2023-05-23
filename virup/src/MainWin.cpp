@@ -723,7 +723,7 @@ void MainWin::applyPostProcShaderParams(
 		shader.setUniform("lenseDist", lenseDist);
 		shader.setUniform("radiusLimit", 0.2f);
 
-		shader.setUniform("distortionMap", 1);
+		shader.setUniform("distortionMap", 2);
 	}
 }
 
