@@ -21,9 +21,9 @@
 PlanetarySystems::PlanetarySystems()
     : shader("default")
 {
-	QString rootdir("/home/florian/git-projects/prograde-data/");
-	QString planetsystemdir(
-	    rootdir + QSettings().value("simulation/planetsystemdir").toString());
+	QString rootdir(QSettings().value("data/rootdir").toString());
+	auto planetsystemdir
+	    = rootdir + QSettings().value("simulation/planetsystemdir").toString();
 
 	QStringList files;
 	QDirIterator it(planetsystemdir, QStringList() << "*.json", QDir::Files,
