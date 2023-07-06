@@ -26,12 +26,12 @@ TimeController::TimeController(Universe& universe)
 {
 	setWindowTitle(tr("Time Controller"));
 
-	auto mainLayout = new QVBoxLayout(this);
+	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = new QWidget(this);
+	auto w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto dateTimeLayout = new QHBoxLayout(w);
-	dtEdit              = new QDateTimeEdit(this);
+	auto dateTimeLayout = make_qt_unique<QHBoxLayout>(*w);
+	dtEdit              = make_qt_unique<QDateTimeEdit>(*this);
 	dtEdit->setCalendarPopup(true);
 	dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
 	dtEdit->setDateTime(universe.getSimulationTime());
@@ -45,26 +45,26 @@ TimeController::TimeController(Universe& universe)
 	        });
 	dateTimeLayout->addWidget(dtEdit);
 
-	timeLabel = new QLabel(this);
+	timeLabel = make_qt_unique<QLabel>(*this);
 	dateTimeLayout->addWidget(timeLabel);
 
-	w = new QWidget(this);
+	w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto buttonsLayout = new QHBoxLayout(w);
+	auto buttonsLayout = make_qt_unique<QHBoxLayout>(*w);
 
-	auto button = new QPushButton(this);
+	auto button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("Flip time flow"));
 	connect(button, &QPushButton::pressed,
 	        [this]() { setTimeCoeffFromUI(-1.f * this->getTimeCoeffForUI()); });
 	buttonsLayout->addWidget(button);
 
-	button = new QPushButton(this);
+	button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("⏪︎"));
 	connect(button, &QPushButton::pressed,
 	        [this]() { setTimeCoeffFromUI(this->getTimeCoeffForUI() / 10.f); });
 	buttonsLayout->addWidget(button);
 
-	button = new QPushButton(this);
+	button = make_qt_unique<QPushButton>(*this);
 	if(timeCoeffBackup == 0.f)
 	{
 		button->setText(tr("⏸︎"));
@@ -96,19 +96,19 @@ TimeController::TimeController(Universe& universe)
 	        });
 	buttonsLayout->addWidget(button);
 
-	button = new QPushButton(this);
+	button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("⏩︎"));
 	connect(button, &QPushButton::pressed,
 	        [this]() { setTimeCoeffFromUI(this->getTimeCoeffForUI() * 10.f); });
 	buttonsLayout->addWidget(button);
 
-	button = new QPushButton(this);
+	button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("x1"));
 	connect(button, &QPushButton::pressed,
 	        [this]() { setTimeCoeffFromUI(1.f); });
 	buttonsLayout->addWidget(button);
 
-	button = new QPushButton(this);
+	button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("Now"));
 	connect(
 	    button, &QPushButton::pressed,

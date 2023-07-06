@@ -25,9 +25,9 @@ AnimationTimeSelector::AnimationTimeSelector(Universe& universe)
 	setWindowTitle(tr("Animation Time Controller"));
 	this->setMinimumWidth(400);
 
-	auto mainLayout = new QVBoxLayout(this);
+	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	slider = new QSlider(Qt::Horizontal, this);
+	slider = make_qt_unique<QSlider>(*this, Qt::Horizontal);
 	slider->setMinimum(0);
 	slider->setMaximum(100);
 	slider->setTickInterval(1);

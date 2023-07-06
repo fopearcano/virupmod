@@ -30,7 +30,7 @@ UniverseElementSelector::UniverseElementSelector(Universe& universe,
 	setFixedSize(250, 600);
 	setWindowTitle(tr("Cosmological Elements List"));
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
 	connect(&listWidget, &QListWidget::itemActivated, this,
 	        &UniverseElementSelector::selectElement);
@@ -40,13 +40,13 @@ UniverseElementSelector::UniverseElementSelector(Universe& universe,
 	{
 		listWidget.addItem(elementName);
 	}
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectElement(listWidget.currentItem()); });
 	layout->addWidget(b);
 
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Edit"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { editElement(listWidget.currentItem()); });
@@ -86,7 +86,7 @@ class UniverseElementEditor : public QDialog
 	    : QDialog(parent, f)
 	    , json(universeElement->getJson())
 	{
-		auto form = new QFormLayout(this);
+		auto form = make_qt_unique<QFormLayout>(*this);
 		for(auto const& pair : UniverseElement::getLauncherFields(*this, json))
 		{
 			form->addRow(pair.first, pair.second);
@@ -123,7 +123,7 @@ class UniverseElementEditor : public QDialog
 			form->addRow(pair.first, pair.second);
 		}
 
-		auto b = new QPushButton(this);
+		auto b = make_qt_unique<QPushButton>(*this);
 		b->setText(tr("Apply"));
 		form->addRow(b);
 		connect(b, &QPushButton::pressed, this,

@@ -41,8 +41,8 @@ class SceneSelector : public VIRUPDialog3D
 
 	bool english = true;
 	QVBoxLayout buttonsLayout;
-	std::vector<QPushButton*> buttons = {};
-	QPushButton* transitionsButton    = nullptr;
+	std::vector<std::unique_ptr<QPushButton>> buttons = {};
+	QPushButton* transitionsButton                    = nullptr;
 	TimeProgressSlider animationTimeSlider;
 };
 

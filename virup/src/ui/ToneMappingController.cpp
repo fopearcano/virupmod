@@ -29,24 +29,24 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 {
 	setWindowTitle(tr("Tone Mapping Controller"));
 
-	auto mainLayout = new QVBoxLayout(this);
+	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = new QWidget(this);
+	auto w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	auto hl = new QHBoxLayout(w);
-	autoCb  = new QCheckBox(this);
+	auto hl = make_qt_unique<QHBoxLayout>(*w);
+	autoCb  = make_qt_unique<QCheckBox>(*this);
 	autoCb->setChecked(tmm.autoexposure);
 	connect(autoCb, &QCheckBox::stateChanged,
 	        [this]() { this->tmm.autoexposure = this->autoCb->isChecked(); });
 	hl->QLayout::addWidget(autoCb);
-	auto l = new QLabel(this);
+	auto l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Automatic exposure"));
 	hl->addWidget(l);
 
-	w = new QWidget(this);
+	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl   = new QHBoxLayout(w);
-	bmCb = new QCheckBox(this);
+	hl   = make_qt_unique<QHBoxLayout>(*w);
+	bmCb = make_qt_unique<QCheckBox>(*this);
 	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
 	connect(bmCb, &QCheckBox::stateChanged,
 	        [this]() {
@@ -54,38 +54,38 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 		            = !this->bmCb->isChecked();
 	        });
 	hl->QLayout::addWidget(bmCb);
-	l = new QLabel(this);
+	l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Realistic luminosities"));
 	hl->addWidget(l);
 
-	w = new QWidget(this);
+	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl    = new QHBoxLayout(w);
-	prkCb = new QCheckBox(this);
+	hl    = make_qt_unique<QHBoxLayout>(*w);
+	prkCb = make_qt_unique<QCheckBox>(*this);
 	prkCb->setChecked(tmm.purkinje);
 	connect(prkCb, &QCheckBox::stateChanged,
 	        [this]() { this->tmm.purkinje = this->prkCb->isChecked(); });
 	hl->QLayout::addWidget(prkCb);
-	l = new QLabel(this);
+	l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Purkinje Effect"));
 	hl->addWidget(l);
 
-	w = new QWidget(this);
+	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl            = new QHBoxLayout(w);
-	exposureLabel = new QLabel(this);
+	hl            = make_qt_unique<QHBoxLayout>(*w);
+	exposureLabel = make_qt_unique<QLabel>(*this);
 	exposureLabel->setText(tr("Exposure :"));
 	hl->addWidget(exposureLabel);
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("-"));
 	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure /= 1.5f; });
 	hl->addWidget(b);
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("+"));
 	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure *= 1.5f; });
 	hl->addWidget(b);
 
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Reset"));
 	connect(b, &QPushButton::pressed,
 	        [this]()

@@ -29,9 +29,9 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 	setFixedSize(300, 900);
 	setWindowTitle(tr("Orbital Systems List"));
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto label = new QLabel(this);
+	auto label = make_qt_unique<QLabel>(*this);
 	label->setText(tr("Solar System"));
 	layout->addWidget(label);
 
@@ -43,7 +43,7 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 
 	auto const& sun
 	    = universe.planetSystems->getSystem("Solar System")->getRootOrbitable();
-	auto item = new QTreeWidgetItem(&solarSystemTree);
+	auto item = qt_owned<QTreeWidgetItem>(&solarSystemTree);
 	item->setText(0, sun.getName().c_str());
 	for(auto childOrb : sun.getChildren())
 	{
@@ -52,23 +52,23 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 	}
 	item->setExpanded(true);
 
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
 	        [this]()
 	        { selectOrbitableSolSys(solarSystemTree.currentItem(), 0); });
 
 	layout->addWidget(b);
-	label = new QLabel(this);
+	label = make_qt_unique<QLabel>(*this);
 	label->setText(tr("Exoplanetary Systems"));
 	layout->addWidget(label);
 
-	auto w            = new QWidget(this);
-	auto layoutSearch = new QHBoxLayout(w);
+	auto w            = make_qt_unique<QWidget>(*this);
+	auto layoutSearch = make_qt_unique<QHBoxLayout>(*w);
 
-	auto searchLabel = new QLabel(w);
+	auto searchLabel = make_qt_unique<QLabel>(*w);
 	searchLabel->setText(tr("Search :"));
-	auto searchBar = new QLineEdit(w);
+	auto searchBar = make_qt_unique<QLineEdit>(*w);
 	connect(searchBar, &QLineEdit::textChanged, this,
 	        &PlanetarySystemSelector::setVisibleItems);
 	layoutSearch->addWidget(searchLabel);
@@ -87,14 +87,14 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 		{
 			continue;
 		}
-		auto item = new QTreeWidgetItem(&fullTree);
+		auto item = qt_owned<QTreeWidgetItem>(&fullTree);
 		item->setText(0, sysName);
 		item->addChild(constructItems(
 		    universe.planetSystems->getSystem(sysName)->getRootOrbitable(),
 		    item, fullTree, universe));
 		topLevelItems.push_back(item);
 	}
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectOrbitableFull(fullTree.currentItem(), 0); });
@@ -123,14 +123,23 @@ QTreeWidgetItem* PlanetarySystemSelector::constructItems(
     Orbitable const& orbitable, QTreeWidgetItem* parent, QTreeWidget& tree,
     Universe const& universe)
 {
+	if(orbitable.getOrbitableType() == Orbitable::Type::BINARY)
+	{
+		for(auto child : orbitable.getChildren())
+		{
+			parent->addChild(constructItems(*child, parent, tree, universe));
+		}
+		return parent;
+	}
+
 	QTreeWidgetItem* item;
 	if(parent == nullptr)
 	{
-		item = new QTreeWidgetItem(&tree);
+		item = qt_owned<QTreeWidgetItem>(&tree);
 	}
 	else
 	{
-		item = new QTreeWidgetItem(parent);
+		item = qt_owned<QTreeWidgetItem>(parent);
 	}
 
 	if(orbitable.getOrbitableType() == Orbitable::Type::SPACECRAFT)
@@ -167,15 +176,6 @@ QTreeWidgetItem* PlanetarySystemSelector::constructItems(
 			                 + "\" doesn't have an orbit"
 			          << std::endl;
 		}
-	}
-	else if(orbitable.getOrbitableType() == Orbitable::Type::BINARY)
-	{
-		delete item;
-		for(auto child : orbitable.getChildren())
-		{
-			parent->addChild(constructItems(*child, parent, tree, universe));
-		}
-		return parent;
 	}
 	else
 	{

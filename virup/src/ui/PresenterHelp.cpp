@@ -30,15 +30,15 @@ PresenterHelp::PresenterHelp(MainWin& mainwin)
 	setWindowTitle(tr("Presenter Help"));
 	setFixedSize(300, 100);
 
-	auto mainLayout = new QVBoxLayout(this);
+	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Refresh Fullscreen"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { this->mainwin.refreshFullscreen(); });
 	mainLayout->addWidget(b);
 
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Quit"));
 	connect(b, &QPushButton::pressed, [this]() { this->mainwin.close(); });
 	mainLayout->addWidget(b);

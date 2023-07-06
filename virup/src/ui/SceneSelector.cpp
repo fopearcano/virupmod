@@ -27,25 +27,25 @@ SceneSelector::SceneSelector(Animator& animator)
 	setWindowTitle(tr("VIRUP Scenes"));
 	setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = new QWidget(this);
+	auto w = make_qt_unique<QWidget>(*this);
 	layout->addWidget(w);
-	auto hl = new QHBoxLayout(w);
+	auto hl = make_qt_unique<QHBoxLayout>(*w);
 
-	auto b = new QPushButton(w);
+	auto b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("RESTART"));
 	connect(b, &QPushButton::clicked, this,
 	        [&animator]() { animator.restart(); });
 	hl->addWidget(b);
 
-	b = new QPushButton(w);
+	b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("PAUSE"));
 	connect(b, &QPushButton::clicked, this,
 	        [&animator]() { animator.pause(); });
 	hl->addWidget(b);
 
-	b = new QPushButton(w);
+	b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("RESUME"));
 	connect(b, &QPushButton::clicked, this, [&animator]() { animator.play(); });
 	connect(&animator, &Animator::paused, this,
@@ -56,27 +56,27 @@ SceneSelector::SceneSelector(Animator& animator)
 	        [b]() { b->setDisabled(true); });
 	hl->addWidget(b);
 
-	b = new QPushButton(w);
+	b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("STOP"));
 	connect(b, &QPushButton::clicked, this, [&animator]() { animator.stop(); });
 	hl->addWidget(b);
 
-	hl->addWidget(new QLabel(tr("EN (on) / JP (off) : ")));
+	hl->addWidget(make_qt_unique<QLabel>(*this, tr("EN (on) / JP (off) : ")));
 
-	auto cb = new QCheckBox(this);
+	auto cb = make_qt_unique<QCheckBox>(*this);
 	cb->setCheckState(Qt::Checked);
 	connect(cb, &QCheckBox::stateChanged,
 	        [this](int state) { english = state != Qt::Unchecked; });
 	hl->addWidget(cb);
 
-	b = new QPushButton(w);
+	b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("Stop Voiceover"));
 	connect(b, &QPushButton::clicked, this,
 	        [&animator]() { animator.stopVoiceover(); });
 	hl->addWidget(b);
 
-	hl->addWidget(new QLabel(tr("User height : ")));
-	auto sb = new QDoubleSpinBox(this);
+	hl->addWidget(make_qt_unique<QLabel>(*this, tr("User height : ")));
+	auto sb = make_qt_unique<QDoubleSpinBox>(*this);
 	sb->setValue(animator.getPersonHeight());
 	connect(sb,
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
@@ -100,18 +100,18 @@ SceneSelector::SceneSelector(Animator& animator)
 	        { animator.setWholeAnimationPercentage(value / 10.f); });
 	layout->addWidget(&animationTimeSlider);
 
-	layout->addWidget(new QLabel("Scenes :"));
+	layout->addWidget(make_qt_unique<QLabel>(*this, "Scenes :"));
 
-	auto buttonsWidget = new QWidget(this);
+	auto buttonsWidget = make_qt_unique<QWidget>(*this);
 	layout->addWidget(buttonsWidget);
 	buttonsWidget->setLayout(&buttonsLayout);
 	connect(&animator, &Animator::transitionsModified, this,
 	        &SceneSelector::updateButtons);
 
-	// layout->addWidget(new QLabel("Options :"));
-	transitionsButton
-	    = new QPushButton("Toggle transitions (only if user is sick, can "
-	                      "introduce problems !)");
+	// layout->addWidget(make_qt_unique<QLabel>(*this, "Options :"));
+	transitionsButton = make_qt_unique<QPushButton>(
+	    *this,
+	    "Toggle transitions (only if user is sick, can introduce problems !)");
 	connect(transitionsButton, &QPushButton::clicked, this,
 	        [&animator]() { animator.toggleAnimations(); });
 	transitionsButton->setFocusPolicy(Qt::NoFocus);
@@ -129,7 +129,7 @@ void SceneSelector::update()
 	int id(animator.getCurrentTransitionId());
 	QString currentScene
 	    = id < 0 ? "" : animator.getTransitions()[id].getName();
-	for(auto button : buttons)
+	for(auto& button : buttons)
 	{
 		QPalette pal = button->palette();
 		if(button->text() == currentScene)
@@ -164,11 +164,7 @@ void SceneSelector::update()
 
 void SceneSelector::updateButtons()
 {
-	for(auto button : buttons)
-	{
-		delete button;
-		buttons.clear();
-	}
+	buttons.clear();
 
 	auto const& transitions(animator.getTransitions());
 	for(unsigned int i(0); i < transitions.size(); ++i)
@@ -177,11 +173,12 @@ void SceneSelector::updateButtons()
 		{
 			continue;
 		}
-		auto button = new QPushButton(transitions[i].getName());
-		connect(button, &QPushButton::clicked, this,
+		buttons.emplace_back(
+		    std::make_unique<QPushButton>(transitions[i].getName(), this));
+		auto& button = buttons.back();
+		connect(button.get(), &QPushButton::clicked, this,
 		        [this, i]() { animator.setTransition(i); });
 		button->setFocusPolicy(Qt::NoFocus);
-		buttonsLayout.addWidget(button);
-		buttons.push_back(button);
+		buttonsLayout.addWidget(button.get());
 	}
 }
