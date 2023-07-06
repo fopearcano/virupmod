@@ -47,11 +47,11 @@ class TreeMethodLOD : public Method
 	bool silent = false;
 
   protected:
-	VolumetricModel* dustModel = nullptr;
+	std::unique_ptr<VolumetricModel> dustModel;
 	std::vector<OctreeLOD> gasTrees;
 	std::vector<OctreeLOD> starsTrees;
 	std::vector<OctreeLOD> darkMatterTrees;
-	VolumetricModel* hiiModel = nullptr;
+	std::unique_ptr<VolumetricModel> hiiModel;
 
 	// ugly fix for pointSize problems
 	bool setPointSize = true;
@@ -61,7 +61,8 @@ class TreeMethodLOD : public Method
 	                               std::string const& name,
 	                               GLShaderProgram const& shaderProgram,
 	                               bool silent);
-	static void initOctree(OctreeLOD* octree, std::istream* in);
+	static void initOctree(OctreeLOD* octree,
+	                       std::shared_ptr<std::istream> const& in);
 	void setShaderColor(QColor const& color);
 };
 

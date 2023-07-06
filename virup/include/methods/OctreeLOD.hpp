@@ -21,6 +21,7 @@ class OctreeLOD : public Octree
 {
   public:
 	OctreeLOD(GLShaderProgram const& shaderProgram);
+	OctreeLOD(OctreeLOD&&) = default;
 	bool isReady() const;
 	unsigned int getLevel() const { return lvl; };
 	virtual void init(std::vector<float>& data,
@@ -33,8 +34,8 @@ class OctreeLOD : public Octree
 	virtual std::vector<float> getOwnData() const override;
 	void unload();
 	void waitOnAsyncLoader();
-	void setFile(std::istream* file);
-	std::istream* getFile() { return file; };
+	void setFile(std::shared_ptr<std::istream> const& file);
+	std::istream* getFile() { return file.get(); };
 	bool preloadLevel(unsigned int lvlToLoad);
 	void update(Camera const& camera, QMatrix4x4 const& globalModel,
 	            QVector3D const& globalCampos, float alpha);
@@ -81,14 +82,14 @@ class OctreeLOD : public Octree
 	                        float compensatedAlpha,
 	                        QMatrix4x4 const& localDustModel);
 
-	GLMesh* mesh = nullptr;
+	std::unique_ptr<GLMesh> mesh;
 	GLShaderProgram const* shaderProgram;
 
   private:
 	unsigned int lvl = 0;
 	BBox bbox;
 
-	std::istream* file    = nullptr;
+	std::shared_ptr<std::istream> file;
 	bool isLoaded         = false;
 	unsigned int dataSize = 0;
 	// total used memory across all instances

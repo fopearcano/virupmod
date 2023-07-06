@@ -196,8 +196,7 @@ void OctreeLOD::unload()
 	{
 		usedMem() -= dataSize * sizeof(float);
 		dataSize = 0;
-		delete mesh;
-		mesh = nullptr;
+		mesh.reset();
 		for(Octree* oct : children)
 		{
 			if(oct != nullptr)
@@ -226,7 +225,7 @@ void OctreeLOD::waitOnAsyncLoader()
 	}
 }
 
-void OctreeLOD::setFile(std::istream* file)
+void OctreeLOD::setFile(std::shared_ptr<std::istream> const& file)
 {
 	this->file = file;
 	for(Octree* oct : children)
@@ -596,7 +595,7 @@ float OctreeLOD::currentTanAngle(QVector3D const& campos) const
 
 void OctreeLOD::ramToVideo()
 {
-	mesh                                                  = new GLMesh;
+	mesh = std::make_unique<GLMesh>();
 	std::vector<QPair<const char*, unsigned int>> mapping = {{"position", 3}};
 	std::vector<QPair<const char*, std::vector<float>>> unused;
 	if((getFlags() & Flags::STORE_RADIUS) != Flags::NONE)

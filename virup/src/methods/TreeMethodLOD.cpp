@@ -52,7 +52,7 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		}
 		else
 		{
-			dustModel = new VolumetricModel(gasPath.c_str());
+			dustModel = std::make_unique<VolumetricModel>(gasPath.c_str());
 		}
 	}
 	if(!starsPath.empty() && starsTrees.empty())
@@ -70,7 +70,8 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		}
 		else
 		{
-			hiiModel = new VolumetricModel(darkMatterPath.c_str());
+			hiiModel
+			    = std::make_unique<VolumetricModel>(darkMatterPath.c_str());
 			hiiModel->initMesh();
 			hiiModel->setColor(darkMatterColor);
 		}
@@ -217,7 +218,7 @@ void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
 	}
 	if(hiiModel != nullptr)
 	{
-		hiiModel->render(camera, model, campos, dustModel);
+		hiiModel->render(camera, model, campos, dustModel.get());
 	}
 }
 
@@ -283,7 +284,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	GLHandler::endTransparent();
 	if(hiiModel != nullptr)
 	{
-		hiiModel->render(camera, model, campos, dustModel);
+		hiiModel->render(camera, model, campos, dustModel.get());
 	}
 }
 
@@ -326,35 +327,21 @@ void TreeMethodLOD::unload()
 
 void TreeMethodLOD::cleanUp()
 {
-	delete dustModel;
-	dustModel = nullptr;
-	delete hiiModel;
-	hiiModel = nullptr;
+	dustModel.reset();
+	hiiModel.reset();
 	for(auto& gasTree : gasTrees)
 	{
 		gasTree.waitOnAsyncLoader();
-		if(gasTree.getFile() != nullptr)
-		{
-			delete gasTree.getFile();
-		}
 	}
 	gasTrees.clear();
 	for(auto& starsTree : starsTrees)
 	{
 		starsTree.waitOnAsyncLoader();
-		if(starsTree.getFile() != nullptr)
-		{
-			delete starsTree.getFile();
-		}
 	}
 	starsTrees.clear();
 	for(auto& darkMatterTree : darkMatterTrees)
 	{
 		darkMatterTree.waitOnAsyncLoader();
-		if(darkMatterTree.getFile() != nullptr)
-		{
-			delete darkMatterTree.getFile();
-		}
 	}
 	darkMatterTrees.clear();
 }
@@ -369,7 +356,7 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	{
 		qDebug() << "Loading " + QString(name.c_str()) + " octree...";
 	}
-	auto file = new std::ifstream();
+	auto file = std::make_shared<std::ifstream>();
 	file->open(path, std::fstream::in | std::fstream::binary);
 
 	container.emplace_back(shaderProgram);
@@ -382,10 +369,10 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	file->seekg(cursor);
 	size *= -1;
 
-	QProgressDialog* progress(nullptr);
+	std::unique_ptr<QProgressDialog> progress;
 	if(!silent)
 	{
-		progress = new QProgressDialog(
+		progress = std::make_unique<QProgressDialog>(
 		    tr("Loading %1 tree structure").arg(name.c_str()), QString(), 0,
 		    size);
 		progress->setMinimumDuration(0);
@@ -435,13 +422,10 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	{
 		qDebug() << QString(name.c_str()) + " loaded...";
 	}
-	if(!silent)
-	{
-		delete progress;
-	}
 }
 
-void TreeMethodLOD::initOctree(OctreeLOD* octree, std::istream* in)
+void TreeMethodLOD::initOctree(OctreeLOD* octree,
+                               std::shared_ptr<std::istream> const& in)
 {
 	octree->init(*in);
 }
