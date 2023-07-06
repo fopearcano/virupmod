@@ -18,26 +18,29 @@
 
 #include "gui/ShaderSelector.hpp"
 
-ShaderSelector::ShaderSelector()
+#include "memory.hpp"
+
+ShaderSelector::ShaderSelector(QWidget* parent)
+    : QDialog(parent)
 {
 	setFixedSize(450, 600);
 	setWindowTitle(tr("Shader Selector"));
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w            = new QWidget(this);
-	auto layoutSearch = new QHBoxLayout(w);
+	auto w            = make_qt_unique<QWidget>(*this);
+	auto layoutSearch = make_qt_unique<QHBoxLayout>(*w);
 
-	auto searchLabel = new QLabel(w);
+	auto searchLabel = make_qt_unique<QLabel>(*w);
 	searchLabel->setText(tr("Search :"));
-	auto searchBar = new QLineEdit(w);
+	auto searchBar = make_qt_unique<QLineEdit>(*w);
 	connect(searchBar, &QLineEdit::textChanged, this,
 	        &ShaderSelector::setVisibleItems);
 	layoutSearch->addWidget(searchLabel);
 	layoutSearch->addWidget(searchBar);
 	layout->addWidget(w);
 
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Refresh"));
 	connect(b, &QPushButton::pressed, [this]() { setVisible(true); });
 	layout->addWidget(b);
@@ -46,7 +49,7 @@ ShaderSelector::ShaderSelector()
 	        &ShaderSelector::selectElement);
 	layout->addWidget(&listWidget);
 
-	b = new QPushButton(this);
+	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Edit"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectElement(listWidget.currentItem()); });
@@ -61,15 +64,19 @@ void ShaderSelector::setVisible(bool visible)
 		for(auto shader : ShaderProgram::getAllShaderPrograms())
 		{
 			QString glID(shader->toStr());
-			QString vert(shader->getVertexShaderPath().split('/').last());
-			QString frag(shader->getFragmentShaderPath().split('/').last());
+			QString pipelineStr;
+			for(auto const& p : shader->getPipeline())
+			{
+				pipelineStr += p.first.split('/').last() + '/';
+			}
+			pipelineStr.chop(1);
 			QString defines;
 			for(auto const& d : shader->getDefines().keys())
 			{
 				defines += d + '(' + shader->getDefines()[d] + "), ";
 			}
-			auto item = new QListWidgetItem(glID + " - " + vert + '/' + frag
-			                                + " - " + defines);
+			auto item = new QListWidgetItem(glID + " - " + pipelineStr + " - "
+			                                + defines);
 			item->setData(Qt::UserRole, glID);
 			listWidget.addItem(item);
 		}
@@ -94,7 +101,7 @@ void ShaderSelector::selectElement(QListWidgetItem* item)
 		return;
 	}
 
-	auto editor = new ShaderEditor(*sp, this);
+	auto editor = make_qt_unique<ShaderEditor>(*this, *sp);
 	editor->show();
 }
 

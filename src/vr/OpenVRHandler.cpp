@@ -18,15 +18,15 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 	pgrep.waitForReadyRead();
 	if(pgrep.readAllStandardOutput().isEmpty())
 	{
-		char rtPath[1024];
+		std::array<char, 1024> rtPath{};
 		uint32_t unRequiredSize;
-		if(vr::VR_GetRuntimePath(rtPath, sizeof(rtPath), &unRequiredSize)
+		if(vr::VR_GetRuntimePath(rtPath.data(), rtPath.size(), &unRequiredSize)
 		   && unRequiredSize < sizeof(rtPath))
 		{
 			qDebug() << "Starting SteamVR...";
-			qDebug() << QString("Runtime path : ") + rtPath;
+			qDebug() << QString("Runtime path : ") + rtPath.data();
 			QProcess vrstartup;
-			cmd = QString(rtPath);
+			cmd = QString(rtPath.data());
 			if(cmd.at(cmd.length() - 1) != '/')
 			{
 				cmd += '/';
@@ -71,8 +71,9 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 	}
 
 	currentTargetSize = getEyeRenderTargetSize();
-	submitFBO         = new GLFramebufferObject(GLTexture::Tex2DProperties(
-	            currentTargetSize.width(), currentTargetSize.height(), GL_RGB8));
+	submitFBO
+	    = std::make_unique<GLFramebufferObject>(GLTexture::Tex2DProperties(
+	        currentTargetSize.width(), currentTargetSize.height(), GL_RGB8));
 	submitFBO->bind();
 
 #ifdef LEAP_MOTION
@@ -86,11 +87,11 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 	}
 #endif
 
-	leftHand  = new Hand(Side::LEFT);
-	rightHand = new Hand(Side::RIGHT);
+	leftHand  = std::make_unique<Hand>(Side::LEFT);
+	rightHand = std::make_unique<Hand>(Side::RIGHT);
 
-	PythonQtHandler::addObject("leftHand", leftHand);
-	PythonQtHandler::addObject("leftHand", rightHand);
+	PythonQtHandler::addObject("leftHand", leftHand.get());
+	PythonQtHandler::addObject("leftHand", rightHand.get());
 
 	return true;
 }
@@ -117,9 +118,9 @@ const Controller* OpenVRHandler::getController(Side side) const
 	switch(side)
 	{
 		case Side::LEFT:
-			return leftController;
+			return leftController.get();
 		case Side::RIGHT:
-			return rightController;
+			return rightController.get();
 		default:
 			return nullptr;
 	}
@@ -132,13 +133,13 @@ const Hand* OpenVRHandler::getHand(Side side) const
 		case Side::LEFT:
 			if(leftHand != nullptr)
 			{
-				return leftHand->isValid() ? leftHand : nullptr;
+				return leftHand->isValid() ? leftHand.get() : nullptr;
 			}
 			break;
 		case Side::RIGHT:
 			if(rightHand != nullptr)
 			{
-				return rightHand->isValid() ? rightHand : nullptr;
+				return rightHand->isValid() ? rightHand.get() : nullptr;
 			}
 			break;
 		default:
@@ -231,9 +232,9 @@ void OpenVRHandler::prepareRendering(Side eye)
 	if(currentTargetSize != getEyeRenderTargetSize())
 	{
 		currentTargetSize = getEyeRenderTargetSize();
-		delete submitFBO;
-		submitFBO = new GLFramebufferObject(GLTexture::Tex2DProperties(
-		    currentTargetSize.width(), currentTargetSize.height(), GL_RGB8));
+		submitFBO         = std::make_unique<GLFramebufferObject>(
+            GLTexture::Tex2DProperties(currentTargetSize.width(),
+		                                       currentTargetSize.height(), GL_RGB8));
 		submitFBO->bind();
 		emit renderTargetSizeChanged(currentTargetSize);
 	}
@@ -414,12 +415,11 @@ void OpenVRHandler::close()
 	GLHandler::glf().glDisable(GL_STENCIL_TEST);
 	updateController(Side::LEFT, -1);
 	updateController(Side::RIGHT, -1);
-	delete leftHand;
-	delete rightHand;
+	leftHand.reset();
+	rightHand.reset();
 	PythonQtHandler::addObject("leftHand", nullptr);
 	PythonQtHandler::addObject("leftHand", nullptr);
-	delete submitFBO;
-	submitFBO = nullptr;
+	submitFBO.reset();
 	qDebug() << "Closing VR runtime...";
 	vr::VR_Shutdown();
 	vr_pointer = nullptr;
@@ -448,40 +448,33 @@ void OpenVRHandler::resetPos()
 
 void OpenVRHandler::updateController(Side side, int nDevice)
 {
-	Controller** controller;
-	if(side == Side::LEFT)
-	{
-		controller = &leftController;
-	}
-	else if(side == Side::RIGHT)
-	{
-		controller = &rightController;
-	}
-	else
+	if(side != Side::LEFT && side != Side::RIGHT)
 	{
 		return;
 	}
 
-	if(*controller != nullptr && nDevice == -1)
+	std::unique_ptr<Controller>& controller(
+	    side == Side::LEFT ? leftController : rightController);
+
+	if(controller != nullptr && nDevice == -1)
 	{
 		qDebug() << QString("Disconnecting ") + sideToStr(side)
 		                + " controller...";
-		delete *controller;
-		*controller = nullptr;
+		controller.reset();
 	}
-	else if(*controller == nullptr && nDevice != -1)
+	else if(controller == nullptr && nDevice != -1)
 	{
 		qDebug() << QString("Connecting ") + sideToStr(side) + " controller...";
-		*controller = new Controller(vr_pointer, nDevice, side);
+		controller = std::make_unique<Controller>(vr_pointer, nDevice, side);
 	}
-	else if(*controller != nullptr)
+	else if(controller != nullptr)
 	{
-		(*controller)->update(tracked_device_pose_matrix.at(nDevice), nDevice);
+		controller->update(tracked_device_pose_matrix.at(nDevice), nDevice);
 	}
 	PythonQtHandler::addObject(
 	    ((side == Side::LEFT) ? QString("left") : QString("right"))
 	        + "Controller",
-	    *controller);
+	    controller.get());
 }
 
 void OpenVRHandler::updateHands()

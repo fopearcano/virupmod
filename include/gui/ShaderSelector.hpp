@@ -32,7 +32,7 @@ class ShaderSelector : public QDialog
 {
 	Q_OBJECT
   public:
-	ShaderSelector();
+	ShaderSelector(QWidget* parent = nullptr);
   public slots:
 	virtual void setVisible(bool visible) override;
 

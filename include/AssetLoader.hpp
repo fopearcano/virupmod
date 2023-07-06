@@ -56,44 +56,41 @@ class AssetLoader
 
 	struct TexturedMesh
 	{
-		GLMesh* mesh;
-		std::map<TextureType, GLTexture*> textures; // a.k.a. material
+		GLMesh mesh;
+		std::map<TextureType, GLTexture> textures; // a.k.a. material
 		QMatrix4x4 transform;
 	};
 
-	// returns model bounding sphere radius
-	static float loadFile(QString modelName,
-	                      std::vector<MeshDescriptor>& meshDescriptors);
+	// returns model bounding sphere radius and meshdescriptors
+	static std::pair<float, std::vector<MeshDescriptor>>
+	    loadFile(QString modelName);
 
-	// GLHandler resources in textured meshes are yours to free !
-	static void loadModel(std::vector<MeshDescriptor> const& meshDescriptors,
-	                      std::vector<TexturedMesh>& meshes,
-	                      GLShaderProgram const& shader,
-	                      QColor const& defaultDiffuseColor
-	                      = {0xff, 0x09, 0xf7});
-
-	// GLHandler resources in textured meshes are yours to free !
-	static float
-	    loadModel(QString const& modelName, std::vector<TexturedMesh>& meshes,
+	static std::vector<TexturedMesh>
+	    loadModel(std::vector<MeshDescriptor> const& meshDescriptors,
 	              GLShaderProgram const& shader,
+	              QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
+
+	static std::pair<float, std::vector<TexturedMesh>>
+	    loadModel(QString const& modelName, GLShaderProgram const& shader,
 	              QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
 
   private:
 	static std::string findFilePath(std::string const& directory,
 	                                std::string const& fileName);
 
-	static QColor getDefaultColor(TextureType ttype, QColor diffuseColor);
+	static QColor getDefaultColor(TextureType ttype,
+	                              QColor const& diffuseColor);
 
 	static std::vector<aiTextureType> const& assimpTextureTypes();
 
-	static QMatrix4x4 assimpToQt(aiMatrix4x4 m);
+	static QMatrix4x4 assimpToQt(aiMatrix4x4 const& m);
 
 	// both return bounding sphere radius
-	static float parseNode(aiNode const* node, aiScene const* scene,
+	static float parseNode(aiNode const& node, aiScene const& scene,
 	                       std::string const& directory,
 	                       QMatrix4x4 const& transform,
 	                       std::vector<MeshDescriptor>& meshDescriptors);
-	static float parseMesh(aiMesh const* mesh, aiScene const* scene,
+	static float parseMesh(aiMesh const& mesh, aiScene const& scene,
 	                       std::string const& directory,
 	                       QMatrix4x4 const& transform, MeshDescriptor& result);
 };

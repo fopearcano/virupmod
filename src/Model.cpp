@@ -21,8 +21,9 @@
 Model::Model(QString const& modelName, QColor const& defaultDiffuseColor)
     : shader("model", setUpShaderDefines())
 {
-	boundingSphereRadius = AssetLoader::loadModel(modelName, meshes, shader,
-	                                              defaultDiffuseColor);
+	auto pair = AssetLoader::loadModel(modelName, shader, defaultDiffuseColor);
+	boundingSphereRadius = pair.first;
+	meshes               = std::move(pair.second);
 
 	shader.setUniform("diffuse", 0);
 	shader.setUniform("specular", 1);
@@ -39,8 +40,10 @@ Model::Model(QString const& modelName, GLShaderProgram&& shader,
              QColor const& defaultDiffuseColor)
     : shader(std::move(shader))
 {
-	boundingSphereRadius = AssetLoader::loadModel(
-	    modelName, meshes, this->shader, defaultDiffuseColor);
+	auto pair
+	    = AssetLoader::loadModel(modelName, this->shader, defaultDiffuseColor);
+	boundingSphereRadius = pair.first;
+	meshes               = std::move(pair.second);
 
 	this->shader.setUniform("diffuse", 0);
 	this->shader.setUniform("specular", 1);
@@ -59,7 +62,7 @@ void Model::generateShadowMap(QMatrix4x4 const& model, Light& light)
 	std::vector<QMatrix4x4> models;
 	for(auto const& mesh : meshes)
 	{
-		glMeshes.push_back(mesh.mesh);
+		glMeshes.emplace_back(&mesh.mesh);
 		models.push_back(mesh.transform);
 	}
 	light.generateShadowMap(glMeshes, boundingSphereRadius, models, model);
@@ -74,22 +77,23 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 	for(auto& mesh : meshes)
 	{
 		std::vector<GLTexture const*> texs(
-		    {mesh.textures[AssetLoader::TextureType::DIFFUSE],
-		     mesh.textures[AssetLoader::TextureType::SPECULAR],
-		     mesh.textures[AssetLoader::TextureType::AMBIENT],
-		     mesh.textures[AssetLoader::TextureType::EMISSIVE],
-		     mesh.textures[AssetLoader::TextureType::NORMALS],
-		     mesh.textures[AssetLoader::TextureType::SHININESS],
-		     mesh.textures[AssetLoader::TextureType::OPACITY],
-		     mesh.textures[AssetLoader::TextureType::LIGHTMAP]});
+		    {&mesh.textures.at(AssetLoader::TextureType::DIFFUSE),
+		     &mesh.textures.at(AssetLoader::TextureType::SPECULAR),
+		     &mesh.textures.at(AssetLoader::TextureType::AMBIENT),
+		     &mesh.textures.at(AssetLoader::TextureType::EMISSIVE),
+		     &mesh.textures.at(AssetLoader::TextureType::NORMALS),
+		     &mesh.textures.at(AssetLoader::TextureType::SHININESS),
+		     &mesh.textures.at(AssetLoader::TextureType::OPACITY),
+		     &mesh.textures.at(AssetLoader::TextureType::LIGHTMAP)});
 		for(auto sMap : shadowMaps)
 		{
 			texs.push_back(sMap);
 		}
+		GLHandler::glf().glEnable(GL_DEPTH_TEST);
 		GLHandler::useTextures(texs);
 		shader.setUniform("localTransform", mesh.transform);
 		GLHandler::setUpRender(shader, model * mesh.transform, geometricSpace);
-		mesh.mesh->render();
+		mesh.mesh.render();
 	}
 }
 
@@ -98,18 +102,6 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 {
 	light.setUpShader(shader, boundingSphereRadius, model);
 	render(cameraPosition, model, {&light.getShadowMap()}, geometricSpace);
-}
-
-Model::~Model()
-{
-	for(auto const& mesh : meshes)
-	{
-		delete mesh.mesh;
-		for(auto pair : mesh.textures)
-		{
-			delete pair.second;
-		}
-	}
 }
 
 QMap<QString, QString> Model::setUpShaderDefines()

@@ -102,13 +102,13 @@ CalibrationCompass::CalibrationCompass()
 	// precompute billboards textures
 	for(unsigned int i(0); i < 100; ++i)
 	{
-		billboards.push_back(new Text3D(256, 256));
-		billboards[i]->setText(QString::number(i));
-		billboards[i]->setColor(QColor(255, 0, 0));
-		auto font(billboards[i]->getFont());
+		billboards.emplace_back(256, 256);
+		billboards[i].setText(QString::number(i));
+		billboards[i].setColor(QColor(255, 0, 0));
+		auto font(billboards[i].getFont());
 		font.setPixelSize(128);
-		billboards[i]->setFont(font);
-		billboards[i]->setFlags(Qt::AlignCenter);
+		billboards[i].setFont(font);
+		billboards[i].setFlags(Qt::AlignCenter);
 	}
 }
 
@@ -173,10 +173,10 @@ void CalibrationCompass::renderCompassTicks(QMatrix4x4 const& angleShiftMat,
 			model.translate(xTop, yTop + 0.04, zTop);
 			model.scale(0.1);
 			model.rotate(i, QVector3D(0.f, -1.f, 0.f));
-			billboards[j]->getModel() = angleShiftMat * model;
-			billboards[j]->getShader().setUniform("exposure", exposure);
-			billboards[j]->getShader().setUniform("dynamicrange", dynamicrange);
-			billboards[j]->render(GLHandler::GeometricSpace::EYE);
+			billboards[j].getModel() = angleShiftMat * model;
+			billboards[j].getShader().setUniform("exposure", exposure);
+			billboards[j].getShader().setUniform("dynamicrange", dynamicrange);
+			billboards[j].render(GLHandler::GeometricSpace::EYE);
 		}
 		++j;
 	}
@@ -186,12 +186,4 @@ void CalibrationCompass::renderCompassTicks(QMatrix4x4 const& angleShiftMat,
 	GLHandler::setUpRender(shader, angleShiftMat,
 	                       GLHandler::GeometricSpace::EYE);
 	mesh.render(PrimitiveType::LINES);
-}
-
-CalibrationCompass::~CalibrationCompass()
-{
-	for(auto* text : billboards)
-	{
-		delete text;
-	}
 }

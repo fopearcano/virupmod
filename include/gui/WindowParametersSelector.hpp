@@ -32,9 +32,9 @@ class WindowParametersSelector : public QWidget
 {
 	Q_OBJECT
   public:
-	WindowParametersSelector(QWidget* parent = nullptr,
-	                         RenderingWindow::Parameters const& initialValue
-	                         = {});
+	WindowParametersSelector(QWidget* parent = nullptr);
+	WindowParametersSelector(RenderingWindow::Parameters const& initialValue,
+	                         QWidget* parent = nullptr);
 
   signals:
 	void parametersChanged(RenderingWindow::Parameters params);

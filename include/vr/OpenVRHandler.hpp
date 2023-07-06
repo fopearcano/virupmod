@@ -61,17 +61,17 @@ class OpenVRHandler : public VRHandler
 	    tracked_device_pose_matrix;
 	vr::IVRRenderModels* vr_render_models;
 
-	Controller* leftController  = nullptr;
-	Controller* rightController = nullptr;
+	std::unique_ptr<Controller> leftController  = nullptr;
+	std::unique_ptr<Controller> rightController = nullptr;
 
 #ifdef LEAP_MOTION
 	Leap::Controller leapController;
 #endif
-	Hand* leftHand  = nullptr;
-	Hand* rightHand = nullptr;
+	std::unique_ptr<Hand> leftHand;
+	std::unique_ptr<Hand> rightHand;
 
 	QSize currentTargetSize;
-	GLFramebufferObject* submitFBO = nullptr;
+	std::unique_ptr<GLFramebufferObject> submitFBO;
 
 	void updateController(Side side, int nDevice);
 	void updateHands();

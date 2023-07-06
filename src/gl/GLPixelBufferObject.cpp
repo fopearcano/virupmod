@@ -26,25 +26,53 @@ unsigned int& GLPixelBufferObject::instancesCount()
 	return instancesCount;
 }
 
+GLPixelBufferObject::GLPixelBufferObject(GLPixelBufferObject&& other) noexcept
+    : buff(std::move(other.buff))
+    , size(other.size)
+    , mappedData(other.mappedData)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning shader if it destroys itself
+	other.doClean = false;
+}
+
+GLPixelBufferObject&
+    GLPixelBufferObject::operator=(GLPixelBufferObject&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	buff       = std::move(other.buff);
+	size       = other.size;
+	mappedData = other.mappedData;
+	doClean    = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLPixelBufferObject::GLPixelBufferObject(QSize const& size)
-    : size(size)
+    : buff(GL_PIXEL_UNPACK_BUFFER, size.width() * size.height() * 4,
+           GL_STREAM_DRAW)
+    , size(size)
 {
 	++instancesCount();
 
-	buff       = new GLBuffer(GL_PIXEL_UNPACK_BUFFER,
-	                          size.width() * size.height() * 4, GL_STREAM_DRAW);
-	mappedData = static_cast<unsigned char*>(buff->map(GL_WRITE_ONLY));
-	buff->unbind();
+	mappedData = static_cast<unsigned char*>(buff.map(GL_WRITE_ONLY));
+	buff.unbind();
 }
 
-GLTexture* GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
+std::unique_ptr<GLTexture>
+    GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
 {
-	buff->unmap();
-	buff->bind(); // be sure it is bound before the call to glTexImage2D
-	// NOLINTNEXTLINE(hicpp-use-nullptr, modernize-use-nullptr)
-	auto result = new GLTexture(
+	buff.unmap();
+	buff.bind(); // be sure it is bound before the call to glTexImage2D
+	std::unique_ptr<GLTexture> result = std::make_unique<GLTexture>(
 	    GLTexture::Tex2DProperties(size.width(), size.height(), sRGB));
-	buff->unbind();
+	buff.unbind();
 
 	return result;
 }
@@ -56,7 +84,6 @@ void GLPixelBufferObject::cleanUp()
 		return;
 	}
 	--instancesCount();
-	buff->unbind();
-	delete buff;
+	buff.unbind();
 	doClean = false;
 }

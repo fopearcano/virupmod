@@ -23,6 +23,11 @@
 #include <QVector2D>
 #include <queue>
 
+#ifdef QT5_GAMEPAD
+#include <QtGamepad/QGamepad>
+#include <QtGamepad/QGamepadManager>
+#endif
+#include "memory.hpp"
 #include "utils.hpp"
 
 class QGamepad;
@@ -72,7 +77,17 @@ class GamepadHandler : public QObject
 
   public:
 	GamepadHandler();
-	bool isEnabled() const { return gamepad != nullptr; };
+#ifdef QT5_GAMEPAD
+	bool isEnabled() const
+	{
+		return gamepad != nullptr;
+	};
+#else
+	bool isEnabled() const
+	{
+		return false;
+	};
+#endif
 	QVector2D getJoystick(Side side) const;
 	double getTrigger(Side side) const;
 	bool pollEvent(Event& e);
@@ -90,13 +105,18 @@ class GamepadHandler : public QObject
 	int desiredDeviceId
 	    = QSettings().value("controls/gamepad").toString().toInt();
 
-	QGamepad* gamepad = nullptr;
+#ifdef QT5_GAMEPAD
+	std::unique_ptr<QGamepad> gamepad;
+#endif
 	QString gamepadName;
 
 	std::queue<Event> events;
 
 	// calibration
 	float deadzone = 0.05f;
+
+	// for sig/slot connection that waits on names to be non empty
+	std::unique_ptr<QMetaObject::Connection> connection;
 };
 
 #endif // GAMEPADHANDLER_HPP

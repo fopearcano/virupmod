@@ -18,6 +18,8 @@
 
 #include "Text3D.hpp"
 
+#include <QOpenGLPaintDevice>
+
 Text3D::Text3D(unsigned int width, unsigned int height)
     : Text3D(width, height, GLShaderProgram("billboard"))
 {
@@ -97,16 +99,19 @@ void Text3D::render(GLHandler::GeometricSpace geometricSpace)
 
 	GLHandler::beginTransparent();
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
-	GLHandler::useTextures({tex});
+	GLHandler::useTextures({&fbo->getColorAttachmentTexture()});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::endTransparent();
 }
 
 void Text3D::updateTex()
 {
-	delete tex;
-
-	image = QImage(superSampling * originalSize, QImage::Format_RGBA8888);
+	if(fbo == nullptr || superSampling * originalSize != fbo->getSize())
+	{
+		fbo = std::make_unique<GLFramebufferObject>(
+		    GLTexture::Tex2DProperties(superSampling * originalSize.width(),
+		                               superSampling * originalSize.height()));
+	}
 
 	bool sizeInPixels(true);
 	int fontSize(font.pixelSize());
@@ -130,7 +135,7 @@ void Text3D::updateTex()
 	                   static_cast<int>(superSampling * rectangle.width()),
 	                   static_cast<int>(superSampling * rectangle.height()));
 
-	paintText(image, text, color, font, backgroundColor, adjustedRect, flags);
+	paintText(*fbo, text, color, font, backgroundColor, adjustedRect, flags);
 
 	if(sizeInPixels)
 	{
@@ -140,35 +145,37 @@ void Text3D::updateTex()
 	{
 		font.setPointSize(fontSize);
 	}
-
-	tex = new GLTexture(image);
 }
 
-Text3D::~Text3D()
+QRect Text3D::paintText(GLFramebufferObject& fbo, QString const& text,
+                        QColor const& color, QFont const& font,
+                        QColor const& backgroundColor, QRect const& rectangle,
+                        int flags)
 {
-	delete tex;
-}
+	fbo.bind();
+	GLHandler::setClearColor(backgroundColor);
+	GLHandler::glf().glClear(GL_COLOR_BUFFER_BIT);
+	GLHandler::setClearColor(Qt::black);
 
-QRect Text3D::paintText(QImage& image, QString const& text, QColor const& color,
-                        QFont const& font, QColor const& backgroundColor,
-                        QRect const& rectangle, int flags)
-{
+	QOpenGLPaintDevice d(fbo.getSize());
+	QPainter painter(&d);
+
 	QRect boundingRect;
 
-	auto painter = new QPainter(&image);
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setRenderHint(QPainter::TextAntialiasing);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
 
-	image.fill(backgroundColor);
-
-	painter->setFont(font);
-	painter->setPen(color);
-	painter->drawText(rectangle.isNull() ? image.rect() : rectangle, flags,
-	                  text, &boundingRect);
-
-	// The QPainter doesn't like its QImage to be changed
-	delete painter;
-	image = image.mirrored(false, true);
+	painter.setFont(font);
+	painter.setPen(color);
+	if(rectangle.isNull())
+	{
+		painter.drawText(0, 0, fbo.getSize().width(), fbo.getSize().height(),
+		                 flags, text, &boundingRect);
+	}
+	else
+	{
+		painter.drawText(rectangle, flags, text, &boundingRect);
+	}
 
 	return boundingRect;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Florian Cabot <florian.cabot@epfl.ch>
+    Copyright (C) 2023 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,9 +16,32 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "Launcher.hpp"
+#include "gui/FontSelector.hpp"
 
-std::unique_ptr<SettingsWidget> Launcher::newSettingsWidget()
+#include <QFontDialog>
+
+FontSelector::FontSelector(QString const& caption, QWidget* parent)
+    : QPushButton(parent)
 {
-	return std::make_unique<ExampleSettings>(this);
+	setObjectName("mainbutton");
+	connect(this, &QPushButton::clicked, this,
+	        [this, caption](bool)
+	        {
+		        bool ok;
+		        QFont result(
+		            QFontDialog::getFont(&ok, currentFont, this, caption));
+		        if(!ok)
+		        {
+			        return;
+		        }
+		        setFont(result);
+	        });
+}
+
+void FontSelector::setFont(QFont const& font)
+{
+	QPushButton::setFont(font);
+	setText(font.family());
+	currentFont = font;
+	emit fontChanged(font);
 }

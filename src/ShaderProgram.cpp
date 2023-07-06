@@ -43,8 +43,17 @@ ShaderProgram::ShaderProgram(QString const& shadersCommonName,
 ShaderProgram::ShaderProgram(QString const& vertexName,
                              QString const& fragmentName,
                              QMap<QString, QString> const& defines)
+    : ShaderProgram({{vertexName, GLShaderProgram::Stage::VERTEX},
+                     {fragmentName, GLShaderProgram::Stage::FRAGMENT}},
+                    defines)
 {
-	load(vertexName, fragmentName, defines);
+}
+
+ShaderProgram::ShaderProgram(
+    std::vector<std::pair<QString, GLShaderProgram::Stage>> const& pipeline,
+    QMap<QString, QString> const& defines)
+{
+	load(pipeline, defines);
 
 	allShaderPrograms().insert(this);
 }
@@ -58,11 +67,27 @@ void ShaderProgram::load(QString const& shadersCommonName,
 void ShaderProgram::load(QString const& vertexName, QString const& fragmentName,
                          QMap<QString, QString> const& defines)
 {
-	delete glShader;
-	glShader      = new GLShaderProgram(vertexName, fragmentName, defines);
-	vert          = vertexName;
-	frag          = fragmentName;
-	this->defines = defines;
+	load({{vertexName, GLShaderProgram::Stage::VERTEX},
+	      {fragmentName, GLShaderProgram::Stage::FRAGMENT}},
+	     defines);
+}
+
+void ShaderProgram::load(
+    std::vector<std::pair<QString, GLShaderProgram::Stage>> const& pipeline,
+    QMap<QString, QString> const& defines)
+{
+	if(pipeline.size() == 1
+	   && pipeline.at(0).second == GLShaderProgram::Stage::COMPUTE)
+	{
+		glShader
+		    = std::make_unique<GLComputeShader>(pipeline.at(0).first, defines);
+	}
+	else
+	{
+		glShader = std::make_unique<GLShaderProgram>(pipeline, defines);
+	}
+	this->pipeline = pipeline;
+	this->defines  = defines;
 	/*
 	GLint count;
 	GLint size;  // size of the variable
@@ -150,8 +175,16 @@ void ShaderProgram::reload()
 {
 	if(glShader != nullptr)
 	{
-		delete glShader;
-		glShader = new GLShaderProgram(vert, frag, defines);
+		if(pipeline.size() == 1
+		   && pipeline.at(0).second == GLShaderProgram::Stage::COMPUTE)
+		{
+			glShader = std::make_unique<GLComputeShader>(pipeline.at(0).first,
+			                                             defines);
+		}
+		else
+		{
+			glShader = std::make_unique<GLShaderProgram>(pipeline, defines);
+		}
 		for(auto const& pair : uniformsBackup)
 		{
 			auto type(static_cast<QMetaType::Type>(pair.second.type()));
@@ -193,22 +226,26 @@ void ShaderProgram::reload()
 						{
 							case QMetaType::QVector3D:
 							{
-								auto arr = new QVector3D[l.size()];
+								std::unique_ptr<QVector3D[]> arr(
+								    new QVector3D[l.size()]);
 								for(int i(0); i < l.size(); ++i)
 								{
 									arr[i] = l.at(i).value<QVector3D>();
 								}
-								glShader->setUniform(pair.first, l.size(), arr);
+								glShader->setUniform(pair.first, l.size(),
+								                     arr.get());
 							}
 							break;
 							case QMetaType::QVector4D:
 							{
-								auto arr = new QVector4D[l.size()];
+								std::unique_ptr<QVector4D[]> arr(
+								    new QVector4D[l.size()]);
 								for(int i(0); i < l.size(); ++i)
 								{
 									arr[i] = l.at(i).value<QVector4D>();
 								}
-								glShader->setUniform(pair.first, l.size(), arr);
+								glShader->setUniform(pair.first, l.size(),
+								                     arr.get());
 							}
 							break;
 							default:
@@ -234,7 +271,6 @@ void ShaderProgram::reloadAllShaderPrograms()
 
 ShaderProgram::~ShaderProgram()
 {
-	delete glShader;
 	allShaderPrograms().erase(this);
 }
 

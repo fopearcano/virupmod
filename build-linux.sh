@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 if [ ! -f "./build.conf" ]; then
 	. ./build.conf.example
 else
@@ -20,5 +20,7 @@ else
 	ncpus="$@"
 fi
 
+echo "Check GLSL code"
+make validate-glsl
 echo "make -j $ncpus"
 make -j $ncpus

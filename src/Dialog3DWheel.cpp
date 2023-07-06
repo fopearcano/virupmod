@@ -29,7 +29,7 @@ Dialog3DWheel::Dialog3DWheel(VRHandler const& vrHandler,
 void Dialog3DWheel::addDialog3D(QString const& name, Dialog3D& dialog3D)
 {
 	auto index(dialog3Ds.size());
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(name);
 	b->setAutoDefault(false);
 	connect(b, &QPushButton::pressed,

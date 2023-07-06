@@ -35,12 +35,11 @@ class NetworkManager : public QObject
 	Q_OBJECT
   public:
 	// takes ownership
-	explicit NetworkManager(AbstractState* networkedState);
+	explicit NetworkManager(std::unique_ptr<AbstractState> networkedState);
 	bool isServer() const { return server; };
-	AbstractState* getNetworkedState() { return networkedState; };
+	AbstractState* getNetworkedState() { return networkedState.get(); };
 	void sendPythonScript(unsigned int toClientId, QString const& script) const;
 	void update(float frameTiming);
-	~NetworkManager();
 
 	const unsigned int clientId
 	    = QSettings().value("network/clientid").toUInt();
@@ -52,21 +51,27 @@ class NetworkManager : public QObject
 	QElapsedTimer networkTimer;
 
 	// client
-	AbstractState* networkedState = nullptr; // state to share
-	QTcpServer* tcpServer         = nullptr;
-	QTcpSocket* tcpSocket         = nullptr;
+	std::unique_ptr<AbstractState> networkedState; // state to share
+	std::unique_ptr<QTcpServer> tcpServer;
 	// server
 	struct Client
 	{
+		Client(QHostAddress addr, quint16 port, qreal frameTiming,
+		       quint16 clientId, qint64 lastReceivedTime)
+		    : addr(addr)
+		    , port(port)
+		    , frameTiming(frameTiming)
+		    , clientId(clientId)
+		    , lastReceivedTime(lastReceivedTime){};
 		QHostAddress addr;
 		quint16 port;
 		qreal frameTiming;
 		quint16 clientId;
 		qint64 lastReceivedTime;
-		qint64 lastSentTime;
-		QTcpSocket* tcpSocket;
+		qint64 lastSentTime = 0;
+		mutable QTcpSocket tcpSocket;
 	};
-	QList<Client> clients;
+	std::list<Client> clients;
 };
 
 #endif // NETWORKMANAGER_HPP

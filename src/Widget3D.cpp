@@ -18,6 +18,8 @@
 
 #include "Widget3D.hpp"
 
+#include "memory.hpp"
+
 Widget3D::Widget3D(QWidget* widget)
     : shader("billboard")
     , widget(widget)
@@ -57,7 +59,7 @@ void Widget3D::render(ToneMappingModel const& tmm,
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
-	GLHandler::useTextures({tex});
+	GLHandler::useTextures({tex.get()});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
@@ -71,29 +73,22 @@ void Widget3D::render(ToneMappingModel const& tmm,
 
 void Widget3D::updateTex()
 {
-	delete tex;
-
 	image = QImage(originalSize, QImage::Format_ARGB32);
 
 	paintWidget(image, *widget);
 
-	tex = new GLTexture(image);
-}
-
-Widget3D::~Widget3D()
-{
-	delete tex;
+	tex = std::make_unique<GLTexture>(image);
 }
 
 void Widget3D::paintWidget(QImage& image, QWidget& widget)
 {
-	auto painter = new QPainter(&image);
-	painter->setRenderHint(QPainter::Antialiasing);
+	// The QPainter doesn't like its QImage to be changed, hence the block
+	{
+		auto painter = std::make_unique<QPainter>(&image);
+		painter->setRenderHint(QPainter::Antialiasing);
 
-	// image.fill(QColor(0, 0, 0, 0));
-	widget.render(painter);
-
-	// The QPainter doesn't like its QImage to be changed
-	delete painter;
+		// image.fill(QColor(0, 0, 0, 0));
+		widget.render(painter.get());
+	}
 	image = image.mirrored(false, true);
 }

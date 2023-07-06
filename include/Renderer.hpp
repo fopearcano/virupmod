@@ -36,18 +36,18 @@ class Renderer
   public:
 	struct RenderPath
 	{
-		explicit RenderPath(BasicCamera* camera)
-		    : camera(camera){};
-		RenderPath(GLbitfield clearMask, BasicCamera* camera)
+		explicit RenderPath(std::unique_ptr<BasicCamera> camera)
+		    : camera(std::move(camera)){};
+		RenderPath(GLbitfield clearMask, std::unique_ptr<BasicCamera> camera)
 		    : clearMask(clearMask)
-		    , camera(camera){};
+		    , camera(std::move(camera)){};
 
 		GLbitfield clearMask = 0x0; // don't clear anything by default
-		BasicCamera* camera;
+		std::unique_ptr<BasicCamera> camera;
 	};
 
 	Renderer(AbstractMainWin& window, VRHandler& vrHandler);
-	void init(Dialog3DWheel* dialog3dWheel);
+	void init(Dialog3DWheel& dialog3dWheel);
 	// if ignore VR, returns hypothetical size if VR wasn't enabled
 	// of course real RT size doesn't ignore VR
 	QSize getSize(bool ignoreVR = false) const;
@@ -147,10 +147,10 @@ class Renderer
 	void reloadPostProcessingTargets();
 	void updateFOV();
 	bool getCalibrationCompass() const { return renderCompass; };
-	CalibrationCompass* getCalibrationCompassPtr() { return compass; };
+	CalibrationCompass* getCalibrationCompassPtr() { return compass.get(); };
 	CalibrationCompass const* getCalibrationCompassPtr() const
 	{
-		return compass;
+		return compass.get();
 	};
 	void setCalibrationCompass(bool on)
 	{
@@ -190,7 +190,7 @@ class Renderer
 	 * pipeline using the corresponding methods.
 	 * * p.second is the render path itself.
 	 */
-	QList<QPair<QString, RenderPath>> const& sceneRenderPipeline
+	std::list<std::pair<QString, RenderPath>> const& sceneRenderPipeline
 	    = sceneRenderPipeline_;
 	/**
 	 * @brief Ordered list of post-processing shaders to apply at the end of
@@ -218,21 +218,21 @@ class Renderer
 	AbstractMainWin& window;
 	VRHandler& vrHandler;
 	Dialog3DWheel* dialog3dWheel = nullptr;
-	DebugCamera* dbgCamera       = nullptr;
+	std::unique_ptr<DebugCamera> dbgCamera;
 
 	QMatrix4x4 angleShiftMat;
 	float vFOV = 0.f;
 	float hFOV = 0.f;
 
-	QList<QPair<QString, RenderPath>> sceneRenderPipeline_;
+	std::list<std::pair<QString, RenderPath>> sceneRenderPipeline_;
 
 	std::list<std::pair<QString, GLComputeShader>> postProcessingPipeline_;
 	float lastFrameAverageLuminance = 0.f;
 
-	bool renderCompass          = false;
-	CalibrationCompass* compass = nullptr;
+	bool renderCompass = false;
+	std::unique_ptr<CalibrationCompass> compass;
 
-	MainRenderTarget* mainRenderTarget = nullptr;
+	std::unique_ptr<MainRenderTarget> mainRenderTarget = nullptr;
 };
 
 template <class T>

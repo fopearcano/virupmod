@@ -113,7 +113,7 @@ class DebugCamera : public BasicCamera
 	/**
 	 * @brief Render's the @p cam's frustum mesh.
 	 */
-	void renderCamera(BasicCamera const* cam);
+	void renderCamera(BasicCamera const& cam);
 
   public slots:
 	/**

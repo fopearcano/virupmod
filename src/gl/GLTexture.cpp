@@ -26,6 +26,39 @@ unsigned int& GLTexture::instancesCount()
 	return instancesCount;
 }
 
+GLTexture::GLTexture(GLTexture&& other) noexcept
+    : type(other.type)
+    , glTexture(other.glTexture)
+    , glTarget(other.glTarget)
+    , internalFormat(other.internalFormat)
+    , size(other.size)
+    , samples(other.samples)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning shader if it destroys itself
+	other.doClean = false;
+}
+
+GLTexture& GLTexture::operator=(GLTexture&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	type           = other.type;
+	glTexture      = other.glTexture;
+	glTarget       = other.glTarget;
+	internalFormat = other.internalFormat;
+	size           = other.size;
+	samples        = other.samples;
+	doClean        = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLTexture::GLTexture(Tex1DProperties const& properties, Sampler const& sampler,
                      Data const& data)
 {
@@ -265,8 +298,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 	return {};
 }
 
-unsigned int GLTexture::getContentAsData(GLfloat** buff,
-                                         unsigned int level) const
+std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 {
 	QSize size(getSize(level));
 
@@ -275,15 +307,14 @@ unsigned int GLTexture::getContentAsData(GLfloat** buff,
 	GLHandler::glf().glGetTexLevelParameteriv(
 	    glTarget, level, GL_TEXTURE_INTERNAL_FORMAT,
 	    &internalFormat); // get internal format type of GL texture
-	GLint numFloats = 0;
+	std::vector<GLfloat> result;
 	if(internalFormat == GL_RGBA32F) // determine what type GL texture has...
 	{
-		numFloats = size.width() * size.height() * 4;
-		*buff     = new GLfloat[numFloats];
+		result.resize(size.width() * size.height() * 4);
 		GLHandler::glf().glGetTexImage(glTarget, level, GL_RGBA, GL_FLOAT,
-		                               *buff);
+		                               result.data());
 	}
-	return numFloats;
+	return result;
 }
 
 float GLTexture::getAverageLuminance() const
@@ -291,10 +322,9 @@ float GLTexture::getAverageLuminance() const
 	generateMipmap();
 	unsigned int lvl = getHighestMipmapLevel() - 3;
 	auto size        = getSize(lvl);
-	GLfloat* buff;
-	unsigned int allocated(getContentAsData(&buff, lvl));
+	auto buff(getContentAsData(lvl));
 	float lastFrameAverageLuminance = 0.f;
-	if(allocated > 0)
+	if(!buff.empty())
 	{
 		float coeffSum = 0.f;
 		float halfWidth((size.width() - 1) / 2.f);
@@ -314,7 +344,6 @@ float GLTexture::getAverageLuminance() const
 			}
 		}
 		lastFrameAverageLuminance /= coeffSum;
-		delete[] buff;
 	}
 	return lastFrameAverageLuminance;
 }
@@ -391,7 +420,7 @@ void GLTexture::setData(const unsigned char* red, const unsigned char* green,
                         const unsigned char* blue, const unsigned char* alpha)
 {
 	const unsigned int nPix(size[0] * size[1] * size[2]);
-	auto image = new GLubyte[nPix * 4];
+	std::vector<GLubyte> image(nPix * 4);
 	for(unsigned int i(0); i < nPix; ++i)
 	{
 		image[4 * i]     = red[i];
@@ -399,8 +428,7 @@ void GLTexture::setData(const unsigned char* red, const unsigned char* green,
 		image[4 * i + 2] = blue[i];
 		image[4 * i + 3] = alpha != nullptr ? alpha[i] : 255;
 	}
-	setData({image});
-	delete[] image;
+	setData({image.data()});
 }
 
 void GLTexture::use(GLenum textureUnit) const

@@ -26,24 +26,24 @@ Renderer::Renderer(AbstractMainWin& window, VRHandler& vrHandler)
 {
 }
 
-void Renderer::init(Dialog3DWheel* dialog3dWheel)
+void Renderer::init(Dialog3DWheel& dialog3dWheel)
 {
 	if(initialized)
 	{
 		clean();
 	}
 
-	this->dialog3dWheel = dialog3dWheel;
+	this->dialog3dWheel = &dialog3dWheel;
 
 	QObject::connect(&vrHandler, &VRHandler::renderTargetSizeChanged,
 	                 [this]() { this->updateRenderTargets(); });
 
-	dbgCamera = new DebugCamera(vrHandler);
+	dbgCamera = std::make_unique<DebugCamera>(vrHandler);
 	dbgCamera->lookAt({2, 0, 2}, {0, 0, 0}, {0, 0, 1});
 
-	auto defaultCam = new BasicCamera(vrHandler);
+	auto defaultCam = std::make_unique<BasicCamera>(vrHandler);
 	defaultCam->lookAt({1, 1, 1}, {0, 0, 0}, {0, 0, 1});
-	appendSceneRenderPath("default", RenderPath(defaultCam));
+	appendSceneRenderPath("default", RenderPath(std::move(defaultCam)));
 
 	reloadPostProcessingTargets();
 	updateFOV();
@@ -126,23 +126,25 @@ QImage Renderer::getLastFrame() const
 
 void Renderer::appendSceneRenderPath(QString const& id, RenderPath path)
 {
-	sceneRenderPipeline_.append(QPair<QString, RenderPath>(id, path));
+	sceneRenderPipeline_.emplace_back(id, std::move(path));
 }
 
 void Renderer::insertSceneRenderPath(QString const& id, RenderPath path,
                                      unsigned int pos)
 {
-	sceneRenderPipeline_.insert(pos, QPair<QString, RenderPath>(id, path));
+	sceneRenderPipeline_.emplace(
+	    std::next(sceneRenderPipeline_.begin(), pos),
+	    std::pair<QString, RenderPath>(id, std::move(path)));
 }
 
 void Renderer::removeSceneRenderPath(QString const& id)
 {
-	for(int i(0); i < sceneRenderPipeline_.size(); ++i)
+	for(auto it(sceneRenderPipeline_.begin()); it != sceneRenderPipeline_.end();
+	    ++it)
 	{
-		if(sceneRenderPipeline_[i].first == id)
+		if(it->first == id)
 		{
-			delete sceneRenderPipeline_[i].second.camera;
-			sceneRenderPipeline_.removeAt(i);
+			sceneRenderPipeline_.erase(it);
 			break;
 		}
 	}
@@ -185,9 +187,8 @@ void Renderer::reloadPostProcessingTargets()
 	    static_cast<unsigned int>(1)
 	    << QSettings().value("graphics/antialiasing").toUInt());
 
-	delete mainRenderTarget;
-	mainRenderTarget = new MainRenderTarget(newSize.width(), newSize.height(),
-	                                        samples, projection);
+	mainRenderTarget = std::make_unique<MainRenderTarget>(
+	    newSize.width(), newSize.height(), samples, projection);
 }
 
 void Renderer::updateFOV()
@@ -212,7 +213,7 @@ void Renderer::updateFOV()
 		hFOV = 360.f * atan(tan(vFOV * M_PI / 360.f) * a) / M_PI;
 	}
 
-	for(auto pair : sceneRenderPipeline_)
+	for(auto const& pair : sceneRenderPipeline_)
 	{
 		pair.second.camera->setPerspectiveProj(vFOV, getAspectRatioFromFOV());
 	}
@@ -226,13 +227,12 @@ void Renderer::toggleCalibrationCompass()
 {
 	if(!renderCompass)
 	{
-		compass       = new CalibrationCompass;
+		compass       = std::make_unique<CalibrationCompass>();
 		renderCompass = true;
 	}
 	else
 	{
-		delete compass;
-		compass       = nullptr;
+		compass.reset();
 		renderCompass = false;
 	}
 }
@@ -280,7 +280,7 @@ void Renderer::vrRenderSinglePath(RenderPath& renderPath, QString const& pathId,
 	    "if \"renderScene\" in dir():\n\trenderScene()");
 	if(debug && debugInHeadset)
 	{
-		dbgCamera->renderCamera(renderPath.camera);
+		dbgCamera->renderCamera(*renderPath.camera);
 	}
 	if(renderCompass)
 	{
@@ -299,7 +299,7 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 	GLHandler::beginRendering(mainRenderTarget->sceneTarget);
 	vrHandler.renderHiddenAreaMesh(side);
 
-	for(auto pair : sceneRenderPipeline_)
+	for(auto& pair : sceneRenderPipeline_)
 	{
 		pair.second.camera->setWindowSize(getSize());
 		vrRenderSinglePath(pair.second, pair.first, debug, debugInHeadset);
@@ -403,7 +403,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 		auto renderFunc =
 		    [=](bool overrideCamera, QMatrix4x4 overrView, QMatrix4x4 overrProj)
 		{
-			for(auto pair : sceneRenderPipeline_)
+			for(auto const& pair : sceneRenderPipeline_)
 			{
 				auto renderSize(mainRenderTarget->sceneTarget.getSize());
 				pair.second.camera->setWindowSize(renderSize);
@@ -436,7 +436,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 				    "if \"renderScene\" in dir():\n\trenderScene()");
 				if(debug)
 				{
-					dbgCamera->renderCamera(pair.second.camera);
+					dbgCamera->renderCamera(*pair.second.camera);
 				}
 				if(renderCompass)
 				{
@@ -561,6 +561,11 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			    it->second, mainRenderTarget->postProcessingTargets.at(i % 2),
 			    mainRenderTarget->postProcessingTargets.at((i + 1) % 2), texs);
 		}
+		mainRenderTarget->postProcessingTargets
+		    .at(postProcessingPipeline_.size() % 2)
+		    .bind();
+		window.renderGui(
+		    mainRenderTarget->postProcessingTargets.at(0).getSize());
 		// blit result on screen
 		mainRenderTarget->postProcessingTargets
 		    .at(postProcessingPipeline_.size() % 2)
@@ -575,15 +580,9 @@ void Renderer::clean()
 		return;
 	}
 
-	delete compass;
-
-	for(auto const& pair : sceneRenderPipeline_)
-	{
-		delete pair.second.camera;
-	}
-	delete dbgCamera;
-
-	delete mainRenderTarget;
+	compass.reset();
+	dbgCamera.reset();
+	mainRenderTarget.reset();
 
 	initialized = false;
 }

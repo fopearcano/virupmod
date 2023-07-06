@@ -33,7 +33,6 @@ class Text3D
 	Text3D(unsigned int width, unsigned int height, GLShaderProgram&& shader);
 	QMatrix4x4 const& getModel() const { return model; };
 	QMatrix4x4& getModel() { return model; };
-	QImage const getImage() const { return image; };
 	QString getText() const { return text; };
 	QColor getColor() const { return color; };
 	float getAlpha() const { return alpha; };
@@ -53,10 +52,10 @@ class Text3D
 	void setSuperSampling(float superSampling);
 	void render(GLHandler::GeometricSpace geometricSpace
 	            = GLHandler::GeometricSpace::WORLD);
-	~Text3D();
 
 	static QRect
-	    paintText(QImage& image, QString const& text, QColor const& color,
+	    paintText(GLFramebufferObject& fbo, QString const& text,
+	              QColor const& color,
 	              QFont const& font
 	              = QFontDatabase::systemFont(QFontDatabase::GeneralFont),
 	              QColor const& backgroundColor = QColor(0, 0, 0, 0),
@@ -67,14 +66,13 @@ class Text3D
 
 	GLShaderProgram shader;
 	GLMesh quad;
-	GLTexture* tex = nullptr;
+	std::unique_ptr<GLFramebufferObject> fbo;
 
 	QMatrix4x4 model;
 
 	QMatrix4x4 aspectratio;
 
 	QSize originalSize;
-	QImage image;
 
 	QString text = "";
 	QColor color = QColor(0, 0, 0, 255);

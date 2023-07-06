@@ -233,7 +233,6 @@ void MainWin::initScene()
 	bill->position = QVector3D(0.f, 0.f, 0.8f);
 
 	text = new Text3D(200, 40);
-	text->setText(tr("Hello World !\nLet's draw some text !"));
 	text->setColor(QColor(0, 0, 0, 255));
 	text->setBackgroundColor(QColor(255, 0, 0, 127));
 	text->setRectangle(QRect(50, 0, 150, 40));
@@ -267,6 +266,7 @@ void MainWin::initScene()
 
 void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 {
+	text->setText(tr("Hello World !\n") + QString::number(round(1.0 / frameTiming)) + " FPS");
 	if(gamepadHandler.isEnabled())
 	{
 		auto leftJoystick(gamepadHandler.getJoystick(Side::LEFT));
@@ -402,7 +402,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	text->render();
 }
 
-void MainWin::renderGui()
+void MainWin::renderGui(QSize const& targetSize)
 {
 	QOpenGLPaintDevice d(size());
 	QPainter painter(&d);
@@ -410,7 +410,8 @@ void MainWin::renderGui()
 	painter.setRenderHint(QPainter::TextAntialiasing);
 	QPen pen(Qt::red);
 	painter.setPen(pen);
-	painter.drawText(0, 0, width(), height(), Qt::AlignRight | Qt::AlignBottom,
+	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
+	                 Qt::AlignRight | Qt::AlignBottom,
 	                 QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION));
 	painter.end();
 }

@@ -138,7 +138,7 @@ void RenderingWindow::keyPressEvent(QKeyEvent* e)
 	QKeySequence ks(modifier + key);
 	actionEvent(inputManager[ks], true);
 
-	if(!PythonQtHandler::isSupported())
+	if(!PythonQtHandler::isInitialized())
 	{
 		return;
 	}
@@ -192,7 +192,7 @@ void RenderingWindow::keyReleaseEvent(QKeyEvent* e)
 	QKeySequence ks(modifier + key);
 	actionEvent(inputManager[ks], false);
 
-	if(!PythonQtHandler::isSupported())
+	if(!PythonQtHandler::isInitialized())
 	{
 		return;
 	}

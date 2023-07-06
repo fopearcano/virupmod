@@ -21,6 +21,7 @@
 
 #include "PythonQtHandler.hpp"
 
+#include "GLBuffer.hpp"
 #include "GLShaderProgram.hpp"
 
 class GLBuffer;
@@ -65,26 +66,20 @@ class GLMesh
 	GLMesh(GLMesh const& other)            = delete;
 	GLMesh& operator=(GLMesh const& other) = delete;
 	/**
-	 * @brief Returns the number of allocated OpenGL meshes .
+	 * @brief Returns the number of allocated OpenGL meshes.
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
 
-	GLMesh(GLMesh&& other)
-	    : vao(other.vao)
-	    , vbo(other.vbo)
-	    , ebo(other.ebo)
-	    , vertexSize(other.vertexSize)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning shader if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLMesh(GLMesh&& other) noexcept;
+	GLMesh& operator=(GLMesh&& other) noexcept;
+
 	/**
 	 * @brief Allocates a new @ref Mesh.
 	 */
 	GLMesh();
-	GLBuffer& getVBO() { return *vbo; };
-	GLBuffer& getEBO() { return *ebo; };
+	GLBuffer& getVBO() { return vbo; };
+	GLBuffer& getEBO() { return ebo; };
 	void setVertexShaderMapping(
 	    GLShaderProgram const& shaderProgram,
 	    std::vector<QPair<const char*, unsigned int>> const& mapping);
@@ -208,9 +203,9 @@ class GLMesh
 	void cleanUp();
 
   private:
-	GLuint vao              = 0;
-	GLBuffer* vbo           = 0;
-	GLBuffer* ebo           = 0;
+	GLuint vao = 0;
+	GLBuffer vbo;
+	GLBuffer ebo;
 	unsigned int vertexSize = 0; // in bytes
 
 	bool doClean = true;
@@ -256,6 +251,9 @@ class PyPrimitiveType : public QObject
 {
 	Q_OBJECT
   public:
+	PyPrimitiveType(QObject* parent = nullptr)
+	    : QObject(parent){};
+
 	enum PrimitiveType
 	{
 		POINTS         = GL_POINTS,

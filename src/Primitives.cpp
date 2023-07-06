@@ -316,3 +316,172 @@ void Primitives::setAsUnitSphere(GLMesh& mesh, GLShaderProgram const& shader,
 	mesh.setVertexShaderMapping(shader, {{"position", 3}});
 	mesh.setVertices(vertices, elements);
 }
+
+void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
+                                   unsigned int radialDivisions,
+                                   PrimitiveType primitiveType)
+{
+	std::vector<float> vertices;
+	std::vector<unsigned int> elements;
+
+	// Generate cap center vertices
+	vertices.push_back(0.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(-1.0f);
+
+	vertices.push_back(0.0f);
+	vertices.push_back(0.0f);
+	vertices.push_back(1.0f);
+
+	// Generate side vertices
+	for(int h = -1; h <= 1; h += 2)
+	{
+		for(unsigned int r = 0; r < radialDivisions; ++r)
+		{
+			float angle = 2.0f * M_PI * static_cast<float>(r) / radialDivisions;
+			float x     = std::cos(angle);
+			float y     = std::sin(angle);
+			auto z      = static_cast<float>(h);
+
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+		}
+	}
+
+	// Generate elements for side and caps
+	for(unsigned int r = 0; r <= radialDivisions; ++r)
+	{
+		// NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
+		unsigned int idx           = r % radialDivisions;
+		unsigned int sideIndex     = 2 + idx;
+		unsigned int next_r        = (r + 1) % radialDivisions;
+		unsigned int nextSideIndex = 2 + next_r;
+
+		if(primitiveType == PrimitiveType::TRIANGLES)
+		{
+			// Side elements
+			elements.push_back(sideIndex);
+			elements.push_back(sideIndex + radialDivisions);
+			elements.push_back(nextSideIndex + radialDivisions);
+
+			elements.push_back(sideIndex);
+			elements.push_back(nextSideIndex + radialDivisions);
+			elements.push_back(nextSideIndex);
+
+			// Cap elements
+			if(r < radialDivisions)
+			{
+				elements.push_back(0);
+				elements.push_back(sideIndex);
+				elements.push_back(nextSideIndex);
+
+				elements.push_back(1);
+				elements.push_back(nextSideIndex + radialDivisions);
+				elements.push_back(sideIndex + radialDivisions);
+			}
+		}
+		else if(primitiveType == PrimitiveType::LINES)
+		{
+			elements.push_back(sideIndex);
+			elements.push_back(sideIndex + radialDivisions);
+
+			elements.push_back(sideIndex);
+			elements.push_back(nextSideIndex);
+
+			// Cap elements
+			if(r < radialDivisions)
+			{
+				elements.push_back(0);
+				elements.push_back(sideIndex);
+
+				elements.push_back(1);
+				elements.push_back(sideIndex + radialDivisions);
+			}
+		}
+	}
+
+	/*if(primitiveType == PrimitiveType::TRIANGLE_STRIP)
+	{
+	    // Bottom cap
+	    for(unsigned int r = 0; r <= radialDivisions; ++r)
+	    {
+	        unsigned int idx       = r % radialDivisions;
+	        unsigned int sideIndex = 2 + idx;
+
+	        if(radialDivisions % 2 == 0)
+	        {
+	            if(r % 2 == 0)
+	            {
+	                elements.push_back(0);
+	            }
+	            else
+	            {
+	                elements.push_back(sideIndex);
+	            }
+	        }
+	        else
+	        {
+	            if(r % 2 == 0)
+	            {
+	                elements.push_back(sideIndex);
+	            }
+	            else
+	            {
+	                elements.push_back(0);
+	            }
+	        }
+	    }
+
+	    // Separator degenerate triangles
+	    elements.push_back(2);
+	    elements.push_back(2 + radialDivisions);
+
+	    // Sides
+	    for(unsigned int r = 0; r <= radialDivisions; ++r)
+	    {
+	        unsigned int idx       = r % radialDivisions;
+	        unsigned int sideIndex = 2 + idx;
+
+	        elements.push_back(sideIndex);
+	        elements.push_back(sideIndex + radialDivisions);
+	    }
+
+	    // Separator degenerate triangles
+	    elements.push_back(1 + radialDivisions);
+	    elements.push_back(1);
+
+	    // Top cap
+	    for(unsigned int r = 0; r <= radialDivisions; ++r)
+	    {
+	        unsigned int idx       = r % radialDivisions;
+	        unsigned int sideIndex = 2 + idx + radialDivisions;
+
+	        if(radialDivisions % 2 == 0)
+	        {
+	            if(r % 2 == 0)
+	            {
+	                elements.push_back(1);
+	            }
+	            else
+	            {
+	                elements.push_back(sideIndex);
+	            }
+	        }
+	        else
+	        {
+	            if(r % 2 == 0)
+	            {
+	                elements.push_back(sideIndex);
+	            }
+	            else
+	            {
+	                elements.push_back(1);
+	            }
+	        }
+	    }
+	}*/
+
+	mesh.setVertexShaderMapping(shader, {{"position", 3}});
+	mesh.setVertices(vertices, elements);
+}

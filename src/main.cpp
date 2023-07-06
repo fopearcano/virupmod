@@ -128,18 +128,11 @@ int main(int argc, char* argv[])
 		}
 	}
 
-// set PYTHONPATH
-#ifdef Q_OS_WIN
-	qputenv(
-	    "PYTHONPATH",
-	    (QCoreApplication::applicationDirPath() + "\\python").toLocal8Bit());
-#endif
-
 	MainWin w;
 	w.setTitle(PROJECT_NAME + QString(" - Loading..."));
 	w.setFullscreen(w.isFullscreen());
 	// start event loop
-	QCoreApplication::postEvent(&w, new QEvent(QEvent::UpdateRequest));
+	QCoreApplication::postEvent(&w, qt_owned<QEvent>(QEvent::UpdateRequest));
 	return QApplication::exec();
 
 	// close log file

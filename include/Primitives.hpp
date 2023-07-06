@@ -46,6 +46,12 @@ class Primitives
 	                            unsigned int lonDivisions = 10,
 	                            PrimitiveType primitiveType
 	                            = PrimitiveType::TRIANGLES);
+
+	// TRIANGLE_STRIP NOT SUPPORTED !
+	static void setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
+	                              unsigned int radialDivisions = 10,
+	                              PrimitiveType primitiveType
+	                              = PrimitiveType::TRIANGLES);
 };
 
 #endif // PRIMITIVES_H

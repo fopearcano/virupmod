@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 
 #include "SettingsWidget.hpp"
+#include "memory.hpp"
 
 /**
  * @brief Base class for the program launcher
@@ -54,7 +55,7 @@ class BaseLauncher : public QDialog
 	 * (let's say you called your class MySettingsWidget), override this method
 	 * to return <code>new MySettingsWidget(this)</code>.
 	 */
-	virtual SettingsWidget* newSettingsWidget();
+	virtual std::unique_ptr<SettingsWidget> newSettingsWidget();
 	/**
 	 * @brief Top level layout of the launcher.
 	 *
@@ -68,7 +69,7 @@ class BaseLauncher : public QDialog
 	void resetSettings();
 
   private:
-	SettingsWidget* settingsWidget;
+	std::unique_ptr<SettingsWidget> settingsWidget;
 };
 
 #endif // BASELAUNCHER_H

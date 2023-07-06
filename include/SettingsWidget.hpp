@@ -81,7 +81,7 @@ class SettingsWidget : public QTabWidget
 	                      QString const& label, double minVal = 0,
 	                      double maxVal = 99, unsigned int decimals = 3);
 	void addStringSetting(QString const& name, QString const& defaultVal,
-	                      QString const& label);
+	                      QString const& label, bool password = false);
 	QComboBox* addStringAmongListSetting(QString const& name,
 	                                     QStringList const& values,
 	                                     QStringList const& strLabels,

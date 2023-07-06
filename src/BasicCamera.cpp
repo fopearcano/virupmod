@@ -45,6 +45,34 @@ QVector4D BasicCamera::project(QVector4D const& vertex) const
 	return fullTransform * vertex;
 }
 
+bool BasicCamera::shouldBeCulledBoudingSphere(QVector3D const& center,
+                                              float radius) const
+{
+	for(auto const& angleShift : clippingPlanes.keys())
+	{
+		if(!shouldBeCulledBoudingSphere(angleShift, center, radius))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool BasicCamera::shouldBeCulledBoudingSphere(QString const& angleShift,
+                                              QVector3D const& center,
+                                              float radius) const
+{
+	for(unsigned int i(0); i < 6; ++i)
+	{
+		if(QVector4D::dotProduct(clippingPlanes[angleShift].at(i), center)
+		   < -radius)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 {
 	const QMatrix4x4 shiftedView(angleShiftMat * view);

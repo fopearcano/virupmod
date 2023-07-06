@@ -24,15 +24,6 @@ bool& AsyncMesh::forceSync()
 	return forceSync;
 }
 
-QList<QPair<QFuture<void>, std::vector<AssetLoader::MeshDescriptor>*>>&
-    AsyncMesh::waitingForDeletion()
-{
-	static QList<
-	    QPair<QFuture<void>, std::vector<AssetLoader::MeshDescriptor>*>>
-	    waitingForDeletion = {};
-	return waitingForDeletion;
-}
-
 AsyncMesh::AsyncMesh(QString const& path, GLMesh&& defaultMesh)
     : defaultMesh(std::move(defaultMesh))
 {
@@ -42,11 +33,8 @@ AsyncMesh::AsyncMesh(QString const& path, GLMesh&& defaultMesh)
 		return;
 	}
 
-	this->meshDescriptors    = new std::vector<AssetLoader::MeshDescriptor>;
-	auto thisMeshDescriptors = this->meshDescriptors;
-	future                   = QtConcurrent::run(
-        [path, thisMeshDescriptors]()
-        { return AssetLoader::loadFile(path, *thisMeshDescriptors); });
+	future
+	    = QtConcurrent::run([path]() { return AssetLoader::loadFile(path); });
 }
 
 void AsyncMesh::updateMesh(GLShaderProgram const& shader)
@@ -69,77 +57,25 @@ void AsyncMesh::updateMesh(GLShaderProgram const& shader)
 	}
 
 	loaded               = true;
-	boundingSphereRadius = future.result();
+	auto pair            = future.result();
+	boundingSphereRadius = pair.first;
 
-	std::vector<AssetLoader::TexturedMesh> meshes;
-	AssetLoader::loadModel(*meshDescriptors, meshes, shader);
+	std::vector<AssetLoader::TexturedMesh> meshes
+	    = AssetLoader::loadModel(pair.second, shader);
 
 	if(meshes.size() == 1)
 	{
-		mesh = meshes[0].mesh;
-		for(auto pair : meshes[0].textures)
-		{
-			delete pair.second;
-		}
-	}
-	else
-	{
-		for(auto const& vMesh : meshes)
-		{
-			delete vMesh.mesh;
-			for(auto pair : vMesh.textures)
-			{
-				delete pair.second;
-			}
-		}
+		mesh = std::move(meshes[0].mesh);
 	}
 
-	delete meshDescriptors;
+	future = {};
 }
 
 GLMesh const& AsyncMesh::getMesh()
 {
-	if(emptyPath)
+	if(emptyPath || !loaded)
 	{
 		return defaultMesh;
 	}
-
-	if(loaded)
-	{
-		return *mesh;
-	}
-	return defaultMesh;
-}
-
-AsyncMesh::~AsyncMesh()
-{
-	// future.waitForFinished();
-	if(!emptyPath)
-	{
-		if(loaded)
-		{
-			delete mesh;
-		}
-		else
-		{
-			waitingForDeletion().push_back({future, meshDescriptors});
-		}
-	}
-}
-
-void AsyncMesh::garbageCollect(bool force)
-{
-	// go in reverse because of possible deletions
-	for(int i(waitingForDeletion().size() - 1); i >= 0; --i)
-	{
-		if(force)
-		{
-			waitingForDeletion()[i].first.waitForFinished();
-		}
-		if(waitingForDeletion()[i].first.isFinished())
-		{
-			delete waitingForDeletion()[i].second;
-			waitingForDeletion().removeAt(i);
-		}
-	}
+	return mesh;
 }

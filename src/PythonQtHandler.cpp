@@ -19,14 +19,32 @@
 #include "PythonQtHandler.hpp"
 
 #ifdef PYTHONQT
-PythonQtObjectPtr* PythonQtHandler::mainModule     = nullptr;
-PythonQtScriptingConsole* PythonQtHandler::console = nullptr;
+std::unique_ptr<PythonQtObjectPtr>& PythonQtHandler::mainModule()
+{
+	static std::unique_ptr<PythonQtObjectPtr> mainModule;
+	return mainModule;
+}
+
+std::unique_ptr<PythonQtScriptingConsole>& PythonQtHandler::console()
+{
+	static std::unique_ptr<PythonQtScriptingConsole> console;
+	return console;
+}
 #endif
 
 bool PythonQtHandler::isSupported()
 {
 #ifdef PYTHONQT
 	return true;
+#else
+	return false;
+#endif
+}
+
+bool PythonQtHandler::isInitialized()
+{
+#ifdef PYTHONQT
+	return console() != nullptr;
 #else
 	return false;
 #endif
@@ -43,23 +61,25 @@ void PythonQtHandler::init()
 #endif
 
 	// get the __main__ python module
-	mainModule = new PythonQtObjectPtr(PythonQt::self()->getMainModule());
+	mainModule() = std::make_unique<PythonQtObjectPtr>(
+	    PythonQt::self()->getMainModule());
 
-	console = new PythonQtScriptingConsole(nullptr, *mainModule, {});
+	console()
+	    = std::make_unique<PythonQtScriptingConsole>(nullptr, *mainModule());
 #endif
 }
 
 void PythonQtHandler::addVariable(QString const& name, QVariant const& v)
 {
 #ifdef PYTHONQT
-	mainModule->addVariable(name, v);
+	mainModule()->addVariable(name, v);
 #endif
 }
 
 QVariant PythonQtHandler::getVariable(QString const& name)
 {
 #ifdef PYTHONQT
-	return mainModule->getVariable(name);
+	return mainModule()->getVariable(name);
 #else
 	return QVariant();
 #endif
@@ -68,21 +88,21 @@ QVariant PythonQtHandler::getVariable(QString const& name)
 void PythonQtHandler::removeVariable(QString const& name)
 {
 #ifdef PYTHONQT
-	mainModule->removeVariable(name);
+	mainModule()->removeVariable(name);
 #endif
 }
 
 void PythonQtHandler::addObject(QString const& name, QObject* object)
 {
 #ifdef PYTHONQT
-	mainModule->addObject(name, object);
+	mainModule()->addObject(name, object);
 #endif
 }
 
 QVariant PythonQtHandler::evalScript(QString const& script)
 {
 #ifdef PYTHONQT
-	return mainModule->evalScript(script);
+	return mainModule()->evalScript(script);
 #else
 	return QVariant();
 #endif
@@ -91,38 +111,36 @@ QVariant PythonQtHandler::evalScript(QString const& script)
 void PythonQtHandler::evalFile(QString const& filename)
 {
 #ifdef PYTHONQT
-	mainModule->evalFile(filename);
+	mainModule()->evalFile(filename);
 #endif
 }
 
 void PythonQtHandler::openConsole()
 {
 #ifdef PYTHONQT
-	console->show();
+	console()->show();
 #endif
 }
 
 void PythonQtHandler::toggleConsole()
 {
 #ifdef PYTHONQT
-	console->setVisible(!console->isVisible());
+	console()->setVisible(!console()->isVisible());
 #endif
 }
 
 void PythonQtHandler::closeConsole()
 {
 #ifdef PYTHONQT
-	console->hide();
+	console()->hide();
 #endif
 }
 
 void PythonQtHandler::clean()
 {
 #ifdef PYTHONQT
-	delete mainModule;
-	mainModule = nullptr;
-	delete console;
-	console = nullptr;
+	mainModule().reset();
+	console().reset();
 #endif
 }
 

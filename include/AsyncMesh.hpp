@@ -33,29 +33,18 @@ class AsyncMesh
 	// call regularly (especially at least before using getMesh)
 	void updateMesh(GLShaderProgram const& shader);
 	GLMesh const& getMesh();
-	~AsyncMesh();
 
 	static bool& forceSync();
-	static void garbageCollect(bool force = false);
 
   private:
 	GLMesh defaultMesh;
-	GLMesh* mesh = nullptr;
+	GLMesh mesh;
 
-	QFuture<float> future;
+	QFuture<std::pair<float, std::vector<AssetLoader::MeshDescriptor>>> future;
 
 	bool loaded                = false;
 	bool emptyPath             = false;
 	float boundingSphereRadius = 0.f;
-
-	std::vector<AssetLoader::MeshDescriptor>* meshDescriptors;
-
-	// never wait for futures to finish within destructor ! if you need to
-	// release resources and the future didn't finish, push it here and other
-	// AsyncTextures will take care of it later
-	static QList<
-	    QPair<QFuture<void>, std::vector<AssetLoader::MeshDescriptor>*>>&
-	    waitingForDeletion();
 };
 
 #endif // ASYNCMESH_HPP

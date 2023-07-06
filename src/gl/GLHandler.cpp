@@ -189,7 +189,7 @@ void GLHandler::postProcess(
 	texs.emplace_back(&from.getColorAttachmentTexture(),
 	                  GLComputeShader::DataAccessMode::R);
 	texs.emplace_back(&to.getColorAttachmentTexture(),
-	                  GLComputeShader::DataAccessMode::R);
+	                  GLComputeShader::DataAccessMode::W);
 	// TODO(florian) performance
 	for(auto tex : uniformTextures)
 	{

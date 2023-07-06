@@ -26,6 +26,33 @@ unsigned int& GLBuffer::instancesCount()
 	return instancesCount;
 }
 
+GLBuffer::GLBuffer(GLBuffer&& other) noexcept
+    : id(other.id)
+    , currentTarget(other.currentTarget)
+    , size(other.size)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning shader if it destroys itself
+	other.doClean = false;
+}
+
+GLBuffer& GLBuffer::operator=(GLBuffer&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	id            = other.id;
+	currentTarget = other.currentTarget;
+	size          = other.size;
+	doClean       = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLBuffer::GLBuffer(GLenum target, size_t size, GLenum usage)
     : currentTarget(target)
 {

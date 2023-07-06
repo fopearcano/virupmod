@@ -64,23 +64,23 @@ void DebugCamera::update(QMatrix4x4 const& angleShiftMat)
 	}
 }
 
-void DebugCamera::renderCamera(BasicCamera const* cam)
+void DebugCamera::renderCamera(BasicCamera const& cam)
 {
 	if(vrHandler.isEnabled() && followHMD())
 	{
 		camMeshShader.setUniform("color", QColor::fromRgbF(1.0f, 0.0f, 0.0f));
 		GLHandler::setUpRender(camMeshShader,
-		                       cam->hmdScreenToWorldTransform(Side::LEFT));
+		                       cam.hmdScreenToWorldTransform(Side::LEFT));
 		camMesh.render(PrimitiveType::LINES);
 		camMeshShader.setUniform("color", QColor::fromRgbF(0.0f, 1.0f, 0.0f));
 		GLHandler::setUpRender(camMeshShader,
-		                       cam->hmdScreenToWorldTransform(Side::RIGHT));
+		                       cam.hmdScreenToWorldTransform(Side::RIGHT));
 		camMesh.render(PrimitiveType::LINES);
 	}
 	else
 	{
 		camMeshShader.setUniform("color", QColor::fromRgbF(1.0f, 0.0f, 0.0f));
-		GLHandler::setUpRender(camMeshShader, cam->screenToWorldTransform());
+		GLHandler::setUpRender(camMeshShader, cam.screenToWorldTransform());
 		camMesh.render(PrimitiveType::LINES);
 	}
 }

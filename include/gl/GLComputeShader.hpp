@@ -53,11 +53,11 @@ class GLComputeShader : public GLShaderProgram
 	          std::array<unsigned int, 3> const& globalGroupSize,
 	          bool waitForFinish = true) const;
 
-	static QMap<QString, QString>
-	    addDefines(QMap<QString, QString> const& userDefines);
-
   private:
 	std::array<GLint, 3> workGroupSize = {};
+
+	static QMap<QString, QString>
+	    addDefines(QMap<QString, QString> const& userDefines);
 };
 
 #endif // GLCOMPUTESHADER_HPP

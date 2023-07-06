@@ -314,6 +314,16 @@ class BasicCamera : public QObject
 	 */
 	QVector4D project(QVector4D const& vertex) const;
 
+	/**
+	 * @brief Computes frustum culling for a given bounding sphere in world
+	 * space.
+	 *
+	 * @param center The center of the bounding sphere.
+	 * @param radius The radius of the bounding sphere.
+	 */
+	bool shouldBeCulledBoudingSphere(QVector3D const& center,
+	                                 float radius) const;
+
   public:
 	/**
 	 * @brief Updates all the camera transformation matrices.
@@ -504,6 +514,9 @@ class BasicCamera : public QObject
 	QSize windowSize;
 
   private:
+	bool shouldBeCulledBoudingSphere(QString const& angleShift,
+	                                 QVector3D const& center,
+	                                 float radius) const;
 	// compute on update
 	float pixVertFOV = 0.f;
 

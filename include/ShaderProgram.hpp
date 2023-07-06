@@ -43,13 +43,22 @@ class ShaderProgram
 	              QMap<QString, QString> const& defines = {});
 	ShaderProgram(QString const& vertexName, QString const& fragmentName,
 	              QMap<QString, QString> const& defines = {});
-	QString getVertexShaderPath() const { return vert; };
-	QString getFragmentShaderPath() const { return frag; };
+	ShaderProgram(
+	    std::vector<std::pair<QString, GLShaderProgram::Stage>> const& pipeline,
+	    QMap<QString, QString> const& defines = {});
+	std::vector<std::pair<QString, GLShaderProgram::Stage>> const&
+	    getPipeline() const
+	{
+		return pipeline;
+	};
 	QMap<QString, QString> getDefines() const { return defines; };
 	void load(QString const& shadersCommonName,
 	          QMap<QString, QString> const& defines = {});
 	void load(QString const& vertexName, QString const& fragmentName,
 	          QMap<QString, QString> const& defines = {});
+	void load(
+	    std::vector<std::pair<QString, GLShaderProgram::Stage>> const& pipeline,
+	    QMap<QString, QString> const& defines = {});
 	void reload();
 	static void reloadAllShaderPrograms();
 	void setUnusedAttributesValues(
@@ -69,6 +78,17 @@ class ShaderProgram
 	template <typename T>
 	void setUniform(char const* name, unsigned int size, T const* value) const;
 	QString toStr() const { return glShader->toStr(); };
+	/** @brief Only valid for compute shaders, will crash otherwise
+	 */
+	void exec(
+	    std::vector<std::pair<GLTexture const*,
+	                          GLComputeShader::DataAccessMode>> const& textures,
+	    std::array<unsigned int, 3> const& globalGroupSize,
+	    bool waitForFinish = true) const
+	{
+		dynamic_cast<GLComputeShader*>(glShader.get())
+		    ->exec(textures, globalGroupSize, waitForFinish);
+	}
 	~ShaderProgram();
 
 	static std::unordered_set<ShaderProgram*> const& getAllShaderPrograms()
@@ -79,10 +99,9 @@ class ShaderProgram
 	operator GLSRef() const;
 
   private:
-	GLShaderProgram* glShader = nullptr;
+	std::unique_ptr<GLShaderProgram> glShader = nullptr;
 
-	QString vert;
-	QString frag;
+	std::vector<std::pair<QString, GLShaderProgram::Stage>> pipeline;
 	QMap<QString, QString> defines;
 
 	mutable std::map<char const*, QVariant> uniformsBackup;

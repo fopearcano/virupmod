@@ -50,23 +50,13 @@ class GLFramebufferObject
 	GLFramebufferObject(GLFramebufferObject const& other)            = delete;
 	GLFramebufferObject& operator=(GLFramebufferObject const& other) = delete;
 	/**
-	 * @brief Returns the number of allocated OpenGL textures.
+	 * @brief Returns the number of allocated OpenGL FBOs.
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
 
-	GLFramebufferObject(GLFramebufferObject&& other)
-	    : fbo(other.fbo)
-	    , texColorBuffer(other.texColorBuffer)
-	    , renderBuffer(other.renderBuffer)
-	    , width(other.width)
-	    , height(other.height)
-	    , depth(other.depth)
-	    , isDepthMap(other.isDepthMap)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning fbo if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLFramebufferObject(GLFramebufferObject&& other) noexcept;
+	GLFramebufferObject& operator=(GLFramebufferObject&& other) noexcept;
 
 	// screen
 	GLFramebufferObject() { ++instancesCount(); };
@@ -125,12 +115,12 @@ class GLFramebufferObject
   private:
 	GLuint fbo = 0;
 	// if depth map, will be the depth buffer instead
-	GLTexture* texColorBuffer = nullptr;
-	GLuint renderBuffer       = 0;
-	unsigned int width        = 1;
-	unsigned int height       = 1;
-	unsigned int depth        = 1;
-	bool isDepthMap           = false;
+	std::unique_ptr<GLTexture> texColorBuffer = nullptr;
+	GLuint renderBuffer                       = 0;
+	unsigned int width                        = 1;
+	unsigned int height                       = 1;
+	unsigned int depth                        = 1;
+	bool isDepthMap                           = false;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();

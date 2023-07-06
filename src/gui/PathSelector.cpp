@@ -18,14 +18,16 @@
 
 #include "gui/PathSelector.hpp"
 
-PathSelector::PathSelector(QWidget* parent, QString const& caption, Type type)
+#include "memory.hpp"
+
+PathSelector::PathSelector(QString const& caption, Type type, QWidget* parent)
     : QWidget(parent)
     , fileEdit(new QLineEdit(this))
 {
 	QObject::connect(fileEdit, &QLineEdit::textChanged,
 	                 [this](QString const& text) { setPath(text); });
 
-	auto browsePb = new QPushButton(parent);
+	auto browsePb = make_qt_unique<QPushButton>(*parent);
 	browsePb->setText("...");
 	QObject::connect(
 	    browsePb, &QPushButton::clicked,
@@ -42,7 +44,7 @@ PathSelector::PathSelector(QWidget* parent, QString const& caption, Type type)
 		    }
 	    });
 
-	auto layout = new QHBoxLayout(this);
+	auto layout = make_qt_unique<QHBoxLayout>(*this);
 	layout->addWidget(fileEdit);
 	layout->addWidget(browsePb);
 }
@@ -50,9 +52,9 @@ PathSelector::PathSelector(QWidget* parent, QString const& caption, Type type)
 void PathSelector::setPath(QString const& path)
 {
 	fileEdit->setText(path);
-	dirModel = new QFileSystemModel;
+	auto dirModel = make_qt_unique<QFileSystemModel>(*fileEdit);
 	dirModel->setRootPath(QFileInfo(path).absoluteDir().absolutePath());
-	auto completer = new QCompleter(dirModel);
+	auto completer = make_qt_unique<QCompleter>(*fileEdit, dirModel);
 	completer->setCaseSensitivity(Qt::CaseInsensitive);
 	completer->setCompletionMode(QCompleter::PopupCompletion);
 	fileEdit->setCompleter(completer);

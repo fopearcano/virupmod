@@ -36,10 +36,10 @@ std::vector<aiTextureType> const& AssetLoader::assimpTextureTypes()
 	return assimpTextureTypes;
 }
 
-float AssetLoader::loadFile(QString modelName,
-                            std::vector<MeshDescriptor>& meshDescriptors)
+std::pair<float, std::vector<AssetLoader::MeshDescriptor>>
+    AssetLoader::loadFile(QString modelName)
 {
-	meshDescriptors.resize(0);
+	std::pair<float, std::vector<AssetLoader::MeshDescriptor>> result;
 	if(!modelName.contains('/'))
 	{
 		modelName = "models/" + modelName;
@@ -51,7 +51,7 @@ float AssetLoader::loadFile(QString modelName,
 	std::string directory = path.substr(0, path.find_last_of('/'));
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(
+	aiScene const* scene = importer.ReadFile(
 	    path, static_cast<unsigned int>(aiProcess_Triangulate)
 	              | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices
 	              | aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals
@@ -66,35 +66,38 @@ float AssetLoader::loadFile(QString modelName,
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString()
 		          << std::endl;
-		return 0.f;
+		return std::make_pair(0.f, std::vector<MeshDescriptor>{});
 	}
 
-	return parseNode(scene->mRootNode, scene, directory, QMatrix4x4(),
-	                 meshDescriptors);
+	result.first = parseNode(*scene->mRootNode, *scene, directory, QMatrix4x4(),
+	                         result.second);
+	return result;
 }
 
-void AssetLoader::loadModel(std::vector<MeshDescriptor> const& meshDescriptors,
-                            std::vector<TexturedMesh>& meshes,
-                            GLShaderProgram const& shader,
-                            QColor const& defaultDiffuseColor)
+std::vector<AssetLoader::TexturedMesh>
+    AssetLoader::loadModel(std::vector<MeshDescriptor> const& meshDescriptors,
+                           GLShaderProgram const& shader,
+                           QColor const& defaultDiffuseColor)
 {
+	std::vector<TexturedMesh> meshes;
 	for(auto const& descriptor : meshDescriptors)
 	{
-		TexturedMesh tMesh;
+		meshes.emplace_back();
+		TexturedMesh& tMesh = meshes.back();
 
-		tMesh.mesh = new GLMesh;
-		tMesh.mesh->setVertexShaderMapping(
+		tMesh.mesh.setVertexShaderMapping(
 		    shader,
 		    {{"position", 3}, {"tangent", 3}, {"normal", 3}, {"texcoord", 2}});
-		tMesh.mesh->setVertices(descriptor.vertices, descriptor.indices);
+		tMesh.mesh.setVertices(descriptor.vertices, descriptor.indices);
 
 		for(auto const& tex : descriptor.texturesPathsTypes)
 		{
 			// discard additional textures, keep only one per type
 			if(tMesh.textures.count(tex.first) == 0 && !tex.second.empty())
 			{
-				tMesh.textures[tex.first] = new GLTexture(
-				    tex.second.c_str(), tex.first == TextureType::DIFFUSE);
+				tMesh.textures.emplace(
+				    tex.first, GLTexture{tex.second.c_str(),
+				                         tex.first == TextureType::DIFFUSE});
 			}
 		}
 		// complete with default textures
@@ -108,32 +111,35 @@ void AssetLoader::loadModel(std::vector<MeshDescriptor> const& meshDescriptors,
 				data[1] = color.green();
 				data[2] = color.blue();
 				data[3] = color.alpha();
-				tMesh.textures[ttype]
-				    = new GLTexture(GLTexture::Tex2DProperties(
-				                        1, 1, ttype == TextureType::DIFFUSE),
-				                    {}, {&data[0]});
+				tMesh.textures.emplace(
+				    ttype,
+				    GLTexture{GLTexture::Tex2DProperties(
+				                  1, 1, ttype == TextureType::DIFFUSE),
+				              GLTexture::Sampler{}, GLTexture::Data{&data[0]}});
 			}
 		}
 		tMesh.transform = descriptor.transform;
-		meshes.push_back(tMesh);
 	}
+	return meshes;
 }
 
-float AssetLoader::loadModel(QString const& modelName,
-                             std::vector<TexturedMesh>& meshes,
-                             GLShaderProgram const& shader,
-                             QColor const& defaultDiffuseColor)
+std::pair<float, std::vector<AssetLoader::TexturedMesh>>
+    AssetLoader::loadModel(QString const& modelName,
+                           GLShaderProgram const& shader,
+                           QColor const& defaultDiffuseColor)
 {
-	std::vector<MeshDescriptor> descriptors;
+	std::pair<float, std::vector<MeshDescriptor>> pair(loadFile(modelName));
 
-	float bsRad(loadFile(modelName, descriptors));
+	float bsRad(pair.first);
 	if(bsRad == 0.f)
 	{
-		return 0.f;
+		return std::make_pair(0.f, std::vector<TexturedMesh>{});
 	}
 
-	loadModel(descriptors, meshes, shader, defaultDiffuseColor);
-	return bsRad;
+	std::pair<float, std::vector<TexturedMesh>> result;
+	result.first  = bsRad;
+	result.second = loadModel(pair.second, shader, defaultDiffuseColor);
+	return result;
 }
 
 std::string AssetLoader::findFilePath(std::string const& directory,
@@ -165,7 +171,8 @@ std::string AssetLoader::findFilePath(std::string const& directory,
 	return "";
 }
 
-QColor AssetLoader::getDefaultColor(TextureType ttype, QColor diffuseColor)
+QColor AssetLoader::getDefaultColor(TextureType ttype,
+                                    QColor const& diffuseColor)
 {
 	switch(ttype)
 	{
@@ -191,24 +198,24 @@ QColor AssetLoader::getDefaultColor(TextureType ttype, QColor diffuseColor)
 	return {};
 }
 
-QMatrix4x4 AssetLoader::assimpToQt(aiMatrix4x4 m)
+QMatrix4x4 AssetLoader::assimpToQt(aiMatrix4x4 const& m)
 {
 	return {m.a1, m.a2, m.a3, m.a4, m.b1, m.b2, m.b3, m.b4,
 	        m.c1, m.c2, m.c3, m.c4, m.d1, m.d2, m.d3, m.d4};
 }
 
-float AssetLoader::parseNode(aiNode const* node, aiScene const* scene,
+float AssetLoader::parseNode(aiNode const& node, aiScene const& scene,
                              std::string const& directory,
                              QMatrix4x4 const& transform,
                              std::vector<MeshDescriptor>& meshDescriptors)
 {
 	float boundingSphereRadius(0.f);
-	QMatrix4x4 nodeTransform(transform * assimpToQt(node->mTransformation));
-	for(unsigned int i(0); i < node->mNumMeshes; ++i)
+	QMatrix4x4 nodeTransform(transform * assimpToQt(node.mTransformation));
+	for(unsigned int i(0); i < node.mNumMeshes; ++i)
 	{
 		meshDescriptors.emplace_back(MeshDescriptor());
 		MeshDescriptor& descriptor = meshDescriptors.back();
-		aiMesh const* mesh         = scene->mMeshes[node->mMeshes[i]];
+		aiMesh const& mesh         = *scene.mMeshes[node.mMeshes[i]];
 		float bsr(parseMesh(mesh, scene, directory, nodeTransform, descriptor));
 		if(bsr > boundingSphereRadius)
 		{
@@ -216,9 +223,9 @@ float AssetLoader::parseNode(aiNode const* node, aiScene const* scene,
 		}
 	}
 	// recurse
-	for(unsigned int i(0); i < node->mNumChildren; ++i)
+	for(unsigned int i(0); i < node.mNumChildren; ++i)
 	{
-		float bsr(parseNode(node->mChildren[i], scene, directory, nodeTransform,
+		float bsr(parseNode(*node.mChildren[i], scene, directory, nodeTransform,
 		                    meshDescriptors));
 		if(bsr > boundingSphereRadius)
 		{
@@ -228,7 +235,7 @@ float AssetLoader::parseNode(aiNode const* node, aiScene const* scene,
 	return boundingSphereRadius;
 }
 
-float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
+float AssetLoader::parseMesh(aiMesh const& mesh, aiScene const& scene,
                              std::string const& directory,
                              QMatrix4x4 const& transform,
                              MeshDescriptor& result)
@@ -236,10 +243,10 @@ float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
 	float boundingSphereRadius(0.f);
 	std::vector<float>& v          = result.vertices;
 	std::vector<unsigned int>& ind = result.indices;
-	for(unsigned int j(0); j < mesh->mNumVertices; j++)
+	for(unsigned int j(0); j < mesh.mNumVertices; j++)
 	{
-		QVector3D vertice(mesh->mVertices[j].x, mesh->mVertices[j].y,
-		                  mesh->mVertices[j].z);
+		QVector3D vertice(mesh.mVertices[j].x, mesh.mVertices[j].y,
+		                  mesh.mVertices[j].z);
 		if(boundingSphereRadius
 		   < (transform * QVector4D(vertice, 1.f)).length())
 		{
@@ -249,11 +256,11 @@ float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
 		v.push_back(vertice.x());
 		v.push_back(vertice.y());
 		v.push_back(vertice.z());
-		if(mesh->HasTangentsAndBitangents())
+		if(mesh.HasTangentsAndBitangents())
 		{
-			v.push_back(mesh->mTangents[j].x);
-			v.push_back(mesh->mTangents[j].y);
-			v.push_back(mesh->mTangents[j].z);
+			v.push_back(mesh.mTangents[j].x);
+			v.push_back(mesh.mTangents[j].y);
+			v.push_back(mesh.mTangents[j].z);
 		}
 		else
 		{
@@ -261,13 +268,13 @@ float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
 			v.push_back(0.f);
 			v.push_back(0.f);
 		}
-		v.push_back(mesh->mNormals[j].x);
-		v.push_back(mesh->mNormals[j].y);
-		v.push_back(mesh->mNormals[j].z);
-		if(mesh->mTextureCoords[0] != nullptr)
+		v.push_back(mesh.mNormals[j].x);
+		v.push_back(mesh.mNormals[j].y);
+		v.push_back(mesh.mNormals[j].z);
+		if(mesh.mTextureCoords[0] != nullptr)
 		{
-			v.push_back(mesh->mTextureCoords[0][j].x);
-			v.push_back(mesh->mTextureCoords[0][j].y);
+			v.push_back(mesh.mTextureCoords[0][j].x);
+			v.push_back(mesh.mTextureCoords[0][j].y);
 		}
 		else
 		{
@@ -275,11 +282,11 @@ float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
 			v.push_back(0.f);
 		}
 	}
-	for(unsigned int j(0); j < mesh->mNumFaces; j++)
+	for(unsigned int j(0); j < mesh.mNumFaces; j++)
 	{
 		aiFace face;
 		face.mNumIndices = 0;
-		face             = mesh->mFaces[j];
+		face             = mesh.mFaces[j];
 		for(unsigned int k = 0; k < face.mNumIndices; k++)
 		{
 			ind.push_back(face.mIndices[k]);
@@ -288,7 +295,7 @@ float AssetLoader::parseMesh(aiMesh const* mesh, aiScene const* scene,
 
 	std::vector<std::pair<TextureType, std::string>>& texturesPathsTypes
 	    = result.texturesPathsTypes;
-	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	aiMaterial* material = scene.mMaterials[mesh.mMaterialIndex];
 	aiString str;
 	for(unsigned int j(0); j < textureTypes().size(); ++j)
 	{

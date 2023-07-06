@@ -33,11 +33,14 @@
 #include <QVariant>
 #include <type_traits>
 
+#include "memory.hpp"
+
 class PythonQtHandler
 {
   public:
 	PythonQtHandler() = delete;
 	static bool isSupported();
+	static bool isInitialized();
 	static void init();
 	template <typename T>
 	static void addClass(QString const& name, QString const& package = "");
@@ -56,8 +59,8 @@ class PythonQtHandler
 
   private:
 #ifdef PYTHONQT
-	static PythonQtObjectPtr* mainModule;
-	static PythonQtScriptingConsole* console;
+	static std::unique_ptr<PythonQtObjectPtr>& mainModule();
+	static std::unique_ptr<PythonQtScriptingConsole>& console();
 #endif
 };
 

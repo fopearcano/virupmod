@@ -18,14 +18,21 @@
 
 #include "gui/WindowParametersSelector.hpp"
 
+#include "memory.hpp"
+
+WindowParametersSelector::WindowParametersSelector(QWidget* parent)
+    : WindowParametersSelector({}, parent)
+{
+}
+
 WindowParametersSelector::WindowParametersSelector(
-    QWidget* parent, RenderingWindow::Parameters const& initialValue)
+    RenderingWindow::Parameters const& initialValue, QWidget* parent)
     : QWidget(parent)
     , value(initialValue)
 {
-	auto mainLayout = new QFormLayout(this);
+	auto mainLayout = make_qt_unique<QFormLayout>(*this);
 
-	widthSpinBox = new QSpinBox(this);
+	widthSpinBox = make_qt_unique<QSpinBox>(*this);
 	widthSpinBox->setRange(0, 17000);
 	widthSpinBox->setValue(initialValue.width);
 	connect(widthSpinBox,
@@ -37,7 +44,7 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Width :"), widthSpinBox);
 
-	heightSpinBox = new QSpinBox(this);
+	heightSpinBox = make_qt_unique<QSpinBox>(*this);
 	heightSpinBox->setRange(0, 17000);
 	heightSpinBox->setValue(initialValue.height);
 	connect(heightSpinBox,
@@ -49,7 +56,7 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Height :"), heightSpinBox);
 
-	fullscreenCBox = new QCheckBox(this);
+	fullscreenCBox = make_qt_unique<QCheckBox>(*this);
 	fullscreenCBox->setChecked(initialValue.fullscreen);
 	connect(fullscreenCBox, &QCheckBox::stateChanged,
 	        [this](int s)
@@ -59,14 +66,14 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Fullscreen :"), fullscreenCBox);
 
-	auto w      = new QWidget(this);
-	auto layout = new QHBoxLayout(w);
+	auto w      = make_qt_unique<QWidget>(*this);
+	auto layout = make_qt_unique<QHBoxLayout>(*w);
 
-	screenLabel = new QLabel(this);
+	screenLabel = make_qt_unique<QLabel>(*this);
 	screenLabel->setText(
 	    initialValue.screenname == "" ? "AUTO" : initialValue.screenname);
 
-	auto button = new QPushButton(this);
+	auto button = make_qt_unique<QPushButton>(*this);
 	button->setText("...");
 
 	connect(button, &QPushButton::clicked, this,
@@ -83,7 +90,7 @@ WindowParametersSelector::WindowParametersSelector(
 	layout->addWidget(button);
 	mainLayout->addRow(tr("Screen :"), w);
 
-	hAngleShiftSpinBox = new QDoubleSpinBox(this);
+	hAngleShiftSpinBox = make_qt_unique<QDoubleSpinBox>(*this);
 	hAngleShiftSpinBox->setRange(-180.0, 180.0);
 	hAngleShiftSpinBox->setDecimals(3);
 	hAngleShiftSpinBox->setValue(initialValue.horizontalAngleShift);
@@ -98,7 +105,7 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Horizontal Shift Angle :"), hAngleShiftSpinBox);
 
-	vAngleShiftSpinBox = new QDoubleSpinBox(this);
+	vAngleShiftSpinBox = make_qt_unique<QDoubleSpinBox>(*this);
 	vAngleShiftSpinBox->setRange(-180.0, 180.0);
 	vAngleShiftSpinBox->setDecimals(3);
 	vAngleShiftSpinBox->setValue(initialValue.verticalAngleShift);
@@ -113,7 +120,7 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Vertical Shift Angle :"), vAngleShiftSpinBox);
 
-	forceLeftCBox = new QCheckBox(this);
+	forceLeftCBox = make_qt_unique<QCheckBox>(*this);
 	forceLeftCBox->setChecked(initialValue.forceleft);
 	connect(forceLeftCBox, &QCheckBox::stateChanged,
 	        [this](int s)
@@ -123,7 +130,7 @@ WindowParametersSelector::WindowParametersSelector(
 	        });
 	mainLayout->addRow(tr("Force left eye rendering only :"), forceLeftCBox);
 
-	forceRightCBox = new QCheckBox(this);
+	forceRightCBox = make_qt_unique<QCheckBox>(*this);
 	forceRightCBox->setChecked(initialValue.forceright);
 	connect(forceRightCBox, &QCheckBox::stateChanged,
 	        [this](int s)

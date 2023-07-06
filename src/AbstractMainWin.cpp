@@ -1,7 +1,17 @@
 #include "AbstractMainWin.hpp"
 
+std::unique_ptr<VRHandler> newVRHandler()
+{
+	if(QSettings().value("vr/handler").toString() == "openvr")
+	{
+		return std::make_unique<OpenVRHandler>();
+	}
+	return std::make_unique<StereoBeamerHandler>();
+}
+
 AbstractMainWin::AbstractMainWin()
-    : renderer(*this, *vrHandler)
+    : vrHandler(newVRHandler())
+    , renderer(*this, *vrHandler)
 {
 	m_context.setFormat(this->format());
 	m_context.create();
@@ -10,7 +20,7 @@ AbstractMainWin::AbstractMainWin()
 	    QSettings().value("window/windefinitions").toStringList().size() - 1);
 	for(unsigned int i(0); i < secondariesNb; ++i)
 	{
-		secondaryWindows.push_back(new RenderingWindow(i + 1));
+		secondaryWindows.push_back(std::make_unique<RenderingWindow>(i + 1));
 		secondaryWindows[i]->setFullscreen(secondaryWindows[i]->isFullscreen());
 	}
 }
@@ -79,7 +89,7 @@ void AbstractMainWin::setVR(bool vr)
 	}
 	if(vrIsEnabled())
 	{
-		PythonQtHandler::addObject("VRHandler", vrHandler);
+		PythonQtHandler::addObject("VRHandler", vrHandler.get());
 	}
 	else
 	{
@@ -118,7 +128,8 @@ bool AbstractMainWin::event(QEvent* e)
 			paintGL();
 		}
 		// animate continuously: schedule an update
-		QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+		QCoreApplication::postEvent(this,
+		                            qt_owned<QEvent>(QEvent::UpdateRequest));
 		return true;
 	}
 	if(e->type() == QEvent::Type::Close)
@@ -127,9 +138,13 @@ bool AbstractMainWin::event(QEvent* e)
 		menuBar->close();
 		dialog3dWheel->close();
 		PythonQtHandler::closeConsole();
-		for(auto w : secondaryWindows)
+		for(auto const& w : secondaryWindows)
 		{
 			w->close();
+		}
+		if(quitOnClose)
+		{
+			QCoreApplication::quit();
 		}
 	}
 	return QWindow::event(e);
@@ -356,11 +371,12 @@ void AbstractMainWin::initializeGL()
 	// Init GL
 	GLHandler::init();
 	// Init ToneMappingModel
-	toneMappingModel = new ToneMappingModel(*vrHandler);
+	toneMappingModel = std::make_unique<ToneMappingModel>(*vrHandler);
 	// Init Dialog3DWheel
-	dialog3dWheel = new Dialog3DWheel(*vrHandler, *toneMappingModel);
+	dialog3dWheel
+	    = std::make_unique<Dialog3DWheel>(*vrHandler, *toneMappingModel);
 	// Init Renderer
-	renderer.init(dialog3dWheel);
+	renderer.init(*dialog3dWheel);
 	// Init PythonQt
 	initializePythonQt();
 	// Init VR
@@ -368,7 +384,7 @@ void AbstractMainWin::initializeGL()
 	// Init libraries
 	initLibraries();
 	// Init NetworkManager
-	networkManager = new NetworkManager(constructNewState());
+	networkManager = std::make_unique<NetworkManager>(constructNewState());
 
 	qDebug() << "Using OpenGL " << format().majorVersion() << "."
 	         << format().minorVersion() << format().profile() << '\n';
@@ -380,7 +396,7 @@ void AbstractMainWin::initializeGL()
 
 	// init menuBar
 
-	menuBar = new QMenuBar();
+	menuBar = std::make_unique<QMenuBar>();
 	menuBar->setWindowFlags(Qt::X11BypassWindowManagerHint
 	                        | Qt::MSWindowsFixedSizeDialogHint
 	                        | Qt::FramelessWindowHint);
@@ -397,7 +413,7 @@ void AbstractMainWin::initializeGL()
 
 	menuBar->show();
 
-	shaderSelector = new ShaderSelector;
+	shaderSelector = std::make_unique<ShaderSelector>();
 
 	// let user init
 	initScene();
@@ -439,11 +455,12 @@ void AbstractMainWin::initializePythonQt()
 {
 	PythonQtHandler::init();
 	PythonQtHandler::addClass<int>("Side");
-	PythonQtHandler::addObject("Side", new PySide);
+	PythonQtHandler::addObject("Side", make_qt_unique<PySide>(*this));
 	PythonQtHandler::addClass<int>("PrimitiveType");
-	PythonQtHandler::addObject("PrimitiveType", new PyPrimitiveType);
-	PythonQtHandler::addObject("GLHandler", new GLHandler);
-	PythonQtHandler::addObject("ToneMappingModel", toneMappingModel);
+	PythonQtHandler::addObject("PrimitiveType",
+	                           make_qt_unique<PyPrimitiveType>(*this));
+	PythonQtHandler::addObject("GLHandler", make_qt_unique<GLHandler>(*this));
+	PythonQtHandler::addObject("ToneMappingModel", toneMappingModel.get());
 	PythonQtHandler::addWrapper<GLShaderProgramWrapper>();
 	PythonQtHandler::addWrapper<GLMeshWrapper>();
 }
@@ -560,7 +577,7 @@ void AbstractMainWin::paintGL()
 			{
 				setFullscreen(false);
 			}
-			for(auto secWin : secondaryWindows)
+			for(auto const& secWin : secondaryWindows)
 			{
 				if(!secWin->getScreenName().isEmpty())
 				{
@@ -574,7 +591,7 @@ void AbstractMainWin::paintGL()
 			{
 				setFullscreen(true);
 			}
-			for(auto secWin : secondaryWindows)
+			for(auto const& secWin : secondaryWindows)
 			{
 				if(!secWin->getScreenName().isEmpty())
 				{
@@ -628,23 +645,21 @@ void AbstractMainWin::paintGL()
 		vrHandler->forceRight = isForcedRight();
 	}
 	renderer.renderFrame(getAngleShiftMatrix());
-	for(auto w : secondaryWindows)
+	for(auto const& w : secondaryWindows)
 	{
 		if(vrHandler->isEnabled())
 		{
 			vrHandler->forceLeft  = w->isForcedLeft();
 			vrHandler->forceRight = w->isForcedRight();
 		}
-		m_context.makeCurrent(w);
+		m_context.makeCurrent(w.get());
 		renderer.renderFrame(w->getAngleShiftMatrix());
 		w->show();
 	}
 	m_context.makeCurrent(this);
-	renderGui();
 
 	// garbage collect some resources
 	AsyncTexture::garbageCollect();
-	AsyncMesh::garbageCollect();
 
 	if(videomode)
 	{
@@ -679,15 +694,30 @@ void AbstractMainWin::paintGL()
 				break;
 		}
 
-		QString res = QString::number(renderer.getSize().width()) + "x"
-		              + QString::number(renderer.getSize().height());
+		QString res
+		    = QString::number(renderer.getSize().width()) + "x"
+		      + QString::number(renderer.getSize().height()) + "_"
+		      + QString::number(QSettings().value("window/videofps").toInt())
+		      + "fps";
 		if(currentVideoFrame == 0)
 		{
 			QDir viddir(QSettings().value("window/viddir").toString());
+			viddir.mkpath(".");
+			QFile::copy("./" + getAbsoluteDataPath("scripts/generate_vids.sh"),
+			            QSettings().value("window/viddir").toString()
+			                + "/generate_vids.sh");
 			viddir.mkdir(subdir);
 			QDir projdir(QSettings().value("window/viddir").toString() + "/"
 			             + subdir);
 			projdir.mkdir(res);
+			QDir framesdir = QSettings().value("window/viddir").toString() + "/"
+			                 + subdir + "/" + res;
+			framesdir.setNameFilters(QStringList() << "frame*.png");
+			framesdir.setFilter(QDir::Files);
+			for(auto const& f : framesdir.entryList())
+			{
+				framesdir.remove(f);
+			}
 		}
 		unsigned int maxframe(QSettings().value("window/maxframe").toUInt());
 		if(maxframe > 0)
@@ -728,7 +758,7 @@ void AbstractMainWin::paintGL()
 		QString framePath(QSettings().value("window/viddir").toString() + "/"
 		                  + subdir + "/" + res + "/frame" + number + ".png");
 		qDebug() << "Writing " + framePath + "...";
-		QThreadPool::globalInstance()->start(new ImageWriter(
+		QThreadPool::globalInstance()->start(qt_owned<ImageWriter>(
 		    framePath, frame.convertToFormat(QImage::Format_RGB888)));
 
 		currentVideoFrame++;
@@ -736,37 +766,21 @@ void AbstractMainWin::paintGL()
 
 	// Trigger a repaint immediatly
 	m_context.swapBuffers(this);
-	for(auto w : secondaryWindows)
+	for(auto const& w : secondaryWindows)
 	{
-		m_context.swapBuffers(w);
+		m_context.swapBuffers(w.get());
 	}
 }
 
 AbstractMainWin::~AbstractMainWin()
 {
-	delete shaderSelector;
-	delete menuBar;
-	delete networkManager;
-	delete toneMappingModel;
-	delete bloomTargets[0];
-	delete bloomTargets[1];
-
 	// force garbage collect some resources
 	AsyncTexture::garbageCollect(true);
-	AsyncMesh::garbageCollect(true);
 
 	PythonQtHandler::evalScript(
 	    "if \"cleanUpScene\" in dir():\n\tcleanUpScene()");
-	renderer.clean();
 	vrHandler->close();
 	PythonQtHandler::clean();
-	delete dialog3dWheel;
-	delete vrHandler;
-
-	for(auto w : secondaryWindows)
-	{
-		delete w;
-	}
 }
 
 void AbstractMainWin::reloadBloomTargets()
@@ -775,10 +789,10 @@ void AbstractMainWin::reloadBloomTargets()
 	{
 		return;
 	}
-	delete bloomTargets[0];
-	delete bloomTargets[1];
-	bloomTargets[0] = new GLFramebufferObject(GLTexture::Tex2DProperties(
-	    renderer.getSize().width(), renderer.getSize().height(), GL_RGBA32F));
-	bloomTargets[1] = new GLFramebufferObject(GLTexture::Tex2DProperties(
-	    renderer.getSize().width(), renderer.getSize().height(), GL_RGBA32F));
+	bloomTargets[0] = std::make_unique<GLFramebufferObject>(
+	    GLTexture::Tex2DProperties(renderer.getSize().width(),
+	                               renderer.getSize().height(), GL_RGBA32F));
+	bloomTargets[1] = std::make_unique<GLFramebufferObject>(
+	    GLTexture::Tex2DProperties(renderer.getSize().width(),
+	                               renderer.getSize().height(), GL_RGBA32F));
 }

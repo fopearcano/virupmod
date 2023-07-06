@@ -21,6 +21,7 @@
 
 #include <QSize>
 
+#include "GLBuffer.hpp"
 #include "GLTexture.hpp"
 
 class GLBuffer;
@@ -31,6 +32,7 @@ class GLPixelBufferObject
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
+	GLPixelBufferObject()                                            = delete;
 	GLPixelBufferObject(GLPixelBufferObject const& other)            = delete;
 	GLPixelBufferObject& operator=(GLPixelBufferObject const& other) = delete;
 	/**
@@ -38,22 +40,16 @@ class GLPixelBufferObject
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
 
-	GLPixelBufferObject(GLPixelBufferObject&& other)
-	    : buff(other.buff)
-	    , size(other.size)
-	    , mappedData(other.mappedData)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning shader if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLPixelBufferObject(GLPixelBufferObject&& other) noexcept;
+	GLPixelBufferObject& operator=(GLPixelBufferObject&& other) noexcept;
 
 	explicit GLPixelBufferObject(QSize const& size);
 	GLPixelBufferObject(unsigned int width, unsigned int height)
 	    : GLPixelBufferObject(QSize(width, height)){};
 	QSize getSize() { return size; };
 	unsigned char* getMappedData() { return mappedData; };
-	GLTexture* copyContentToNewTex(bool sRGB = true) const;
+	std::unique_ptr<GLTexture> copyContentToNewTex(bool sRGB = true) const;
 
 	virtual ~GLPixelBufferObject() { cleanUp(); };
 
@@ -64,7 +60,7 @@ class GLPixelBufferObject
 	void cleanUp();
 
   private:
-	GLBuffer* buff = nullptr;
+	GLBuffer buff;
 	QSize size;
 	unsigned char* mappedData;
 

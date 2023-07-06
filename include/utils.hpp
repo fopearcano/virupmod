@@ -20,6 +20,8 @@ class PySide : public QObject
 {
 	Q_OBJECT
   public:
+	PySide(QObject* parent = nullptr)
+	    : QObject(parent){};
 	enum Side
 	{
 		NONE,

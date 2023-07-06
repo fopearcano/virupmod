@@ -26,12 +26,41 @@ unsigned int& GLMesh::instancesCount()
 	return instancesCount;
 }
 
+GLMesh::GLMesh(GLMesh&& other) noexcept
+    : vao(other.vao)
+    , vbo(std::move(other.vbo))
+    , ebo(std::move(other.ebo))
+    , vertexSize(other.vertexSize)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning shader if it destroys itself
+	other.doClean = false;
+}
+
+GLMesh& GLMesh::operator=(GLMesh&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	vao        = other.vao;
+	vbo        = std::move(other.vbo);
+	ebo        = std::move(other.ebo);
+	vertexSize = other.vertexSize;
+	doClean    = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLMesh::GLMesh()
+    : vbo(GL_ARRAY_BUFFER)
+    , ebo(GL_ELEMENT_ARRAY_BUFFER)
 {
 	++instancesCount();
 	GLHandler::glf().glGenVertexArrays(1, &vao);
-	vbo = new GLBuffer(GL_ARRAY_BUFFER);
-	ebo = new GLBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }
 
 void GLMesh::cleanUp()
@@ -41,8 +70,6 @@ void GLMesh::cleanUp()
 		return;
 	}
 	--instancesCount();
-	delete vbo;
-	delete ebo;
 	GLHandler::glf().glDeleteVertexArrays(1, &vao);
 	doClean = false;
 }
@@ -65,7 +92,7 @@ void GLMesh::setVertexShaderMapping(
 		if(posAttrib != -1)
 		{
 			GLHandler::glf().glEnableVertexAttribArray(posAttrib);
-			vbo->bind(); // binds the vbo to the vao attrib pointer
+			vbo.bind(); // binds the vbo to the vao attrib pointer
 			GLHandler::glf().glVertexAttribPointer(
 			    posAttrib, map.second, GL_FLOAT, GL_FALSE,
 			    stride * sizeof(float),
@@ -76,7 +103,7 @@ void GLMesh::setVertexShaderMapping(
 	}
 	vertexSize = offset * sizeof(float);
 
-	ebo->bind();
+	ebo.bind();
 	GLHandler::glf().glBindVertexArray(0);
 }
 
@@ -95,14 +122,14 @@ void GLMesh::setVertexShaderMapping(
 
 void GLMesh::setVertices(float const* vertices, size_t vertSize)
 {
-	vbo->setData(vertices, vertSize);
+	vbo.setData(vertices, vertSize);
 }
 
 void GLMesh::setVertices(float const* vertices, size_t vertSize,
                          unsigned int const* elements, size_t elemSize)
 {
-	vbo->setData(vertices, vertSize);
-	ebo->setData(elements, elemSize);
+	vbo.setData(vertices, vertSize);
+	ebo.setData(elements, elemSize);
 }
 
 void GLMesh::setVertices(std::vector<float> const& vertices)
@@ -126,8 +153,8 @@ void GLMesh::drawArrays(unsigned int first, size_t count,
 	}
 	if(primitiveType == PrimitiveType::AUTO)
 	{
-		primitiveType = (ebo->getSize() == 0) ? PrimitiveType::POINTS
-		                                      : PrimitiveType::TRIANGLES;
+		primitiveType = (ebo.getSize() == 0) ? PrimitiveType::POINTS
+		                                     : PrimitiveType::TRIANGLES;
 	}
 
 	GLHandler::glf().glBindVertexArray(vao);
@@ -144,20 +171,20 @@ void GLMesh::render(PrimitiveType primitiveType) const
 	}
 	if(primitiveType == PrimitiveType::AUTO)
 	{
-		primitiveType = (ebo->getSize() == 0) ? PrimitiveType::POINTS
-		                                      : PrimitiveType::TRIANGLES;
+		primitiveType = (ebo.getSize() == 0) ? PrimitiveType::POINTS
+		                                     : PrimitiveType::TRIANGLES;
 	}
 
 	GLHandler::glf().glBindVertexArray(vao);
-	if(ebo->getSize() == 0)
+	if(ebo.getSize() == 0)
 	{
 		GLHandler::glf().glDrawArrays(static_cast<GLenum>(primitiveType), 0,
-		                              vbo->getSize() / vertexSize);
+		                              vbo.getSize() / vertexSize);
 	}
 	else
 	{
 		GLHandler::glf().glDrawElements(static_cast<GLenum>(primitiveType),
-		                                ebo->getSize() / sizeof(unsigned int),
+		                                ebo.getSize() / sizeof(unsigned int),
 		                                GL_UNSIGNED_INT, nullptr);
 	}
 	GLHandler::glf().glBindVertexArray(0);

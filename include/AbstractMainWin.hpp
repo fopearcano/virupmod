@@ -30,6 +30,7 @@
 #include "gl/GLHandler.hpp"
 #include "gl/GLShaderProgram.hpp"
 #include "gui/ShaderSelector.hpp"
+#include "memory.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
 
@@ -313,7 +314,10 @@ class AbstractMainWin : public RenderingWindow
 	 */
 	virtual void updateScene(BasicCamera& camera, QString const& pathId) = 0;
 
-	virtual AbstractState* constructNewState() const { return nullptr; };
+	virtual std::unique_ptr<AbstractState> constructNewState() const
+	{
+		return nullptr;
+	};
 	virtual void readState(AbstractState const& /*s*/){};
 	virtual void writeState(AbstractState& /*s*/) const {};
 
@@ -330,7 +334,7 @@ class AbstractMainWin : public RenderingWindow
 	virtual void renderScene(BasicCamera const& camera, QString const& pathId)
 	    = 0;
 
-	virtual void renderGui(){};
+	virtual void renderGui(QSize const& /*targetSize*/){};
 	/**
 	 * @brief Gets called before applying a specific post-processing shader.
 	 *
@@ -371,17 +375,14 @@ class AbstractMainWin : public RenderingWindow
 	/**
 	 * @brief The engine's only @ref VRHandler.
 	 */
-	VRHandler* vrHandler
-	    = QSettings().value("vr/handler").toString() == "openvr"
-	          ? static_cast<VRHandler*>(new OpenVRHandler)
-	          : static_cast<VRHandler*>(new StereoBeamerHandler);
+	std::unique_ptr<VRHandler> vrHandler;
 
 	GamepadHandler gamepadHandler;
 	/**
 	 * @brief The engine's only @ref Renderer.
 	 */
 	Renderer renderer;
-	NetworkManager* networkManager = nullptr;
+	std::unique_ptr<NetworkManager> networkManager;
 	/**
 	 * @brief Last frame time to render in seconds.
 	 *
@@ -392,6 +393,10 @@ class AbstractMainWin : public RenderingWindow
 	 * @brief Gamma value to use for gamma correction
 	 */
 	float gamma = 2.2f;
+	/**
+	 * @brief Quits the application if the main window is closed.
+	 */
+	bool quitOnClose = true;
 
 	// OFFSCREEN RENDERING
 	bool videomode = QSettings().value("window/videomode").toBool();
@@ -407,15 +412,15 @@ class AbstractMainWin : public RenderingWindow
 	unsigned int currentVideoFrame = 0;
 
 	// Postprocessing
-	ToneMappingModel* toneMappingModel = nullptr;
+	std::unique_ptr<ToneMappingModel> toneMappingModel;
 
 	// Menu Bar
-	QMenuBar* menuBar = nullptr;
+	std::unique_ptr<QMenuBar> menuBar;
 
 	// Dialog3Ds Wheel
-	Dialog3DWheel* dialog3dWheel = nullptr;
+	std::unique_ptr<Dialog3DWheel> dialog3dWheel;
 
-	ShaderSelector* shaderSelector = nullptr;
+	std::unique_ptr<ShaderSelector> shaderSelector;
 
   private:
 	void initializeGL();
@@ -434,10 +439,10 @@ class AbstractMainWin : public RenderingWindow
 
 	// BLOOM
 	bool bloom = QSettings().value("graphics/bloom").toBool();
-	std::array<GLFramebufferObject*, 2> bloomTargets = {{nullptr, nullptr}};
+	std::array<std::unique_ptr<GLFramebufferObject>, 2> bloomTargets;
 	void reloadBloomTargets();
 	// SECONDARY WINDOWS
-	std::vector<RenderingWindow*> secondaryWindows;
+	std::vector<std::unique_ptr<RenderingWindow>> secondaryWindows;
 
 	//#ifdef Q_OS_WIN
 	// FULLSCREEN HACK

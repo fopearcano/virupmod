@@ -70,7 +70,6 @@ class CalibrationCompass
 	    getDoubleFarRightPixelSubtendedAngle(float horizontalFOV,
 	                                         unsigned int renderTargetWidth);
 	static double getCurrentTickResolution();
-	~CalibrationCompass();
 
 	float exposure     = 1.f;
 	float dynamicrange = 1.f;
@@ -97,7 +96,7 @@ class CalibrationCompass
   private:
 	GLShaderProgram shader;
 	GLMesh circle;
-	std::vector<Text3D*> billboards;
+	std::vector<Text3D> billboards;
 
 	void renderCircle(QMatrix4x4 const& angleShiftMat, float latitude);
 	void renderCompassTicks(QMatrix4x4 const& angleShiftMat,

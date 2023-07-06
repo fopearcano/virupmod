@@ -36,8 +36,8 @@ class PathSelector : public QWidget
 		DIRECTORY
 	};
 
-	PathSelector(QWidget* parent, QString const& caption,
-	             Type type = Type::FILE);
+	PathSelector(QString const& caption, Type type = Type::FILE,
+	             QWidget* parent = nullptr);
 
   signals:
 	void pathChanged(QString const& path);
@@ -47,7 +47,6 @@ class PathSelector : public QWidget
 
   private:
 	QLineEdit* fileEdit;
-	QFileSystemModel* dirModel = nullptr;
 };
 
 #endif // PATHSELECTOR_HPP

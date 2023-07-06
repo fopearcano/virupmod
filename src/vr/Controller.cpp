@@ -1,5 +1,7 @@
 #include "vr/Controller.hpp"
 
+#include <memory>
+
 //-----------------------------------------------------------------------------
 // Purpose: Helper to get a string from a tracked device property and turn it
 //			into a std::string
@@ -16,11 +18,10 @@ std::string GetTrackedDeviceString(vr::IVRSystem* pHmd,
 		return "";
 	}
 
-	auto pchBuffer = new char[requiredBufferLen];
-	pHmd->GetStringTrackedDeviceProperty(unDevice, prop, pchBuffer,
+	auto pchBuffer = std::unique_ptr<char[]>(new char[requiredBufferLen]);
+	pHmd->GetStringTrackedDeviceProperty(unDevice, prop, pchBuffer.get(),
 	                                     requiredBufferLen, peError);
-	std::string sResult = pchBuffer;
-	delete[] pchBuffer;
+	std::string sResult = pchBuffer.get();
 	return sResult;
 }
 
@@ -167,9 +168,9 @@ Controller::Controller(vr::IVRSystem* vr_pointer, unsigned int nDevice,
 	mesh.setVertexShaderMapping(
 	    shaderProgram, {{"position", 3}, {"normal", 3}, {"texcoord", 2}});
 
-	tex = new GLTexture(
+	tex = std::make_unique<GLTexture>(
 	    GLTexture::Tex2DProperties(rm_texture->unWidth, rm_texture->unHeight),
-	    {}, {rm_texture->rubTextureMapData});
+	    GLTexture::Sampler{}, GLTexture::Data{rm_texture->rubTextureMapData});
 
 	shaderProgram.setUniform("alpha", 1.0f);
 	if(side == Side::LEFT)
@@ -209,6 +210,6 @@ void Controller::render(ToneMappingModel const& tmm) const
 	shaderProgram.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shaderProgram, model,
 	                       GLHandler::GeometricSpace::SEATEDTRACKED);
-	GLHandler::useTextures({tex});
+	GLHandler::useTextures({tex.get()});
 	mesh.render();
 }

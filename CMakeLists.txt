@@ -40,16 +40,16 @@ endforeach()
 project(${PROJECT_NAME} CXX)
 set(CMAKE_PROJECT_DESCRIPTION ${PROJECT_DESCRIPTION})
 
-# C++ 11
+# C++ 14
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=gnu++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+CHECK_CXX_COMPILER_FLAG("-std=gnu++14" COMPILER_SUPPORTS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
+if(COMPILER_SUPPORTS_CXX14)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+elseif(COMPILER_SUPPORTS_CXX1Y)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 else()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
 endif()
 
 # For clang - tidy to use(clang - tidy - p)
@@ -123,11 +123,17 @@ execute_process(COMMAND git submodule update --init --recursive
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty)
-	file(GLOB THIRDPARTY_INCLUDES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/include/ LIST_DIRECTORIES true)
-	file(GLOB THIRDPARTY_DATA_FILES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/data LIST_DIRECTORIES true)
+	file(GLOB ALL_PATHS "${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/*/include")
+	set(RESULT "")
+	foreach(PATH ${ALL_PATHS})
+		if(IS_DIRECTORY ${PATH})
+			list(APPEND RESULT ${PATH})
+		endif()
+	endforeach()
 endif()
 
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
+set(THIRDPARTY_INCLUDES ${RESULT})
 set(PROJECT_INCLUDES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/include)
 set(TEST_INCLUDES ${PROJECT_SOURCE_DIR}/test ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/test)
 
@@ -490,6 +496,7 @@ endif()
 # Including extra cmake rules
 include(cmake/ClangDevTools.cmake)
 include(cmake/Doc.cmake)
+include(cmake/GLSLValidator.cmake)
 
 # Translation
 if(PROJECT_TRANSLATE)

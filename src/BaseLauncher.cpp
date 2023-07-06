@@ -21,14 +21,13 @@
 void BaseLauncher::init()
 {
 	this->setWindowTitle(QString(PROJECT_NAME) + tr(" Launcher"));
-	this->setFixedSize(QSize(800, 600));
 
-	mainLayout = new QVBoxLayout(this);
+	mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
 	// SETTINGS TAB WIDGET
 	settingsWidget = newSettingsWidget();
-	mainLayout->addWidget(settingsWidget);
-	connect(settingsWidget, &SettingsWidget::maxWidgetSizeChanged,
+	mainLayout->addWidget(settingsWidget.get());
+	connect(settingsWidget.get(), &SettingsWidget::maxWidgetSizeChanged,
 	        [this](QSize const& maxWidgetSize)
 	        {
 		        QSize borders(30, 150);
@@ -46,29 +45,29 @@ void BaseLauncher::init()
 	        });
 
 	// LAUNCH AND QUIT BUTTONS
-	auto w = new QWidget(this);
+	auto w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto l   = new QHBoxLayout(w);
-	auto pbl = new QPushButton(this);
+	auto l   = make_qt_unique<QHBoxLayout>(*w);
+	auto pbl = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbl);
 	pbl->setText(tr("LAUNCH"));
 	pbl->setDefault(true);
 	connect(pbl, SIGNAL(pressed()), this, SLOT(accept()));
 
-	auto pbr = new QPushButton(this);
+	auto pbr = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbr);
 	pbr->setText(tr("RESET TO DEFAULT"));
 	connect(pbr, SIGNAL(pressed()), this, SLOT(resetSettings()));
 
-	auto pbq = new QPushButton(this);
+	auto pbq = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbq);
 	pbq->setText(tr("QUIT"));
 	connect(pbq, SIGNAL(pressed()), this, SLOT(reject()));
 }
 
-SettingsWidget* BaseLauncher::newSettingsWidget()
+std::unique_ptr<SettingsWidget> BaseLauncher::newSettingsWidget()
 {
-	return new SettingsWidget(this);
+	return std::make_unique<SettingsWidget>();
 }
 
 void BaseLauncher::resetSettings()
@@ -82,8 +81,7 @@ void BaseLauncher::resetSettings()
 		return;
 	}
 	QSettings().clear();
-	SettingsWidget* oldWidget(settingsWidget);
-	settingsWidget = newSettingsWidget();
-	mainLayout->replaceWidget(oldWidget, settingsWidget);
-	delete oldWidget;
+	auto newWidget = newSettingsWidget();
+	mainLayout->replaceWidget(settingsWidget.get(), newWidget.get());
+	settingsWidget = std::move(newWidget);
 }

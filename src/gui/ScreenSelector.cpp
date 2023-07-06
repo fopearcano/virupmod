@@ -18,6 +18,8 @@
 
 #include "gui/ScreenSelector.hpp"
 
+#include "memory.hpp"
+
 QString& ScreenSelector::retValue()
 {
 	static QString retValue = "";
@@ -42,7 +44,7 @@ ScreenSelector::ScreenSelector(QWidget* parent)
 	this->setFixedSize(QSize(w, h));
 	for(auto const& s : getScreens())
 	{
-		auto button = new QPushButton(this);
+		auto button = make_qt_unique<QPushButton>(*this);
 		button->setGeometry(s.second);
 		button->setText(s.first);
 

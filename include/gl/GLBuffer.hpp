@@ -30,22 +30,17 @@ class GLBuffer
   public:
 	// implement those in protected if and only if they're needed for the Python
 	// API
+	GLBuffer()                                 = delete;
 	GLBuffer(GLBuffer const& other)            = delete;
 	GLBuffer& operator=(GLBuffer const& other) = delete;
 	/**
-	 * @brief Returns the number of allocated OpenGL textures.
+	 * @brief Returns the number of allocated OpenGL buffers.
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
 
-	GLBuffer(GLBuffer&& other)
-	    : id(other.id)
-	    , currentTarget(other.currentTarget)
-	    , size(other.size)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning shader if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLBuffer(GLBuffer&& other) noexcept;
+	GLBuffer& operator=(GLBuffer&& other) noexcept;
 
 	explicit GLBuffer(GLenum target, size_t size = 0,
 	                  GLenum usage = GL_STATIC_DRAW);

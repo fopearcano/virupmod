@@ -19,10 +19,6 @@
 #include "GamepadHandler.hpp"
 
 #include <QtDebug>
-#ifdef QT5_GAMEPAD
-#include <QtGamepad/QGamepad>
-#include <QtGamepad/QGamepadManager>
-#endif
 
 GamepadHandler::GamepadHandler()
 {
@@ -143,8 +139,7 @@ void GamepadHandler::updateGamepad()
 {
 #ifdef QT5_GAMEPAD
 	bool previouslyEnabled = isEnabled();
-	delete gamepad;
-	gamepad          = nullptr;
+	gamepad.reset();
 	bool noEmptyName = false;
 #ifdef Q_OS_WIN
 	// usually names never get recovered on Windows
@@ -154,7 +149,7 @@ void GamepadHandler::updateGamepad()
 	{
 		if(pair.first == desiredDeviceId)
 		{
-			gamepad = new QGamepad(pair.first);
+			gamepad = std::make_unique<QGamepad>(pair.first);
 			setupGamepadConnections();
 			if(!previouslyEnabled)
 			{
@@ -170,16 +165,16 @@ void GamepadHandler::updateGamepad()
 				}
 				else // wait for name to be non-empty
 				{
-					auto const connection = new QMetaObject::Connection;
-					*connection
-					    = connect(gamepad, &QGamepad::nameChanged,
-					              [this, connection](QString const& name)
-					              {
-						              qDebug() << name + " connected...";
-						              gamepadName = gamepad->name();
-						              QObject::disconnect(*connection);
-						              delete connection;
-					              });
+					connection  = std::make_unique<QMetaObject::Connection>();
+					*connection = connect(gamepad.get(), &QGamepad::nameChanged,
+					                      [this](QString const& name)
+					                      {
+						                      qDebug()
+						                          << name + " connected...";
+						                      gamepadName = gamepad->name();
+						                      QObject::disconnect(*connection);
+						                      connection.reset();
+					                      });
 				}
 			}
 			break;
@@ -196,112 +191,112 @@ void GamepadHandler::updateGamepad()
 void GamepadHandler::setupGamepadConnections()
 {
 #ifdef QT5_GAMEPAD
-	connect(gamepad, &QGamepad::buttonAChanged,
+	connect(gamepad.get(), &QGamepad::buttonAChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::A);
 	        });
-	connect(gamepad, &QGamepad::buttonBChanged,
+	connect(gamepad.get(), &QGamepad::buttonBChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::B);
 	        });
-	connect(gamepad, &QGamepad::buttonXChanged,
+	connect(gamepad.get(), &QGamepad::buttonXChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::X);
 	        });
-	connect(gamepad, &QGamepad::buttonYChanged,
+	connect(gamepad.get(), &QGamepad::buttonYChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::Y);
 	        });
-	connect(gamepad, &QGamepad::buttonL1Changed,
+	connect(gamepad.get(), &QGamepad::buttonL1Changed,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::L1);
 	        });
-	connect(gamepad, &QGamepad::buttonR1Changed,
+	connect(gamepad.get(), &QGamepad::buttonR1Changed,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::R1);
 	        });
-	connect(gamepad, &QGamepad::buttonL3Changed,
+	connect(gamepad.get(), &QGamepad::buttonL3Changed,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::L3);
 	        });
-	connect(gamepad, &QGamepad::buttonR3Changed,
+	connect(gamepad.get(), &QGamepad::buttonR3Changed,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::R3);
 	        });
-	connect(gamepad, &QGamepad::buttonUpChanged,
+	connect(gamepad.get(), &QGamepad::buttonUpChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::UP);
 	        });
-	connect(gamepad, &QGamepad::buttonDownChanged,
+	connect(gamepad.get(), &QGamepad::buttonDownChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::DOWN);
 	        });
-	connect(gamepad, &QGamepad::buttonLeftChanged,
+	connect(gamepad.get(), &QGamepad::buttonLeftChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::LEFT);
 	        });
-	connect(gamepad, &QGamepad::buttonRightChanged,
+	connect(gamepad.get(), &QGamepad::buttonRightChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::RIGHT);
 	        });
-	connect(gamepad, &QGamepad::buttonCenterChanged,
+	connect(gamepad.get(), &QGamepad::buttonCenterChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::CENTER);
 	        });
-	connect(gamepad, &QGamepad::buttonSelectChanged,
+	connect(gamepad.get(), &QGamepad::buttonSelectChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::SELECT);
 	        });
-	connect(gamepad, &QGamepad::buttonStartChanged,
+	connect(gamepad.get(), &QGamepad::buttonStartChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED
 		                         : EventType::BUTTON_UNPRESSED,
 		                       Button::START);
 	        });
-	connect(gamepad, &QGamepad::buttonGuideChanged,
+	connect(gamepad.get(), &QGamepad::buttonGuideChanged,
 	        [this](bool v)
 	        {
 		        events.emplace(v ? EventType::BUTTON_PRESSED

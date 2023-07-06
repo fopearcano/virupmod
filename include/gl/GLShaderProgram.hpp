@@ -55,20 +55,11 @@ class GLShaderProgram
 	 * actual @ref GLShaderProgram number of instances).
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
-	/**
-	 * @brief Returns a string description of the shader.
-	 *
-	 * The integer shown is the actual GLuint id of the OpenGL shader program.
-	 */
-	QString toStr() const { return QString::number(glShaderProgram); };
 
-	GLShaderProgram(GLShaderProgram&& other)
-	    : glShaderProgram(other.glShaderProgram)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning shader if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLShaderProgram(GLShaderProgram&& other) noexcept;
+	GLShaderProgram& operator=(GLShaderProgram&& other) noexcept;
+
 	/**
 	 * @brief Convenient shortcut for GLShaderProgram(@p shadersCommonName, @p
 	 * shadersCommonName, @p shadersCommonName).
@@ -111,6 +102,13 @@ class GLShaderProgram
 	// pair := (name/path, stage)
 	GLShaderProgram(std::vector<std::pair<QString, Stage>> const& pipeline,
 	                QMap<QString, QString> const& defines = {});
+	/**
+	 * @brief Returns a string description of the shader.
+	 *
+	 * The integer shown is the actual GLuint id of the OpenGL shader program.
+	 */
+	QString toStr() const { return QString::number(glShaderProgram); };
+
 	/** @brief Returns attribute location in shader program.
 	 */
 	int getAttribLocationFromName(const char* attributeName) const;
@@ -249,7 +247,7 @@ class GLShaderProgram
 	void get(GLenum pname, GLint* params) const;
 
   private:
-	const GLuint glShaderProgram;
+	GLuint glShaderProgram;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();

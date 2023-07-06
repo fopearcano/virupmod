@@ -43,7 +43,6 @@ class Widget3D
 	void render(ToneMappingModel const& tmm,
 	            GLHandler::GeometricSpace geometricSpace,
 	            QVector2D const& cursorPos);
-	~Widget3D();
 
 	static void paintWidget(QImage& image, QWidget& widget);
 
@@ -55,7 +54,7 @@ class Widget3D
 
 	GLShaderProgram shader;
 	GLMesh quad;
-	GLTexture* tex = nullptr;
+	std::unique_ptr<GLTexture> tex;
 
 	QMatrix4x4 model;
 

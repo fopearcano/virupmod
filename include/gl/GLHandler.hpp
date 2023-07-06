@@ -38,10 +38,6 @@
  * GLHandler is designed to be used as a static class and you shouldn't
  * instanciate it.
  *
- * Any result of a new*() method should be deleted with the corresponding
- * delete*() method to free resources as if they were new and delete
- * operators.
- *
  * @todo Write examples + one small paragraph per category.
  */
 class GLHandler : public QObject
@@ -70,10 +66,13 @@ class GLHandler : public QObject
 	Q_ENUM(GeometricSpace)
 
   public:
+	GLHandler(QObject* parent = nullptr)
+	    : QObject(parent){};
+
 	/**
 	 * @brief Initializes the OpenGL API. No OpenGL call can be issued before
 	 * this method is called, which you can consider all of the other methods
-	 * do, including allocating resources through the new*() methods.
+	 * do, including allocating resources.
 	 */
 	static bool init();
 

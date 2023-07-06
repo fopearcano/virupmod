@@ -19,9 +19,12 @@
 #ifndef GLTEXTURE_HPP
 #define GLTEXTURE_HPP
 
+#include <array>
+
 #include "glfunctions.hpp"
 
 #include "PythonQtHandler.hpp"
+#include "memory.hpp"
 
 class GLHandler;
 
@@ -208,6 +211,7 @@ class GLTexture
 
 	// implement those in protected if and only if they're needed for the Python
 	// API
+	GLTexture()                                  = delete;
 	GLTexture(GLTexture const& other)            = delete;
 	GLTexture& operator=(GLTexture const& other) = delete;
 	/**
@@ -215,18 +219,9 @@ class GLTexture
 	 */
 	static unsigned int getInstancesCount() { return instancesCount(); };
 
-	GLTexture(GLTexture&& other)
-	    : type(other.type)
-	    , glTexture(other.glTexture)
-	    , glTarget(other.glTarget)
-	    , internalFormat(other.internalFormat)
-	    , size(other.size)
-	    , samples(other.samples)
-	    , doClean(other.doClean)
-	{
-		// prevent other from cleaning shader if it destroys itself
-		other.doClean = false;
-	};
+	// move semantics
+	GLTexture(GLTexture&& other) noexcept;
+	GLTexture& operator=(GLTexture&& other) noexcept;
 
 	explicit GLTexture(Tex1DProperties const& properties,
 	                   Sampler const& sampler = {}, Data const& data = {});
@@ -256,7 +251,7 @@ class GLTexture
 	QImage getContentAsImage(unsigned int level = 0) const;
 	// allocates buff ; don't forget to delete ; returns allocated size (zero if
 	// error)
-	unsigned int getContentAsData(GLfloat** buff, unsigned int level = 0) const;
+	std::vector<GLfloat> getContentAsData(unsigned int level = 0) const;
 	float getAverageLuminance() const;
 
 	void setSampler(Sampler const& sampler) const;
@@ -273,7 +268,7 @@ class GLTexture
 
   protected:
 	/**
-	 * @brief Frees the underlying OpenGL buffers.
+	 * @brief Frees the underlying OpenGL texture.
 	 */
 	void cleanUp();
 

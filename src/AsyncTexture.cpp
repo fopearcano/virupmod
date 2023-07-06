@@ -24,10 +24,12 @@ bool& AsyncTexture::forceSync()
 	return forceSync;
 }
 
-QList<QPair<at::WorkerThread*, GLPixelBufferObject*>>&
+std::list<std::pair<std::unique_ptr<at::WorkerThread>,
+                    std::unique_ptr<GLPixelBufferObject>>>&
     AsyncTexture::waitingForDeletion()
 {
-	static QList<QPair<at::WorkerThread*, GLPixelBufferObject*>>
+	static std::list<std::pair<std::unique_ptr<at::WorkerThread>,
+	                           std::unique_ptr<GLPixelBufferObject>>>
 	    waitingForDeletion = {};
 	return waitingForDeletion;
 }
@@ -54,10 +56,9 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
 	QImageReader imReader(path);
 	QSize size(imReader.size());
 
-	pbo = new GLPixelBufferObject(size);
-	unsigned char* data(pbo->getMappedData());
+	pbo = std::make_unique<GLPixelBufferObject>(size);
 
-	thread = new at::WorkerThread(path, data);
+	thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData());
 	thread->start();
 }
 
@@ -88,18 +89,17 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
 	   && (width > static_cast<unsigned int>(size.width())
 	       || height > static_cast<unsigned int>(size.height())))
 	{
-		pbo = new GLPixelBufferObject(size);
-		unsigned char* data(pbo->getMappedData());
+		pbo = std::make_unique<GLPixelBufferObject>(size);
 
-		thread = new at::WorkerThread(path, data);
+		thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData());
 		thread->start();
 	}
 	else
 	{
-		pbo = new GLPixelBufferObject(width, height);
-		unsigned char* data(pbo->getMappedData());
+		pbo = std::make_unique<GLPixelBufferObject>(width, height);
 
-		thread = new at::WorkerThread(path, data, width, height);
+		thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData(),
+		                                            width, height);
 		thread->start();
 	}
 }
@@ -129,11 +129,11 @@ GLTexture const& AsyncTexture::getTexture()
 	}
 
 	tex = pbo->copyContentToNewTex(sRGB);
-	delete pbo;
+	pbo.reset();
 	tex->generateMipmap();
 	unsigned int lastMipmap(tex->getHighestMipmapLevel());
 	averageColor = tex->getContentAsImage(lastMipmap).pixelColor(0, 0);
-	delete thread;
+	thread.reset();
 	loaded = true;
 
 	return *tex;
@@ -141,39 +141,30 @@ GLTexture const& AsyncTexture::getTexture()
 
 AsyncTexture::~AsyncTexture()
 {
-	if(!emptyPath)
+	if(!emptyPath && !loaded && !thread->isFinished())
 	{
-		if(loaded)
-		{
-			delete tex;
-		}
-		else if(thread->isFinished())
-		{
-			delete pbo;
-			delete thread;
-		}
-		else
-		{
-			thread->setPriority(QThread::LowestPriority);
-			waitingForDeletion().push_back({thread, pbo});
-		}
+		thread->setPriority(QThread::LowestPriority);
+		waitingForDeletion().emplace_back(std::move(thread), std::move(pbo));
 	}
 }
 
 void AsyncTexture::garbageCollect(bool force)
 {
 	// go in reverse because of possible deletions
-	for(int i(waitingForDeletion().size() - 1); i >= 0; --i)
+	for(auto it(waitingForDeletion().begin());
+	    it != waitingForDeletion().end();)
 	{
 		if(force)
 		{
-			waitingForDeletion()[i].first->wait();
+			it->first->wait();
 		}
-		if(waitingForDeletion()[i].first->isFinished())
+		if(it->first->isFinished())
 		{
-			delete waitingForDeletion()[i].second;
-			delete waitingForDeletion()[i].first;
-			waitingForDeletion().removeAt(i);
+			it = waitingForDeletion().erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
 }

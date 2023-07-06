@@ -25,6 +25,42 @@ unsigned int& GLFramebufferObject::instancesCount()
 	return instancesCount;
 }
 
+GLFramebufferObject::GLFramebufferObject(GLFramebufferObject&& other) noexcept
+    : fbo(other.fbo)
+    , texColorBuffer(std::move(other.texColorBuffer))
+    , renderBuffer(other.renderBuffer)
+    , width(other.width)
+    , height(other.height)
+    , depth(other.depth)
+    , isDepthMap(other.isDepthMap)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning fbo if it destroys itself
+	other.doClean = false;
+}
+
+GLFramebufferObject&
+    GLFramebufferObject::operator=(GLFramebufferObject&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	fbo            = other.fbo;
+	texColorBuffer = std::move(other.texColorBuffer);
+	renderBuffer   = other.renderBuffer;
+	width          = other.width;
+	height         = other.height;
+	depth          = other.depth;
+	isDepthMap     = other.isDepthMap;
+	doClean        = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLFramebufferObject::GLFramebufferObject(
     GLTexture::Tex1DProperties const& properties,
     GLTexture::Sampler const& sampler)
@@ -36,7 +72,7 @@ GLFramebufferObject::GLFramebufferObject(
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	// generate texture
-	texColorBuffer = new GLTexture(properties, sampler);
+	texColorBuffer = std::make_unique<GLTexture>(properties, sampler);
 	GLHandler::glf().glFramebufferTexture1D(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer->getGLTarget(),
 	    texColorBuffer->getGLTexture(), 0);
@@ -63,8 +99,9 @@ GLFramebufferObject::GLFramebufferObject(
 	if(isDepthMap)
 	{
 		// generate texture
-		texColorBuffer = new GLTexture(properties, sampler,
-		                               {nullptr, GL_FLOAT, GL_DEPTH_COMPONENT});
+		texColorBuffer = std::make_unique<GLTexture>(
+		    properties, sampler,
+		    GLTexture::Data{nullptr, GL_FLOAT, GL_DEPTH_COMPONENT});
 
 		// add depth specific texture parameters for sampler2DShadow
 		GLHandler::glf().glBindTexture(GL_TEXTURE_2D,
@@ -85,7 +122,7 @@ GLFramebufferObject::GLFramebufferObject(
 	else
 	{
 		// generate texture
-		texColorBuffer = new GLTexture(properties, sampler);
+		texColorBuffer = std::make_unique<GLTexture>(properties, sampler);
 		GLHandler::glf().glFramebufferTexture2D(
 		    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer->getGLTarget(),
 		    texColorBuffer->getGLTexture(), 0);
@@ -116,7 +153,7 @@ GLFramebufferObject::GLFramebufferObject(
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	// generate texture
-	texColorBuffer = new GLTexture(properties, sampler);
+	texColorBuffer = std::make_unique<GLTexture>(properties, sampler);
 	GLHandler::glf().glFramebufferTexture2D(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer->getGLTarget(),
 	    texColorBuffer->getGLTexture(), 0);
@@ -148,7 +185,7 @@ GLFramebufferObject::GLFramebufferObject(
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	// generate texture
-	texColorBuffer = new GLTexture(properties, sampler);
+	texColorBuffer = std::make_unique<GLTexture>(properties, sampler);
 	GLHandler::glf().glFramebufferTexture3D(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer->getGLTarget(),
 	    texColorBuffer->getGLTexture(), 0, 0);
@@ -166,7 +203,7 @@ GLFramebufferObject::GLFramebufferObject(
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	// generate texture
-	texColorBuffer = new GLTexture(properties, sampler);
+	texColorBuffer = std::make_unique<GLTexture>(properties, sampler);
 	GLHandler::glf().glFramebufferTexture2D(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 	    texColorBuffer->getGLTexture(), 0);
@@ -241,19 +278,17 @@ void GLFramebufferObject::showOnScreen(int screenx0, int screeny0, int screenx1,
 
 QImage GLFramebufferObject::copyColorBufferToQImage() const
 {
+	// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 	auto data(new uchar[width * height * 4]);
 
 	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	GLHandler::glf().glReadPixels(0, 0, width, height, GL_RGBA,
 	                              GL_UNSIGNED_BYTE, static_cast<GLvoid*>(data));
 
-	return {data,
-	        static_cast<int>(width),
-	        static_cast<int>(height),
-	        static_cast<int>(width * 4),
-	        QImage::Format::Format_RGBA8888,
-	        [](void* data) { delete static_cast<uchar*>(data); },
-	        data};
+	return {data, static_cast<int>(width), static_cast<int>(height),
+	        static_cast<int>(width * 4), QImage::Format::Format_RGBA8888,
+	        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+	        [](void* data) { delete static_cast<uchar*>(data); }, data};
 }
 
 void GLFramebufferObject::cleanUp()
@@ -264,7 +299,6 @@ void GLFramebufferObject::cleanUp()
 	}
 	--instancesCount();
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	delete texColorBuffer;
 	GLHandler::glf().glDeleteRenderbuffers(1, &renderBuffer);
 	GLHandler::glf().glDeleteFramebuffers(1, &fbo);
 	doClean = false;

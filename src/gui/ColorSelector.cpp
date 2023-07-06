@@ -18,7 +18,7 @@
 
 #include "gui/ColorSelector.hpp"
 
-ColorSelector::ColorSelector(QWidget* parent, QString const& caption)
+ColorSelector::ColorSelector(QString const& caption, QWidget* parent)
     : QPushButton(parent)
 {
 	setObjectName("mainbutton");

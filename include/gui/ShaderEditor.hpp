@@ -32,8 +32,6 @@ class ShaderEditor : public QDialog
 {
   public:
 	ShaderEditor(ShaderProgram& shader, QWidget* parent = nullptr);
-
-  private:
 };
 
 #endif // SHADEREDITOR_HPP

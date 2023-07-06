@@ -26,6 +26,29 @@ unsigned int& GLShaderProgram::instancesCount()
 	return instancesCount;
 }
 
+GLShaderProgram::GLShaderProgram(GLShaderProgram&& other) noexcept
+    : glShaderProgram(other.glShaderProgram)
+    , doClean(other.doClean)
+{
+	// prevent other from cleaning shader if it destroys itself
+	other.doClean = false;
+}
+
+GLShaderProgram& GLShaderProgram::operator=(GLShaderProgram&& other) noexcept
+{
+	if(this == &other)
+	{
+		return *this;
+	}
+	cleanUp();
+
+	glShaderProgram = other.glShaderProgram;
+	doClean         = other.doClean;
+
+	other.doClean = false;
+	return *this;
+}
+
 GLShaderProgram::GLShaderProgram(QString const& shadersCommonName,
                                  QMap<QString, QString> const& defines)
     : GLShaderProgram(shadersCommonName, shadersCommonName, defines)
@@ -172,7 +195,7 @@ void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
                                  QVector3D const* values) const
 {
 	use();
-	auto data = new GLfloat[3 * size];
+	std::unique_ptr<GLfloat[]> data(new GLfloat[3 * size]);
 	for(unsigned int i(0); i < size; ++i)
 	{
 		for(unsigned int j(0); j < 3; ++j)
@@ -182,8 +205,7 @@ void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
 	}
 	GLHandler::glf().glUniform3fv(
 	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), size,
-	    &(data[0]));
-	delete[] data;
+	    data.get());
 }
 
 void GLShaderProgram::setUniform(const char* paramName,
@@ -199,7 +221,7 @@ void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
                                  QVector4D const* values) const
 {
 	use();
-	auto data = new GLfloat[4 * size];
+	std::unique_ptr<GLfloat[]> data(new GLfloat[4 * size]);
 	for(unsigned int i(0); i < size; ++i)
 	{
 		for(unsigned int j(0); j < 4; ++j)
@@ -209,8 +231,7 @@ void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
 	}
 	GLHandler::glf().glUniform4fv(
 	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), size,
-	    &(data[0]));
-	delete[] data;
+	    data.get());
 }
 
 void GLShaderProgram::setUniform(const char* paramName,
@@ -273,6 +294,7 @@ QString GLShaderProgram::getFullPreprocessedSource(
 		f.setFileName(getAbsoluteDataPath("shaders/" + path));
 		if(!f.exists())
 		{
+			qWarning() << "Shader not loaded :\"" << path << "\" not found";
 			return "///!ERROR";
 		}
 	}

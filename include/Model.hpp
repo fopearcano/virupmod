@@ -47,7 +47,6 @@ class Model
 	            Light const& light      = Light(),
 	            GLHandler::GeometricSpace geometricSpace
 	            = GLHandler::GeometricSpace::WORLD);
-	~Model();
 
   private:
 	static QMap<QString, QString> setUpShaderDefines();

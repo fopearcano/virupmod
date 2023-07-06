@@ -19,17 +19,22 @@
 #include "gui/ShaderEditor.hpp"
 
 #include "gui/glslSyntaxHighlighter.h"
+#include "memory.hpp"
 
 ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
     : QDialog(parent)
 {
 	setWindowTitle(tr("Shader Editor") + " - " + shader.toStr());
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto label = new QLabel(this);
-	QString header(shader.getVertexShaderPath() + '\n'
-	               + shader.getFragmentShaderPath() + "\n\n");
+	auto label = make_qt_unique<QLabel>(*this);
+	QString header;
+	for(auto const& p : shader.getPipeline())
+	{
+		header += p.first + '\n';
+	}
+	header += '\n';
 	header += "DEFINES :";
 	for(auto const& d : shader.getDefines().keys())
 	{
@@ -39,47 +44,37 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 	layout->addWidget(label);
 
 	QStringList files;
-	std::vector<QString> _f;
-	GLShaderProgram::getFullPreprocessedSource(
-	    shader.getVertexShaderPath()
-	        + GLShaderProgram::decodeStage(GLShaderProgram::Stage::VERTEX)
-	              .first,
-	    shader.getDefines(), _f);
-	for(auto const& file : _f)
+	for(auto const& p : shader.getPipeline())
 	{
-		files.append(getAbsoluteDataPath("shaders/" + file));
-	}
-	_f.clear();
-	GLShaderProgram::getFullPreprocessedSource(
-	    shader.getFragmentShaderPath()
-	        + GLShaderProgram::decodeStage(GLShaderProgram::Stage::FRAGMENT)
-	              .first,
-	    shader.getDefines(), _f);
-	for(auto const& file : _f)
-	{
-		files.append(getAbsoluteDataPath("shaders/" + file));
+		std::vector<QString> _f;
+		GLShaderProgram::getFullPreprocessedSource(
+		    p.first + GLShaderProgram::decodeStage(p.second).first,
+		    shader.getDefines(), _f);
+		for(auto const& file : _f)
+		{
+			files.append(getAbsoluteDataPath("shaders/" + file));
+		}
 	}
 	files.removeDuplicates();
 
-	auto t = new QTabWidget(this);
+	auto t = make_qt_unique<QTabWidget>(*this);
 	layout->addWidget(t);
 
 	for(auto const& f : files)
 	{
-		auto w         = new QWidget(this);
-		auto tabLayout = new QVBoxLayout(w);
+		auto w         = make_qt_unique<QWidget>(*this);
+		auto tabLayout = make_qt_unique<QVBoxLayout>(*w);
 
 		QFile file(f);
 		file.open(QIODevice::ReadOnly | QFile::Text);
-		auto in   = new QTextStream(&file);
-		auto text = new QTextEdit(this);
-		text->setText(in->readAll().toLocal8Bit());
-		delete in;
+		QTextStream in(&file);
+		auto text = make_qt_unique<QTextEdit>(*this);
+		text->setText(in.readAll().toLocal8Bit());
 		file.close();
 		tabLayout->addWidget(text);
-		(void) new GlslSyntaxHighlighter(text->document());
+		(void) make_qt_unique<GlslSyntaxHighlighter>(*text->document());
 
-		auto b = new QPushButton(tr("Save"), this);
+		auto b = make_qt_unique<QPushButton>(*this, tr("Save"));
 		connect(b, &QPushButton::pressed,
 		        [text, f]()
 		        {
@@ -92,7 +87,7 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 
 		t->addTab(w, f);
 	}
-	auto b = new QPushButton(tr("Reload"), this);
+	auto b = make_qt_unique<QPushButton>(*this, tr("Reload"));
 	connect(b, &QPushButton::pressed, [&shader]() { shader.reload(); });
 	layout->addWidget(b);
 }
