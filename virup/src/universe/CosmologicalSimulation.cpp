@@ -258,86 +258,89 @@ void CosmologicalSimulation::render(Camera const& camera,
 }
 
 QList<QPair<QString, QWidget*>>
-    CosmologicalSimulation::getLauncherFields(QWidget* parent,
-                                              QJsonObject* jsonObj)
+    CosmologicalSimulation::getLauncherFields(QWidget& parent,
+                                              QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector = new PathSelector(parent, QObject::tr("Gas path"));
+	auto pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Gas path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["gasfile"] = path; });
-	pathSelector->setPath((*jsonObj)["gasfile"].toString());
+	                 { jsonObj["gasfile"] = path; });
+	pathSelector->setPath(jsonObj["gasfile"].toString());
 
 	result.append({QObject::tr("Gas Path:"), pathSelector});
 
-	pathSelector = new PathSelector(parent, QObject::tr("Stars path"));
+	pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Stars path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["starsfile"] = path; });
-	pathSelector->setPath((*jsonObj)["starsfile"].toString());
+	                 { jsonObj["starsfile"] = path; });
+	pathSelector->setPath(jsonObj["starsfile"].toString());
 
 	result.append({QObject::tr("Stars Path:"), pathSelector});
 
-	pathSelector = new PathSelector(parent, QObject::tr("Dark matter path"));
+	pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Dark matter path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["darkmatterfile"] = path; });
-	pathSelector->setPath((*jsonObj)["darkmatterfile"].toString());
+	                 { jsonObj["darkmatterfile"] = path; });
+	pathSelector->setPath(jsonObj["darkmatterfile"].toString());
 
 	result.append({QObject::tr("Dark Matter Path:"), pathSelector});
 
-	auto cbox = new QCheckBox(parent);
+	auto cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [jsonObj](int state) {
-		                 (*jsonObj)["loaddarkmatter"] = (state == Qt::Checked);
-	                 });
-	cbox->setCheckState((*jsonObj)["loaddarkmatter"].toBool() ? Qt::Checked
-	                                                          : Qt::Unchecked);
+	                 [jsonObj](int state)
+	                 { jsonObj["loaddarkmatter"] = (state == Qt::Checked); });
+	cbox->setCheckState(jsonObj["loaddarkmatter"].toBool() ? Qt::Checked
+	                                                       : Qt::Unchecked);
 
 	result.append({QObject::tr("Load Dark Matter:"), cbox});
 
-	cbox = new QCheckBox(parent);
+	cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [jsonObj](int state) {
-		                 (*jsonObj)["temporalseries"] = (state == Qt::Checked);
-	                 });
-	cbox->setCheckState((*jsonObj)["temporalseries"].toBool(true)
-	                        ? Qt::Checked
-	                        : Qt::Unchecked);
+	                 [jsonObj](int state)
+	                 { jsonObj["temporalseries"] = (state == Qt::Checked); });
+	cbox->setCheckState(jsonObj["temporalseries"].toBool(true) ? Qt::Checked
+	                                                           : Qt::Unchecked);
 
 	result.append({QObject::tr("Temporal Series:"), cbox});
 
-	auto colorSelector = new ColorSelector(parent, QObject::tr("Gas color"));
+	auto colorSelector
+	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Gas color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
 	                 [jsonObj](QColor const& color)
-	                 { (*jsonObj)["gascolor"] = color.name(); });
-	colorSelector->setColor((*jsonObj)["gascolor"].toString("#000000"));
+	                 { jsonObj["gascolor"] = color.name(); });
+	colorSelector->setColor(jsonObj["gascolor"].toString("#000000"));
 
 	result.append({QObject::tr("Gas Color:"), colorSelector});
 
-	colorSelector = new ColorSelector(parent, QObject::tr("Stars color"));
+	colorSelector
+	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Stars color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
 	                 [jsonObj](QColor const& color)
-	                 { (*jsonObj)["starscolor"] = color.name(); });
-	colorSelector->setColor((*jsonObj)["starscolor"].toString("#000000"));
+	                 { jsonObj["starscolor"] = color.name(); });
+	colorSelector->setColor(jsonObj["starscolor"].toString("#000000"));
 
 	result.append({QObject::tr("Stars Color:"), colorSelector});
 
-	colorSelector = new ColorSelector(parent, QObject::tr("Dark matter color"));
+	colorSelector = make_qt_unique<ColorSelector>(
+	    parent, QObject::tr("Dark matter color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
 	                 [jsonObj](QColor const& color)
-	                 { (*jsonObj)["darkmattercolor"] = color.name(); });
-	colorSelector->setColor((*jsonObj)["darkmattercolor"].toString("#000000"));
+	                 { jsonObj["darkmattercolor"] = color.name(); });
+	colorSelector->setColor(jsonObj["darkmattercolor"].toString("#000000"));
 
 	result.append({QObject::tr("Dark Matter Color:"), colorSelector});
 
 	auto gradient = new grd::Gradient;
-	gradient->setJson((*jsonObj)["gradient"].toObject());
+	gradient->setJson(jsonObj["gradient"].toObject());
 	auto gradientSelector = new GradientSelector(*gradient);
 	connect(gradientSelector, &GradientSelector::gradientChanged,
 	        [jsonObj, gradient]()
-	        { (*jsonObj)["gradient"] = gradient->getJson(); });
+	        { jsonObj["gradient"] = gradient->getJson(); });
 
 	result.append({QObject::tr("Gradient:"), gradientSelector});
 

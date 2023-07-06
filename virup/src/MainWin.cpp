@@ -337,13 +337,15 @@ void MainWin::initScene()
 	toneMappingModel->dynamicrange = 10000.f;
 	grid                           = new Grid;
 
-	auto cam            = new Camera(*vrHandler);
-	cam->seatedVROrigin = false;
+	std::unique_ptr<Camera> cam = std::make_unique<Camera>(*vrHandler);
+	cam->seatedVROrigin         = false;
 	cam->setPerspectiveProj(renderer.getVerticalFOV(),
 	                        renderer.getAspectRatioFromFOV());
 
-	auto camPlanet = new OrbitalSystemCamera(
-	    *vrHandler, toneMappingModel->exposure, toneMappingModel->dynamicrange);
+	std::unique_ptr<OrbitalSystemCamera> camPlanet
+	    = std::make_unique<OrbitalSystemCamera>(*vrHandler,
+	                                            toneMappingModel->exposure,
+	                                            toneMappingModel->dynamicrange);
 	camPlanet->seatedVROrigin = false;
 	camPlanet->setPerspectiveProj(renderer.getVerticalFOV(),
 	                              renderer.getAspectRatioFromFOV());
@@ -376,7 +378,7 @@ void MainWin::initScene()
 	debugText->setSuperSampling(2.f);
 
 	movementControls = new MovementControls(
-	    *vrHandler, universe->getBoundingBox(), cam, camPlanet);
+	    *vrHandler, universe->getBoundingBox(), *cam, *camPlanet);
 
 	inSound.setSource(
 	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/in.wav")));
@@ -409,8 +411,10 @@ void MainWin::initScene()
 
 	renderer.removeSceneRenderPath("default");
 
-	renderer.appendSceneRenderPath("cosmo", Renderer::RenderPath(cam));
-	renderer.appendSceneRenderPath("planet", Renderer::RenderPath(camPlanet));
+	renderer.appendSceneRenderPath("cosmo",
+	                               Renderer::RenderPath(std::move(cam)));
+	renderer.appendSceneRenderPath("planet",
+	                               Renderer::RenderPath(std::move(camPlanet)));
 
 	animator = new Animator(*universe, *vrHandler, *toneMappingModel);
 
@@ -722,7 +726,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	          .length();
 }
 
-void MainWin::renderGui()
+void MainWin::renderGui(QSize const& targetSize)
 {
 	if(!showInfoText)
 	{
@@ -751,8 +755,8 @@ void MainWin::renderGui()
 	painter.setRenderHint(QPainter::TextAntialiasing);
 	QPen pen(Qt::red);
 	painter.setPen(pen);
-	painter.drawText(0, 0, width(), height(), Qt::AlignLeft | Qt::AlignTop,
-	                 str);
+	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
+	                 Qt::AlignLeft | Qt::AlignTop, str);
 	painter.end();
 
 	GLHandler::glf().glEnable(GL_DEPTH_TEST);

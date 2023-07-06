@@ -44,7 +44,7 @@ class MovementControls : public QObject
 	Q_OBJECT
   public:
 	MovementControls(VRHandler const& vrHandler, BBox dataBBox,
-	                 Camera* cosmoCam, OrbitalSystemCamera* cam);
+	                 Camera& cosmoCam, OrbitalSystemCamera& cam);
 	void actionEvent(BaseInputManager::Action const& a, bool pressed);
 	void wheelEvent(QWheelEvent* e);
 	void vrEvent(VRHandler::Event const& e,
@@ -84,7 +84,7 @@ class MovementControls : public QObject
 
 	/* CUBE */
 	BBox dataBBox = {};
-	Camera* cosmoCam;
+	Camera& cosmoCam;
 
 	// scaling/translation controls variables
 	bool leftGripPressedCube        = false;
@@ -95,7 +95,7 @@ class MovementControls : public QObject
 
 	/* ORBITAL SYSTEM */
 
-	OrbitalSystemCamera* planetCam;
+	OrbitalSystemCamera& planetCam;
 
 	// scaling/translation controls variables
 	bool leftGripPressedOrb      = false;

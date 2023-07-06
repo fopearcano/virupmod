@@ -206,7 +206,7 @@ class MainWin : public AbstractMainWin
 	// (no controllers or hands)
 	virtual void renderScene(BasicCamera const& camera,
 	                         QString const& pathId) override;
-	virtual void renderGui() override;
+	virtual void renderGui(QSize const& /*targetSize*/) override;
 
 	virtual void applyPostProcShaderParams(
 	    QString const& id, GLShaderProgram const& shader,
@@ -218,9 +218,9 @@ class MainWin : public AbstractMainWin
 	        QString const& id, GLShaderProgram const& shader,
 	        GLFramebufferObject const& currentTarget) const override;
 
-	virtual AbstractState* constructNewState() const override
+	virtual std::unique_ptr<AbstractState> constructNewState() const override
 	{
-		return new MainWin::State;
+		return std::make_unique<MainWin::State>();
 	};
 	virtual void readState(AbstractState const& s) override
 	{

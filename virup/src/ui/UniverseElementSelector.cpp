@@ -87,7 +87,7 @@ class UniverseElementEditor : public QDialog
 	    , json(universeElement->getJson())
 	{
 		auto form = new QFormLayout(this);
-		for(auto const& pair : UniverseElement::getLauncherFields(this, &json))
+		for(auto const& pair : UniverseElement::getLauncherFields(*this, json))
 		{
 			form->addRow(pair.first, pair.second);
 		}
@@ -96,27 +96,27 @@ class UniverseElementEditor : public QDialog
 		QList<QPair<QString, QWidget*>> fields;
 		if(type == "cosmolabels")
 		{
-			fields = CosmologicalLabels::getLauncherFields(this, &json);
+			fields = CosmologicalLabels::getLauncherFields(*this, json);
 		}
 		if(type == "csvstars")
 		{
-			fields = CSVObjects::getStarsLauncherFields(this, &json);
+			fields = CSVObjects::getStarsLauncherFields(*this, json);
 		}
 		if(type == "csvgalaxies")
 		{
-			fields = CSVObjects::getGalaxiesLauncherFields(this, &json);
+			fields = CSVObjects::getGalaxiesLauncherFields(*this, json);
 		}
 		if(type == "cosmosim")
 		{
-			fields = CosmologicalSimulation::getLauncherFields(this, &json);
+			fields = CosmologicalSimulation::getLauncherFields(*this, json);
 		}
 		if(type == "texsphere")
 		{
-			fields = TexturedSphere::getLauncherFields(this, &json);
+			fields = TexturedSphere::getLauncherFields(*this, json);
 		}
 		if(type == "credits")
 		{
-			fields = Credits::getLauncherFields(this, &json);
+			fields = Credits::getLauncherFields(*this, json);
 		}
 		for(auto const& pair : fields)
 		{

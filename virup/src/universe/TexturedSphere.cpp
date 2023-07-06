@@ -75,25 +75,25 @@ void TexturedSphere::render(Camera const& camera,
 }
 
 QList<QPair<QString, QWidget*>>
-    TexturedSphere::getLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+    TexturedSphere::getLauncherFields(QWidget& parent, QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector = new PathSelector(parent, QObject::tr("Texture path"));
+	auto pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Texture path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
-	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["file"] = path; });
-	pathSelector->setPath((*jsonObj)["file"].toString());
+	                 [&jsonObj](QString const& path)
+	                 { jsonObj["file"] = path; });
+	pathSelector->setPath(jsonObj["file"].toString());
 
 	result.append({QObject::tr("Texture Path:"), pathSelector});
 
-	auto cbox = new QCheckBox(parent);
+	auto cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [jsonObj](int state) {
-		                 (*jsonObj)["cullfrontfaces"] = (state == Qt::Checked);
-	                 });
-	cbox->setCheckState((*jsonObj)["cullfrontfaces"].toBool() ? Qt::Checked
-	                                                          : Qt::Unchecked);
+	                 [jsonObj](int state)
+	                 { jsonObj["cullfrontfaces"] = (state == Qt::Checked); });
+	cbox->setCheckState(jsonObj["cullfrontfaces"].toBool() ? Qt::Checked
+	                                                       : Qt::Unchecked);
 
 	result.append({QObject::tr("Cull front faces :"), cbox});
 

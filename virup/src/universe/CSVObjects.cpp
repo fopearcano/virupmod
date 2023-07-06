@@ -457,23 +457,25 @@ CSVObjects::~CSVObjects()
 }
 
 QList<QPair<QString, QWidget*>>
-    CSVObjects::getStarsLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+    CSVObjects::getStarsLauncherFields(QWidget& parent, QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector = new PathSelector(parent, QObject::tr("CSV path"));
+	auto pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("CSV path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["file"] = path; });
-	pathSelector->setPath((*jsonObj)["file"].toString());
+	                 { jsonObj["file"] = path; });
+	pathSelector->setPath(jsonObj["file"].toString());
 
 	result.append({QObject::tr("CSV Path:"), pathSelector});
 
-	pathSelector = new PathSelector(parent, QObject::tr("Constellations path"));
+	pathSelector = make_qt_unique<PathSelector>(
+	    parent, QObject::tr("Constellations path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["confile"] = path; });
-	pathSelector->setPath((*jsonObj)["confile"].toString());
+	                 { jsonObj["confile"] = path; });
+	pathSelector->setPath(jsonObj["confile"].toString());
 
 	result.append({QObject::tr("Consellations Path:"), pathSelector});
 
@@ -481,23 +483,25 @@ QList<QPair<QString, QWidget*>>
 }
 
 QList<QPair<QString, QWidget*>>
-    CSVObjects::getGalaxiesLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+    CSVObjects::getGalaxiesLauncherFields(QWidget& parent, QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector = new PathSelector(parent, QObject::tr("CSV path"));
+	auto pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("CSV path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["file"] = path; });
-	pathSelector->setPath((*jsonObj)["file"].toString());
+	                 { jsonObj["file"] = path; });
+	pathSelector->setPath(jsonObj["file"].toString());
 
 	result.append({QObject::tr("CSV Path:"), pathSelector});
 
-	pathSelector = new PathSelector(parent, QObject::tr("Atlas path"));
+	pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Atlas path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["atlasfile"] = path; });
-	pathSelector->setPath((*jsonObj)["atlasfile"].toString());
+	                 { jsonObj["atlasfile"] = path; });
+	pathSelector->setPath(jsonObj["atlasfile"].toString());
 
 	result.append({QObject::tr("Atlas Path:"), pathSelector});
 

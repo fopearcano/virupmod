@@ -63,16 +63,17 @@ void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
 	GLHandler::setBackfaceCulling(true);
 }
 
-QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget* parent,
-                                                           QJsonObject* jsonObj)
+QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget& parent,
+                                                           QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector = new PathSelector(parent, QObject::tr("Textures path"));
+	auto pathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Textures path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [jsonObj](QString const& path)
-	                 { (*jsonObj)["file"] = path; });
-	pathSelector->setPath((*jsonObj)["file"].toString());
+	                 { jsonObj["file"] = path; });
+	pathSelector->setPath(jsonObj["file"].toString());
 
 	result.append({QObject::tr("Textures Path:"), pathSelector});
 

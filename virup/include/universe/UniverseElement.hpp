@@ -164,7 +164,7 @@ class UniverseElement : public QObject
 	static QMatrix4x4 transform(ReferenceFrame from, ReferenceFrame to);
 
 	static QList<QPair<QString, QWidget*>>
-	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
 	static bool& useBrightnessMultiplier();
 

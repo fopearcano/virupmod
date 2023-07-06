@@ -73,9 +73,9 @@ class CSVObjects : public UniverseElement
 	float constellationsAlpha  = 0.f;
 
 	static QList<QPair<QString, QWidget*>>
-	    getStarsLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getStarsLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 	static QList<QPair<QString, QWidget*>>
-	    getGalaxiesLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getGalaxiesLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
   private:
 	void init(QString const& csvFile, QString const& atlasFile);

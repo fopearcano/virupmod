@@ -157,20 +157,20 @@ QMatrix4x4 UniverseElement::transform(ReferenceFrame from, ReferenceFrame to)
 }
 
 QList<QPair<QString, QWidget*>>
-    UniverseElement::getLauncherFields(QWidget* parent, QJsonObject* jsonObj)
+    UniverseElement::getLauncherFields(QWidget& parent, QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto sbox = new SciDoubleSpinBox(parent);
+	auto sbox = make_qt_unique<SciDoubleSpinBox>(parent);
 	QObject::connect(sbox,
 	                 static_cast<void (QDoubleSpinBox::*)(double)>(
 	                     &QDoubleSpinBox::valueChanged),
-	                 [jsonObj](double v) { (*jsonObj)["unit"] = v; });
-	sbox->setValue((*jsonObj)["unit"].toDouble(1.0));
+	                 [jsonObj](double v) { jsonObj["unit"] = v; });
+	sbox->setValue(jsonObj["unit"].toDouble(1.0));
 
 	result.append({QObject::tr("Data unit (in kpc):"), sbox});
 
-	auto cbox = new QComboBox(parent);
+	auto cbox = make_qt_unique<QComboBox>(parent);
 	QStringList entries({QObject::tr("Equatorial"), QObject::tr("Galactic"),
 	                     QObject::tr("Ecliptic")});
 	QStringList entriesIds({"equatorial", "galactic", "ecliptic"});
@@ -180,23 +180,23 @@ QList<QPair<QString, QWidget*>>
 	}
 	QObject::connect(cbox, &QComboBox::currentTextChanged,
 	                 [jsonObj, entries, entriesIds](QString const& text) {
-		                 (*jsonObj)["referenceframe"]
+		                 jsonObj["referenceframe"]
 		                     = entriesIds[entries.indexOf(text)];
 	                 });
-	if(jsonObj->keys().indexOf("referenceframe") >= 0)
+	if(jsonObj.keys().indexOf("referenceframe") >= 0)
 	{
-		cbox->setCurrentText(entries[entriesIds.indexOf(
-		    (*jsonObj)["referenceframe"].toString())]);
+		cbox->setCurrentText(
+		    entries[entriesIds.indexOf(jsonObj["referenceframe"].toString())]);
 	}
 	else
 	{
-		(*jsonObj)["referenceframe"] = entriesIds[0];
+		jsonObj["referenceframe"] = entriesIds[0];
 	}
 
 	result.append({QObject::tr("Reference frame:"), cbox});
 
-	Vector3 stored((*jsonObj)["solarsyslocalpos"].toObject());
-	auto w                                  = new QWidget(parent);
+	Vector3 stored(jsonObj["solarsyslocalpos"].toObject());
+	auto w                                  = make_qt_unique<QWidget>(parent);
 	auto layout                             = new QHBoxLayout(w);
 	std::array<SciDoubleSpinBox*, 3> sboxes = {{nullptr, nullptr, nullptr}};
 	std::array<QString, 3> componentLabels
@@ -204,7 +204,7 @@ QList<QPair<QString, QWidget*>>
 	unsigned int i(0);
 	for(auto& sbox : sboxes)
 	{
-		sbox = new SciDoubleSpinBox(parent);
+		sbox = make_qt_unique<SciDoubleSpinBox>(parent);
 	}
 	for(auto& sbox : sboxes)
 	{
@@ -213,29 +213,30 @@ QList<QPair<QString, QWidget*>>
 		                     &QDoubleSpinBox::valueChanged),
 		                 [jsonObj, sboxes](double)
 		                 {
-			                 (*jsonObj)["solarsyslocalpos"]
+			                 jsonObj["solarsyslocalpos"]
 			                     = Vector3(sboxes[0]->value(),
 			                               sboxes[1]->value(),
 			                               sboxes[2]->value())
 			                           .getJSONRepresentation();
 		                 });
 		sbox->setValue(stored[i]);
-		layout->addWidget(new QLabel(componentLabels.at(i) + " :", parent));
+		layout->addWidget(
+		    make_qt_unique<QLabel>(parent, componentLabels.at(i) + " :"));
 		layout->addWidget(sbox);
 		++i;
 	}
 
 	result.append({QObject::tr("Solar System local position:"), w});
 
-	stored          = (*jsonObj)["customzaxis"].toObject();
-	w               = new QWidget(parent);
+	stored          = jsonObj["customzaxis"].toObject();
+	w               = make_qt_unique<QWidget>(parent);
 	layout          = new QHBoxLayout(w);
 	sboxes          = {{nullptr, nullptr, nullptr}};
 	componentLabels = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};
 	i               = 0;
 	for(auto& sbox : sboxes)
 	{
-		sbox = new SciDoubleSpinBox(parent);
+		sbox = make_qt_unique<SciDoubleSpinBox>(parent);
 	}
 	for(auto& sbox : sboxes)
 	{
@@ -244,26 +245,27 @@ QList<QPair<QString, QWidget*>>
 		                     &QDoubleSpinBox::valueChanged),
 		                 [jsonObj, sboxes](double)
 		                 {
-			                 (*jsonObj)["customzaxis"]
+			                 jsonObj["customzaxis"]
 			                     = Vector3(sboxes[0]->value(),
 			                               sboxes[1]->value(),
 			                               sboxes[2]->value())
 			                           .getJSONRepresentation();
 		                 });
 		sbox->setValue(stored[i]);
-		layout->addWidget(new QLabel(componentLabels.at(i) + " :", parent));
+		layout->addWidget(
+		    make_qt_unique<QLabel>(parent, componentLabels.at(i) + " :"));
 		layout->addWidget(sbox);
 		++i;
 	}
 
 	result.append({QObject::tr("Custom z-axis:"), w});
 
-	sbox = new SciDoubleSpinBox(parent);
+	sbox = make_qt_unique<SciDoubleSpinBox>(parent);
 	QObject::connect(sbox,
 	                 static_cast<void (QDoubleSpinBox::*)(double)>(
 	                     &QDoubleSpinBox::valueChanged),
-	                 [jsonObj](double v) { (*jsonObj)["brightnessmul"] = v; });
-	sbox->setValue((*jsonObj)["brightnessmul"].toDouble(1.0));
+	                 [jsonObj](double v) { jsonObj["brightnessmul"] = v; });
+	sbox->setValue(jsonObj["brightnessmul"].toDouble(1.0));
 
 	result.append({QObject::tr("Brightness multiplier:"), sbox});
 	return result;

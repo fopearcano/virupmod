@@ -18,7 +18,7 @@
 
 #include "Launcher.hpp"
 
-SettingsWidget* Launcher::newSettingsWidget()
+std::unique_ptr<SettingsWidget> Launcher::newSettingsWidget()
 {
-	return new VIRUPSettings(this);
+	return std::make_unique<VIRUPSettings>(this);
 }

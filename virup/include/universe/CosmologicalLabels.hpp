@@ -35,7 +35,7 @@ class CosmologicalLabels : public UniverseElement
 	~CosmologicalLabels();
 
 	static QList<QPair<QString, QWidget*>>
-	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
   private:
 	// in kpc

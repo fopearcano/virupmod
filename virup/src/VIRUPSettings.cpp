@@ -302,8 +302,8 @@ void DataListWidget::loadMainLayout()
 	auto w       = new QWidget(this);
 	auto l       = new QHBoxLayout(w);
 	auto label   = new QLabel(tr("Root directory :"));
-	pathSelector = new PathSelector(this, tr("Data root directory"),
-	                                PathSelector::Type::DIRECTORY);
+	pathSelector = make_qt_unique<PathSelector>(
+	    *this, tr("Data root directory"), PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
 	connect(pathSelector, &PathSelector::pathChanged, this,
 	        [](QString const& t)
@@ -526,7 +526,7 @@ DataDialog::DataDialog(QStringList const& entries,
 	nameEdit->setText(result["name"].toString());
 	layout->addRow(tr("Name :"), nameEdit);
 
-	for(auto const& pair : UniverseElement::getLauncherFields(this, &result))
+	for(auto const& pair : UniverseElement::getLauncherFields(*this, result))
 	{
 		layout->addRow(pair.first, pair.second);
 	}
@@ -592,28 +592,28 @@ void DataDialog::setType(QString const& type)
 	QList<QPair<QString, QWidget*>> fields;
 	if(type == "cosmolabels")
 	{
-		fields = CosmologicalLabels::getLauncherFields(specialized, &result);
+		fields = CosmologicalLabels::getLauncherFields(*specialized, result);
 	}
 	if(type == "csvstars")
 	{
-		fields = CSVObjects::getStarsLauncherFields(specialized, &result);
+		fields = CSVObjects::getStarsLauncherFields(*specialized, result);
 	}
 	if(type == "csvgalaxies")
 	{
-		fields = CSVObjects::getGalaxiesLauncherFields(specialized, &result);
+		fields = CSVObjects::getGalaxiesLauncherFields(*specialized, result);
 	}
 	if(type == "cosmosim")
 	{
 		fields
-		    = CosmologicalSimulation::getLauncherFields(specialized, &result);
+		    = CosmologicalSimulation::getLauncherFields(*specialized, result);
 	}
 	if(type == "texsphere")
 	{
-		fields = TexturedSphere::getLauncherFields(specialized, &result);
+		fields = TexturedSphere::getLauncherFields(*specialized, result);
 	}
 	if(type == "credits")
 	{
-		fields = Credits::getLauncherFields(specialized, &result);
+		fields = Credits::getLauncherFields(*specialized, result);
 	}
 	for(auto const& pair : fields)
 	{

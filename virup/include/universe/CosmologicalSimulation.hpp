@@ -59,7 +59,7 @@ class CosmologicalSimulation : public UniverseElement
 	float localAnimationTime = -1.f;
 
 	static QList<QPair<QString, QWidget*>>
-	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
   private:
 	void init(std::string const& gasOctreePath,

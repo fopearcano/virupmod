@@ -36,7 +36,7 @@ class TexturedSphere : public UniverseElement
 	virtual ~TexturedSphere();
 
 	static QList<QPair<QString, QWidget*>>
-	    getLauncherFields(QWidget* parent, QJsonObject* jsonObj);
+	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
   private:
 	GLShaderProgram shader;
