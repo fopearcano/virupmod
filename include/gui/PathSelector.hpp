@@ -36,8 +36,8 @@ class PathSelector : public QWidget
 		DIRECTORY
 	};
 
-	PathSelector(QString const& caption, Type type = Type::FILE,
-	             QWidget* parent = nullptr);
+	PathSelector(QString const& caption, QWidget* parent = nullptr);
+	PathSelector(QString const& caption, Type type, QWidget* parent = nullptr);
 
   signals:
 	void pathChanged(QString const& path);

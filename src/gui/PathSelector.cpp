@@ -20,6 +20,11 @@
 
 #include "memory.hpp"
 
+PathSelector::PathSelector(QString const& caption, QWidget* parent)
+    : PathSelector(caption, Type::FILE, parent)
+{
+}
+
 PathSelector::PathSelector(QString const& caption, Type type, QWidget* parent)
     : QWidget(parent)
     , fileEdit(new QLineEdit(this))
