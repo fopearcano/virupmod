@@ -123,6 +123,7 @@ execute_process(COMMAND git submodule update --init --recursive
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty)
+	file(GLOB THIRDPARTY_DATA_FILES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/data LIST_DIRECTORIES true)
 	file(GLOB ALL_PATHS "${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/*/include")
 	set(RESULT "")
 	foreach(PATH ${ALL_PATHS})
