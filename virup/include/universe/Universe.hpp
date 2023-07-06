@@ -320,11 +320,11 @@ class Universe : public QObject
 	BBox getBoundingBox() const { return boundingBox; };
 	UniverseElement const* getElement(QString const& name) const
 	{
-		return elements.at(name);
+		return elements.at(name).get();
 	};
 	UniverseElement* getElement(QString const& name)
 	{
-		return elements.at(name);
+		return elements.at(name).get();
 	};
 	bool isPlanetarySystemRendered() const
 	{
@@ -373,7 +373,7 @@ class Universe : public QObject
 	QStringList getUniverseElementsNames() const
 	{
 		QStringList result;
-		for(auto pair : elements)
+		for(auto const& pair : elements)
 		{
 			result << pair.first;
 		}
@@ -406,13 +406,13 @@ class Universe : public QObject
 	BBox boundingBox
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
-	std::map<QString, UniverseElement*> elements    = {};
-	std::map<UniverseElement*, QString> elementsRev = {};
+	std::map<QString, std::unique_ptr<UniverseElement>> elements = {};
+	std::map<UniverseElement*, QString> elementsRev              = {};
 	QList<CosmologicalSimulation*> cosmoSims;
 	QList<CSVObjects*> csvObjs;
 
   public:
-	PlanetarySystems* planetSystems = nullptr;
+	PlanetarySystems* planetSystems;
 
 	// 1 m = 3.24078e-20 kpc
 	const double mtokpc = 3.24078e-20;
@@ -424,11 +424,11 @@ class Universe : public QObject
 
 	// planets
 	OrbitalSystemCamera& camPlanet;
-	OrbitalSystem* orbitalSystem          = nullptr;
-	OrbitalSystemRenderer* systemRenderer = nullptr;
-	Vector3 lastData                      = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
-	Vector3 sysInWorld                    = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
-	bool forceUpdateFromCosmo             = true;
+	OrbitalSystem* orbitalSystem = nullptr;
+	std::unique_ptr<OrbitalSystemRenderer> systemRenderer;
+	Vector3 lastData          = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
+	Vector3 sysInWorld        = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);
+	bool forceUpdateFromCosmo = true;
 	UniversalTime lastCurrentUt;
 	SimulationTime clock = SimulationTime(
 	    QSettings().value("simulation/starttime").value<QDateTime>());

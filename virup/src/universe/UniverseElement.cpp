@@ -197,7 +197,7 @@ QList<QPair<QString, QWidget*>>
 
 	Vector3 stored(jsonObj["solarsyslocalpos"].toObject());
 	auto w                                  = make_qt_unique<QWidget>(parent);
-	auto layout                             = new QHBoxLayout(w);
+	auto layout                             = make_qt_unique<QHBoxLayout>(*w);
 	std::array<SciDoubleSpinBox*, 3> sboxes = {{nullptr, nullptr, nullptr}};
 	std::array<QString, 3> componentLabels
 	    = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};
@@ -230,7 +230,7 @@ QList<QPair<QString, QWidget*>>
 
 	stored          = jsonObj["customzaxis"].toObject();
 	w               = make_qt_unique<QWidget>(parent);
-	layout          = new QHBoxLayout(w);
+	layout          = make_qt_unique<QHBoxLayout>(*w);
 	sboxes          = {{nullptr, nullptr, nullptr}};
 	componentLabels = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};
 	i               = 0;

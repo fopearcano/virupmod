@@ -337,7 +337,7 @@ QList<QPair<QString, QWidget*>>
 
 	auto gradient = new grd::Gradient;
 	gradient->setJson(jsonObj["gradient"].toObject());
-	auto gradientSelector = new GradientSelector(*gradient);
+	auto gradientSelector = make_qt_unique<GradientSelector>(parent, *gradient);
 	connect(gradientSelector, &GradientSelector::gradientChanged,
 	        [jsonObj, gradient]()
 	        { jsonObj["gradient"] = gradient->getJson(); });

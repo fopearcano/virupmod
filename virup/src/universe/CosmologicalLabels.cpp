@@ -49,10 +49,6 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 	}
 	else
 	{
-		for(auto cosmoLabel : cosmoLabels)
-		{
-			delete cosmoLabel.second;
-		}
 		cosmoLabels.clear();
 		bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
@@ -65,8 +61,7 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 			Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
 			                fields[3].toDouble());
 
-			auto labelText = new LabelRenderer(label, color);
-			cosmoLabels.emplace_back(dataPos, labelText);
+			cosmoLabels.emplace_back(dataPos, LabelRenderer{label, color});
 			bbox.minx = std::min(bbox.minx, static_cast<float>(dataPos[0]));
 			bbox.miny = std::min(bbox.miny, static_cast<float>(dataPos[1]));
 			bbox.minz = std::min(bbox.minz, static_cast<float>(dataPos[2]));
@@ -91,7 +86,7 @@ void CosmologicalLabels::update(Camera const& camera)
 	Vector3 camPosData(camera.worldToDataPosition(Utils::fromQt(
 	    camera.hmdScaledSpaceToWorldTransform() * QVector3D(0.f, 0.f, 0.f))));
 
-	for(auto cosmoLabel : cosmoLabels)
+	for(auto& cosmoLabel : cosmoLabels)
 	{
 		Vector3 posData = Utils::fromQt(this->getRelToAbsTransform()
 		                                * Utils::toQt(cosmoLabel.first));
@@ -107,7 +102,7 @@ void CosmologicalLabels::update(Camera const& camera)
 		model.scale(rescale * camRelPos.length() * camera.scale / 3.0);
 		model.rotate(yaw * 180.f / M_PI + 90.f, 0.0, 0.0, 1.0);
 		model.rotate(pitch * 180.f / M_PI + 90.f, 1.0, 0.0, 0.0);
-		cosmoLabel.second->updateModel(model);
+		cosmoLabel.second.updateModel(model);
 	}
 }
 
@@ -116,19 +111,11 @@ void CosmologicalLabels::render(Camera const& /*camera*/,
 {
 	if(getVisibility() > 0.f)
 	{
-		for(auto cosmoLabel : cosmoLabels)
+		for(auto& cosmoLabel : cosmoLabels)
 		{
-			cosmoLabel.second->setAlpha(getVisibility());
-			cosmoLabel.second->render(tmm.exposure, tmm.dynamicrange);
+			cosmoLabel.second.setAlpha(getVisibility());
+			cosmoLabel.second.render(tmm.exposure, tmm.dynamicrange);
 		}
-	}
-}
-
-CosmologicalLabels::~CosmologicalLabels()
-{
-	for(auto cosmoLabel : cosmoLabels)
-	{
-		delete cosmoLabel.second;
 	}
 }
 

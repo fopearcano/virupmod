@@ -40,10 +40,10 @@ void TexturedSphere::setJson(QJsonObject const& json)
 	cullFrontFaces = json["cullfrontfaces"].toBool();
 
 	qDebug() << QSettings().value("data/rootdir").toString() + file;
-	delete tex;
-	tex = new GLTexture((QSettings().value("data/rootdir").toString() + file)
-	                        .toLatin1()
-	                        .data());
+	tex = std::make_unique<GLTexture>(
+	    (QSettings().value("data/rootdir").toString() + file)
+	        .toLatin1()
+	        .data());
 }
 
 BBox TexturedSphere::getBoundingBox() const
@@ -67,7 +67,7 @@ void TexturedSphere::render(Camera const& camera,
 
 	GLHandler::beginTransparent(GL_ONE, GL_ONE);
 	GLHandler::setBackfaceCulling(cullFrontFaces, GL_FRONT);
-	GLHandler::useTextures({tex});
+	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
 	GLHandler::setBackfaceCulling(true);
@@ -98,9 +98,4 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Cull front faces :"), cbox});
 
 	return result;
-}
-
-TexturedSphere::~TexturedSphere()
-{
-	delete tex;
 }

@@ -20,15 +20,15 @@
 
 #include <cfloat>
 
-GLTexture*& CSVObjects::starTex()
+std::unique_ptr<GLTexture>& CSVObjects::starTex()
 {
-	static GLTexture* starTex = nullptr;
+	static std::unique_ptr<GLTexture> starTex;
 	return starTex;
 }
 
-GLTexture*& CSVObjects::galTex()
+std::unique_ptr<GLTexture>& CSVObjects::galTex()
 {
-	static GLTexture* galTex = nullptr;
+	static std::unique_ptr<GLTexture> galTex;
 	return galTex;
 }
 
@@ -59,13 +59,13 @@ void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 {
 	if(starTex() == nullptr)
 	{
-		starTex() = new GLTexture(
+		starTex() = std::make_unique<GLTexture>(
 		    getAbsoluteDataPath("images/star.png").toLatin1().data());
 		starTex()->generateMipmap();
 	}
 	if(galTex() == nullptr && !atlasFile.isEmpty())
 	{
-		galTex() = new GLTexture(atlasFile.toLatin1().data());
+		galTex() = std::make_unique<GLTexture>(atlasFile.toLatin1().data());
 		galTex()->generateMipmap();
 	}
 	QFile file(csvFile);
@@ -159,9 +159,9 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 				{
 					// average position
 					currentPosSum /= posNumber;
-					auto labelText = new LabelRenderer(
-					    currentName, QColor(0, 230, 255), false);
-					conLabels.emplace_back(currentPosSum, labelText);
+					conLabels.emplace_back(
+					    currentPosSum,
+					    LabelRenderer{currentName, QColor(0, 230, 255), false});
 				}
 				currentName   = line.simplified();
 				currentPosSum = Vector3();
@@ -204,9 +204,9 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 		{
 			// average position
 			currentPosSum /= posNumber;
-			auto labelText
-			    = new LabelRenderer(currentName, QColor(0, 230, 255), false);
-			conLabels.emplace_back(currentPosSum, labelText);
+			conLabels.emplace_back(
+			    currentPosSum,
+			    LabelRenderer{currentName, QColor(0, 230, 255), false});
 		}
 		file.close();
 	}
@@ -248,7 +248,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 		shader.setUniform("camexp", tmm.exposure);
 		shader.setUniform("camdynrange", tmm.dynamicrange);
 	}
-	GLHandler::useTextures({galaxies ? galTex() : starTex()});
+	GLHandler::useTextures({galaxies ? galTex().get() : starTex().get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
 	GLHandler::endTransparent();
@@ -288,7 +288,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 				coeff = 0.f;
 			}
 			coeff = pow(coeff, 0.5f);
-			for(auto conLabel : conLabels)
+			for(auto& conLabel : conLabels)
 			{
 				Vector3 pos(conLabel.first);
 				Vector3 camRelPos(Utils::fromQt(campos) - pos);
@@ -306,10 +306,10 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 				model2.rotate(yaw * 180.f / M_PI + 90.f, 0.0, 0.0, 1.0);
 				model2.rotate(pitch * 180.f / M_PI + 90.f, 1.0, 0.0, 0.0);
 				model2.scale(rescale * camRelPos.length() / 3.0);
-				conLabel.second->updateModel(model * model2);
+				conLabel.second.updateModel(model * model2);
 
-				conLabel.second->setAlpha(constellationsLabels * coeff);
-				conLabel.second->render(tmm.exposure, tmm.dynamicrange);
+				conLabel.second.setAlpha(constellationsLabels * coeff);
+				conLabel.second.render(tmm.exposure, tmm.dynamicrange);
 			}
 		}
 		GLHandler::glf().glDisable(GL_MULTISAMPLE);
@@ -424,36 +424,17 @@ CSVObjects::Object
 	return result;
 }
 
-void CSVObjects::cleanUp()
+CSVObjects::~CSVObjects()
 {
 	// TODO don't do that, check if last instance of CSVObjects !
 	if(starTex() != nullptr && !galaxies)
 	{
-		delete starTex();
-		starTex() = nullptr;
+		starTex().reset();
 	}
 	if(galTex() != nullptr && galaxies)
 	{
-		delete galTex();
-		galTex() = nullptr;
+		galTex().reset();
 	}
-
-	if(containsConstellations)
-	{
-		for(auto conLabel : conLabels)
-		{
-			delete conLabel.second;
-		}
-	}
-	objects.clear();
-	bbox = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.0, {}};
-	indexByName.clear();
-	conLabels.clear();
-}
-
-CSVObjects::~CSVObjects()
-{
-	cleanUp();
 }
 
 QList<QPair<QString, QWidget*>>

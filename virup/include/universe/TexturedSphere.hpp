@@ -33,7 +33,6 @@ class TexturedSphere : public UniverseElement
 	virtual BBox getBoundingBox() const override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	virtual ~TexturedSphere();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
@@ -41,7 +40,7 @@ class TexturedSphere : public UniverseElement
   private:
 	GLShaderProgram shader;
 	GLMesh mesh;
-	GLTexture* tex = nullptr;
+	std::unique_ptr<GLTexture> tex;
 
 	QString file;
 	bool cullFrontFaces = false;

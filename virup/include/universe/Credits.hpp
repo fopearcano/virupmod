@@ -31,7 +31,6 @@ class Credits : public UniverseElement
 	virtual BBox getBoundingBox() const override { return {}; };
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	virtual ~Credits();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
@@ -39,7 +38,7 @@ class Credits : public UniverseElement
   private:
 	GLShaderProgram shader;
 	GLMesh mesh;
-	GLTexture* tex = nullptr;
+	std::unique_ptr<GLTexture> tex;
 
 	QString file;
 };

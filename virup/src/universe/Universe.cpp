@@ -34,36 +34,36 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 	for(auto entry : dataJsonRepresentation["entries"].toArray())
 	{
 		auto entryObj(entry.toObject());
-		UniverseElement* newElem = nullptr;
+		std::unique_ptr<UniverseElement> newElem;
 		if(entryObj["type"] == "cosmolabels")
 		{
-			newElem = new CosmologicalLabels;
+			newElem = std::make_unique<CosmologicalLabels>();
 		}
 		else if(entryObj["type"] == "csvstars")
 		{
-			auto csv = new CSVObjects(entryObj, false);
-			newElem  = csv;
-			csvObjs.append(csv);
+			auto csv = std::make_unique<CSVObjects>(entryObj, false);
+			csvObjs.append(csv.get());
+			newElem = std::move(csv);
 		}
 		else if(entryObj["type"] == "csvgalaxies")
 		{
-			auto csv = new CSVObjects(entryObj, true);
-			newElem  = csv;
-			csvObjs.append(csv);
+			auto csv = std::make_unique<CSVObjects>(entryObj, true);
+			csvObjs.append(csv.get());
+			newElem = std::move(csv);
 		}
 		else if(entryObj["type"] == "cosmosim")
 		{
-			auto cs = new CosmologicalSimulation(entryObj);
-			newElem = cs;
-			cosmoSims.append(cs);
+			auto cs = std::make_unique<CosmologicalSimulation>(entryObj);
+			cosmoSims.append(cs.get());
+			newElem = std::move(cs);
 		}
 		else if(entryObj["type"] == "texsphere")
 		{
-			newElem = new TexturedSphere;
+			newElem = std::make_unique<TexturedSphere>();
 		}
 		else if(entryObj["type"] == "credits")
 		{
-			newElem = new Credits;
+			newElem = std::make_unique<Credits>();
 		}
 		else
 		{
@@ -74,13 +74,14 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 		}
 		newElem->setJson(entryObj);
 		updateBoundingBox(newElem->getBoundingBox());
-		elements[newElem->name] = newElem;
-		elementsRev[newElem]    = newElem->name;
+		elementsRev[newElem.get()] = newElem->name;
+		elements[newElem->name]    = std::move(newElem);
 	}
 
-	planetSystems = new PlanetarySystems;
+	auto planetSystemsUniqPtr = std::make_unique<PlanetarySystems>();
+	planetSystems             = planetSystemsUniqPtr.get();
 	updateBoundingBox(planetSystems->getBoundingBox());
-	elements["Exoplanets"] = planetSystems;
+	elements["Exoplanets"] = std::move(planetSystemsUniqPtr);
 
 	loadClosestSystem();
 
@@ -441,7 +442,8 @@ int Universe::getCosmoSimForcedQuality(QString const& name) const
 		qWarning() << name + " is not a valid UniverseElement";
 		return -1;
 	}
-	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	auto cosmoSim
+	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
 		qWarning() << name + " is not a valid CosmologicalSimulation";
@@ -457,7 +459,8 @@ void Universe::setCosmoSimForcedQuality(QString const& name, int forcedQuality)
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
 	}
-	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	auto cosmoSim
+	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
 		qWarning() << name + " is not a valid CosmologicalSimulation";
@@ -473,7 +476,8 @@ float Universe::getCosmoLocalAnimationTime(QString const& name) const
 		qWarning() << name + " is not a valid UniverseElement";
 		return -1;
 	}
-	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	auto cosmoSim
+	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
 		qWarning() << name + " is not a valid CosmologicalSimulation";
@@ -489,7 +493,8 @@ void Universe::setCosmoLocalAnimationTime(QString const& name, float animTime)
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
 	}
-	auto cosmoSim = dynamic_cast<CosmologicalSimulation*>(elements.at(name));
+	auto cosmoSim
+	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
 		qWarning() << name + " is not a valid CosmologicalSimulation";
@@ -512,7 +517,7 @@ void Universe::dumpOctreesStates()
 void Universe::updateCosmo()
 {
 	OctreeLOD::updateTanAngleLimit(camCosmo);
-	for(auto pair : elements)
+	for(auto const& pair : elements)
 	{
 		if(pair.second->getVisibility() < 0.0001)
 		{
@@ -580,7 +585,7 @@ void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
 	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
 	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	for(auto pair : elements)
+	for(auto const& pair : elements)
 	{
 		// only used by CosmologicalLabels for now
 		// pair.second->setVisibility(CelestialBodyRenderer::renderLabels);
@@ -636,10 +641,8 @@ void Universe::loadClosestSystem()
 		return;
 	}
 
-	delete systemRenderer;
-
 	orbitalSystem  = planetSystems->getClosestSystem();
-	systemRenderer = new OrbitalSystemRenderer(orbitalSystem);
+	systemRenderer = std::make_unique<OrbitalSystemRenderer>(orbitalSystem);
 
 	/*debugText->setText(QString(orbitalSystem->getName().c_str()));
 	lastTargetName = orbitalSystem->getMainCelestialBody()->getName();
@@ -690,10 +693,5 @@ void Universe::loadClosestSystem()
 
 Universe::~Universe()
 {
-	delete systemRenderer;
-	for(auto const& pair : elements)
-	{
-		delete pair.second;
-	}
 	AsyncReader::clean();
 }

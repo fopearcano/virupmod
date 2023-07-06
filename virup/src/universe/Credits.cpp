@@ -37,10 +37,10 @@ void Credits::setJson(QJsonObject const& json)
 	UniverseElement::setJson(json);
 	file = json["file"].toString();
 
-	delete tex;
-	tex = new GLTexture((QSettings().value("data/rootdir").toString() + file)
-	                        .toLatin1()
-	                        .data());
+	tex = std::make_unique<GLTexture>(
+	    (QSettings().value("data/rootdir").toString() + file)
+	        .toLatin1()
+	        .data());
 }
 
 void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
@@ -57,7 +57,7 @@ void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
 	scale.scale(1.f);
 
 	GLHandler::setBackfaceCulling(false);
-	GLHandler::useTextures({tex});
+	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, scale);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
@@ -78,9 +78,4 @@ QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget& parent,
 	result.append({QObject::tr("Textures Path:"), pathSelector});
 
 	return result;
-}
-
-Credits::~Credits()
-{
-	delete tex;
 }

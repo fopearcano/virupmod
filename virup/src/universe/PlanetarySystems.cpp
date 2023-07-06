@@ -43,8 +43,8 @@ PlanetarySystems::PlanetarySystems()
 			QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll());
 			QString name(QFileInfo(jsonFile).dir().dirName());
 
-			auto orbitalSystem
-			    = new OrbitalSystem(name.toStdString(), jsonDoc.object());
+			auto orbitalSystem = std::make_unique<OrbitalSystem>(
+			    name.toStdString(), jsonDoc.object());
 			if(!orbitalSystem->isValid())
 			{
 				qWarning() << QString(orbitalSystem->getName().c_str())
@@ -60,9 +60,9 @@ PlanetarySystems::PlanetarySystems()
 			vertices.push_back(position[1]);
 			vertices.push_back(position[2]);
 			positions.push_back(position);
-			systems.push_back(orbitalSystem);
 			directories.push_back(QFileInfo(jsonFile).absoluteDir().path());
 			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
+			systems.emplace_back(std::move(orbitalSystem));
 
 			bbox.minx = std::min(bbox.minx, static_cast<float>(position[0]));
 			bbox.miny = std::min(bbox.miny, static_cast<float>(position[1]));
@@ -93,8 +93,8 @@ PlanetarySystems::PlanetarySystems()
 		PlanetRenderer::currentSystemDir = dir;
 		CSVOrbit::currentSystemDir       = dir;
 
-		auto orbitalSystem
-		    = new OrbitalSystem(name.toStdString(), jsonDoc.object());
+		auto orbitalSystem = std::make_unique<OrbitalSystem>(name.toStdString(),
+		                                                     jsonDoc.object());
 		if(!orbitalSystem->isValid())
 		{
 			qWarning() << QString(orbitalSystem->getName().c_str())
@@ -106,9 +106,9 @@ PlanetarySystems::PlanetarySystems()
 			vertices.push_back(0.0);
 			vertices.push_back(0.0);
 			positions.emplace_back();
-			systems.push_back(orbitalSystem);
 			directories.push_back(dir);
 			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
+			systems.emplace_back(std::move(orbitalSystem));
 			qDebug() << dir;
 		}
 	}
@@ -193,13 +193,4 @@ void PlanetarySystems::render(Camera const& /*camera*/,
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
 	GLHandler::endTransparent();
-}
-
-// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
-PlanetarySystems::~PlanetarySystems()
-{
-	for(auto sys : systems)
-	{
-		delete sys;
-	}
 }

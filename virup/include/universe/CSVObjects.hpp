@@ -64,7 +64,6 @@ class CSVObjects : public UniverseElement
 	virtual BBox getBoundingBox() const override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	void cleanUp();
 	virtual ~CSVObjects();
 
 	float colormix = 0.0f;
@@ -96,8 +95,8 @@ class CSVObjects : public UniverseElement
 
 	GLShaderProgram shader;
 	GLMesh mesh;
-	static GLTexture*& starTex();
-	static GLTexture*& galTex();
+	static std::unique_ptr<GLTexture>& starTex();
+	static std::unique_ptr<GLTexture>& galTex();
 
 	bool galaxies = false;
 
@@ -106,7 +105,7 @@ class CSVObjects : public UniverseElement
 	GLShaderProgram conShader;
 	GLMesh conMesh;
 
-	std::vector<std::pair<Vector3, LabelRenderer*>> conLabels;
+	std::vector<std::pair<Vector3, LabelRenderer>> conLabels;
 };
 
 #endif // CSVOBJECTS

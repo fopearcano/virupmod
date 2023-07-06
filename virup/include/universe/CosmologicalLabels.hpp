@@ -32,14 +32,13 @@ class CosmologicalLabels : public UniverseElement
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	~CosmologicalLabels();
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
   private:
 	// in kpc
-	std::vector<std::pair<Vector3, LabelRenderer*>> cosmoLabels;
+	std::vector<std::pair<Vector3, LabelRenderer>> cosmoLabels;
 
 	QMatrix4x4 model;
 	QVector3D campos;

@@ -35,19 +35,18 @@ class PlanetarySystems : public UniverseElement
 	QStringList getSystemsNames() const;
 	OrbitalSystem const* getSystem(QString const& name)
 	{
-		return systems[ids.at(name)];
+		return systems[ids.at(name)].get();
 	};
 	Vector3 getClosestSystemPosition()
 	{
 		return Utils::fromQt(getRelToAbsTransform()
 		                     * Utils::toQt(positions[closestId]));
 	};
-	OrbitalSystem* getClosestSystem() { return systems[closestId]; };
+	OrbitalSystem* getClosestSystem() { return systems[closestId].get(); };
 	Vector3 getAbsolutePosition(QString const& systemName) const;
 	virtual void update(Camera const& camera) override;
 	virtual void render(Camera const& camera,
 	                    ToneMappingModel const& tmm) override;
-	~PlanetarySystems();
 
 	bool useVRCamposForClosest = true;
 
@@ -55,7 +54,7 @@ class PlanetarySystems : public UniverseElement
 	bool doRender          = false;
 	unsigned int closestId = 0;
 	std::vector<Vector3> positions;
-	std::vector<OrbitalSystem*> systems;
+	std::vector<std::unique_ptr<OrbitalSystem>> systems;
 	std::vector<QString> directories;
 	std::map<QString, unsigned int> ids;
 
