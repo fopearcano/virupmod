@@ -24,7 +24,7 @@
 template <typename Functor>
 void test_main(Functor assertFunc)
 {
-	assertFunc(new TestExample());
+	assertFunc(std::make_unique<TestExample>());
 }
 
 #endif // TEST_MAIN_H
