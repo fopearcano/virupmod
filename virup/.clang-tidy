@@ -166,7 +166,7 @@ Checks:          "abseil-string-find-startswith, \
     cppcoreguidelines-interfaces-global-init, \
     -cppcoreguidelines-narrowing-conversions, \ # too restrictive for now
     cppcoreguidelines-no-malloc, \
-    -cppcoreguidelines-owning-memory, \ # not planning to use GSL as of now
+    cppcoreguidelines-owning-memory, \
     cppcoreguidelines-pro-bounds-array-to-pointer-decay, \
     cppcoreguidelines-pro-bounds-constant-array-index, \
     -cppcoreguidelines-pro-bounds-pointer-arithmetic, \ # too restrictive for us

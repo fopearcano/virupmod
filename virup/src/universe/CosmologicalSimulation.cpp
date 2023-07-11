@@ -335,12 +335,14 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Dark Matter Color:"), colorSelector});
 
-	auto gradient = new grd::Gradient;
+	auto gradient    = std::make_unique<grd::Gradient>();
+	auto gradientPtr = gradient.get();
 	gradient->setJson(jsonObj["gradient"].toObject());
-	auto gradientSelector = make_qt_unique<GradientSelector>(parent, *gradient);
+	auto gradientSelector
+	    = make_qt_unique<GradientSelector>(parent, std::move(gradient));
 	connect(gradientSelector, &GradientSelector::gradientChanged,
-	        [jsonObj, gradient]()
-	        { jsonObj["gradient"] = gradient->getJson(); });
+	        [jsonObj, gradientPtr]()
+	        { jsonObj["gradient"] = gradientPtr->getJson(); });
 
 	result.append({QObject::tr("Gradient:"), gradientSelector});
 
