@@ -45,7 +45,7 @@ class VIRUPSettings : public SettingsWidget
 class DataListWidget : public QScrollArea
 {
   public:
-	DataListWidget();
+	DataListWidget(QWidget* parent = nullptr);
 	void importJsonFromPath(QString const& path);
 
   private:

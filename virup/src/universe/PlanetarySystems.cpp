@@ -61,7 +61,7 @@ PlanetarySystems::PlanetarySystems()
 			vertices.push_back(position[2]);
 			positions.push_back(position);
 			directories.push_back(QFileInfo(jsonFile).absoluteDir().path());
-			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
+			ids[orbitalSystem->getName().c_str()] = systems.size();
 			systems.emplace_back(std::move(orbitalSystem));
 
 			bbox.minx = std::min(bbox.minx, static_cast<float>(position[0]));
@@ -107,7 +107,7 @@ PlanetarySystems::PlanetarySystems()
 			vertices.push_back(0.0);
 			positions.emplace_back();
 			directories.push_back(dir);
-			ids[orbitalSystem->getName().c_str()] = systems.size() - 1;
+			ids[orbitalSystem->getName().c_str()] = systems.size();
 			systems.emplace_back(std::move(orbitalSystem));
 			qDebug() << dir;
 		}

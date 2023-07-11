@@ -335,7 +335,7 @@ void MainWin::initScene()
 {
 	toneMappingModel->exposure     = 0.3f;
 	toneMappingModel->dynamicrange = 10000.f;
-	grid                           = new Grid;
+	grid                           = std::make_unique<Grid>();
 
 	std::unique_ptr<Camera> cam = std::make_unique<Camera>(*vrHandler);
 	cam->seatedVROrigin         = false;
@@ -351,13 +351,13 @@ void MainWin::initScene()
 	                              renderer.getAspectRatioFromFOV());
 
 	// COSMO LOADING
-	universe = new Universe(*cam, *camPlanet);
+	universe = std::make_unique<Universe>(*cam, *camPlanet);
 
 	// UI
-	helperBillboard = new Billboard(
+	helperBillboard = std::make_unique<Billboard>(
 	    getAbsoluteDataPath("images/halfcave_helper.png").toLatin1().data());
 
-	debugText = new Text3D(textWidth, textHeight);
+	debugText = std::make_unique<Text3D>(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
 	debugText->setColor(
 	    QSettings().value("misc/uilabelscolor").value<QColor>());
@@ -377,7 +377,7 @@ void MainWin::initScene()
 	}
 	debugText->setSuperSampling(2.f);
 
-	movementControls = new MovementControls(
+	movementControls = std::make_unique<MovementControls>(
 	    *vrHandler, universe->getBoundingBox(), *cam, *camPlanet);
 
 	inSound.setSource(
@@ -395,7 +395,7 @@ void MainWin::initScene()
 			        thrustSound.play();
 		        }
 	        });
-	connect(movementControls, &MovementControls::gamepadIsMovingChanged,
+	connect(movementControls.get(), &MovementControls::gamepadIsMovingChanged,
 	        [this](bool isMoving)
 	        {
 		        if(isMoving)
@@ -416,7 +416,8 @@ void MainWin::initScene()
 	renderer.appendSceneRenderPath("planet",
 	                               Renderer::RenderPath(std::move(camPlanet)));
 
-	animator = new Animator(*universe, *vrHandler, *toneMappingModel);
+	animator
+	    = std::make_unique<Animator>(*universe, *vrHandler, *toneMappingModel);
 
 	// we will draw them ourselves
 	renderer.pathIdRenderingControllers = "";
@@ -424,21 +425,24 @@ void MainWin::initScene()
 	loaded = true;
 
 	// LENSING
-	lenseDistortionMap
-	    = new GLTexture("data/virup/images/pointmass-distortion.png", false);
+	lenseDistortionMap = std::make_unique<GLTexture>(
+	    "data/virup/images/pointmass-distortion.png", false);
 	lenseDistortionMap->generateMipmap();
 
 	// UI
 	if(networkManager->isServer())
 	{
-		visibilities    = new Visibilities(*universe);
-		planetSysSelect = new PlanetarySystemSelector(*universe, *animator);
-		univElemSelect  = new UniverseElementSelector(*universe, *animator);
-		timeController  = new TimeController(*universe);
-		animTimeSelect  = new AnimationTimeSelector(*universe);
-		tmController    = new ToneMappingController(*toneMappingModel);
-		scenes          = new SceneSelector(*animator);
-		presenterHelp   = new PresenterHelp(*this);
+		visibilities = std::make_unique<Visibilities>(*universe);
+		planetSysSelect
+		    = std::make_unique<PlanetarySystemSelector>(*universe, *animator);
+		univElemSelect
+		    = std::make_unique<UniverseElementSelector>(*universe, *animator);
+		timeController = std::make_unique<TimeController>(*universe);
+		animTimeSelect = std::make_unique<AnimationTimeSelector>(*universe);
+		tmController
+		    = std::make_unique<ToneMappingController>(*toneMappingModel);
+		scenes        = std::make_unique<SceneSelector>(*animator);
+		presenterHelp = std::make_unique<PresenterHelp>(*this);
 
 		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
@@ -801,7 +805,8 @@ std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
 	}
 	if(id == "lensing")
 	{
-		return {{lenseDistortionMap, GLComputeShader::DataAccessMode::SAMPLER}};
+		return {{lenseDistortionMap.get(),
+		         GLComputeShader::DataAccessMode::SAMPLER}};
 	}
 	return {};
 }
@@ -830,7 +835,7 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	QString posstr;
 	&posstr << position;
 
-	auto msgBox = new QMessageBox;
+	auto msgBox = qt_owned<QMessageBox>();
 	msgBox->setAttribute(Qt::WA_DeleteOnClose);
 	msgBox->setStandardButtons(QMessageBox::Ok);
 	msgBox->setWindowTitle(tr("Position selected"));
@@ -856,23 +861,4 @@ std::vector<float> MainWin::generateVertices(unsigned int number,
 	}
 
 	return vertices;
-}
-
-MainWin::~MainWin()
-{
-	delete animator;
-	delete presenterHelp;
-	delete scenes;
-	delete visibilities;
-	delete timeController;
-	delete animTimeSelect;
-	delete tmController;
-	delete planetSysSelect;
-	delete univElemSelect;
-	delete lenseDistortionMap;
-	delete debugText;
-	delete helperBillboard;
-	delete movementControls;
-	delete universe;
-	delete grid;
 }

@@ -21,7 +21,7 @@
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
 {
-	auto dlw = new DataListWidget;
+	auto dlw = make_qt_unique<DataListWidget>(*this);
 	insertCustomGroup("data", tr("Data"), 0, dlw);
 
 	insertGroup("simulation", tr("Simulation"), 1);
@@ -279,8 +279,10 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	dlw->importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo.json");
 }
 
-DataListWidget::DataListWidget()
+DataListWidget::DataListWidget(QWidget* parent)
 {
+	QObject::setParent(
+	    parent); // messes up layout if put in QScrollArea constructor
 	entries << tr("Cosmological Labels") << tr("CSV Stars")
 	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
 	        << tr("Textured Sphere") << tr("Credits");
@@ -296,12 +298,12 @@ DataListWidget::DataListWidget()
 
 void DataListWidget::loadMainLayout()
 {
-	layout = new QVBoxLayout(this);
+	layout = make_qt_unique<QVBoxLayout>(*this);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-	auto w       = new QWidget(this);
-	auto l       = new QHBoxLayout(w);
-	auto label   = new QLabel(tr("Root directory :"));
+	auto w       = make_qt_unique<QWidget>(*this);
+	auto l       = make_qt_unique<QHBoxLayout>(*w);
+	auto label   = make_qt_unique<QLabel>(*w, tr("Root directory :"));
 	pathSelector = make_qt_unique<PathSelector>(
 	    *this, tr("Data root directory"), PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
@@ -312,22 +314,22 @@ void DataListWidget::loadMainLayout()
 	l->addWidget(pathSelector);
 	layout->addWidget(w);
 
-	w = new QWidget(this);
+	w = make_qt_unique<QWidget>(*this);
 	w->resize(size());
 	loadJsonRepresentation();
 
 	w->setLayout(layout);
 	setWidget(w);
 
-	auto addButton = new QPushButton(this);
+	auto addButton = make_qt_unique<QPushButton>(*this);
 	addButton->setText(tr("Add..."));
 	connect(addButton, &QPushButton::clicked, this, &DataListWidget::addData);
 	layout->addWidget(addButton);
 
-	w                 = new QWidget(this);
-	auto hl           = new QHBoxLayout(w);
-	auto importButton = new QPushButton(this);
-	auto exportButton = new QPushButton(this);
+	w                 = make_qt_unique<QWidget>(*this);
+	auto hl           = make_qt_unique<QHBoxLayout>(*w);
+	auto importButton = make_qt_unique<QPushButton>(*this);
+	auto exportButton = make_qt_unique<QPushButton>(*this);
 	importButton->setText(tr("Import.."));
 	exportButton->setText(tr("Export.."));
 	connect(importButton, &QPushButton::clicked, this,
@@ -380,18 +382,18 @@ void DataListWidget::addData()
 
 void DataListWidget::addPushButtons(QJsonObject const& entry)
 {
-	auto w  = new QWidget(this);
-	auto hl = new QHBoxLayout(w);
+	auto w  = make_qt_unique<QWidget>(*this);
+	auto hl = make_qt_unique<QHBoxLayout>(*w);
 	w->setLayout(hl);
 
-	auto b0 = new QPushButton(w);
+	auto b0 = make_qt_unique<QPushButton>(*w);
 	QString name(entry["name"].toString());
 	QString type(entry["type"].toString());
 	type = entries[entriesIds.indexOf(type)];
 	b0->setText(name + "|" + type);
 	hl->addWidget(b0);
 
-	auto b1 = new QPushButton(w);
+	auto b1 = make_qt_unique<QPushButton>(*w);
 	b1->setText(tr("Remove"));
 	b1->setMaximumWidth(150);
 	hl->QLayout::addWidget(b1);
@@ -437,7 +439,7 @@ void DataListWidget::addPushButtons(QJsonObject const& entry)
 
 		        layout->removeWidget(w);
 		        w->hide();
-		        delete w;
+		        w->deleteLater();
 		        removeEntry(name);
 	        });
 }
@@ -517,10 +519,10 @@ DataDialog::DataDialog(QStringList const& entries,
                        QJsonObject const& editFrom)
     : result(editFrom)
 {
-	layout = new QFormLayout;
+	layout = make_qt_unique<QFormLayout>(*this);
 	setLayout(layout);
 
-	auto nameEdit = new QLineEdit;
+	auto nameEdit = make_qt_unique<QLineEdit>(*this);
 	connect(nameEdit, &QLineEdit::textChanged,
 	        [this](QString const& text) { this->result["name"] = text; });
 	nameEdit->setText(result["name"].toString());
@@ -531,7 +533,7 @@ DataDialog::DataDialog(QStringList const& entries,
 		layout->addRow(pair.first, pair.second);
 	}
 
-	auto typeEdit = new QComboBox;
+	auto typeEdit = make_qt_unique<QComboBox>(*this);
 	for(auto const& entry : entries)
 	{
 		typeEdit->addItem(entry);
@@ -550,13 +552,13 @@ DataDialog::DataDialog(QStringList const& entries,
 	}
 	layout->addRow(tr("Type :"), typeEdit);
 
-	auto w  = new QWidget(this);
-	auto hl = new QHBoxLayout(w);
+	auto w  = make_qt_unique<QWidget>(*this);
+	auto hl = make_qt_unique<QHBoxLayout>(*w);
 	w->setLayout(hl);
-	auto accept = new QPushButton(this);
+	auto accept = make_qt_unique<QPushButton>(*this);
 	accept->setText(tr("Accept"));
 	connect(accept, &QPushButton::clicked, this, &QDialog::accept);
-	auto cancel = new QPushButton(this);
+	auto cancel = make_qt_unique<QPushButton>(*this);
 	cancel->setText(tr("Cancel"));
 	connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
 	hl->addWidget(accept);
@@ -585,8 +587,8 @@ void DataDialog::setType(QString const& type)
 	{
 		layout->removeRow(layout->rowCount() - 2);
 	}
-	specialized     = new QWidget(this);
-	auto speclayout = new QFormLayout(specialized);
+	specialized     = make_qt_unique<QWidget>(*this);
+	auto speclayout = make_qt_unique<QFormLayout>(*specialized);
 	specialized->setLayout(speclayout);
 
 	QList<QPair<QString, QWidget*>> fields;

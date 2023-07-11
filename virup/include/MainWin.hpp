@@ -159,8 +159,6 @@ class MainWin : public AbstractMainWin
 	 */
 	void setGridEnabled(bool enabled) { showGrid = enabled; };
 
-	~MainWin();
-
   public slots:
 	/**
 	 * @brief Toggles the @e gridEnabled property.
@@ -273,23 +271,23 @@ class MainWin : public AbstractMainWin
 	static std::vector<float> generateVertices(unsigned int number,
 	                                           unsigned int seed);
 
-	bool loaded        = false;
-	Universe* universe = nullptr;
-	Grid* grid         = nullptr;
-	bool showGrid      = QSettings().value("misc/showgrid").toBool();
+	bool loaded = false;
+	std::unique_ptr<Universe> universe;
+	std::unique_ptr<Grid> grid;
+	bool showGrid = QSettings().value("misc/showgrid").toBool();
 
 	bool moveView = false;
 	QPoint cursorPosBackup;
 	QElapsedTimer cursorTimer;
-	MovementControls* movementControls = nullptr;
+	std::unique_ptr<MovementControls> movementControls;
 
 	/* TEXT */
 	bool showHelperBillboard
 	    = QSettings().value("misc/halfcavehelper").toBool();
 	double uiLabelsSizeMul
 	    = QSettings().value("misc/uilabelssizemul").toDouble();
-	Billboard* helperBillboard = nullptr;
-	Text3D* debugText          = nullptr;
+	std::unique_ptr<Billboard> helperBillboard;
+	std::unique_ptr<Text3D> debugText;
 	double timeSinceTextUpdate = DBL_MAX;
 	bool showInfoText          = false;
 
@@ -300,22 +298,22 @@ class MainWin : public AbstractMainWin
 	std::string lastTargetName = std::string("");
 
 	// LENSING
-	GLTexture* lenseDistortionMap = nullptr;
+	std::unique_ptr<GLTexture> lenseDistortionMap;
 	QVector4D lenseScreenCoord;
 	float lenseDist = 0.f;
 
 	// UI
-	Visibilities* visibilities               = nullptr;
-	PlanetarySystemSelector* planetSysSelect = nullptr;
-	UniverseElementSelector* univElemSelect  = nullptr;
-	TimeController* timeController           = nullptr;
-	AnimationTimeSelector* animTimeSelect    = nullptr;
-	ToneMappingController* tmController      = nullptr;
-	SceneSelector* scenes                    = nullptr;
-	PresenterHelp* presenterHelp             = nullptr;
+	std::unique_ptr<Visibilities> visibilities;
+	std::unique_ptr<PlanetarySystemSelector> planetSysSelect;
+	std::unique_ptr<UniverseElementSelector> univElemSelect;
+	std::unique_ptr<TimeController> timeController;
+	std::unique_ptr<AnimationTimeSelector> animTimeSelect;
+	std::unique_ptr<ToneMappingController> tmController;
+	std::unique_ptr<SceneSelector> scenes;
+	std::unique_ptr<PresenterHelp> presenterHelp;
 
 	// scenes
-	Animator* animator = nullptr;
+	std::unique_ptr<Animator> animator;
 	QSoundEffect ambiance;
 	QSoundEffect inSound;
 	QSoundEffect thrustSound;

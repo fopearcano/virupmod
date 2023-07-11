@@ -40,7 +40,6 @@ class VolumetricModel
 	void render(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos,
 	            VolumetricModel const* occlusionModel = nullptr);
-	~VolumetricModel();
 
 	float brightnessMultiplier = 1.f;
 
@@ -48,7 +47,7 @@ class VolumetricModel
 	Vector3 minPos;
 	Vector3 maxPos;
 	QMatrix4x4 posToTexCoord;
-	GLTexture* tex = nullptr;
+	std::unique_ptr<GLTexture> tex;
 
 	bool renderable = false;
 

@@ -68,9 +68,10 @@ VolumetricModel::VolumetricModel(QString const& datFile)
 		}
 	}
 
-	tex = new GLTexture(GLTexture::Tex3DProperties(Nz, Ny, Nx, GL_R32F),
-	                    {GL_LINEAR, GL_CLAMP_TO_BORDER},
-	                    {&data[0], GL_FLOAT, GL_RED});
+	tex = std::make_unique<GLTexture>(
+	    GLTexture::Tex3DProperties(Nz, Ny, Nx, GL_R32F),
+	    GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER},
+	    GLTexture::Data{&data[0], GL_FLOAT, GL_RED});
 	tex->generateMipmap();
 }
 
@@ -95,7 +96,7 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
 	shader.setUniform("color", color);
 	shader.setUniform("campos", dataModel.inverted() * campos);
 
-	std::vector<GLTexture const*> texs({tex});
+	std::vector<GLTexture const*> texs({tex.get()});
 
 	if(occlusionModel != nullptr)
 	{
@@ -112,9 +113,4 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
 	GLHandler::endTransparent();
-}
-
-VolumetricModel::~VolumetricModel()
-{
-	delete tex;
 }
