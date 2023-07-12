@@ -21,6 +21,8 @@
 
 #include "TestExample.hpp"
 
+#include "memory.hpp"
+
 template <typename Functor>
 void test_main(Functor assertFunc)
 {
