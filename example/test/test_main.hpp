@@ -19,12 +19,14 @@
 #ifndef TEST_MAIN_H
 #define TEST_MAIN_H
 
+#include "memory.hpp"
+
 #include "TestExample.hpp"
 
 template <typename Functor>
 void test_main(Functor assertFunc)
 {
-	assertFunc(new TestExample());
+	assertFunc(std::make_unique<TestExample>());
 }
 
 #endif // TEST_MAIN_H

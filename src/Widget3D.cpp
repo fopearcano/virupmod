@@ -20,7 +20,7 @@
 
 #include "memory.hpp"
 
-Widget3D::Widget3D(QWidget* widget)
+Widget3D::Widget3D(QWidget& widget)
     : shader("billboard")
     , widget(widget)
 {
@@ -29,13 +29,13 @@ Widget3D::Widget3D(QWidget* widget)
 
 void Widget3D::update()
 {
-	if(!widget->isVisible())
+	if(!widget.isVisible())
 	{
-		widget->setVisible(true);
-		widget->setVisible(false);
+		widget.setVisible(true);
+		widget.setVisible(false);
 	}
-	unsigned int width(widget->width()), height(widget->height());
-	originalSize = widget->size();
+	unsigned int width(widget.width()), height(widget.height());
+	originalSize = widget.size();
 	aspectratio  = QMatrix4x4();
 	if(width > height)
 	{
@@ -75,7 +75,7 @@ void Widget3D::updateTex()
 {
 	image = QImage(originalSize, QImage::Format_ARGB32);
 
-	paintWidget(image, *widget);
+	paintWidget(image, widget);
 
 	tex = std::make_unique<GLTexture>(image);
 }

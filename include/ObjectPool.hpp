@@ -21,15 +21,14 @@
 
 #include <list>
 
+#include "memory.hpp"
+
 /**@brief A template to create pools object, useful for reusing GPU resources
  * for the whole runtime instead of constantly allocate/deallocate them.
  */
 template <typename T>
 class ObjectPool
 {
-  protected:
-	std::list<T*> objects;
-
   public:
 	ObjectPool() = default;
 
@@ -37,41 +36,39 @@ class ObjectPool
 	ObjectPool& operator=(const ObjectPool&) = delete;
 	ObjectPool(ObjectPool&&)                 = delete;
 	ObjectPool& operator=(ObjectPool&&)      = delete;
+	virtual ~ObjectPool()                    = default;
 
-	virtual ~ObjectPool()
-	{
-		while(!objects.empty())
-		{
-			delete objects.back();
-			objects.pop_back();
-		}
-	}
-
-	virtual T* createObject() const = 0;
+	virtual std::unique_ptr<T> createObject() const = 0;
 
 	std::size_t getSize() { return objects.size(); };
 
-	T* acquire()
+	std::unique_ptr<T> acquire()
 	{
 		if(objects.empty())
 		{
-			objects.push_back(createObject());
+			return createObject();
 		}
 
-		T* obj = objects.back();
+		auto obj(std::move(objects.back()));
 		objects.pop_back();
 		return obj;
 	}
 
-	void release(T* object) { objects.push_back(object); }
+	void release(std::unique_ptr<T> object)
+	{
+		objects.emplace_back(std::move(object));
+	}
 
 	void reserve(std::size_t size)
 	{
 		while(objects.size() < size)
 		{
-			objects.push_back(createObject());
+			objects.emplace_back(std::move(createObject()));
 		}
 	}
+
+  protected:
+	std::list<std::unique_ptr<T>> objects;
 };
 
 #endif // OBJECTPOOL_HPP

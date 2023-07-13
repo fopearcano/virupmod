@@ -80,4 +80,3 @@ std::vector<float> MovingCube::cubeVertices(uint64_t dt)
 
 	return result;
 }
-

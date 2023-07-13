@@ -24,4 +24,3 @@ ExampleSettings::ExampleSettings(QWidget* parent)
 	addGroup("misc", tr("Miscellaneous"));
 	addBoolSetting("mouseview", true, tr("Toggle mouse view"));
 }
-

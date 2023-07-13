@@ -18,7 +18,7 @@
 
 #include "Launcher.hpp"
 
-SettingsWidget* Launcher::newSettingsWidget()
+std::unique_ptr<SettingsWidget> Launcher::newSettingsWidget()
 {
-	return new BlankSettings(this);
+	return std::make_unique<BlankSettings>(this);
 }

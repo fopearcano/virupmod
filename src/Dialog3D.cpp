@@ -19,7 +19,7 @@
 #include "Dialog3D.hpp"
 
 Dialog3D::Dialog3D()
-    : widget3d(this)
+    : widget3d(*this)
     , shader("default")
 {
 	shader.setUniform("color", QColor(255, 0, 0));

@@ -52,10 +52,10 @@ class MainWin : public AbstractMainWin
 	};
 
 	MainWin() = default;
-	~MainWin();
 
   protected:
-	virtual void actionEvent(BaseInputManager::Action const& a, bool pressed) override;
+	virtual void actionEvent(BaseInputManager::Action const& a,
+	                         bool pressed) override;
 	virtual bool event(QEvent* e) override;
 	virtual void mousePressEvent(QMouseEvent* e) override;
 	virtual void mouseReleaseEvent(QMouseEvent* e) override;
@@ -108,38 +108,39 @@ class MainWin : public AbstractMainWin
 
   private:
 	ShaderProgram sbShader;
-	GLMesh* skybox;
-	GLTexture* sbTexture;
+	std::unique_ptr<GLMesh> skybox;
+	std::unique_ptr<GLTexture> sbTexture;
 
-	GLMesh* mesh;
+	std::unique_ptr<GLMesh> mesh;
 	ShaderProgram shaderProgram;
 
-	GLMesh* pointsMesh;
+	std::unique_ptr<GLMesh> pointsMesh;
 	ShaderProgram pointsShader;
 
-	MovingCube* movingCube;
+	std::unique_ptr<MovingCube> movingCube;
 
-	GLMesh* sphere;
+	std::unique_ptr<GLMesh> sphere;
 	ShaderProgram sphereShader;
 
-	GLMesh* playarea;
+	std::unique_ptr<GLMesh> playarea;
 	ShaderProgram playareaShader;
 
-	Model* model;
-	Light* light;
+	std::unique_ptr<Model> model;
+	std::unique_ptr<Light> light;
 	QMatrix4x4 modelModel;
 
-	Billboard* bill;
-	Text3D* text;
-	Widget3D* widget3d;
-	DemoDialog* dialog;
+	std::unique_ptr<Billboard> bill;
+	std::unique_ptr<Text3D> text;
+	QCalendarWidget calendar;
+	std::unique_ptr<Widget3D> widget3d;
+	std::unique_ptr<DemoDialog> dialog;
 
 	float barrelPower = 1.01f;
 
 	bool moveView = false;
 	QPoint cursorPosBackup;
-	float yaw = 0.f;
-	float pitch = 0.f;
+	float yaw        = 0.f;
+	float pitch      = 0.f;
 	QVector3D campos = QVector3D(1, 1, 1);
 
 	QElapsedTimer timer;

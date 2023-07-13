@@ -23,10 +23,8 @@
 
 class ExampleSettings : public SettingsWidget
 {
-	public:
-		ExampleSettings(QWidget* parent);
+  public:
+	ExampleSettings(QWidget* parent);
 };
 
-
 #endif // EXAMPLESETTINGS_HPP
-

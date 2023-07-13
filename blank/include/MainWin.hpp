@@ -1,7 +1,6 @@
 #ifndef MAINWIN_H
 #define MAINWIN_H
 
-
 #include "AbstractMainWin.hpp"
 
 class MainWin : public AbstractMainWin

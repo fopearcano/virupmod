@@ -23,9 +23,10 @@ DemoDialog::DemoDialog()
 	setFixedSize(250, 600);
 	setWindowTitle(tr("Demo 3D Dialog"));
 
-	auto layout = new QVBoxLayout(this);
+	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
-	connect(&listWidget, &QListWidget::itemActivated, [](QListWidgetItem *item) { qDebug() << item->text();});
+	connect(&listWidget, &QListWidget::itemActivated,
+	        [](QListWidgetItem* item) { qDebug() << item->text(); });
 	layout->addWidget(&listWidget);
 
 	for(auto const& elementName : QStringList({"Foo", "Bar", "Baz"}))
@@ -33,9 +34,9 @@ DemoDialog::DemoDialog()
 		listWidget.addItem(elementName);
 	}
 
-	auto b = new QPushButton(this);
+	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Close"));
-	connect(b, &QPushButton::clicked, [this](){this->hide();});
+	connect(b, &QPushButton::clicked, [this]() { this->hide(); });
 	layout->addWidget(b);
 	installEventFilters();
 }

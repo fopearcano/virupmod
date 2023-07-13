@@ -30,12 +30,12 @@
 class Widget3D
 {
   public:
-	explicit Widget3D(QWidget* widget);
+	explicit Widget3D(QWidget& widget);
 	QMatrix4x4 const& getModel() const { return model; };
 	QMatrix4x4& getModel() { return model; };
 	QMatrix4x4 getAspectRatioMatrix() const { return aspectratio; };
 	QImage const getImage() const { return image; };
-	QWidget& getWidget() const { return *widget; };
+	QWidget& getWidget() const { return widget; };
 	void triggerRepaint() { this->repaint = true; };
 	void render(ToneMappingModel const& tmm,
 	            GLHandler::GeometricSpace geometricSpace
@@ -63,7 +63,7 @@ class Widget3D
 	QSize originalSize;
 	QImage image;
 
-	QWidget* widget = nullptr;
+	QWidget& widget;
 };
 
 #endif // WIDGET3D_H
