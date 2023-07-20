@@ -18,6 +18,7 @@
 
 #include "universe/CSVObjects.hpp"
 
+#include "physics/blackbody.hpp"
 #include <cfloat>
 
 std::unique_ptr<GLTexture>& CSVObjects::starTex()

@@ -117,7 +117,7 @@ void MovementControls::actionEvent(BaseInputManager::Action const& a,
 void MovementControls::wheelEvent(QWheelEvent* e)
 {
 	cosmoCam.scale *= (1.f + e->angleDelta().y() / 1000.f);
-	CelestialBodyRenderer::overridenScale
+	CelestialBodyRenderer::overridenScale()
 	    *= (1.f + e->angleDelta().y() / 1000.f);
 }
 
@@ -248,7 +248,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						initControllerRelPos
 						    = Utils::fromQt(trackedSpaceToWorldTransform
 						                    * left->getPosition())
-						          / CelestialBodyRenderer::overridenScale
+						          / CelestialBodyRenderer::overridenScale()
 						      + planetCam.relativePosition;
 					}
 					else if(e.side == Side::RIGHT && right != nullptr)
@@ -257,7 +257,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						initControllerRelPos
 						    = Utils::fromQt(trackedSpaceToWorldTransform
 						                    * right->getPosition())
-						          / CelestialBodyRenderer::overridenScale
+						          / CelestialBodyRenderer::overridenScale()
 						      + planetCam.relativePosition;
 					}
 					else
@@ -270,7 +270,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						initControllersDistance
 						    = left->getPosition().distanceToPoint(
 						        right->getPosition());
-						initScaleOrb = CelestialBodyRenderer::overridenScale;
+						initScaleOrb = CelestialBodyRenderer::overridenScale();
 
 						QVector3D controllersMidPoint;
 						controllersMidPoint
@@ -281,7 +281,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						                      * controllersMidPoint;
 						scaleCenterOrb
 						    = Utils::fromQt(controllersMidPoint)
-						          / CelestialBodyRenderer::overridenScale
+						          / CelestialBodyRenderer::overridenScale()
 						      + planetCam.relativePosition;
 					}
 					break;
@@ -306,7 +306,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 							initControllerRelPos
 							    = Utils::fromQt(trackedSpaceToWorldTransform
 							                    * right->getPosition())
-							          / CelestialBodyRenderer::overridenScale
+							          / CelestialBodyRenderer::overridenScale()
 							      + planetCam.relativePosition;
 						}
 						else
@@ -322,7 +322,7 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 							initControllerRelPos
 							    = Utils::fromQt(trackedSpaceToWorldTransform
 							                    * left->getPosition())
-							          / CelestialBodyRenderer::overridenScale
+							          / CelestialBodyRenderer::overridenScale()
 							      + planetCam.relativePosition;
 						}
 						else
@@ -412,7 +412,7 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 		float fI((scaleIncreaseFactor - 1.f) * frameTiming + 1.f);
 		float fD((scaleDecreaseFactor - 1.f) * frameTiming + 1.f);
 		cosmoCam.scale *= fI / fD;
-		CelestialBodyRenderer::overridenScale *= fI / fD;
+		CelestialBodyRenderer::overridenScale() *= fI / fD;
 	}
 	else
 	{
@@ -512,7 +512,7 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 			controllerRelPos
 			    = Utils::fromQt(planetCam.seatedTrackedSpaceToWorldTransform()
 			                    * left->getPosition())
-			          / CelestialBodyRenderer::overridenScale
+			          / CelestialBodyRenderer::overridenScale()
 			      + planetCam.relativePosition;
 		}
 		else if(rightGripPressedOrb && right != nullptr)
@@ -520,7 +520,7 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 			controllerRelPos
 			    = Utils::fromQt(planetCam.seatedTrackedSpaceToWorldTransform()
 			                    * right->getPosition())
-			          / CelestialBodyRenderer::overridenScale
+			          / CelestialBodyRenderer::overridenScale()
 			      + planetCam.relativePosition;
 		}
 		planetCam.relativePosition -= controllerRelPos - initControllerRelPos;
@@ -533,7 +533,7 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 		            * left->getPosition().distanceToPoint(right->getPosition())
 		            / initControllersDistance,
 		        scaleCenterOrb, planetCam.relativePosition,
-		        CelestialBodyRenderer::overridenScale);
+		        CelestialBodyRenderer::overridenScale());
 	}
 
 	// apply gamepad and keyboard controls
@@ -543,7 +543,7 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 		    += frameTiming
 		       * (planetCam.getView().inverted()
 		          * (negVel + posVel + gamepadVel))[i]
-		       / CelestialBodyRenderer::overridenScale;
+		       / CelestialBodyRenderer::overridenScale();
 	}
 }
 

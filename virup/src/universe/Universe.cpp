@@ -121,8 +121,8 @@ double Universe::getScale() const
 
 void Universe::setScale(double scale)
 {
-	camCosmo.scale                        = scale / mtokpc;
-	CelestialBodyRenderer::overridenScale = scale;
+	camCosmo.scale                          = scale / mtokpc;
+	CelestialBodyRenderer::overridenScale() = scale;
 }
 
 Vector3 Universe::getCosmoPosition() const
@@ -209,12 +209,8 @@ QString Universe::getClosestCommonAncestorName(
 	{
 		return "";
 	}
-	auto result(Orbitable::getCommonAncestor(orb0, orb1));
-	if(result == nullptr)
-	{
-		return "";
-	}
-	return result->getName().c_str();
+	auto const& result(Orbitable::getCommonAncestor(*orb0, *orb1));
+	return result.getName().c_str();
 }
 
 Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
@@ -243,9 +239,9 @@ Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
 	if(dt.isValid())
 	{
 		return Orbitable::getRelativePositionAtUt(
-		    orbRef, orb, SimulationTime::dateTimeToUT(dt));
+		    *orbRef, *orb, SimulationTime::dateTimeToUT(dt));
 	}
-	return Orbitable::getRelativePositionAtUt(orbRef, orb,
+	return Orbitable::getRelativePositionAtUt(*orbRef, *orb,
 	                                          clock.getCurrentUt());
 }
 
@@ -272,16 +268,12 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 	{
 		return {};
 	}
-	auto ancestor(Orbitable::getCommonAncestor(orb0, orb1));
-	if(ancestor == nullptr)
-	{
-		return {};
-	}
+	auto const& ancestor(Orbitable::getCommonAncestor(*orb0, *orb1));
 
-	return (Orbitable::getRelativePositionAtUt(ancestor, orb0,
+	return (Orbitable::getRelativePositionAtUt(ancestor, *orb0,
 	                                           clock.getCurrentUt())
 	        * (1 - t))
-	       + (Orbitable::getRelativePositionAtUt(ancestor, orb1,
+	       + (Orbitable::getRelativePositionAtUt(ancestor, *orb1,
 	                                             clock.getCurrentUt())
 	          * t);
 }
@@ -302,7 +294,7 @@ Vector3 Universe::getCameraCurrentRelPosToBody(QString const& bodyName) const
 	{
 		return {};
 	}
-	return camPlanet.getRelativePositionTo(orb, lastCurrentUt);
+	return camPlanet.getRelativePositionTo(*orb, lastCurrentUt);
 }
 
 double Universe::getVisibility(QString const& name) const
@@ -317,11 +309,11 @@ double Universe::getVisibility(QString const& name) const
 	}
 	if(name == "Orbits")
 	{
-		return CelestialBodyRenderer::renderOrbits;
+		return CelestialBodyRenderer::renderOrbits();
 	}
 	if(name == "PlanetsLabels")
 	{
-		return CelestialBodyRenderer::renderLabels;
+		return CelestialBodyRenderer::renderLabels();
 	}
 	if(name == "Debris")
 	{
@@ -364,18 +356,18 @@ void Universe::setVisibility(QString const& name, double visibility)
 	}
 	if(name == "Orbits")
 	{
-		if(CelestialBodyRenderer::renderOrbits != visibility)
+		if(CelestialBodyRenderer::renderOrbits() != visibility)
 		{
-			CelestialBodyRenderer::renderOrbits = visibility;
+			CelestialBodyRenderer::renderOrbits() = visibility;
 			emit nonElementVisibilityChanged(name, visibility);
 		}
 		return;
 	}
 	if(name == "PlanetsLabels")
 	{
-		if(CelestialBodyRenderer::renderLabels != visibility)
+		if(CelestialBodyRenderer::renderLabels() != visibility)
 		{
-			CelestialBodyRenderer::renderLabels = visibility;
+			CelestialBodyRenderer::renderLabels() = visibility;
 			emit nonElementVisibilityChanged(name, visibility);
 		}
 		return;
@@ -432,7 +424,7 @@ void Universe::setSolarSystemPosition(QString const& name, Vector3 const& pos)
 
 void Universe::setLabelsOrbitsOnly(QStringList const& nameList)
 {
-	CelestialBodyRenderer::renderLabelsOrbitsOnly = nameList;
+	CelestialBodyRenderer::renderLabelsOrbitsOnly() = nameList;
 }
 
 int Universe::getCosmoSimForcedQuality(QString const& name) const
@@ -561,10 +553,10 @@ void Universe::updatePlanetarySystem()
 	lastData   = planetSystems->getClosestSystemPosition();
 	sysInWorld = camCosmo.dataToWorldPosition(lastData);
 
-	CelestialBodyRenderer::overridenScale = mtokpc * camCosmo.scale;
+	CelestialBodyRenderer::overridenScale() = mtokpc * camCosmo.scale;
 
 	if((camPlanet.target == orbitalSystem->getMainCelestialBody()
-	    && CelestialBodyRenderer::overridenScale < 1e-12)
+	    && CelestialBodyRenderer::overridenScale() < 1e-12)
 	   || forceUpdateFromCosmo)
 	{
 		camPlanet.relativePosition
@@ -642,7 +634,7 @@ void Universe::loadClosestSystem()
 	}
 
 	orbitalSystem  = planetSystems->getClosestSystem();
-	systemRenderer = std::make_unique<OrbitalSystemRenderer>(orbitalSystem);
+	systemRenderer = std::make_unique<OrbitalSystemRenderer>(*orbitalSystem);
 
 	/*debugText->setText(QString(orbitalSystem->getName().c_str()));
 	lastTargetName = orbitalSystem->getMainCelestialBody()->getName();
@@ -687,8 +679,8 @@ void Universe::loadClosestSystem()
 
 	camPlanet.target = orbitalSystem->getMainCelestialBody();
 
-	CelestialBodyRenderer::overridenScale = 1.0;
-	forceUpdateFromCosmo                  = true;
+	CelestialBodyRenderer::overridenScale() = 1.0;
+	forceUpdateFromCosmo                    = true;
 }
 
 Universe::~Universe()

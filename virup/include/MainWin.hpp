@@ -120,24 +120,30 @@ class MainWin : public AbstractMainWin
 	/**
 	 * @getter{renderOrbits}
 	 */
-	float renderOrbits() const { return CelestialBodyRenderer::renderOrbits; };
+	float renderOrbits() const
+	{
+		return CelestialBodyRenderer::renderOrbits();
+	};
 	/**
 	 * @setter{renderOrbits, renderOrbits}
 	 */
 	void setRenderOrbits(float render)
 	{
-		CelestialBodyRenderer::renderOrbits = render;
+		CelestialBodyRenderer::renderOrbits() = render;
 	};
 	/**
 	 * @getter{renderLabels}
 	 */
-	float renderLabels() const { return CelestialBodyRenderer::renderLabels; };
+	float renderLabels() const
+	{
+		return CelestialBodyRenderer::renderLabels();
+	};
 	/**
 	 * @setter{renderLabels, renderLabels}
 	 */
 	void setRenderLabels(float render)
 	{
-		CelestialBodyRenderer::renderLabels = render;
+		CelestialBodyRenderer::renderLabels() = render;
 	};
 	/**
 	 * @getter{darkmatterEnabled}
@@ -238,8 +244,8 @@ class MainWin : public AbstractMainWin
 			{
 			}
 		}
-		CelestialBodyRenderer::renderLabels = state.renderLabels;
-		CelestialBodyRenderer::renderOrbits = state.renderOrbits;
+		CelestialBodyRenderer::renderLabels() = state.renderLabels;
+		CelestialBodyRenderer::renderOrbits() = state.renderOrbits;
 		renderer.setCalibrationCompass(state.compass);
 		CalibrationCompass::readState(state.compassState);
 		vrHandler->setStereoMultiplier(state.stereoMultiplier);
@@ -258,8 +264,8 @@ class MainWin : public AbstractMainWin
 			    renderer.getCamera<OrbitalSystemCamera const&>("planet"));
 			cam2.writeState(state.planetCamState);
 		}
-		state.renderLabels = CelestialBodyRenderer::renderLabels;
-		state.renderOrbits = CelestialBodyRenderer::renderOrbits;
+		state.renderLabels = CelestialBodyRenderer::renderLabels();
+		state.renderOrbits = CelestialBodyRenderer::renderOrbits();
 		state.compass      = renderer.getCalibrationCompass();
 		CalibrationCompass::writeState(state.compassState);
 		state.stereoMultiplier = vrHandler->getStereoMultiplier();

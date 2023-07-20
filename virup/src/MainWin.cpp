@@ -27,13 +27,13 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 			}
 			else if(a.id == "toggleorbits")
 			{
-				CelestialBodyRenderer::renderOrbits
-				    = CelestialBodyRenderer::renderOrbits > 0.f ? 0.f : 1.f;
+				CelestialBodyRenderer::renderOrbits()
+				    = CelestialBodyRenderer::renderOrbits() > 0.f ? 0.f : 1.f;
 			}
 			else if(a.id == "togglelabels")
 			{
-				CelestialBodyRenderer::renderLabels
-				    = CelestialBodyRenderer::renderLabels > 0.f ? 0.f : 1.f;
+				CelestialBodyRenderer::renderLabels()
+				    = CelestialBodyRenderer::renderLabels() > 0.f ? 0.f : 1.f;
 			}
 			else if(a.id == "toggledm")
 			{

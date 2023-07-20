@@ -12,7 +12,6 @@
 #include "Primitives.hpp"
 #include "gl/GLHandler.hpp"
 #include "math/Vector3.hpp"
-#include "physics/blackbody.hpp"
 #include "utils.hpp"
 
 #define MAX_LEAVES_PER_NODE 16000

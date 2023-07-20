@@ -90,8 +90,8 @@ PlanetarySystems::PlanetarySystems()
 		QString name(QFileInfo(jsonFile).dir().dirName());
 
 		QString dir(QFileInfo(jsonFile).absoluteDir().path());
-		PlanetRenderer::currentSystemDir = dir;
-		CSVOrbit::currentSystemDir       = dir;
+		PlanetRenderer::currentSystemDir() = dir;
+		CSVOrbit::currentSystemDir()       = dir;
 
 		auto orbitalSystem = std::make_unique<OrbitalSystem>(name.toStdString(),
 		                                                     jsonDoc.object());
@@ -119,8 +119,8 @@ PlanetarySystems::PlanetarySystems()
 
 	shader.setUniform("color", QVector3D(1000000.f, 0.f, 0.f));
 
-	PlanetRenderer::currentSystemDir = directories[closestId];
-	CSVOrbit::currentSystemDir       = directories[closestId];
+	PlanetRenderer::currentSystemDir() = directories[closestId];
+	CSVOrbit::currentSystemDir()       = directories[closestId];
 }
 
 QStringList PlanetarySystems::getSystemsNames() const
@@ -168,9 +168,9 @@ void PlanetarySystems::update(Camera const& camera)
 		}
 	}
 	// put max neighborDist
-	neighborDist                     = neighborDist > 2 ? 2 : neighborDist;
-	PlanetRenderer::currentSystemDir = directories[closestId];
-	CSVOrbit::currentSystemDir       = directories[closestId];
+	neighborDist                       = neighborDist > 2 ? 2 : neighborDist;
+	PlanetRenderer::currentSystemDir() = directories[closestId];
+	CSVOrbit::currentSystemDir()       = directories[closestId];
 
 	if(camera.scale * neighborDist > 2000
 	   && (!doRender || oldClosestId != closestId))

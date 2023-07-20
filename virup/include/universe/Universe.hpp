@@ -297,7 +297,7 @@ class Universe : public QObject
 		setVisibility("Debris", state.visibilities[elements.size() + 1]);
 		setVisibility("Asteroids", state.visibilities[elements.size() + 2]);
 		clock.setCurrentUt(state.ut);
-		CelestialBodyRenderer::renderLabelsOrbitsOnly
+		CelestialBodyRenderer::renderLabelsOrbitsOnly()
 		    = state.renderLabelsOrbitsOnly;
 	};
 	void writeState(AbstractState& s) const
@@ -313,7 +313,7 @@ class Universe : public QObject
 		state.visibilities.push_back(getVisibility("Asteroids"));
 		state.ut = clock.getCurrentUt();
 		state.renderLabelsOrbitsOnly
-		    = CelestialBodyRenderer::renderLabelsOrbitsOnly;
+		    = CelestialBodyRenderer::renderLabelsOrbitsOnly();
 	};
 
 	Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet);

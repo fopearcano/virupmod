@@ -45,7 +45,7 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 	    = universe.planetSystems->getSystem("Solar System")->getRootOrbitable();
 	auto item = qt_owned<QTreeWidgetItem>(&solarSystemTree);
 	item->setText(0, sun.getName().c_str());
-	for(auto childOrb : sun.getChildren())
+	for(auto const& childOrb : sun.getChildren())
 	{
 		item->addChild(
 		    constructItems(*childOrb, item, solarSystemTree, universe));
@@ -125,7 +125,7 @@ QTreeWidgetItem* PlanetarySystemSelector::constructItems(
 {
 	if(orbitable.getOrbitableType() == Orbitable::Type::BINARY)
 	{
-		for(auto child : orbitable.getChildren())
+		for(auto const& child : orbitable.getChildren())
 		{
 			parent->addChild(constructItems(*child, parent, tree, universe));
 		}
@@ -182,7 +182,7 @@ QTreeWidgetItem* PlanetarySystemSelector::constructItems(
 		item->setText(0, QString::fromStdString(orbitable.getName()));
 	}
 
-	for(auto child : orbitable.getChildren())
+	for(auto const& child : orbitable.getChildren())
 	{
 		item->addChild(constructItems(*child, item, tree, universe));
 	}
