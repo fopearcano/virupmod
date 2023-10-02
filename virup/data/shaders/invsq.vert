@@ -41,7 +41,7 @@ vec3 log10_3(in vec3 x)
 
 #include <raymarch.glsl>
 
-#include <gradient/gradient.glsl>
+// #include <gradient/gradient.glsl>
 
 void main()
 {
@@ -49,7 +49,7 @@ void main()
 	gl_Position        = pos;
 	gl_ClipDistance[0] = (pos.z / pos.w) - 0.1;
 
-	vec3 usedColor = evaluateGradient(luminosity);
+	vec3 usedColor = color; // evaluateGradient(luminosity);
 
 	float camdist = length(position - campos) * unitInKpc; // in kpc
 	vec3 absmag = 4.83 - 2.5 * log10_3(max(vec3(1.0e-30), usedColor) ); // color is in Solar Luminosity ;

@@ -25,8 +25,8 @@ float& CosmologicalSimulation::animationTime()
 }
 
 CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
-    : gradient(json["gradient"].toObject())
-    , gradientSelector(gradient)
+/*: gradient(json["gradient"].toObject())
+, gradientSelector(gradient)*/
 {
 	QString rootdir(QSettings().value("data/rootdir").toString() + '/'),
 	    gasPath(json["gasfile"].toString()),
@@ -47,7 +47,7 @@ CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 
 	temporalSeries = json["temporalseries"].toBool(true);
 
-	gradient.setJson(json["gradient"].toObject());
+	// gradient.setJson(json["gradient"].toObject());
 
 	init(gasPath.toStdString(), starsPath.toStdString(),
 	     json["loaddarkmatter"].toBool() ? dmPath.toStdString() : "",
@@ -60,7 +60,7 @@ CosmologicalSimulation::CosmologicalSimulation(
     std::string const& darkMatterOctreePath, bool loadDarkMatter,
     QColor const& gasColor, QColor const& starsColor,
     QColor const& darkMatterColor)
-    : gradientSelector(gradient)
+// : gradientSelector(gradient)
 {
 	init(gasOctreePath, starsOctreePath,
 	     loadDarkMatter ? darkMatterOctreePath : "", gasColor, starsColor,
@@ -173,10 +173,10 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 
 	trees.silent = true;
 
-	gradientSelector.show();
+	/* gradientSelector.show();
 	connect(&gradientSelector, &GradientSelector::gradientChanged,
 	        [this]() { gradient.setShaderUniforms(trees.shaderProgram); });
-	gradient.setShaderUniforms(trees.shaderProgram);
+	gradient.setShaderUniforms(trees.shaderProgram);*/
 }
 
 // NOLINTBEGIN(misc-unused-parameters)

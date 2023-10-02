@@ -85,8 +85,8 @@ class CosmologicalSimulation : public UniverseElement
 	QColor starsColor;
 	QColor darkMatterColor;
 
-	grd::Gradient gradient;
-	GradientSelector gradientSelector;
+	/*grd::Gradient gradient;
+	GradientSelector gradientSelector;*/
 };
 
 #endif // COSMOLOGICALSIMULATION_HPP
