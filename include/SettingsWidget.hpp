@@ -88,7 +88,8 @@ class SettingsWidget : public QTabWidget
 	                                     QString const& label,
 	                                     unsigned int defaultIndex = 0);
 	void addFilePathSetting(QString const& name, QString const& defaultVal,
-	                        QString const& label);
+	                        QString const& label,
+	                        QString const& filter = QString());
 	void addDirPathSetting(QString const& name, QString const& defaultVal,
 	                       QString const& label);
 	void addVector3DSetting(QString const& name, QVector3D const& defaultVal,

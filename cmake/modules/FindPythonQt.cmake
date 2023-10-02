@@ -6,8 +6,11 @@
 # Python is required
 find_package(PythonLibs)
 if(NOT PYTHONLIBS_FOUND)
-  message(FATAL_ERROR "error: Python is required to build PythonQt")
-endif()
+	string(ASCII 27 Esc)
+	set(ColorReset "${Esc}[m")
+	set(ColorBold  "${Esc}[1m")
+	message(NOTICE "${ColorBold}Python is required to build PythonQt - it will not be used.${ColorReset}")
+else() ####
 
 # Python2
 find_path(PYTHONQT_PYTHON2_INSTALL_DIR NAMES include/PythonQt/PythonQt.h include/PythonQt5/PythonQt.h include/Qt5Python27/PythonQt/PythonQt.h DOC "Directory where PythonQt was installed.")
@@ -53,3 +56,4 @@ elseif(PYTHONQT_PYTHON2_INCLUDE_DIR AND PYTHONQT_PYTHON2_LIBRARY)
   set(PYTHONQT_PYTHON2 ON)
 endif()
 
+endif() ####

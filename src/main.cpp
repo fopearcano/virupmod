@@ -2,6 +2,7 @@
 #include <QLibraryInfo>
 #include <QSettings>
 #include <QTranslator>
+#include <sstream>
 #ifdef Q_OS_UNIX
 #include <QDir>
 #include <unistd.h>
@@ -11,17 +12,56 @@
 #include "Logger.hpp"
 #include "MainWin.hpp"
 
+#define STRINGIFY2(X) #X
+#define STRINGIFY(X) STRINGIFY2(X)
+
 int main(int argc, char* argv[])
 {
+	std::ostringstream versionOss;
+	versionOss << PROJECT_NAME << " version " << PROJECT_VERSION << std::endl;
+	versionOss << "\tWill request OpenGL version " << OPENGL_MAJOR_VERSION
+	           << "." << OPENGL_MINOR_VERSION << ' '
+	           << STRINGIFY(OPENGL_PROFILE) << std::endl;
+	versionOss << "\tGamepad support : ";
+#ifdef QT5_GAMEPAD
+	versionOss << "ON" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
+	versionOss << "\tPythonQt support : ";
+#ifdef PYTHONQT
+	versionOss << "ON (Python version " << PYTHON_VERSION << ")" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
+	versionOss << "\tPythonQt_QtAll support : ";
+#ifdef PYTHONQT_QTALL
+	versionOss << "ON (Python version " << PYTHON_VERSION << ")" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
+	versionOss << "\tLeapMotion support : ";
+#ifdef LEAP_MOTION
+	versionOss << "ON" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
+	versionOss << "\tlibktx support : ";
+#ifdef LIBKTX
+	versionOss << "ON" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
 	if(argc == 2 && std::string(argv[1]) == "--version")
 	{
-		std::cout << PROJECT_NAME << " version " << PROJECT_VERSION
-		          << std::endl;
+		std::cout << versionOss.str();
 		return EXIT_SUCCESS;
 	}
 
 	// setup logging
 	Logger::init();
+
+	qDebug() << versionOss.str().c_str();
 
 	// Set config file names for QSettings
 	QCoreApplication::setOrganizationName(PROJECT_NAME);
@@ -103,7 +143,6 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-	qDebug() << PROJECT_NAME << PROJECT_VERSION;
 #ifdef PYTHONQT
 	// set PYTHONPATH
 	QDir pathDir(QDir::currentPath() + "/python");
@@ -115,7 +154,6 @@ int main(int argc, char* argv[])
 			        (QDir::currentPath() + "/python").toLocal8Bit());
 		}
 	}
-	qDebug() << "Built with Python" << PYTHON_VERSION;
 #endif
 
 	if(!parser.isSet(noLauncher))

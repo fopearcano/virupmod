@@ -30,7 +30,7 @@ void Primitives::setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
 
 	if(primitiveType == PrimitiveType::POINTS)
 	{
-		mesh.setVertexShaderMapping(shader, {{"position", 3}});
+		mesh.setVertexShaderMapping(shader, {{"position", 2}});
 		mesh.setVertices(vertices);
 		return;
 	}

@@ -11,6 +11,7 @@
 #include "Primitives.hpp"
 #include "ShaderProgram.hpp"
 #include "Text3D.hpp"
+#include "Volume.hpp"
 #include "Widget3D.hpp"
 #include "movingcube/MovingCube.hpp"
 
@@ -134,6 +135,13 @@ class MainWin : public AbstractMainWin
 	QCalendarWidget calendar;
 	std::unique_ptr<Widget3D> widget3d;
 	std::unique_ptr<DemoDialog> dialog;
+
+	std::unique_ptr<Volume> volume;
+
+	/* TEST ANISOTROPIC FILTERING
+	std::unique_ptr<GLShaderProgram> largeGridShader;
+	std::unique_ptr<GLTexture> largeGridTex;
+	std::unique_ptr<GLMesh> largeGridMesh;*/
 
 	float barrelPower = 1.01f;
 

@@ -14,7 +14,7 @@ cd openvr
 git checkout v1.12.5
 mkdir build ; cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=ON
-make -j 8
+make -j $(nproc)
 make install
 cd ../..
 rm -rf /deps

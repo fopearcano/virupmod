@@ -58,6 +58,8 @@ class GLComputeShader : public GLShaderProgram
 
 	static QMap<QString, QString>
 	    addDefines(QMap<QString, QString> const& userDefines);
+
+	static PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 };
 
 #endif // GLCOMPUTESHADER_HPP

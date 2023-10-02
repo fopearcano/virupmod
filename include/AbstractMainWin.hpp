@@ -30,6 +30,7 @@
 #include "gl/GLHandler.hpp"
 #include "gl/GLShaderProgram.hpp"
 #include "gui/ShaderSelector.hpp"
+#include "gui/textures/TextureSelector.hpp"
 #include "memory.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
@@ -421,6 +422,7 @@ class AbstractMainWin : public RenderingWindow
 	std::unique_ptr<Dialog3DWheel> dialog3dWheel;
 
 	std::unique_ptr<ShaderSelector> shaderSelector;
+	std::unique_ptr<TextureSelector> textureSelector;
 
   private:
 	void initializeGL();

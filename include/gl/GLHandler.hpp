@@ -12,7 +12,6 @@
 #include <QVector3D>
 #include <QVector>
 #include <QtMath>
-#include <QtOpenGLExtensions>
 #include <array>
 #include <functional>
 
@@ -83,8 +82,6 @@ class GLHandler : public QObject
 	 * Make sure you keep a clean OpenGL state.
 	 */
 	static OpenGLFunctions& glf();
-
-	static QOpenGLExtension_ARB_compute_shader& glf_ARB_compute_shader();
 
   public slots:
 	/**

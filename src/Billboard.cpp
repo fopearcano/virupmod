@@ -27,13 +27,23 @@ Billboard::Billboard(QImage const& image)
 {
 }
 
+Billboard::Billboard(GLTexture&& texture)
+    : Billboard(std::move(texture), GLShaderProgram("billboard"))
+{
+}
+
 Billboard::Billboard(const char* texPath, GLShaderProgram&& shader)
     : Billboard(QImage(texPath).mirrored(), std::move(shader))
 {
 }
 
 Billboard::Billboard(QImage const& image, GLShaderProgram&& shader)
-    : tex(image)
+    : Billboard(GLTexture(image), std::move(shader))
+{
+}
+
+Billboard::Billboard(GLTexture&& texture, GLShaderProgram&& shader)
+    : tex(std::move(texture))
     , shader(std::move(shader))
 {
 	Primitives::setAsQuad(quad, this->shader, PrimitiveType::TRIANGLE_STRIP);

@@ -37,6 +37,9 @@ class GLHandler;
 class GLTexture
 {
   public:
+	static float getMaxAnisotropicFilterSamples();
+
+  public:
 	enum class Type
 	{
 		TEX1D,
@@ -164,25 +167,35 @@ class GLTexture
 
 	struct Sampler
 	{
-		Sampler(GLint filter = GL_LINEAR, GLint wrap = GL_CLAMP_TO_EDGE)
+		Sampler(GLint filter = GL_LINEAR, GLint wrap = GL_CLAMP_TO_EDGE,
+		        GLfloat anisotropicFilterSamples
+		        = getMaxAnisotropicFilterSamples())
 		    : filter(filter)
 		    , wraps(wrap)
 		    , wrapt(wrap)
-		    , wrapr(wrap){};
-		Sampler(GLint filter, GLint wraps, GLint wrapt)
+		    , wrapr(wrap)
+		    , anisotropicFilterSamples(anisotropicFilterSamples){};
+		Sampler(GLint filter, GLint wraps, GLint wrapt,
+		        GLfloat anisotropicFilterSamples
+		        = getMaxAnisotropicFilterSamples())
 		    : filter(filter)
 		    , wraps(wraps)
 		    , wrapt(wrapt)
-		    , wrapr(wrapt){};
-		Sampler(GLint filter, GLint wraps, GLint wrapt, GLint wrapr)
+		    , wrapr(wrapt)
+		    , anisotropicFilterSamples(anisotropicFilterSamples){};
+		Sampler(GLint filter, GLint wraps, GLint wrapt, GLint wrapr,
+		        GLfloat anisotropicFilterSamples
+		        = getMaxAnisotropicFilterSamples())
 		    : filter(filter)
 		    , wraps(wraps)
 		    , wrapt(wrapt)
-		    , wrapr(wrapr){};
+		    , wrapr(wrapr)
+		    , anisotropicFilterSamples(anisotropicFilterSamples){};
 		GLint filter;
 		GLint wraps;
 		GLint wrapt;
 		GLint wrapr;
+		GLfloat anisotropicFilterSamples;
 	};
 
 	struct Data
@@ -236,17 +249,25 @@ class GLTexture
 	                   DataArray<6> const& data = {});
 
 	explicit GLTexture(QImage const& image, bool sRGB = true);
-	explicit GLTexture(const char* texturePath, bool sRGB = true);
+	// sRGB ignored for KTX textures
+	explicit GLTexture(QString const& texturePath, bool sRGB = true);
 	explicit GLTexture(std::array<QImage, 6> const& images, bool sRGB = true);
-	explicit GLTexture(std::array<const char*, 6> const& texturesPaths,
+	explicit GLTexture(std::array<QString, 6> const& texturesPaths,
 	                   bool sRGB = true);
 
+	static QList<GLTexture*> const& getAllTextures() { return allTextures(); };
 	// dangerous !
 	GLuint getGLTexture() const { return glTexture; };
 	GLenum getGLTarget() const { return glTarget; };
+	QString getName() const { return name; };
+	void setName(QString const& name) { this->name = name; };
 	// level = level of mipmapping
 	QSize getSize(unsigned int level = 0) const;
-	void generateMipmap() const;
+	Type getType() const { return type; };
+	QString getTypeStr() const;
+	QMap<QString, QVariant> const& getMetadata() const { return metadata; };
+	void generateMipmap(unsigned int baseLevel = 0,
+	                    unsigned int maxLevel  = 1000) const;
 	unsigned int getHighestMipmapLevel() const;
 	QImage getContentAsImage(unsigned int level = 0) const;
 	// allocates buff ; don't forget to delete ; returns allocated size (zero if
@@ -276,9 +297,8 @@ class GLTexture
 	void initData(Data const& data) const;
 	void initData(DataArray<6> const& data) const;
 
-	static QImage getImage(const char* const& path);
-	static std::array<QImage, 6>
-	    getImages(std::array<const char*, 6> const& paths);
+	static QImage getImage(QString const& path);
+	static std::array<QImage, 6> getImages(std::array<QString, 6> const& paths);
 
 	friend GLHandler;
 	Type type;
@@ -288,8 +308,12 @@ class GLTexture
 	std::array<unsigned int, 3> size = {{1, 1, 1}};
 	unsigned int samples             = 1;
 
+	QString name;
+	QMap<QString, QVariant> metadata;
+
 	bool doClean = true;
 	static unsigned int& instancesCount();
+	static QList<GLTexture*>& allTextures();
 };
 
 #endif // GLTEXTURE_HPP

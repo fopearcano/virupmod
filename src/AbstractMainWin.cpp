@@ -135,6 +135,7 @@ bool AbstractMainWin::event(QEvent* e)
 	if(e->type() == QEvent::Type::Close)
 	{
 		shaderSelector->close();
+		textureSelector->close();
 		menuBar->close();
 		dialog3dWheel->close();
 		PythonQtHandler::closeConsole();
@@ -410,10 +411,16 @@ void AbstractMainWin::initializeGL()
 		                  this->shaderSelector->setVisible(
 		                      !this->shaderSelector->isVisible());
 	                  });
+	engine->addAction(tr("Explore Textures..."), this,
+	                  [this]() {
+		                  this->textureSelector->setVisible(
+		                      !this->textureSelector->isVisible());
+	                  });
 
 	menuBar->show();
 
-	shaderSelector = std::make_unique<ShaderSelector>();
+	shaderSelector  = std::make_unique<ShaderSelector>();
+	textureSelector = std::make_unique<TextureSelector>();
 
 	// let user init
 	initScene();
@@ -655,6 +662,20 @@ void AbstractMainWin::paintGL()
 		m_context.makeCurrent(w.get());
 		renderer.renderFrame(w->getAngleShiftMatrix());
 		w->show();
+	}
+	// render texture display if available
+	{
+		auto viewer(textureSelector->getViewer());
+		if(viewer != nullptr)
+		{
+			auto& win = viewer->getTextureDisplayWindow();
+			if(win.isExposed())
+			{
+				m_context.makeCurrent(&win);
+				viewer->render();
+				m_context.swapBuffers(&win);
+			}
+		}
 	}
 	m_context.makeCurrent(this);
 

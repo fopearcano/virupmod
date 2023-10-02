@@ -202,7 +202,8 @@ QVector3D BasicCamera::getWorldSpacePosition() const
 		    = vrHandler.getEyeViewMatrix(vrHandler.getCurrentRenderingEye());
 	}
 
-	return QVector3D((hmdScaledToWorld * eyeViewMatrix.inverted()).column(3));
+	return view.inverted()
+	       * QVector3D((hmdScaledToWorld * eyeViewMatrix.inverted()).column(3));
 }
 
 QMatrix4x4 BasicCamera::eyeSpaceToWorldTransform() const

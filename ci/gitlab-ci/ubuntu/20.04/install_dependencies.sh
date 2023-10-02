@@ -8,8 +8,8 @@ git checkout 18d4c249ca9b0003cfb10ad711c60fb7f9d5f79b ;
 # Python >= 8
 sed -i "s/#undef _POSIX_THREADS//" ./src/PythonQtPythonInclude.h
 cd build ;
-cmake .. -DBUILD_SHARED_LIBS=ON -DPythonQt_Python3=ON;
-make -j 8 ;
+cmake .. -DBUILD_SHARED_LIBS=ON -DPythonQt_Python3=ON -DCMAKE_CXX_FLAGS=-w;
+make -j $(nproc);
 make install ;
 cd ../../..
 # install openvr

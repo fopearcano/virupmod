@@ -148,7 +148,7 @@ void MainWin::initScene()
 	skybox = std::make_unique<GLMesh>();
 	Primitives::setAsUnitCube(*skybox, sbShader);
 
-	std::array<const char*, 6> paths = {};
+	std::array<QString, 6> paths = {};
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::BACK))
 	    = "data/example/images/ame_ash/ashcanyon_bk.png";
 	paths.at(static_cast<unsigned int>(GLTexture::CubemapFace::BOTTOM))
@@ -229,7 +229,10 @@ void MainWin::initScene()
 	light                = std::make_unique<Light>();
 	light->ambiantFactor = 0.05f;
 
-	bill           = std::make_unique<Billboard>("data/example/images/cc.png");
+	GLTexture tex("data/example/images/cc.ktx");
+	tex.setName("cc.ktx");
+	tex.setSampler(GLTexture::Sampler(GL_NEAREST, GL_CLAMP_TO_EDGE));
+	bill           = std::make_unique<Billboard>(std::move(tex));
 	bill->position = QVector3D(0.f, 0.f, 0.8f);
 
 	text = std::make_unique<Text3D>(200, 40);
@@ -251,6 +254,18 @@ void MainWin::initScene()
 
 	dialog = std::make_unique<DemoDialog>();
 	dialog3dWheel->addDialog3D("Demo Dialog", *dialog);
+
+	volume = std::make_unique<Volume>(GLTexture("data/example/images/volume.ktx"));
+
+	/*
+	largeGridShader = std::make_unique<GLShaderProgram>("grid");
+	largeGridTex = std::make_unique<GLTexture>(GLTexture::Tex2DProperties(1000, 1000, GL_RGBA8));
+	GLComputeShader cmp("grid.comp");
+	cmp.exec({{largeGridTex.get(), GLComputeShader::W}}, {1000, 1000, 1});
+	largeGridTex->generateMipmap();
+
+	largeGridMesh = std::make_unique<GLMesh>();
+	Primitives::setAsQuad(*largeGridMesh, *largeGridShader, PrimitiveType::TRIANGLES);*/
 
 	auto tools(menuBar->addMenu(tr("Tools")));
 	tools->addAction(tr("Demo Dialog"), this,
@@ -401,6 +416,15 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	widget3d->render(*toneMappingModel);
 	bill->render(camera);
 	text->render();
+
+	volume->render(camera);
+
+	/*
+	QMatrix4x4 model;
+	model.scale(100.f);
+	GLHandler::useTextures({largeGridTex.get()});
+	GLHandler::setUpRender(*largeGridShader, model);
+	largeGridMesh->render();*/
 }
 
 void MainWin::renderGui(QSize const& targetSize)

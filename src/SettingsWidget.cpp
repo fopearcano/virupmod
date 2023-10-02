@@ -420,7 +420,8 @@ QComboBox* SettingsWidget::addStringAmongListSetting(
 
 void SettingsWidget::addFilePathSetting(QString const& name,
                                         QString const& defaultVal,
-                                        QString const& label)
+                                        QString const& label,
+                                        QString const& filter)
 {
 	QString fullName(currentGroup + '/' + name);
 
@@ -443,10 +444,10 @@ void SettingsWidget::addFilePathSetting(QString const& name,
 	auto browsePb = make_qt_unique<QPushButton>(*this);
 	browsePb->setText("...");
 	connect(browsePb, &QPushButton::clicked, this,
-	        [this, label, lineEdit](bool)
+	        [this, label, lineEdit, filter](bool)
 	        {
-		        QString result(QFileDialog::getOpenFileName(this, label,
-		                                                    lineEdit->text()));
+		        QString result(QFileDialog::getOpenFileName(
+		            this, label, lineEdit->text(), filter));
 		        if(result != "")
 		        {
 			        lineEdit->setText(result);

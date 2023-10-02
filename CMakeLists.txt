@@ -194,6 +194,7 @@ macro(hydrogenvr_find_packages)
 		"LeapMotion        0.0.0       N/A               false"
 		"PythonQt          0.0.0       N/A               false"
 		"PythonQt_QtAll    0.0.0       N/A               false"
+		"libktx            0.0.0       N/A               false"
     )
 
 	foreach(PACKAGE ${REQUIRED_LIBS})
@@ -243,7 +244,7 @@ endmacro()
 hydrogenvr_find_packages()
 
 # Qt5 requires that we find individual component
-find_package(Qt5 COMPONENTS Widgets Concurrent Test Network OpenGLExtensions)
+find_package(Qt5 COMPONENTS Widgets Concurrent Test Network)
 if(NOT Qt5_FOUND)
     list(APPEND CONAN_REQUIRED_LIBS "qt/5.14.1@bincrafters/stable")
 endif()
@@ -291,7 +292,7 @@ if (CONAN_REQUIRED_LIBS)
 
 	# Now that we've installed what we are missing, try to locate them again
 	hydrogenvr_find_packages(FORCE_REQUIRED)
-	find_package(Qt5 REQUIRED COMPONENTS Widgets Concurrent Test Network OpenGLExtensions)
+	find_package(Qt5 REQUIRED COMPONENTS Widgets Concurrent Test Network)
 	find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
 endif()
 
@@ -334,6 +335,13 @@ else()
 	message(STATUS "PythonQt not found")
 endif()
 
+# libktx
+if(libktx_FOUND)
+	message(STATUS "libktx found")
+else()
+	message(STATUS "libktx not found")
+endif()
+
 #Additional
 if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
 	include(${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
@@ -353,11 +361,15 @@ if(PythonQt_QtAll_FOUND)
 	add_definitions(-DPYTHONQT_QTALL)
 	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHONQT_QTALL_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 endif()
+if(libktx_FOUND)
+	add_definitions(-DLIBKTX)
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${LIBKTX_INCLUDE_DIRS})
+endif()
 
 include_directories(${COMMON_INCLUDES} ${THIRDPARTY_INCLUDES} ${PROJECT_INCLUDES} ${TEST_INCLUDES} SYSTEM ${EXTERNAL_LIBS_INCLUDE_DIRS})
 
 # LINKING SETUP
-set(LD_LIBS Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network Qt5::OpenGLExtensions ${QT5_OPTIONAL_LIBS} ${ASSIMP_LIBRARIES} ${OPENVR_LIBRARIES} ${PROJECT_LIBRARIES})
+set(LD_LIBS Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network ${QT5_OPTIONAL_LIBS} ${ASSIMP_LIBRARIES} ${OPENVR_LIBRARIES} ${PROJECT_LIBRARIES})
 if(LeapMotion_FOUND)
 	set(LD_LIBS ${LD_LIBS} ${LEAPMOTION_LIBRARIES})
 endif()
@@ -366,6 +378,9 @@ if(PythonQt_FOUND)
 endif()
 if(PythonQt_QtAll_FOUND)
 	set(LD_LIBS ${LD_LIBS} ${PYTHONQT_QTALL_LIBRARIES} ${PYTHON_LIBRARIES})
+endif()
+if(libktx_FOUND)
+	set(LD_LIBS ${LD_LIBS} ${LIBKTX_LIBRARIES})
 endif()
 
 # Find .so in working directory

@@ -20,6 +20,8 @@
 
 #include "gl/GLShaderProgram.hpp"
 
+#include <QOpenGLFunctions>
+
 unsigned int& GLShaderProgram::instancesCount()
 {
 	static unsigned int instancesCount = 0;

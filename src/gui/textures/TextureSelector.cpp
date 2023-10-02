@@ -16,15 +16,22 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "gui/ShaderSelector.hpp"
+#include "gui/textures/TextureSelector.hpp"
 
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QVBoxLayout>
+
+#include "gui/textures/TEX2DViewer.hpp"
 #include "memory.hpp"
 
-ShaderSelector::ShaderSelector(QWidget* parent)
+TextureSelector::TextureSelector(QWidget* parent)
     : QDialog(parent)
 {
 	setFixedSize(450, 600);
-	setWindowTitle(tr("Shader Selector"));
+	setWindowTitle(tr("Texture Selector"));
 
 	auto layout = make_qt_unique<QVBoxLayout>(*this);
 
@@ -35,7 +42,7 @@ ShaderSelector::ShaderSelector(QWidget* parent)
 	searchLabel->setText(tr("Search :"));
 	auto searchBar = make_qt_unique<QLineEdit>(*w);
 	connect(searchBar, &QLineEdit::textChanged, this,
-	        &ShaderSelector::setVisibleItems);
+	        &TextureSelector::setVisibleItems);
 	layoutSearch->addWidget(searchLabel);
 	layoutSearch->addWidget(searchBar);
 	layout->addWidget(w);
@@ -46,37 +53,32 @@ ShaderSelector::ShaderSelector(QWidget* parent)
 	layout->addWidget(b);
 
 	connect(&listWidget, &QListWidget::itemActivated, this,
-	        &ShaderSelector::selectElement);
+	        &TextureSelector::selectElement);
 	layout->addWidget(&listWidget);
 
 	b = make_qt_unique<QPushButton>(*this);
-	b->setText(tr("Edit"));
+	b->setText(tr("View"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectElement(listWidget.currentItem()); });
 	layout->addWidget(b);
 }
 
-void ShaderSelector::setVisible(bool visible)
+void TextureSelector::setVisible(bool visible)
 {
 	if(visible)
 	{
 		listWidget.clear();
-		for(auto shader : ShaderProgram::getAllShaderPrograms())
+		for(auto texture : GLTexture::getAllTextures())
 		{
-			QString glID(shader->toStr());
-			QString pipelineStr;
-			for(auto const& p : shader->getPipeline())
+			QString label;
+			QString glID(QString::number(texture->getGLTexture()));
+			label = glID;
+			if(!texture->getName().isEmpty())
 			{
-				pipelineStr += p.first.split('/').last() + '/';
+				label += " - " + texture->getName();
 			}
-			pipelineStr.chop(1);
-			QString defines;
-			for(auto const& d : shader->getDefines().keys())
-			{
-				defines += d + '(' + shader->getDefines()[d] + "), ";
-			}
-			auto item = std::make_unique<QListWidgetItem>(
-			    glID + " - " + pipelineStr + " - " + defines);
+			label += " - " + texture->getTypeStr();
+			auto item = std::make_unique<QListWidgetItem>(label);
 			item->setData(Qt::UserRole, glID);
 			listWidget.addItem(item.release());
 		}
@@ -84,28 +86,44 @@ void ShaderSelector::setVisible(bool visible)
 	QDialog::setVisible(visible);
 }
 
-void ShaderSelector::selectElement(QListWidgetItem* item)
+void TextureSelector::selectElement(QListWidgetItem* item)
 {
-	auto glID         = item->data(Qt::UserRole);
-	ShaderProgram* sp = nullptr;
-	for(auto shader : ShaderProgram::getAllShaderPrograms())
+	auto glID    = item->data(Qt::UserRole);
+	GLTexture* t = nullptr;
+	for(auto texture : GLTexture::getAllTextures())
 	{
-		if(shader->toStr() == glID)
+		if(QString::number(texture->getGLTexture()) == glID)
 		{
-			sp = shader;
+			t = texture;
 		}
 	}
 
-	if(sp == nullptr)
+	if(t == nullptr)
 	{
 		return;
 	}
 
-	auto editor = make_qt_unique<ShaderEditor>(*this, *sp);
-	editor->show();
+	switch(t->getType())
+	{
+		case GLTexture::Type::TEX2D:
+		{
+			viewer = make_qt_unique<TEX2DViewer>(*this, *t);
+			viewer->show();
+			connect(viewer, &QDialog::finished, [this]() { viewer = nullptr; });
+		}
+		break;
+		case GLTexture::Type::TEX1D:
+		case GLTexture::Type::TEX3D:
+		case GLTexture::Type::TEXMULTISAMPLE:
+		case GLTexture::Type::TEXCUBEMAP:
+		default:
+			QMessageBox::warning(
+			    this, tr("Unsupported texture type"),
+			    tr("This texture type doesn't have a viewer implemented yet."));
+	}
 }
 
-void ShaderSelector::setVisibleItems(QString const& match)
+void TextureSelector::setVisibleItems(QString const& match)
 {
 	for(auto item : listWidget.findItems("", Qt::MatchContains))
 	{

@@ -20,10 +20,29 @@
 
 #include "gl/GLTexture.hpp"
 
+#include <QMap>
+
+#ifdef LIBKTX
+#include "ktx.h"
+#endif
+
+float GLTexture::getMaxAnisotropicFilterSamples()
+{
+	GLfloat result;
+	GLHandler::glf().glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &result);
+	return result;
+}
+
 unsigned int& GLTexture::instancesCount()
 {
 	static unsigned int instancesCount = 0;
 	return instancesCount;
+}
+
+QList<GLTexture*>& GLTexture::allTextures()
+{
+	static QList<GLTexture*> allTextures = {};
+	return allTextures;
 }
 
 GLTexture::GLTexture(GLTexture&& other) noexcept
@@ -33,10 +52,14 @@ GLTexture::GLTexture(GLTexture&& other) noexcept
     , internalFormat(other.internalFormat)
     , size(other.size)
     , samples(other.samples)
+    , name(other.name)
+    , metadata(other.metadata)
     , doClean(other.doClean)
 {
 	// prevent other from cleaning shader if it destroys itself
-	other.doClean = false;
+	other.doClean     = false;
+	auto id           = allTextures().indexOf(&other);
+	allTextures()[id] = this;
 }
 
 GLTexture& GLTexture::operator=(GLTexture&& other) noexcept
@@ -53,9 +76,13 @@ GLTexture& GLTexture::operator=(GLTexture&& other) noexcept
 	internalFormat = other.internalFormat;
 	size           = other.size;
 	samples        = other.samples;
+	name           = other.name;
+	metadata       = other.metadata;
 	doClean        = other.doClean;
 
-	other.doClean = false;
+	other.doClean     = false;
+	auto id           = allTextures().indexOf(&other);
+	allTextures()[id] = this;
 	return *this;
 }
 
@@ -63,6 +90,7 @@ GLTexture::GLTexture(Tex1DProperties const& properties, Sampler const& sampler,
                      Data const& data)
 {
 	++instancesCount();
+	allTextures().append(this);
 	type           = Type::TEX1D;
 	glTarget       = properties.target;
 	internalFormat = properties.internalFormat;
@@ -77,6 +105,7 @@ GLTexture::GLTexture(Tex2DProperties const& properties, Sampler const& sampler,
                      Data const& data)
 {
 	++instancesCount();
+	allTextures().append(this);
 	type           = Type::TEX2D;
 	glTarget       = properties.target;
 	internalFormat = properties.internalFormat;
@@ -92,6 +121,7 @@ GLTexture::GLTexture(TexMultisampleProperties const& properties,
                      Sampler const& sampler)
 {
 	++instancesCount();
+	allTextures().append(this);
 	type           = Type::TEXMULTISAMPLE;
 	glTarget       = GL_TEXTURE_2D_MULTISAMPLE;
 	internalFormat = properties.internalFormat;
@@ -113,6 +143,7 @@ GLTexture::GLTexture(Tex3DProperties const& properties, Sampler const& sampler,
                      Data const& data)
 {
 	++instancesCount();
+	allTextures().append(this);
 	type           = Type::TEX3D;
 	glTarget       = properties.target;
 	internalFormat = properties.internalFormat;
@@ -129,6 +160,7 @@ GLTexture::GLTexture(TexCubemapProperties const& properties,
                      Sampler const& sampler, DataArray<6> const& data)
 {
 	++instancesCount();
+	allTextures().append(this);
 	type           = Type::TEXCUBEMAP;
 	glTarget       = properties.target;
 	internalFormat = properties.internalFormat;
@@ -148,9 +180,216 @@ GLTexture::GLTexture(QImage const& image, bool sRGB)
 	setData({img_data.bits()});
 }
 
-GLTexture::GLTexture(const char* texturePath, bool sRGB)
-    : GLTexture(getImage(texturePath), sRGB)
+GLTexture::GLTexture(QString const& texturePath, bool sRGB)
 {
+	++instancesCount();
+	allTextures().append(this);
+	auto i = texturePath.lastIndexOf('.');
+	if((texturePath.size() == i + 4 && texturePath[i + 1] == 'k'
+	    && texturePath[i + 2] == 't' && texturePath[i + 3] == 'x')
+	   || (texturePath.size() == i + 5 && texturePath[i + 1] == 'k'
+	       && texturePath[i + 2] == 't' && texturePath[i + 3] == 'x'
+	       && texturePath[i + 4] == '2'))
+	{
+		// LOAD KTX
+#ifdef LIBKTX
+		ktxTexture* kTexture;
+		KTX_error_code result;
+		GLenum glerror;
+
+		result = ktxTexture_CreateFromNamedFile(texturePath.toLatin1().data(),
+		                                        KTX_TEXTURE_CREATE_NO_FLAGS,
+		                                        &kTexture);
+		if(result != KTX_SUCCESS)
+		{
+			qWarning() << "Can't load texture" << texturePath
+			           << ": libktx returned error code" << result;
+		}
+
+		if(kTexture->isArray)
+		{
+			qWarning()
+			    << "Texture" << texturePath
+			    << "is an array which is unsupported by HydrogenVR for now."
+			    << result;
+		}
+
+		GLHandler::glf().glGenTextures(1, &glTexture);
+		// Fill metadata
+		for(auto entry = kTexture->kvDataHead; entry != nullptr;
+		    entry      = ktxHashList_Next(entry))
+		{
+			unsigned int len;
+			char *bKey, *bVal;
+			ktxHashListEntry_GetKey(entry, &len, &bKey);
+			ktxHashListEntry_GetValue(
+			    entry, &len,
+			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			    reinterpret_cast<void**>(&bVal));
+			QString key(bKey);
+			QString prefix(key.left(4)), suffix(key.mid(4));
+			if(prefix == "i32_")
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+				metadata[suffix] = *reinterpret_cast<int*>(bVal);
+			}
+			else if(prefix == "f32_")
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+				metadata[suffix] = *reinterpret_cast<float*>(bVal);
+			}
+			else
+			{
+				metadata[key] = QString(bVal);
+			}
+		}
+
+		// Upload to OpenGL
+		// Upload TEXTURE_3D manually
+		if(kTexture->numDimensions == 3 && !kTexture->isArray
+		   && kTexture->numFaces == 1 && metadata.contains("glinternalformat"))
+		{
+			// reload with data
+			ktxTexture_Destroy(kTexture);
+			ktxTexture_CreateFromNamedFile(
+			    texturePath.toLatin1().data(),
+			    KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &kTexture);
+
+			glTarget        = GL_TEXTURE_3D;
+			type            = Type::TEX3D;
+			GLenum glType   = GL_FLOAT;
+			GLenum glFormat = GL_RGBA;
+
+			if(metadata["glinternalformat"] == "GL_R32F")
+			{
+				internalFormat = GL_R32F;
+				glType         = GL_FLOAT;
+				glFormat       = GL_RED;
+			}
+			else if(metadata["glinternalformat"] == "GL_RG32F")
+			{
+				internalFormat = GL_RG32F;
+				glType         = GL_FLOAT;
+				glFormat       = GL_RG;
+			}
+			else if(metadata["glinternalformat"] == "GL_RGB32F")
+			{
+				internalFormat = GL_RGB32F;
+				glType         = GL_FLOAT;
+				glFormat       = GL_RGB;
+			}
+			else if(metadata["glinternalformat"] == "GL_RGBA32F")
+			{
+				internalFormat = GL_RGBA32F;
+				glType         = GL_FLOAT;
+				glFormat       = GL_RGBA;
+			}
+			else
+			{
+				qCritical() << "Unrecognized \"glinternalformat\" key value :"
+				            << metadata["glinternalformat"];
+			}
+
+			size[0] = kTexture->baseWidth;
+			size[1] = kTexture->baseHeight;
+			size[2] = kTexture->baseDepth;
+
+			GLHandler::glf().glGenTextures(1, &glTexture);
+			use();
+			GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MAX_LEVEL, 0);
+			initData({kTexture->pData, glType, glFormat});
+		}
+		else
+		{
+			result = ktxTexture_GLUpload(kTexture, &glTexture, &glTarget,
+			                             &glerror);
+			if(result != KTX_SUCCESS)
+			{
+				if(result == KTX_INVALID_VALUE)
+				{
+					qCritical()
+					    << "Can't load texture" << texturePath
+					    << ": libktx error : This or target is NULL or the "
+					       "size of a mip level is greater than the size of "
+					       "the preceding level.";
+				}
+				else if(result == KTX_GL_ERROR)
+				{
+					qCritical()
+					    << "Can't load texture" << texturePath
+					    << ": libktx error : A GL error was raised by "
+					       "glBindTexture, glGenTextures or gl*TexImage*. "
+					       "The GL error will be returned in *glerror, if "
+					       "glerror is not NULL.";
+					qCritical() << "glError ==" << glerror;
+				}
+				else if(result == KTX_UNSUPPORTED_TEXTURE_TYPE)
+				{
+					qCritical()
+					    << "Can't load texture" << texturePath
+					    << ": libktx error : The type of texture is not "
+					       "supported by the current OpenGL context.";
+				}
+				else
+				{
+					qCritical() << "Can't load texture" << texturePath
+					            << ": libktx error : Unknown error.";
+				}
+			}
+		}
+
+		ktxTexture_Destroy(kTexture);
+
+		switch(glTarget)
+		{
+			case GL_TEXTURE_1D:
+				type = Type::TEX1D;
+				break;
+			case GL_TEXTURE_2D:
+				type = Type::TEX2D;
+				break;
+			case GL_TEXTURE_3D:
+				type = Type::TEX3D;
+				break;
+			case GL_TEXTURE_CUBE_MAP:
+				type = Type::TEXCUBEMAP;
+				break;
+			case GL_TEXTURE_2D_MULTISAMPLE:
+				type = Type::TEXMULTISAMPLE;
+				break;
+			default:
+				qCritical()
+				    << "Cannot recognize texture glTarget :" << glTarget;
+				break;
+		}
+		size[0] = kTexture->baseWidth;
+		size[1] = kTexture->baseHeight;
+		size[2] = kTexture->baseDepth;
+
+		GLHandler::glf().glBindTexture(glTarget, glTexture);
+		GLHandler::glf().glGetTexLevelParameteriv(
+		    glTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+#else
+		qWarning() << "Can't load texture" << texturePath
+		           << ": HydrogenVR wasn't build with libktx support.";
+#endif
+	}
+	else
+	{
+		// LOAD QIMAGE
+		auto image(getImage(texturePath));
+		Tex2DProperties properties(image.width(), image.height(), sRGB);
+		type           = Type::TEX2D;
+		glTarget       = properties.target;
+		internalFormat = properties.internalFormat;
+		size[0]        = properties.width;
+		size[1]        = properties.height;
+
+		GLHandler::glf().glGenTextures(1, &glTexture);
+		QImage img_data = image.convertToFormat(QImage::Format_RGBA8888);
+		initData({img_data.bits()});
+		setSampler(Sampler(GL_LINEAR, GL_REPEAT));
+	}
 }
 
 GLTexture::GLTexture(std::array<QImage, 6> const& images, bool sRGB)
@@ -217,7 +456,7 @@ GLTexture::GLTexture(std::array<QImage, 6> const& images, bool sRGB)
 	setData({data});
 }
 
-GLTexture::GLTexture(std::array<const char*, 6> const& texturesPaths, bool sRGB)
+GLTexture::GLTexture(std::array<QString, 6> const& texturesPaths, bool sRGB)
     : GLTexture(getImages(texturesPaths), sRGB)
 {
 }
@@ -235,12 +474,35 @@ QSize GLTexture::getSize(unsigned int level) const
 	return {width, height};
 }
 
-void GLTexture::generateMipmap() const
+QString GLTexture::getTypeStr() const
+{
+	switch(type)
+	{
+		case Type::TEX1D:
+			return "TEX1D";
+		case Type::TEX2D:
+			return "TEX2D";
+		case Type::TEX3D:
+			return "TEX3D";
+		case Type::TEXMULTISAMPLE:
+			return "TEXMULTISAMPLE";
+		case Type::TEXCUBEMAP:
+			return "TEXCUBEMAP";
+		default:
+			return "UNKNOWN";
+	}
+}
+
+void GLTexture::generateMipmap(unsigned int baseLevel,
+                               unsigned int maxLevel) const
 {
 	GLHandler::glf().glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MIN_FILTER,
 	                                 GL_LINEAR_MIPMAP_LINEAR);
+	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_BASE_LEVEL,
+	                                 baseLevel);
+	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MAX_LEVEL, maxLevel);
 	GLHandler::glf().glGenerateMipmap(glTarget);
 	GLHandler::glf().glBindTexture(glTarget, 0);
 }
@@ -361,9 +623,8 @@ void GLTexture::setSampler(Sampler const& sampler) const
 	                                 sampler.wrapt);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_R,
 	                                 sampler.wrapr);
-	/*GLfloat fLargest;
-	glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest );
-	glTexParameterf( format, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest );*/
+	GLHandler::glf().glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+	                                 sampler.anisotropicFilterSamples);
 	GLHandler::glf().glBindTexture(glTarget, 0);
 }
 
@@ -444,6 +705,7 @@ void GLTexture::cleanUp()
 		return;
 	}
 	--instancesCount();
+	allTextures().removeOne(this);
 	GLHandler::glf().glDeleteTextures(1, &glTexture);
 	doClean = false;
 }
@@ -497,7 +759,7 @@ void GLTexture::initData(DataArray<6> const& data) const
 	GLHandler::glf().glBindTexture(glTarget, 0);
 }
 
-QImage GLTexture::getImage(const char* const& path)
+QImage GLTexture::getImage(QString const& path)
 {
 	QImage img_data;
 	if(!img_data.load(path))
@@ -508,8 +770,7 @@ QImage GLTexture::getImage(const char* const& path)
 	return img_data;
 }
 
-std::array<QImage, 6>
-    GLTexture::getImages(std::array<const char*, 6> const& paths)
+std::array<QImage, 6> GLTexture::getImages(std::array<QString, 6> const& paths)
 {
 	std::array<QImage, 6> images;
 	for(unsigned int i(0); i < 6; ++i)

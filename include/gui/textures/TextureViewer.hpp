@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Florian Cabot <florian.cabot@epfl.ch>
+    Copyright (C) 2023 Florian Cabot <florian.cabot@hotmail.fr>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,34 +16,36 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef BILLBOARD_H
-#define BILLBOARD_H
+#ifndef TEXTUREVIEWER_HPP
+#define TEXTUREVIEWER_HPP
 
-#include "BasicCamera.hpp"
-#include "Primitives.hpp"
-#include "gl/GLHandler.hpp"
+#include <QDialog>
+#include <QImage>
+#include <QLabel>
+#include <QVBoxLayout>
 
-class Billboard
+#include "TextureDisplayWindow.hpp"
+#include "gl/GLTexture.hpp"
+
+class TextureViewer : public QDialog
 {
+	Q_OBJECT
   public:
-	explicit Billboard(const char* texPath);
-	explicit Billboard(QImage const& image);
-	explicit Billboard(GLTexture&& texture);
-	Billboard(const char* texPath, GLShaderProgram&& shader);
-	Billboard(QImage const& image, GLShaderProgram&& shader);
-	Billboard(GLTexture&& texture, GLShaderProgram&& shader);
-	GLShaderProgram const& getShader() { return shader; };
-	void render(BasicCamera const& camera);
+	explicit TextureViewer(GLTexture const& tex, GLShaderProgram&& shader,
+	                       QWidget* parent = nullptr);
+	virtual void render();
+	TextureDisplayWindow& getTextureDisplayWindow();
 
-	QVector3D position = QVector3D();
-	float width        = 1.f;
+  protected:
+	virtual bool event(QEvent* e) override;
 
-  private:
-	GLTexture tex;
-	GLMesh quad;
+	QVBoxLayout* layout;
+
 	GLShaderProgram shader;
+	GLMesh quad;
+	TextureDisplayWindow texDispWindow;
 
-	QMatrix4x4 aspectratio;
+	GLTexture const& tex;
 };
 
-#endif // BILLBOARD_H
+#endif // TEXTUREVIEWER_HPP
