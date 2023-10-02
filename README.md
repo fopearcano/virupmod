@@ -11,7 +11,7 @@ Code documentation can be found here : [Code documentation](https://dexter9313.g
 
 ## Releases
 
-You can download releases for GNU/Linux and Windows produced by the engine build system through Travis CI and Appveyor on Github : [VIRUP Releases](https://github.com/Dexter9313/VIRUP-mirror/releases).
+You can download releases for GNU/Linux and Windows produced by the engine build system through Gitlab CI and Appveyor on Gitlab : [VIRUP Releases](https://gitlab.com/Dexter9313/virup/-/releases).
 
 ## Installation and requirements
 
@@ -24,57 +24,44 @@ If you want to run VIRUP from a portable zip archive instead, you will need to m
 
 ### GNU/Linux binaries
 
-You will need the following requirements :
-* [liboctree](https://gitlab.com/Dexter9313/octree-file-format/blob/master/liboctree/)
-* OpenGL
-* Qt5 Core and Gui (libqt5core5a and libqt5gui5 packages on Ubuntu)
-
 You can then install the DEB package you want from the Releases page or use the portable zip version.
 
 ### GNU/Linux building from source
 
-You will need the following requirements :
-* A C++ compiler (g++ for example)
-* CMake
+To install the requirements on Ubuntu, see the following scripts :
+* *ci/gitlab-ci/ubuntu/VERSION/install_dependencies.sh*
+* *ci/gitlab-ci/commons/install_dependencies.sh*
+* *virup/ci/gitlab-ci/install_dependencies.sh*
+
+For other distributions, it shouldn't be too hard to adapt the scripts.
+
+In summary, your environment should have installed :
+* A C++14 compiler (g++ for example)
+* CMake >= 3.10
 * [liboctree](https://gitlab.com/Dexter9313/octree-file-format/blob/master/liboctree/)
 * OpenGL dev
-* Qt Core and Gui (qtbase5-dev packages on Ubuntu)
+* Qt 5 Core and Gui (qtbase5-dev packages on Ubuntu)
 * [OpenVR](https://github.com/ValveSoftware/openvr)
 * (Optional) [Leap Motion SDK 2.3.1](https://developer.leapmotion.com/sdk/v2)
+* (Optional) [PythonQt](https://mevislab.github.io/pythonqt/) and its dependencies.
+* (Optional) Qt 5 Gamepad
 
 
 Then clone this repository. We now suppose the root directory of the repository is stored in the $VIRUP_ROOT_DIR variable.
 
         cd $VIRUP_ROOT_DIR
-        ./build-linux.sh
+        ./build-linux.sh $(nproc)
         cd build
         sudo make install
 
 Optionally, you can generate a deb package to make installation managing easier if you are on a debian-based system. The package name will be "virup".
 
-        cd $VIRUP_ROOT_DIR
-        ./build-linux.sh package
+        cd $VIRUP_ROOT_DIR/build/
+        cmake ..
+        make package -j $(nproc)
         sudo dpkg -i ./build/*.deb
 
-## Usage
-
-$ virup-prototype [method] [number of points] [seed for random generation]
-
-method:
-
-	--base : draws every point as one pixel
-
-	--basetex : draws every point as a dust texture
-
-	--treelod : draws most visible points only at every frame as a subset of pixels
-
-	--treetex : same as --treelod but points are rendered as dust textures
-
-If number of points isn't supplied, will load octree files supplied in params.txt .
-
-Use your keyboard's left and right arrow to rotate the cube. Up and down arrows to move towards or outwards the center. PageUp and PageDown to increase or decrease the transparency of points.
-Escape key to quit.
-
+In both examples, you can replace $(nproc) with any number of CPU threads.
 
 ## Uninstall
 
