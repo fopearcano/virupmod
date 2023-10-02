@@ -165,7 +165,7 @@ QList<QPair<QString, QWidget*>>
 	QObject::connect(sbox,
 	                 static_cast<void (QDoubleSpinBox::*)(double)>(
 	                     &QDoubleSpinBox::valueChanged),
-	                 [jsonObj](double v) { jsonObj["unit"] = v; });
+	                 [&jsonObj](double v) { jsonObj["unit"] = v; });
 	sbox->setValue(jsonObj["unit"].toDouble(1.0));
 
 	result.append({QObject::tr("Data unit (in kpc):"), sbox});
@@ -264,7 +264,7 @@ QList<QPair<QString, QWidget*>>
 	QObject::connect(sbox,
 	                 static_cast<void (QDoubleSpinBox::*)(double)>(
 	                     &QDoubleSpinBox::valueChanged),
-	                 [jsonObj](double v) { jsonObj["brightnessmul"] = v; });
+	                 [&jsonObj](double v) { jsonObj["brightnessmul"] = v; });
 	sbox->setValue(jsonObj["brightnessmul"].toDouble(1.0));
 
 	result.append({QObject::tr("Brightness multiplier:"), sbox});

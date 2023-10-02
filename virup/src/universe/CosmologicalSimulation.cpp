@@ -266,7 +266,7 @@ QList<QPair<QString, QWidget*>>
 	auto pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Gas path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
-	                 [jsonObj](QString const& path)
+	                 [&jsonObj](QString const& path)
 	                 { jsonObj["gasfile"] = path; });
 	pathSelector->setPath(jsonObj["gasfile"].toString());
 
@@ -275,7 +275,7 @@ QList<QPair<QString, QWidget*>>
 	pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Stars path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
-	                 [jsonObj](QString const& path)
+	                 [&jsonObj](QString const& path)
 	                 { jsonObj["starsfile"] = path; });
 	pathSelector->setPath(jsonObj["starsfile"].toString());
 
@@ -284,7 +284,7 @@ QList<QPair<QString, QWidget*>>
 	pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Dark matter path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
-	                 [jsonObj](QString const& path)
+	                 [&jsonObj](QString const& path)
 	                 { jsonObj["darkmatterfile"] = path; });
 	pathSelector->setPath(jsonObj["darkmatterfile"].toString());
 
@@ -292,7 +292,7 @@ QList<QPair<QString, QWidget*>>
 
 	auto cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [jsonObj](int state)
+	                 [&jsonObj](int state)
 	                 { jsonObj["loaddarkmatter"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["loaddarkmatter"].toBool() ? Qt::Checked
 	                                                       : Qt::Unchecked);
@@ -301,7 +301,7 @@ QList<QPair<QString, QWidget*>>
 
 	cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [jsonObj](int state)
+	                 [&jsonObj](int state)
 	                 { jsonObj["temporalseries"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["temporalseries"].toBool(true) ? Qt::Checked
 	                                                           : Qt::Unchecked);
@@ -311,7 +311,7 @@ QList<QPair<QString, QWidget*>>
 	auto colorSelector
 	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Gas color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
-	                 [jsonObj](QColor const& color)
+	                 [&jsonObj](QColor const& color)
 	                 { jsonObj["gascolor"] = color.name(); });
 	colorSelector->setColor(jsonObj["gascolor"].toString("#000000"));
 
@@ -320,7 +320,7 @@ QList<QPair<QString, QWidget*>>
 	colorSelector
 	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Stars color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
-	                 [jsonObj](QColor const& color)
+	                 [&jsonObj](QColor const& color)
 	                 { jsonObj["starscolor"] = color.name(); });
 	colorSelector->setColor(jsonObj["starscolor"].toString("#000000"));
 
@@ -329,7 +329,7 @@ QList<QPair<QString, QWidget*>>
 	colorSelector = make_qt_unique<ColorSelector>(
 	    parent, QObject::tr("Dark matter color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
-	                 [jsonObj](QColor const& color)
+	                 [&jsonObj](QColor const& color)
 	                 { jsonObj["darkmattercolor"] = color.name(); });
 	colorSelector->setColor(jsonObj["darkmattercolor"].toString("#000000"));
 
