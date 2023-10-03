@@ -61,7 +61,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addScreenSetting("presenterscreen", "", tr("Presenter screen"));
 
 	insertGroup("sound", tr("Sound"), 4);
-	addDoubleSetting("ambiancevolume", 1.0,
+	addDoubleSetting("ambiancevolume", 0.0,
 	                 tr("Ambiant music volume (0.0-1.0)"), 0.0, 1.0);
 
 	editGroup("graphics");
