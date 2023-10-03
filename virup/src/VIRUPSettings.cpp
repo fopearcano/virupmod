@@ -85,6 +85,43 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	{
 		return;
 	}
+	dlw->downloadDefaultData();
+}
+
+DataListWidget::DataListWidget(QWidget* parent)
+{
+	QObject::setParent(
+	    parent); // messes up layout if put in QScrollArea constructor
+	entries << tr("Cosmological Labels") << tr("CSV Stars")
+	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
+	        << tr("Textured Sphere") << tr("Credits");
+	entriesIds << "cosmolabels"
+	           << "csvstars"
+	           << "csvgalaxies"
+	           << "cosmosim"
+	           << "texsphere"
+	           << "credits";
+
+	loadMainLayout();
+}
+
+void DataListWidget::importJsonFromPath(QString const& path)
+{
+	QFile in(path);
+	if(!in.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		return;
+	}
+	dataJsonRepresentation
+	    = QJsonDocument(QJsonDocument::fromJson(in.readAll())).object();
+	saveJsonRepresentation();
+	delete layout;
+	loadMainLayout();
+	pathSelector->setPath(QFileInfo(in).absoluteDir().absolutePath());
+}
+
+void DataListWidget::downloadDefaultData()
+{
 	auto yesOrNo = QMessageBox::question(
 	    this, tr("Data Download"),
 	    tr("No data detected. Do you want to download the default data "
@@ -276,30 +313,19 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	}
 
 	downloadedFile.remove();
-	dlw->importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo.json");
-}
-
-DataListWidget::DataListWidget(QWidget* parent)
-{
-	QObject::setParent(
-	    parent); // messes up layout if put in QScrollArea constructor
-	entries << tr("Cosmological Labels") << tr("CSV Stars")
-	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
-	        << tr("Textured Sphere") << tr("Credits");
-	entriesIds << "cosmolabels"
-	           << "csvstars"
-	           << "csvgalaxies"
-	           << "cosmosim"
-	           << "texsphere"
-	           << "credits";
-
-	loadMainLayout();
+	importJsonFromPath(downloadDir + "/VIRUP-DATA/vrdemo.json");
 }
 
 void DataListWidget::loadMainLayout()
 {
 	layout = make_qt_unique<QVBoxLayout>(*this);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
+
+	auto downloadButton
+	    = make_qt_unique<QPushButton>(*this, tr("Download default data..."));
+	connect(downloadButton, &QPushButton::pressed,
+	        [this]() { downloadDefaultData(); });
+	layout->addWidget(downloadButton);
 
 	auto w       = make_qt_unique<QWidget>(*this);
 	auto l       = make_qt_unique<QHBoxLayout>(*w);
@@ -496,21 +522,6 @@ void DataListWidget::importJson()
 	                                       QDir::home().absolutePath(),
 	                                       tr("JSON Files (*.json)")));
 	importJsonFromPath(path);
-}
-
-void DataListWidget::importJsonFromPath(QString const& path)
-{
-	QFile in(path);
-	if(!in.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		return;
-	}
-	dataJsonRepresentation
-	    = QJsonDocument(QJsonDocument::fromJson(in.readAll())).object();
-	saveJsonRepresentation();
-	delete layout;
-	loadMainLayout();
-	pathSelector->setPath(QFileInfo(in).absoluteDir().absolutePath());
 }
 
 DataDialog::DataDialog(QStringList const& entries,

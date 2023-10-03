@@ -47,6 +47,7 @@ class DataListWidget : public QScrollArea
   public:
 	DataListWidget(QWidget* parent = nullptr);
 	void importJsonFromPath(QString const& path);
+	void downloadDefaultData();
 
   private:
 	QJsonObject dataJsonRepresentation;
