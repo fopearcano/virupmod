@@ -93,6 +93,7 @@ def extract(zippath):
         return
     end=zippath.rfind('/')
     directory=zippath[:end]
+    workingdir=os.path.abspath(os.getcwd())
     os.chdir(directory)
 
     end=currentfilepath.rfind('/')
@@ -100,4 +101,5 @@ def extract(zippath):
 
     z = zipfile.ZipFile(zippath)
     z.extract(currentfilepath)
+    os.chdir(workingdir) # reset working dir
 
