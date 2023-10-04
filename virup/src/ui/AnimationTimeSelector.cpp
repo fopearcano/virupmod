@@ -19,7 +19,7 @@
 #include "ui/AnimationTimeSelector.hpp"
 
 AnimationTimeSelector::AnimationTimeSelector(Universe& universe)
-    : VIRUPDialog3D({0.0f, 0.3f})
+    : VIRUPDialog3D({0.0f, 0.35f})
     , universe(universe)
 {
 	setWindowTitle(tr("Animation Time Controller"));
