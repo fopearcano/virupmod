@@ -175,7 +175,17 @@ class MainWin : public AbstractMainWin
 	{
 		if(isServer())
 		{
-			return QSettings().value("data/rootdir").toString() + "/voiceover/"
+			QString mainScriptRootDir(
+			    "./data/" + QString(PROJECT_DIRECTORY) + "/scripts/"
+			    + QSettings().value("scripting/rootdir").toString());
+
+			if(!QSettings().value("scripting/customdir").toString().isEmpty())
+			{
+				mainScriptRootDir
+				    = QSettings().value("scripting/customdir").toString();
+			}
+
+			return mainScriptRootDir + "/voiceover/"
 			       + (scenes->voiceOverIsEnglish() ? "EN" : "JP") + ".wav";
 		}
 		else
