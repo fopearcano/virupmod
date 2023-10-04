@@ -114,6 +114,7 @@ after_build:
     - appveyor DownloadFile %PYTHON_URL% -FileName python.zip
     - 7z x python.zip -o.\python > nul
     - 7z x python\python37.zip -o%RELEASE_DIR%\python > nul
+    - move python\*.pyd %RELEASE_DIR%\python
     - move data %RELEASE_DIR%
     - cd Release
     - set USER_BEFORE_ARCHIVING=..\..\%PROJECT_DIRECTORY%\ci\appveyor\before_archiving.bat
