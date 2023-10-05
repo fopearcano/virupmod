@@ -287,9 +287,17 @@ float Animator::getWholeAnimationPercentage() const
 void Animator::setWholeAnimationPercentage(float percentage)
 {
 	float time(getTotalDuration() * percentage / 100.f);
-	stop();
+	stop(false);
 	pausedAt = time;
-	play();
+	play(false);
+
+	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
+	if(!PythonQtHandler::getVariable("__foo").toBool())
+	{
+		startVoiceover();
+	}
+	PythonQtHandler::evalScript("voiceover.setPosition("
+	                            + QString::number(time * 1000.f) + ")");
 }
 
 void Animator::setIdleMode(bool idleMode)
@@ -324,33 +332,64 @@ void Animator::restart()
 	stop();
 	play();
 	animationsDisabled = false;
-	PythonQtHandler::evalScript(
-	    "voiceover=QSound(VIRUP.getVoiceoverPath())\nvoiceover.play()");
+	startVoiceover();
 }
 
-void Animator::play()
+void Animator::play(bool playVoiceover)
 {
 	timer.restart();
+	if(playVoiceover)
+	{
+		PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
+		if(PythonQtHandler::getVariable("__foo").toBool())
+		{
+			PythonQtHandler::evalScript("voiceover.play()");
+		}
+	}
 	emit resumed();
 }
 
-void Animator::pause()
+void Animator::pause(bool pauseVoiceOver)
 {
 	pausedAt += timer.elapsed();
 	timer.invalidate();
-	stopVoiceover();
+	if(pauseVoiceOver)
+	{
+		PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
+		if(PythonQtHandler::getVariable("__foo").toBool())
+		{
+			PythonQtHandler::evalScript("voiceover.pause()");
+		}
+	}
 	emit paused();
 }
 
-void Animator::stop()
+void Animator::stop(bool stopVoiceover)
 {
 	setId(-1);
 	OrbitalSystemRenderer::autoCameraTarget = true;
 	playCustom                              = false;
 	pausedAt                                = 0.f;
 	timer.invalidate();
-	stopVoiceover();
+	if(stopVoiceover)
+	{
+		this->stopVoiceover();
+	}
 	emit stopped();
+}
+
+void Animator::startVoiceover()
+{
+	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
+	if(PythonQtHandler::getVariable("__foo").toBool())
+	{
+		PythonQtHandler::evalScript("del voiceover");
+	}
+	PythonQtHandler::evalScript(
+	    "voiceover=QMediaPlayer()\n"
+	    "url=QUrl('file://' + os.path.abspath(VIRUP.getVoiceoverPath()))\n"
+	    "voiceover.setMedia(QMediaContent(url))\n"
+	    "voiceover.play()");
 }
 
 void Animator::stopVoiceover()

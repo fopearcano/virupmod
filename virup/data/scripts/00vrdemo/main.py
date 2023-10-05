@@ -1,7 +1,8 @@
-from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone
-from PythonQt.QtMultimedia import QSound
+from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone, QUrl
+from PythonQt.QtMultimedia import QSound, QMediaPlayer, QMediaContent
 from PythonQt.libplanet import Vector3
 from PythonQt.virup import Transition, Scene, SceneSpatialData, SceneTemporalData, SceneUI
+import os
 
 # CUSTOM
 def smoothstep(t, v0 = 0, v1 = 0):

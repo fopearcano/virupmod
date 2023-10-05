@@ -131,9 +131,10 @@ class Animator : public QObject
 
 	void setFirstScene();
 	void restart();
-	void play();
-	void pause();
-	void stop();
+	void play(bool playVoiceover = true);
+	void pause(bool pauseVoiceover = true);
+	void stop(bool stopVoiceover = true);
+	void startVoiceover();
 	void stopVoiceover();
 
 	QString getPythonRepresentation() const;
