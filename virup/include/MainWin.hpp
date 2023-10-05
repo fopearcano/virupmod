@@ -171,7 +171,7 @@ class MainWin : public AbstractMainWin
 	 */
 	void toggleGrid() { setGridEnabled(!gridEnabled()); };
 
-	QString getVoiceoverPath()
+	QUrl getVoiceoverUrl() const
 	{
 		if(isServer())
 		{
@@ -185,12 +185,15 @@ class MainWin : public AbstractMainWin
 				    = QSettings().value("scripting/customdir").toString();
 			}
 
-			return mainScriptRootDir + "/voiceover/"
-			       + (scenes->voiceOverIsEnglish() ? "EN" : "JP") + ".wav";
+			auto relPath = mainScriptRootDir + "/voiceover/"
+			               + (scenes->voiceOverIsEnglish() ? "EN" : "JP")
+			               + ".wav";
+
+			return {"file://" + QDir::currentPath() + '/' + relPath};
 		}
 		else
 		{
-			return "";
+			return {""};
 		}
 	};
 

@@ -416,8 +416,8 @@ void MainWin::initScene()
 	renderer.appendSceneRenderPath("planet",
 	                               Renderer::RenderPath(std::move(camPlanet)));
 
-	animator
-	    = std::make_unique<Animator>(*universe, *vrHandler, *toneMappingModel);
+	animator = std::make_unique<Animator>(*universe, *vrHandler,
+	                                      *toneMappingModel, *this);
 
 	// we will draw them ourselves
 	renderer.pathIdRenderingControllers = "";

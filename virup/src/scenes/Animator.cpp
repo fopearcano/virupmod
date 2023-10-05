@@ -18,6 +18,8 @@
 
 #include "scenes/Animator.hpp"
 
+#include "MainWin.hpp"
+
 void Animator::setPersonHeight(float personHeight)
 {
 	this->personHeight = personHeight;
@@ -287,17 +289,10 @@ float Animator::getWholeAnimationPercentage() const
 void Animator::setWholeAnimationPercentage(float percentage)
 {
 	float time(getTotalDuration() * percentage / 100.f);
-	stop(false);
+	stop();
 	pausedAt = time;
-	play(false);
-
-	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
-	if(!PythonQtHandler::getVariable("__foo").toBool())
-	{
-		startVoiceover();
-	}
-	PythonQtHandler::evalScript("voiceover.setPosition("
-	                            + QString::number(time * 1000.f) + ")");
+	play();
+	voiceover.setPosition(time * 1000.f);
 }
 
 void Animator::setIdleMode(bool idleMode)
@@ -330,75 +325,35 @@ void Animator::restart()
 {
 	animationsDisabled = true;
 	stop();
+	voiceover.setMedia(QUrl(mainWin.getVoiceoverUrl()));
 	play();
 	animationsDisabled = false;
-	startVoiceover();
 }
 
-void Animator::play(bool playVoiceover)
+void Animator::play()
 {
 	timer.restart();
-	if(playVoiceover)
-	{
-		PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
-		if(PythonQtHandler::getVariable("__foo").toBool())
-		{
-			PythonQtHandler::evalScript("voiceover.play()");
-		}
-	}
+	voiceover.play();
 	emit resumed();
 }
 
-void Animator::pause(bool pauseVoiceOver)
+void Animator::pause()
 {
 	pausedAt += timer.elapsed();
 	timer.invalidate();
-	if(pauseVoiceOver)
-	{
-		PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
-		if(PythonQtHandler::getVariable("__foo").toBool())
-		{
-			PythonQtHandler::evalScript("voiceover.pause()");
-		}
-	}
+	voiceover.pause();
 	emit paused();
 }
 
-void Animator::stop(bool stopVoiceover)
+void Animator::stop()
 {
 	setId(-1);
 	OrbitalSystemRenderer::autoCameraTarget = true;
 	playCustom                              = false;
 	pausedAt                                = 0.f;
 	timer.invalidate();
-	if(stopVoiceover)
-	{
-		this->stopVoiceover();
-	}
+	voiceover.stop();
 	emit stopped();
-}
-
-void Animator::startVoiceover()
-{
-	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
-	if(PythonQtHandler::getVariable("__foo").toBool())
-	{
-		PythonQtHandler::evalScript("del voiceover");
-	}
-	PythonQtHandler::evalScript(
-	    "voiceover=QMediaPlayer()\n"
-	    "url=QUrl('file://' + os.path.abspath(VIRUP.getVoiceoverPath()))\n"
-	    "voiceover.setMedia(QMediaContent(url))\n"
-	    "voiceover.play()");
-}
-
-void Animator::stopVoiceover()
-{
-	PythonQtHandler::evalScript("__foo=('voiceover' in locals())");
-	if(PythonQtHandler::getVariable("__foo").toBool())
-	{
-		PythonQtHandler::evalScript("del voiceover");
-	}
 }
 
 QString Animator::getPythonRepresentation() const

@@ -19,9 +19,13 @@
 #ifndef ANIMATOR_HPP
 #define ANIMATOR_HPP
 
+#include <QMediaPlayer>
+
 #include "PythonQtHandler.hpp"
 #include "Transition.hpp"
 #include "universe/Universe.hpp"
+
+class MainWin;
 
 /** @ingroup pycall
  *
@@ -71,10 +75,11 @@ class Animator : public QObject
 
   public:
 	Animator(Universe& universe, VRHandler const& vrHandler,
-	         ToneMappingModel& tmm)
+	         ToneMappingModel& tmm, MainWin const& mainWin)
 	    : universe(universe)
 	    , vrHandler(vrHandler)
 	    , tmm(tmm)
+	    , mainWin(mainWin)
 	{
 		PythonQtHandler::addObject("Animator", this);
 	};
@@ -131,11 +136,10 @@ class Animator : public QObject
 
 	void setFirstScene();
 	void restart();
-	void play(bool playVoiceover = true);
-	void pause(bool pauseVoiceover = true);
-	void stop(bool stopVoiceover = true);
-	void startVoiceover();
-	void stopVoiceover();
+	void play();
+	void pause();
+	void stop();
+	void stopVoiceover() { voiceover.stop(); };
 
 	QString getPythonRepresentation() const;
 
@@ -183,6 +187,9 @@ class Animator : public QObject
 
 	bool idleMode        = false;
 	bool idleModeForward = true;
+
+	MainWin const& mainWin;
+	QMediaPlayer voiceover;
 };
 
 #endif // ANIMATOR_HPP
