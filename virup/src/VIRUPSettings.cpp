@@ -177,7 +177,7 @@ void DataListWidget::downloadDefaultData()
 		                                + downloadedFilePath + "\")");
 	    });
 
-	QProgressDialog progress;
+	QProgressDialog progress(this);
 	progress.setWindowTitle(tr("Downloading..."));
 	progress.show();
 
