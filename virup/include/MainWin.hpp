@@ -189,7 +189,11 @@ class MainWin : public AbstractMainWin
 			               + (scenes->voiceOverIsEnglish() ? "EN" : "JP")
 			               + ".wav";
 
+#ifdef Q_OS_WIN
+			return QUrl::fromLocalFile(relPath);
+#else
 			return {"file://" + QDir::currentPath() + '/' + relPath};
+#endif
 		}
 		else
 		{
