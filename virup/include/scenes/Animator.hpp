@@ -53,7 +53,11 @@ class Animator : public QObject
 	  public:
 		Timer() = default;
 		bool isValid() const { return el != -1.f; }
-		void invalidate() { el = -1.f; };
+		void invalidate()
+		{
+			el = -1.f;
+			qtTimer.invalidate();
+		};
 		void update(float frameTiming)
 		{
 			if(isValid())
@@ -61,16 +65,30 @@ class Animator : public QObject
 				el += frameTiming;
 			}
 		}
-		float elapsed() const { return el; };
+		float elapsed() const
+		{
+			if(videomode())
+			{
+				return el;
+			}
+			else
+			{
+				return qtTimer.elapsed() * 0.001f;
+			}
+		};
 		float restart()
 		{
+			qtTimer.restart();
 			auto e = el;
 			el     = 0.f;
 			return e;
 		};
 
+		static bool& videomode();
+
 	  private:
 		float el = -1.f;
+		QElapsedTimer qtTimer;
 	};
 
   public:
@@ -119,7 +137,7 @@ class Animator : public QObject
 	void toggleAnimations() { animationsDisabled = !animationsDisabled; };
 	void appendTransition(Transition t);
 	void setTransition(int newid);
-	void update(float frameTiming);
+	void update(float frameTiming, bool videomode);
 	void removeAllTransitions();
 	void executeTransition(Transition t);
 	float getTotalDuration() const;

@@ -20,6 +20,12 @@
 
 #include "MainWin.hpp"
 
+bool& Animator::Timer::videomode()
+{
+	static bool videomode = false;
+	return videomode;
+}
+
 void Animator::setPersonHeight(float personHeight)
 {
 	this->personHeight = personHeight;
@@ -110,8 +116,9 @@ void Animator::setTransition(int newid)
 	setId(newid);
 }
 
-void Animator::update(float frameTiming)
+void Animator::update(float frameTiming, bool videomode)
 {
+	Timer::videomode() = videomode;
 	timer.update(frameTiming);
 	if(idleMode && !playCustom)
 	{
