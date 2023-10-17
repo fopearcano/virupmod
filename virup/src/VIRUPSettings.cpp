@@ -365,6 +365,7 @@ void DataListWidget::loadMainLayout()
 	hl->addWidget(importButton);
 	hl->addWidget(exportButton);
 	layout->addWidget(w);
+	layout->addStretch();
 
 	for(auto entry : dataJsonRepresentation["entries"].toArray())
 	{
