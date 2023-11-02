@@ -159,6 +159,15 @@ void GLShaderProgram::setUnusedAttributesValues(
 	setUnusedAttributesValues(defaultValues);
 }
 
+void GLShaderProgram::setUniform(const char* paramName,
+                                 unsigned int value) const
+{
+	use();
+	GLHandler::glf().glUniform1ui(
+	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName),
+	    value);
+}
+
 void GLShaderProgram::setUniform(const char* paramName, int value) const
 {
 	use();

@@ -65,6 +65,7 @@ void Renderer::updateRenderTargets()
 QSize Renderer::getSize(bool ignoreVR) const
 {
 	QSize renderSize(window.size().width(), window.size().height());
+	renderSize *= window.screen()->devicePixelRatio();
 	if(vrHandler.isEnabled() && !ignoreVR)
 	{
 		renderSize = vrHandler.getEyeRenderTargetSize();
@@ -340,27 +341,25 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 		{
 			mainRenderTarget->postProcessingTargets
 			    .at(postProcessingPipeline_.size() % 2)
-			    .showOnScreen(0, 0, window.width(), window.height());
+			    .showOnWindow(window);
 		}
 		else if(side == Side::LEFT)
 		{
 			mainRenderTarget->postProcessingTargets
 			    .at(postProcessingPipeline_.size() % 2)
-			    .showOnScreen(0, 0, window.width() / 2, window.height());
+			    .showOnWindow(window, 0, 0, 0.5f, 1.f);
 			if(vrHandler.getStereoMultiplier() == 0.0)
 			{
 				mainRenderTarget->postProcessingTargets
 				    .at(postProcessingPipeline_.size() % 2)
-				    .showOnScreen(window.width() / 2, 0, window.width(),
-				                  window.height());
+				    .showOnWindow(window, 0.5f, 0.f, 1.f, 1.f);
 			}
 		}
 		else
 		{
 			mainRenderTarget->postProcessingTargets
 			    .at(postProcessingPipeline_.size() % 2)
-			    .showOnScreen(window.width() / 2, 0, window.width(),
-			                  window.height());
+			    .showOnWindow(window, 0.5f, 0.f, 1.f, 1.f);
 		}
 	}
 }
@@ -569,7 +568,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 		// blit result on screen
 		mainRenderTarget->postProcessingTargets
 		    .at(postProcessingPipeline_.size() % 2)
-		    .showOnScreen(0, 0, window.width(), window.height());
+		    .showOnWindow(window);
 	}
 }
 

@@ -24,6 +24,7 @@
 #include "GLTexture.hpp"
 
 class GLHandler;
+class QWindow;
 
 /** @ingroup pywrap
  * @brief Represents an OpenGL Framebuffer Object.
@@ -93,15 +94,27 @@ class GLFramebufferObject
 	void blitDepthBufferTo(GLFramebufferObject const& to) const;
 	/**
 	 * @brief Shows this FBO's color attachment content on screen.
+	 * @deprecated Will probably break on high-DPI screens if you're not
+	 * careful. Use the other overload instead.
 	 *
 	 * It will be displayed as rectangle which top-left coordinates are (@p
-	 * screenx0, @p screeny0) and bottom-right coordinates are (@p screenx1, @p
-	 * screeny1).
+	 * x0, @p y0) and bottom-right coordinates are (@p x1, @p
+	 * y1).
 	 *
 	 * Coordinates are from window space (0->width, 0->height).
 	 */
-	void showOnScreen(int screenx0, int screeny0, int screenx1,
-	                  int screeny1) const;
+	[[deprecated]] void showOnWindow(int x0, int y0, int x1, int y1) const;
+	/**
+	 * @brief Shows this FBO's color attachment content on screen.
+	 *
+	 * It will be displayed as rectangle which top-left relative coordinates are
+	 * (@p xf0, @p yf0) and bottom-right relative coordinates are (@p xf1, @p
+	 * yf1).
+	 *
+	 * Coordinates are from window space (0.f->1.f, 0.f->1.f).
+	 */
+	void showOnWindow(QWindow const& window, float xf0 = 0.f, float yf0 = 0.f,
+	                  float xf1 = 1.f, float yf1 = 1.f) const;
 	QImage copyColorBufferToQImage() const;
 
 	virtual ~GLFramebufferObject() { cleanUp(); };

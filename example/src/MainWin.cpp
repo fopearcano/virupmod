@@ -46,7 +46,12 @@ void MainWin::mousePressEvent(QMouseEvent* e)
 		QCursor c(cursor());
 		c.setShape(Qt::CursorShape::BlankCursor);
 		cursorPosBackup = QCursor::pos();
-		QCursor::setPos(width() / 2, height() / 2);
+
+		QSize windowSize(this->size());
+		windowSize *= this->screen()->devicePixelRatio();
+
+		QCursor::setPos(this->x() + windowSize.width() / 2,
+		                this->y() + windowSize.height() / 2);
 		setCursor(c);
 	}
 }
@@ -69,14 +74,21 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	{
 		return;
 	}
+	QSize windowSize(this->size());
+	windowSize *= this->screen()->devicePixelRatio();
 	if(QSettings().value("misc/mouseview").toBool())
 	{
-		float dx = (static_cast<float>(width()) / 2 - e->globalX()) / width();
-		float dy = (static_cast<float>(height()) / 2 - e->globalY()) / height();
+		float dx = (this->x() + static_cast<float>(windowSize.width()) / 2
+		            - e->globalX())
+		           / width();
+		float dy = (this->y() + static_cast<float>(windowSize.height()) / 2
+		            - e->globalY())
+		           / height();
 		yaw += dx * 3.14f / 3.f;
 		pitch += dy * 3.14f / 3.f;
 	}
-	QCursor::setPos(width() / 2, height() / 2);
+	QCursor::setPos(this->x() + windowSize.width() / 2,
+	                this->y() + windowSize.height() / 2);
 }
 
 void MainWin::gamepadEvent(GamepadHandler::Event const& e)
@@ -274,6 +286,7 @@ void MainWin::initScene()
 	renderer.getCamera("default").setEyeDistanceFactor(1.0f);
 
 	renderer.appendPostProcessingShader("distort", "distort");
+	renderer.appendPostProcessingShader("noisepostproc", "noisepostproc");
 	renderer.renderControllersBeforeScene = false;
 
 	timer.start();
@@ -429,10 +442,17 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 
 void MainWin::renderGui(QSize const& targetSize)
 {
-	QOpenGLPaintDevice d(size());
+	QOpenGLPaintDevice d(targetSize);
 	QPainter painter(&d);
 	painter.setRenderHint(QPainter::Antialiasing);
 	painter.setRenderHint(QPainter::TextAntialiasing);
+
+	int screenHeight(this->screen()->geometry().height()
+	                 * this->screen()->devicePixelRatio());
+	QFont font = painter.font();
+	font.setPointSize(font.pointSize() * screenHeight / 1080);
+	painter.setFont(font);
+
 	QPen pen(Qt::red);
 	painter.setPen(pen);
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
@@ -450,4 +470,9 @@ void MainWin::applyPostProcShaderParams(
 	{
 		shader.setUniform("BarrelPower", barrelPower);
 	}
+	else if(id == "noisepostproc")
+	{
+		shader.setUniform("seed", static_cast<unsigned int>(timer.elapsed()));
+	}
+
 }

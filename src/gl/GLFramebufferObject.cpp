@@ -19,6 +19,9 @@
 
 #include "gl/GLFramebufferObject.hpp"
 
+#include <QScreen>
+#include <QWindow>
+
 unsigned int& GLFramebufferObject::instancesCount()
 {
 	static unsigned int instancesCount = 0;
@@ -269,11 +272,19 @@ void GLFramebufferObject::blitDepthBufferTo(GLFramebufferObject const& to) const
 	                                   GL_NEAREST);
 }
 
-void GLFramebufferObject::showOnScreen(int screenx0, int screeny0, int screenx1,
-                                       int screeny1) const
+void GLFramebufferObject::showOnWindow(int x0, int y0, int x1, int y1) const
 {
-	blitColorBufferTo({}, 0, 0, width, height, screenx0, screeny0, screenx1,
-	                  screeny1);
+	blitColorBufferTo({}, 0, 0, width, height, x0, y0, x1, y1);
+}
+
+void GLFramebufferObject::showOnWindow(QWindow const& window, float xf0,
+                                       float yf0, float xf1, float yf1) const
+{
+	QSize windowSize(window.size());
+	windowSize *= window.screen()->devicePixelRatio();
+	blitColorBufferTo({}, 0, 0, width, height, windowSize.width() * xf0,
+	                  windowSize.height() * yf0, windowSize.width() * xf1,
+	                  windowSize.height() * yf1);
 }
 
 QImage GLFramebufferObject::copyColorBufferToQImage() const

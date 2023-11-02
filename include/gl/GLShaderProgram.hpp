@@ -153,6 +153,13 @@ class GLShaderProgram
 	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
 	 * value.
 	 *
+	 * The uniform must be of type uint.
+	 */
+	void setUniform(const char* paramName, unsigned int value) const;
+	/**
+	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
+	 * value.
+	 *
 	 * The uniform must be of type int.
 	 */
 	void setUniform(const char* paramName, int value) const;
