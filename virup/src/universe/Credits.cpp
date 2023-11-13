@@ -43,7 +43,7 @@ void Credits::setJson(QJsonObject const& json)
 	        .data());
 }
 
-void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
+void Credits::render(Camera const& camera, ToneMappingModel const& tmm)
 {
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
@@ -53,12 +53,15 @@ void Credits::render(Camera const& /*camera*/, ToneMappingModel const& tmm)
 	auto size = tex->getSize();
 	shader.setUniform("aspectratio", size.width() / size.height());
 
-	QMatrix4x4 scale;
-	scale.scale(1.f);
+	// Conserve credits center position and Keep parallel to view "up"
+	QMatrix4x4 model;
+	model.translate({-0.5f, 0.f, 0.f});
+	model.rotate(camera.pitch * 180.f / M_PI, {0.f, 1.f, 0.f});
+	model.translate({0.5f, 0.f, 0.f});
 
 	GLHandler::setBackfaceCulling(false);
 	GLHandler::useTextures({tex.get()});
-	GLHandler::setUpRender(shader, scale);
+	GLHandler::setUpRender(shader, model);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
 }
