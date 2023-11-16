@@ -49,14 +49,15 @@ def saturn(t, t_harsh):
 #2021-06-26T01:52:07Z
 #2021-06-25T22:00:07Z
 startdt = QDateTime(QDate(2016, 3, 24), QTime(10, 45, 00), QTimeZone(0))
-isspos = Vector3(-48, 37, 20) # -50 0 30
-
 
 transitions = [
 # Intro
     # Earth
+    Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 120),
+        SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "ISS"),
+    # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 30000000),
-        SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "Earth", "earth"),
+        SceneTemporalData(1.0), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "Earth", "earth"),
     # Debris
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 40000000),
           SceneTemporalData(1000.0), SceneUI({"Gaia":1.0, "Hipparcos":0.1, "Debris":1.0})), 10.0, "Debris", "earth"),
@@ -80,14 +81,14 @@ transitions = [
           SceneTemporalData(), SceneUI({"LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "Milky Way"),
     # Illustris
     Transition(Scene(SceneSpatialData(Universe, 0.2e+25),
-          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0}),
+          SceneTemporalData(), SceneUI({"IllustrisTNG":1.0}),
           SceneCameraData(), SceneToneMappingData(0.3, 1.3)), 10.0, "IllustrisTNG"),
     # SDSS distant
     Transition(Scene(SceneSpatialData(Universe, 1.0e+26),
-          SceneTemporalData(), SceneUI({"SDSS":1.0, "IllustrisTNG":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "SDSS"),
+          SceneTemporalData(), SceneUI({"SDSS":1.0,})), 10.0, "SDSS"),
     #CMB
     Transition(Scene(SceneSpatialData(Universe, 1.0e+27),
-          SceneTemporalData(), SceneUI({"SDSS":1.0, "IllustrisTNG":1.0, "CMB":1.0, "LG Dwarves":5.0, "Volumetric AGORA":1.0, "M33":1.0, "Andromeda":1.0})), 10.0, "CMB"),
+          SceneTemporalData(), SceneUI({"SDSS":1.0, "CMB":1.0})), 10.0, "CMB"),
 ]
 
 def initScene():
