@@ -54,7 +54,7 @@ transitions = [
 # Intro
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'ISS', 120),
-        SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "ISS"),
+        SceneTemporalData(1.0, startdt), SceneUI({"Hipparcos":0.1})), 10.0, "ISS"),
     # Earth
     Transition(Scene(SceneSpatialData(Universe, 'Solar System', 'Earth', 30000000),
         SceneTemporalData(1.0), SceneUI({"Hipparcos":0.1, "PlanetsLabels":1.0})), 10.0, "Earth", "earth"),
