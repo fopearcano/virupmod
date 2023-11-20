@@ -1,7 +1,5 @@
 #include "AbstractMainWin.hpp"
 
-#include "camera/DebugCamera.hpp"
-
 std::unique_ptr<VRHandler> newVRHandler()
 {
 	if(QSettings().value("vr/handler").toString() == "openvr")

@@ -18,10 +18,26 @@
 
 #include "Logger.hpp"
 
+Logger::NoFormatGuard::NoFormatGuard()
+{
+	Logger::format() = false;
+}
+
+Logger::NoFormatGuard::~NoFormatGuard()
+{
+	Logger::format() = true;
+}
+
 std::ofstream& Logger::logFile()
 {
 	static std::ofstream logFile;
 	return logFile;
+}
+
+bool& Logger::format()
+{
+	static bool format = true;
+	return format;
 }
 
 void Logger::init()
@@ -35,6 +51,13 @@ void Logger::init()
 void Logger::log(QtMsgType type, const QMessageLogContext& context,
                  const QString& msg)
 {
+	if(!format())
+	{
+		logFile() << msg.toLocal8Bit().constData();
+		std::cerr << msg.toLocal8Bit().constData();
+		return;
+	}
+
 	QByteArray localMsg   = msg.toLocal8Bit();
 	const char* file      = context.file != nullptr ? context.file : "";
 	const char* shortFile = file;
@@ -43,6 +66,9 @@ void Logger::log(QtMsgType type, const QMessageLogContext& context,
 		shortFile += strlen(BUILD_SRC_DIR) + 1;
 	}
 	const char* function = context.function != nullptr ? context.function : "";
+
+	QDateTime time(QDateTime::currentDateTimeUtc());
+	const char* timeStr(time.toString(Qt::ISODateWithMs).toLatin1().data());
 
 	std::string messageTypeStr, messageTypeStrColor;
 	switch(type)
@@ -68,11 +94,13 @@ void Logger::log(QtMsgType type, const QMessageLogContext& context,
 			messageTypeStrColor = "\033[31mFatal\033[0m";
 			break;
 	}
-	logFile() << messageTypeStr << " (" << shortFile << ":" << context.line
-	          << ", " << function << "):" << std::endl
+	logFile() << messageTypeStr << " " << timeStr << std::endl
+	          << shortFile << ":" << context.line << ", " << function << ":"
+	          << std::endl
 	          << "\t" << localMsg.constData() << std::endl;
-	std::cerr << messageTypeStrColor << " (" << shortFile << ":" << context.line
-	          << ", " << function << "):" << std::endl
+	std::cerr << messageTypeStrColor << " " << timeStr << std::endl
+	          << shortFile << ":" << context.line << ", " << function << ":"
+	          << std::endl
 	          << "\t" << localMsg.constData() << std::endl;
 }
 

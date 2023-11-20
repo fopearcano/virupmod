@@ -89,7 +89,6 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 		{
 			texs.push_back(sMap);
 		}
-		GLHandler::glf().glEnable(GL_DEPTH_TEST);
 		GLHandler::useTextures(texs);
 		shader.setUniform("localTransform", mesh.transform);
 		GLHandler::setUpRender(shader, model * mesh.transform, geometricSpace);

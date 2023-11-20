@@ -22,6 +22,7 @@
 #include "AbstractState.hpp"
 #include "Primitives.hpp"
 #include "Text3D.hpp"
+#include "camera/BasicCamera.hpp"
 #include "gl/GLMesh.hpp"
 
 class CalibrationCompass

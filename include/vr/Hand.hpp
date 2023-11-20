@@ -24,6 +24,7 @@
 #endif
 #include "../ToneMappingModel.hpp"
 #include "../utils.hpp"
+#include "camera/BasicCamera.hpp"
 
 /** @ingroup pycall
  *

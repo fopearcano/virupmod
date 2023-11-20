@@ -19,7 +19,7 @@
 #ifndef DEBUGCAMERA_H
 #define DEBUGCAMERA_H
 
-#include "BasicCamera.hpp"
+#include "camera/BasicCamera.hpp"
 
 /**
  * @brief A camera that the scene doesn't know about to see how the scene reacts

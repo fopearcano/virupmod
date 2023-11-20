@@ -286,30 +286,17 @@ void OpenVRHandler::prepareRendering(Side eye)
 
 void OpenVRHandler::renderHiddenAreaMesh(Side eye)
 {
-	GLHandler::setBackfaceCulling(false);
 	GLShaderProgram s("hiddenarea");
-
-	GLHandler::glf().glClearStencil(0x0);
-	GLHandler::glf().glEnable(GL_STENCIL_TEST);
-	GLHandler::glf().glStencilMask(0xFF);
-	GLHandler::glf().glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	GLHandler::glf().glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
 	GLMesh hiddenAreaMesh;
 	hiddenAreaMesh.setVertexShaderMapping(s, {{"position", 2}});
 	hiddenAreaMesh.setVertices(
 	    &(vr_pointer->GetHiddenAreaMesh(getEye(eye)).pVertexData[0].v[0]),
 	    2 * 3 * vr_pointer->GetHiddenAreaMesh(getEye(eye)).unTriangleCount);
 
-	GLHandler::glf().glClear(static_cast<GLuint>(GL_STENCIL_BUFFER_BIT));
 	s.use();
+	GLHandler::setBackfaceCulling(false);
 	hiddenAreaMesh.render(PrimitiveType::TRIANGLES);
-
 	GLHandler::setBackfaceCulling(true);
-
-	GLHandler::glf().glStencilMask(0x00);
-	GLHandler::glf().glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	GLHandler::glf().glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 }
 
 void OpenVRHandler::renderControllers() const

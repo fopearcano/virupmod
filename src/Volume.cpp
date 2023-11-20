@@ -19,7 +19,6 @@
 #include "Volume.hpp"
 
 #include "Primitives.hpp"
-#include "camera/BasicCamera.hpp"
 
 Volume::Volume(GLTexture&& tex3D)
     : Volume(std::move(tex3D), GLShaderProgram("volume"))
@@ -84,11 +83,10 @@ void Volume::render(BasicCamera const& camera) const
 
 	// GLHandler::glf().glDisable(GL_DEPTH_TEST);
 	GLHandler::useTextures({&texture});
-	GLHandler::beginTransparent(GL_ONE, GL_ONE);
+	GLBlendSet glBlend({GL_ONE, GL_ONE});
 	GLHandler::setBackfaceCulling(true, GL_FRONT);
 	GLHandler::setUpRender(volumeShader);
 	volumeCube.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
-	GLHandler::endTransparent();
 	// GLHandler::glf().glEnable(GL_DEPTH_TEST);
 }

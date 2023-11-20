@@ -1,4 +1,5 @@
 #include "MainWin.hpp"
+#include "Logger.hpp"
 
 #include <QOpenGLPaintDevice>
 
@@ -155,6 +156,14 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 
 void MainWin::initScene()
 {
+	qDebug() << "This will be logged formatted and anotated.";
+	{
+		Logger::NoFormatGuard nfg;
+		qDebug() << "This will be";
+		qDebug() << " logged raw.\n";
+	}
+	qDebug() << "The guard restores logging state after the scope.";
+
 	// SKYBOX
 	sbShader.load("skybox");
 	skybox = std::make_unique<GLMesh>();

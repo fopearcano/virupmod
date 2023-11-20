@@ -97,11 +97,10 @@ void Text3D::render(GLHandler::GeometricSpace geometricSpace)
 		return;
 	}
 
-	GLHandler::beginTransparent();
+	GLBlendSet glBlend(GLBlendSet::BlendState{});
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
 	GLHandler::useTextures({&fbo->getColorAttachmentTexture()});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
-	GLHandler::endTransparent();
 }
 
 void Text3D::updateTex()

@@ -25,6 +25,7 @@
 #include "CalibrationCompass.hpp"
 #include "Dialog3DWheel.hpp"
 #include "MainRenderTarget.hpp"
+#include "camera/BasicCamera.hpp"
 #include "camera/DebugCamera.hpp"
 #include "vr/VRHandler.hpp"
 

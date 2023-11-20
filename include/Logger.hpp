@@ -23,6 +23,12 @@
 class Logger
 {
   public:
+	struct NoFormatGuard
+	{
+		NoFormatGuard();
+		~NoFormatGuard();
+	};
+
 	Logger() = delete;
 	static void init();
 	static void log(QtMsgType type, const QMessageLogContext& context,
@@ -31,4 +37,5 @@ class Logger
 
   private:
 	static std::ofstream& logFile();
+	static bool& format();
 };

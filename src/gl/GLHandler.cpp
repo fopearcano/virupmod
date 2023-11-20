@@ -261,21 +261,6 @@ void GLHandler::endWireframe()
 	GLHandler::glf().glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void GLHandler::beginTransparent(GLenum blendfuncSfactor,
-                                 GLenum blendfuncDfactor)
-{
-	glf().glDepthMask(GL_FALSE);
-	// enable transparency
-	glf().glEnable(GL_BLEND);
-	glf().glBlendFunc(blendfuncSfactor, blendfuncDfactor);
-}
-
-void GLHandler::endTransparent()
-{
-	glf().glDepthMask(GL_TRUE);
-	glf().glDisable(GL_BLEND);
-}
-
 void GLHandler::setBackfaceCulling(bool on, GLenum faceToCull,
                                    GLenum frontFaceWindingOrder)
 {

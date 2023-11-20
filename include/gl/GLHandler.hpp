@@ -18,12 +18,14 @@
 #include "PythonQtHandler.hpp"
 #include "utils.hpp"
 
+#include "gl/GLBlendSet.hpp"
 #include "gl/GLBuffer.hpp"
 #include "gl/GLComputeShader.hpp"
 #include "gl/GLFramebufferObject.hpp"
 #include "gl/GLMesh.hpp"
 #include "gl/GLPixelBufferObject.hpp"
 #include "gl/GLShaderProgram.hpp"
+#include "gl/GLStateSet.hpp"
 #include "gl/GLTexture.hpp"
 #include "gl/glfunctions.hpp"
 
@@ -191,28 +193,6 @@ class GLHandler : public QObject
 	 * @brief Ends wireframe rendering.
 	 */
 	static void endWireframe();
-	/**
-	 * @brief Begins transparent meshes rendering.
-	 *
-	 * The meshes will access the depth buffer as read only to not occlude one
-	 * another or themselves.
-	 *
-	 * @attention Therefore, it is advised to render transparent meshes last.
-	 *
-	 * Parameters are passed to the glBlendFunc function as is.
-	 */
-	static void beginTransparent(GLenum blendfuncSfactor = GL_SRC_ALPHA,
-	                             GLenum blendfuncDfactor
-	                             = GL_ONE_MINUS_SRC_ALPHA);
-	/**
-	 * @brief Ends transparent meshes rendering.
-	 *
-	 * @attention Even if transparent meshes are the last to be rendered in a
-	 * frame, you should call endTransparent() before ending the frame rendering
-	 * as the engine won't do it itself and it could make the beginning of the
-	 * next frame render in transparent mode.
-	 */
-	static void endTransparent();
 	static void setBackfaceCulling(bool on, GLenum faceToCull = GL_BACK,
 	                               GLenum frontFaceWindingOrder = GL_CCW);
 	/**

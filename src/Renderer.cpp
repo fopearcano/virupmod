@@ -298,7 +298,17 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 {
 	vrHandler.prepareRendering(side);
 	GLHandler::beginRendering(mainRenderTarget->sceneTarget);
+
+	GLStateSet glState({{GL_STENCIL_TEST, true}});
+	GLHandler::glf().glClearStencil(0x0);
+	GLHandler::glf().glStencilMask(0xFF);
+	GLHandler::glf().glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	GLHandler::glf().glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	GLHandler::glf().glClear(static_cast<GLuint>(GL_STENCIL_BUFFER_BIT));
 	vrHandler.renderHiddenAreaMesh(side);
+	GLHandler::glf().glStencilMask(0x00);
+	GLHandler::glf().glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	GLHandler::glf().glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 	for(auto& pair : sceneRenderPipeline_)
 	{

@@ -117,7 +117,7 @@ void CalibrationCompass::render(QMatrix4x4 const& angleShiftMat)
 	QMatrix4x4 tiltMat;
 	tiltMat.rotate(tilt(), QVector3D(0.f, 0.f, -1.f));
 
-	GLHandler::glf().glDisable(GL_DEPTH_TEST);
+	GLStateSet glState({{GL_DEPTH_TEST, false}});
 
 	shader.setUniform("exposure", exposure);
 	shader.setUniform("dynamicrange", dynamicrange);
@@ -132,8 +132,6 @@ void CalibrationCompass::render(QMatrix4x4 const& angleShiftMat)
 	renderCompassTicks(angleShiftMat * tiltMat, 1.3, 100.0 * doubleAngle, true);
 	renderCompassTicks(angleShiftMat * tiltMat, 1.0, 10.0 * doubleAngle);
 	renderCompassTicks(angleShiftMat * tiltMat, 0.7, 1.0 * doubleAngle);
-
-	GLHandler::glf().glEnable(GL_DEPTH_TEST);
 }
 
 void CalibrationCompass::renderCircle(QMatrix4x4 const& angleShiftMat,

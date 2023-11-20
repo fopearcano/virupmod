@@ -103,7 +103,9 @@ class GLFramebufferObject
 	 *
 	 * Coordinates are from window space (0->width, 0->height).
 	 */
-	[[deprecated]] void showOnWindow(int x0, int y0, int x1, int y1) const;
+	[[deprecated("Use showOnWindow(QWindow const&, float, float, float, float, "
+	             "float) instead.")]] void
+	    showOnWindow(int x0, int y0, int x1, int y1) const;
 	/**
 	 * @brief Shows this FBO's color attachment content on screen.
 	 *

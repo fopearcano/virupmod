@@ -23,6 +23,7 @@
 
 #include "AssetLoader.hpp"
 #include "Light.hpp"
+#include "camera/BasicCamera.hpp"
 #include "gl/GLHandler.hpp"
 
 class Model

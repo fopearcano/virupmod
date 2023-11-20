@@ -25,6 +25,8 @@
 #include "RenderingWindow.hpp"
 #include "ShaderProgram.hpp"
 #include "ToneMappingModel.hpp"
+#include "camera/BasicCamera.hpp"
+#include "camera/DebugCamera.hpp"
 #include "gl/GLHandler.hpp"
 #include "gl/GLShaderProgram.hpp"
 #include "gui/ShaderSelector.hpp"
@@ -32,8 +34,6 @@
 #include "memory.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
-
-class BasicCamera;
 
 /** @ingroup pycall
  *
