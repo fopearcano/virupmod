@@ -22,8 +22,8 @@
 #include <cmath>
 
 #include "AbstractState.hpp"
-#include "BasicCamera.hpp"
 #include "MainRenderTarget.hpp"
+#include "camera/BasicCamera.hpp"
 #include "graphics/Utils.hpp"
 #include "math/Vector3.hpp"
 
