@@ -91,7 +91,7 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
                              QVector3D const& campos,
                              VolumetricModel const* occlusionModel)
 {
-	GLHandler::beginTransparent(GL_ONE, GL_ONE);
+	GLBlendSet glBlend({GL_ONE, GL_ONE});
 	GLHandler::setBackfaceCulling(true, GL_FRONT);
 	shader.setUniform("color", color);
 	shader.setUniform("campos", dataModel.inverted() * campos);
@@ -112,5 +112,4 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
 	GLHandler::setUpRender(shader, model * dataModel);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
 	GLHandler::setBackfaceCulling(true);
-	GLHandler::endTransparent();
 }

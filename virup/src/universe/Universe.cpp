@@ -575,8 +575,7 @@ void Universe::updatePlanetarySystem()
 void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 {
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
-	GLHandler::glf().glEnable(GL_DEPTH_CLAMP);
-	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
+	GLStateSet glState({{GL_DEPTH_CLAMP, true}, {GL_CLIP_DISTANCE0, true}});
 	for(auto const& pair : elements)
 	{
 		// only used by CosmologicalLabels for now
@@ -589,9 +588,6 @@ void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 	}
 
 	planetSystems->render(camCosmo, toneMappingModel);
-
-	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
-	GLHandler::glf().glDisable(GL_DEPTH_CLAMP);
 }
 
 void Universe::renderPlanetarySystem()

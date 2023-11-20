@@ -732,6 +732,8 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 
 void MainWin::renderGui(QSize const& targetSize)
 {
+	// will get disabled by QOpenGLPaintDevice anyway
+	GLStateSet glState({{GL_DEPTH_TEST, false}});
 	if(!showInfoText)
 	{
 		return;
@@ -762,8 +764,6 @@ void MainWin::renderGui(QSize const& targetSize)
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
 	                 Qt::AlignLeft | Qt::AlignTop, str);
 	painter.end();
-
-	GLHandler::glf().glEnable(GL_DEPTH_TEST);
 }
 
 void MainWin::applyPostProcShaderParams(

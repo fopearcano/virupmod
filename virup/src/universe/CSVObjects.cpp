@@ -228,59 +228,55 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 	QVector3D campos;
 	getModelAndCampos(camera, model, campos);
 
-	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
-	GLHandler::glf().glEnable(GL_POINT_SPRITE);
-	GLHandler::glf().glEnable(GL_PROGRAM_POINT_SIZE);
-	GLHandler::beginTransparent(GL_ONE, GL_ONE);
-	shader.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
-	auto vis = getVisibility();
-	if(useBrightnessMultiplier())
 	{
-		vis *= brightnessMultiplier;
+		GLStateSet glState(
+		    {{GL_CLIP_DISTANCE0, true}, {GL_PROGRAM_POINT_SIZE, true}});
+		GLBlendSet glBlend({GL_ONE, GL_ONE});
+		shader.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
+		auto vis = getVisibility();
+		if(useBrightnessMultiplier())
+		{
+			vis *= brightnessMultiplier;
+		}
+		shader.setUniform("brightnessMultiplier", vis);
+		shader.setUniform("campos", campos);
+		if(galaxies)
+		{
+			shader.setUniform("atlassize", QVector2D(47, 10));
+			shader.setUniform("colormix", colormix);
+		}
+		else
+		{
+			shader.setUniform("camexp", tmm.exposure);
+			shader.setUniform("camdynrange", tmm.dynamicrange);
+		}
+		GLHandler::useTextures({galaxies ? galTex().get() : starTex().get()});
+		GLHandler::setUpRender(shader, model);
+		mesh.render();
 	}
-	shader.setUniform("brightnessMultiplier", vis);
-	shader.setUniform("campos", campos);
-	if(galaxies)
-	{
-		shader.setUniform("atlassize", QVector2D(47, 10));
-		shader.setUniform("colormix", colormix);
-	}
-	else
-	{
-		shader.setUniform("camexp", tmm.exposure);
-		shader.setUniform("camdynrange", tmm.dynamicrange);
-	}
-	GLHandler::useTextures({galaxies ? galTex().get() : starTex().get()});
-	GLHandler::setUpRender(shader, model);
-	mesh.render();
-	GLHandler::endTransparent();
-	GLHandler::glf().glDisable(GL_PROGRAM_POINT_SIZE);
-	GLHandler::glf().glDisable(GL_POINT_SPRITE);
-	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 
 	if(containsConstellations
 	   && (constellationsAlpha > 0.f || constellationsLabels > 0.f))
 	{
-		GLHandler::glf().glEnable(GL_MULTISAMPLE);
-		GLHandler::beginTransparent(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		GLHandler::glf().glEnable(GL_LINE_SMOOTH);
-		GLHandler::glf().glLineWidth(2.f);
-		GLHandler::glf().glEnable(GL_PRIMITIVE_RESTART);
-		GLHandler::glf().glPrimitiveRestartIndex(0xFFFF);
+		GLStateSet glState({{GL_MULTISAMPLE, true}});
+		{
+			GLStateSet glState(
+			    {{GL_LINE_SMOOTH, true}, {GL_PRIMITIVE_RESTART, true}});
+			GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
+			GLHandler::glf().glLineWidth(2.f);
+			GLHandler::glf().glPrimitiveRestartIndex(0xFFFF);
 
-		conShader.setUniform("alpha", constellationsAlpha);
-		conShader.setUniform("exposure", tmm.exposure);
-		conShader.setUniform("dynamicrange", tmm.dynamicrange);
-		conShader.setUniform("camPos", Utils::toQt(camera.position));
-		conShader.setUniform("unit", static_cast<float>(unit));
+			conShader.setUniform("alpha", constellationsAlpha);
+			conShader.setUniform("exposure", tmm.exposure);
+			conShader.setUniform("dynamicrange", tmm.dynamicrange);
+			conShader.setUniform("camPos", Utils::toQt(camera.position));
+			conShader.setUniform("unit", static_cast<float>(unit));
 
-		GLHandler::setUpRender(conShader, model);
-		conMesh.render(PrimitiveType::LINE_STRIP);
+			GLHandler::setUpRender(conShader, model);
+			conMesh.render(PrimitiveType::LINE_STRIP);
 
-		GLHandler::glf().glDisable(GL_PRIMITIVE_RESTART);
-		GLHandler::glf().glLineWidth(1.f);
-		GLHandler::glf().glDisable(GL_LINE_SMOOTH);
-		GLHandler::endTransparent();
+			GLHandler::glf().glLineWidth(1.f);
+		}
 
 		if(constellationsLabels > 0.f)
 		{
@@ -314,7 +310,6 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 				conLabel.second.render(tmm.exposure, tmm.dynamicrange);
 			}
 		}
-		GLHandler::glf().glDisable(GL_MULTISAMPLE);
 	}
 }
 

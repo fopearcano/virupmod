@@ -108,7 +108,7 @@ void BaseLineMethod::render(Camera const& camera)
 	    "alpha", static_cast<float>(camera.scale * camera.scale * getAlpha()));
 	shaderProgram.setUniform(
 	    "view", camera.hmdScaledSpaceToWorldTransform().inverted() * model);
-	GLHandler::beginTransparent(GL_SRC_ALPHA, GL_ONE);
+	GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE});
 	GLHandler::setUpRender(shaderProgram, model);
 	shaderProgram.setUniform("color", gasColor);
 	shaderProgram.setUnusedAttributesValues({{"luminosity", {1.f}}});
@@ -121,5 +121,4 @@ void BaseLineMethod::render(Camera const& camera)
 	shaderProgram.setUnusedAttributesValues(
 	    {{"radius", {1.f}}, {"luminosity", {1.f}}});
 	darkMatterMesh.render();
-	GLHandler::endTransparent();
 }

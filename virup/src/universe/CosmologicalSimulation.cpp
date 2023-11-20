@@ -252,9 +252,8 @@ void CosmologicalSimulation::render(Camera const& camera,
 		vis *= brightnessMultiplier;
 	}
 	trees.setAlpha(vis);
-	GLHandler::glf().glEnable(GL_CLIP_DISTANCE0);
+	GLStateSet glState({{GL_CLIP_DISTANCE0, true}});
 	trees.render(camera, model, campos, unit);
-	GLHandler::glf().glDisable(GL_CLIP_DISTANCE0);
 }
 
 QList<QPair<QString, QWidget*>>

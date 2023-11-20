@@ -231,9 +231,8 @@ void TreeMethodLOD::render(Camera const& camera)
 void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
                            QVector3D const& campos, float unitInKpc)
 {
-	GLHandler::glf().glEnable(GL_POINT_SPRITE);
-	GLHandler::glf().glEnable(GL_PROGRAM_POINT_SIZE);
-	GLHandler::beginTransparent(GL_ONE, GL_ONE);
+	GLStateSet glState({{GL_PROGRAM_POINT_SIZE, true}});
+	GLBlendSet glBlend({GL_ONE, GL_ONE});
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color", std::vector<float>{1.0f, 1.0f, 1.0f}}});
 	shaderProgram.setUniform("useDust", dustModel == nullptr ? 0.f : 1.f);
@@ -281,7 +280,6 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 			                      dustTransform);
 		}
 	}
-	GLHandler::endTransparent();
 	if(hiiModel != nullptr)
 	{
 		hiiModel->render(camera, model, campos, dustModel.get());

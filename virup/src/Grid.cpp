@@ -53,11 +53,12 @@ void Grid::render(double scale, double height)
 	t.translate(QVector3D(0.f, height, 0.f));
 	t.scale(gridScale);
 
-	GLHandler::beginTransparent();
-	GLHandler::setUpRender(shader, t,
-	                       GLHandler::GeometricSpace::STANDINGTRACKED);
-	mesh.render(PrimitiveType::LINES);
-	GLHandler::endTransparent();
+	{
+		GLBlendSet glBlend(GLBlendSet::BlendState{});
+		GLHandler::setUpRender(shader, t,
+		                       GLHandler::GeometricSpace::STANDINGTRACKED);
+		mesh.render(PrimitiveType::LINES);
+	}
 
 	QString newScaleText(generateScaleText(10.0 * roundscale));
 	if(newScaleText != scaleText)

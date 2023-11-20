@@ -560,10 +560,9 @@ void MovementControls::renderGuides()
 {
 	if(displayGuide)
 	{
-		GLHandler::beginTransparent();
+		GLBlendSet glBlend(GLBlendSet::BlendState{});
 		GLHandler::setUpRender(guideShader, guideModel,
 		                       GLHandler::GeometricSpace::SEATEDTRACKED);
 		guideMesh.render();
-		GLHandler::endTransparent();
 	}
 }
