@@ -18,6 +18,8 @@
 
 #include "Billboard.hpp"
 
+#include "camera/BasicCamera.hpp"
+
 Billboard::Billboard(const char* texPath)
     : Billboard(texPath, GLShaderProgram("billboard"))
 {

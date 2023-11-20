@@ -19,9 +19,10 @@
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-#include "BasicCamera.hpp"
 #include "Primitives.hpp"
 #include "gl/GLHandler.hpp"
+
+class BasicCamera;
 
 class Billboard
 {

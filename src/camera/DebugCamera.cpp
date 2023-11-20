@@ -16,7 +16,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "DebugCamera.hpp"
+#include "camera/DebugCamera.hpp"
 
 DebugCamera::DebugCamera(VRHandler const& vrHandler)
     : BasicCamera(vrHandler)

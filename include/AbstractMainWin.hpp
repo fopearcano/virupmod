@@ -17,8 +17,6 @@
 #include "AbstractLibrary.hpp"
 #include "AsyncMesh.hpp"
 #include "AsyncTexture.hpp"
-#include "BasicCamera.hpp"
-#include "DebugCamera.hpp"
 #include "Dialog3DWheel.hpp"
 #include "GamepadHandler.hpp"
 #include "InputManager.hpp"
@@ -34,6 +32,8 @@
 #include "memory.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
+
+class BasicCamera;
 
 /** @ingroup pycall
  *

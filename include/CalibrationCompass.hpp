@@ -20,7 +20,6 @@
 #define CALIBRATIONCOMPASS_HPP
 
 #include "AbstractState.hpp"
-#include "BasicCamera.hpp"
 #include "Primitives.hpp"
 #include "Text3D.hpp"
 #include "gl/GLMesh.hpp"

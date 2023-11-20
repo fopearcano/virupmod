@@ -5,7 +5,6 @@
 #include <QVector2D>
 #include <openvr/openvr.h>
 
-#include "../BasicCamera.hpp"
 #include "../ToneMappingModel.hpp"
 #include "../utils.hpp"
 

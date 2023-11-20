@@ -22,11 +22,10 @@
 #include <list>
 #include <utility>
 
-#include "BasicCamera.hpp"
 #include "CalibrationCompass.hpp"
-#include "DebugCamera.hpp"
 #include "Dialog3DWheel.hpp"
 #include "MainRenderTarget.hpp"
+#include "camera/DebugCamera.hpp"
 #include "vr/VRHandler.hpp"
 
 class AbstractMainWin;

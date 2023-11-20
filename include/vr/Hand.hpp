@@ -22,7 +22,6 @@
 #ifdef LEAP_MOTION
 #include <Leap.h>
 #endif
-#include "../BasicCamera.hpp"
 #include "../ToneMappingModel.hpp"
 #include "../utils.hpp"
 

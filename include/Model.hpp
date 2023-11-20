@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "AssetLoader.hpp"
-#include "BasicCamera.hpp"
 #include "Light.hpp"
 #include "gl/GLHandler.hpp"
 

@@ -1,4 +1,4 @@
-#include "BasicCamera.hpp"
+#include "camera/BasicCamera.hpp"
 
 BasicCamera::BasicCamera(VRHandler const& vrHandler)
     : vrHandler(vrHandler)

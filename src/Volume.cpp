@@ -19,6 +19,7 @@
 #include "Volume.hpp"
 
 #include "Primitives.hpp"
+#include "camera/BasicCamera.hpp"
 
 Volume::Volume(GLTexture&& tex3D)
     : Volume(std::move(tex3D), GLShaderProgram("volume"))

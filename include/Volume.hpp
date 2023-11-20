@@ -19,9 +19,10 @@
 #ifndef VOLUME_HPP
 #define VOLUME_HPP
 
-#include "BasicCamera.hpp"
 #include "gl/GLHandler.hpp"
 #include <QElapsedTimer>
+
+class BasicCamera;
 
 /** Represents a ray-marchable volume data with rendering-related methods.
  *
