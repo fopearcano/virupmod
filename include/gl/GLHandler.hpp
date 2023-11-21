@@ -21,6 +21,7 @@
 #include "gl/GLBlendSet.hpp"
 #include "gl/GLBuffer.hpp"
 #include "gl/GLComputeShader.hpp"
+#include "gl/GLCullFaceSet.hpp"
 #include "gl/GLFramebufferObject.hpp"
 #include "gl/GLMesh.hpp"
 #include "gl/GLPixelBufferObject.hpp"
@@ -193,8 +194,6 @@ class GLHandler : public QObject
 	 * @brief Ends wireframe rendering.
 	 */
 	static void endWireframe();
-	static void setBackfaceCulling(bool on, GLenum faceToCull = GL_BACK,
-	                               GLenum frontFaceWindingOrder = GL_CCW);
 	/**
 	 * @brief Clears depth buffer
 	 *

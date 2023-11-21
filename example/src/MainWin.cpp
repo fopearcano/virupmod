@@ -1,3 +1,4 @@
+#include "Logger.hpp"
 #include "MainWin.hpp"
 #include "Logger.hpp"
 
@@ -276,17 +277,19 @@ void MainWin::initScene()
 	dialog = std::make_unique<DemoDialog>();
 	dialog3dWheel->addDialog3D("Demo Dialog", *dialog);
 
-	volume = std::make_unique<Volume>(GLTexture("data/example/images/volume.ktx"));
+	volume
+	    = std::make_unique<Volume>(GLTexture("data/example/images/volume.ktx"));
 
 	/*
 	largeGridShader = std::make_unique<GLShaderProgram>("grid");
-	largeGridTex = std::make_unique<GLTexture>(GLTexture::Tex2DProperties(1000, 1000, GL_RGBA8));
-	GLComputeShader cmp("grid.comp");
+	largeGridTex = std::make_unique<GLTexture>(GLTexture::Tex2DProperties(1000,
+	1000, GL_RGBA8)); GLComputeShader cmp("grid.comp");
 	cmp.exec({{largeGridTex.get(), GLComputeShader::W}}, {1000, 1000, 1});
 	largeGridTex->generateMipmap();
 
 	largeGridMesh = std::make_unique<GLMesh>();
-	Primitives::setAsQuad(*largeGridMesh, *largeGridShader, PrimitiveType::TRIANGLES);*/
+	Primitives::setAsQuad(*largeGridMesh, *largeGridShader,
+	PrimitiveType::TRIANGLES);*/
 
 	auto tools(menuBar->addMenu(tr("Tools")));
 	tools->addAction(tr("Demo Dialog"), this,
@@ -396,11 +399,12 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	QMatrix4x4 skyboxSize;
 	skyboxSize.scale(1000.f);
 	GLHandler::useTextures({sbTexture.get()});
-	GLHandler::setBackfaceCulling(false);
-	GLHandler::setUpRender(sbShader, skyboxSize,
-	                       GLHandler::GeometricSpace::SKYBOX);
-	skybox->render(PrimitiveType::TRIANGLE_STRIP);
-	GLHandler::setBackfaceCulling(true);
+	{
+		GLStateSet glState({{GL_CULL_FACE, false}});
+		GLHandler::setUpRender(sbShader, skyboxSize,
+		                       GLHandler::GeometricSpace::SKYBOX);
+		skybox->render(PrimitiveType::TRIANGLE_STRIP);
+	}
 	GLHandler::clearDepthBuffer();
 
 	QMatrix4x4 modelSphere;
@@ -483,5 +487,4 @@ void MainWin::applyPostProcShaderParams(
 	{
 		shader.setUniform("seed", static_cast<unsigned int>(timer.elapsed()));
 	}
-
 }

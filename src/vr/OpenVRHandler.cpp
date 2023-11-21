@@ -294,9 +294,8 @@ void OpenVRHandler::renderHiddenAreaMesh(Side eye)
 	    2 * 3 * vr_pointer->GetHiddenAreaMesh(getEye(eye)).unTriangleCount);
 
 	s.use();
-	GLHandler::setBackfaceCulling(false);
+	GLStateSet glState({{GL_CULL_FACE, false}});
 	hiddenAreaMesh.render(PrimitiveType::TRIANGLES);
-	GLHandler::setBackfaceCulling(true);
 }
 
 void OpenVRHandler::renderControllers() const

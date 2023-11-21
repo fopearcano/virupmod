@@ -84,9 +84,8 @@ void Volume::render(BasicCamera const& camera) const
 	// GLHandler::glf().glDisable(GL_DEPTH_TEST);
 	GLHandler::useTextures({&texture});
 	GLBlendSet glBlend({GL_ONE, GL_ONE});
-	GLHandler::setBackfaceCulling(true, GL_FRONT);
+	GLCullFaceSet glCullFace(GL_FRONT);
 	GLHandler::setUpRender(volumeShader);
 	volumeCube.render(PrimitiveType::TRIANGLE_STRIP);
-	GLHandler::setBackfaceCulling(true);
 	// GLHandler::glf().glEnable(GL_DEPTH_TEST);
 }

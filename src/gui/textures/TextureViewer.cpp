@@ -53,9 +53,8 @@ void TextureViewer::render()
 	                            texDispWindow.geometry().height());
 	GLHandler::useTextures({&tex});
 	shader.use();
-	GLHandler::setBackfaceCulling(false);
+	GLStateSet glState({{GL_CULL_FACE, false}});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
-	GLHandler::setBackfaceCulling(true);
 }
 
 TextureDisplayWindow& TextureViewer::getTextureDisplayWindow()

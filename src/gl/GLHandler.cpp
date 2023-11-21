@@ -52,11 +52,9 @@ bool GLHandler::init()
 {
 	glf().initializeOpenGLFunctions();
 
-	// enable depth test
+	// enable backface culling and depth test
+	glf().glEnable(GL_CULL_FACE);
 	glf().glEnable(GL_DEPTH_TEST);
-
-	// enable backface culling for optimization
-	setBackfaceCulling(true);
 
 	return true;
 }
@@ -145,9 +143,8 @@ void GLHandler::postProcess(
 		texs.push_back(tex);
 	}
 	useTextures(texs);
-	setBackfaceCulling(false);
+	GLStateSet glState({{GL_CULL_FACE, false}});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
-	setBackfaceCulling(true);
 }
 
 void GLHandler::postProcess(
@@ -203,9 +200,8 @@ void GLHandler::renderFromScratch(GLShaderProgram const& shader,
 	{
 		beginRendering(to);
 		shader.use();
-		setBackfaceCulling(false);
+		GLStateSet glState({{GL_CULL_FACE, false}});
 		quad.render(PrimitiveType::TRIANGLE_STRIP);
-		setBackfaceCulling(true);
 	}
 	else
 	{
@@ -213,9 +209,8 @@ void GLHandler::renderFromScratch(GLShaderProgram const& shader,
 		{
 			GLHandler::beginRendering(to, GLTexture::CubemapFace::FRONT, i);
 			shader.setUniform("z", i / static_cast<float>(to.getDepth()));
-			GLHandler::setBackfaceCulling(false);
+			GLStateSet glState({{GL_CULL_FACE, false}});
 			quad.render(PrimitiveType::TRIANGLE_STRIP);
-			setBackfaceCulling(true);
 		}
 	}
 }
@@ -259,21 +254,6 @@ void GLHandler::beginWireframe()
 void GLHandler::endWireframe()
 {
 	GLHandler::glf().glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-void GLHandler::setBackfaceCulling(bool on, GLenum faceToCull,
-                                   GLenum frontFaceWindingOrder)
-{
-	if(on)
-	{
-		glf().glEnable(GL_CULL_FACE);
-		glf().glCullFace(faceToCull);
-		glf().glFrontFace(frontFaceWindingOrder);
-	}
-	else
-	{
-		glf().glDisable(GL_CULL_FACE);
-	}
 }
 
 void GLHandler::clearDepthBuffer()
