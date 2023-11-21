@@ -65,12 +65,12 @@ void TexturedSphere::render(Camera const& camera,
 	}
 	shader.setUniform("exposure", vis);
 
+	GLStateSet glState({{GL_CULL_FACE, cullFrontFaces}});
 	GLBlendSet glBlend({GL_ONE, GL_ONE});
-	GLHandler::setBackfaceCulling(cullFrontFaces, GL_FRONT);
+	GLCullFaceSet glCullFace(GL_FRONT);
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
-	GLHandler::setBackfaceCulling(true);
 }
 
 QList<QPair<QString, QWidget*>>

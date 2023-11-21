@@ -56,14 +56,13 @@ void Credits::render(Camera const& camera, ToneMappingModel const& tmm)
 	// Conserve credits center position and Keep parallel to view "up"
 	QMatrix4x4 model;
 	model.translate({-0.5f, 0.f, 0.f});
-	model.rotate(camera.pitch * 180.f / M_PI, {0.f, 1.f, 0.f});
+	model.rotate(camera.pitch * 45.f / M_PI, {0.f, 1.f, 0.f});
 	model.translate({0.5f, 0.f, 0.f});
 
-	GLHandler::setBackfaceCulling(false);
+	GLStateSet glState({{GL_CULL_FACE, false}});
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
-	GLHandler::setBackfaceCulling(true);
 }
 
 QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget& parent,
