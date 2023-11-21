@@ -24,7 +24,7 @@
 #include "AbstractState.hpp"
 #include "MainRenderTarget.hpp"
 #include "camera/BasicCamera.hpp"
-#include "graphics/Utils.hpp"
+#include "graphics/GraphicsUtils.hpp"
 #include "math/Vector3.hpp"
 
 struct BBox

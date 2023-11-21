@@ -24,7 +24,7 @@
 #include "Camera.hpp"
 #include "Primitives.hpp"
 #include "gl/GLHandler.hpp"
-#include "graphics/Utils.hpp"
+#include "graphics/GraphicsUtils.hpp"
 #include "math/Vector3.hpp"
 
 class VolumetricModel
