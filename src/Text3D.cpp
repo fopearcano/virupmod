@@ -156,6 +156,8 @@ QRect Text3D::paintText(GLFramebufferObject& fbo, QString const& text,
 	GLHandler::glf().glClear(GL_COLOR_BUFFER_BIT);
 	GLHandler::setClearColor(Qt::black);
 
+	// will get disabled by QOpenGLPaintDevice anyway
+	GLStateSet glState({{GL_DEPTH_TEST, false}});
 	QOpenGLPaintDevice d(fbo.getSize());
 	QPainter painter(&d);
 
