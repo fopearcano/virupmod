@@ -1002,13 +1002,13 @@ scenes = [
 ]
 
 ### COMOV DISTANCES FOR COSOMODYNAMICS
-comovdistfile="/media/florian/Archive/CosmoDynamics/COMOV_DISTANCES"
-with open(comovdistfile, "r") as f:
-    content=f.readlines()
+#comovdistfile="/media/florian/Archive/CosmoDynamics/COMOV_DISTANCES"
+#with open(comovdistfile, "r") as f:
+#    content=f.readlines()
 
 comovdists=[]
-for c in content:
-    comovdists.append(float(c.split('\t')[1]))
+#for c in content:
+#    comovdists.append(float(c.split('\t')[1]))
 
 def getAnimationTimeFromComovDist(comov_dist):
     global comovdists
@@ -1169,12 +1169,14 @@ def updateScene():
     #if id == getIdFromName("mwevolbeg"):
     #    VIRUP.close()
 
+    """
     if id <= cubeevolstartid-3:
         Universe.setSolarSystemPosition("CosmoDynamics", Vector3(10000,10000,10000) - Vector3(-1000.0, -800.0, 2500.0))
     elif id <= cubeevolstartid:
         Universe.setSolarSystemPosition("CosmoDynamics", Vector3(10000,10000,10000) - Vector3(0.0, -13946899, 0.0))
     else:
         Universe.setSolarSystemPosition("CosmoDynamics", Vector3(10000,10000,10000))
+    """
 
     t_harsh = timer.elapsed() / ((scenes[id].transitiontimeto) * 1000.0)
     t = smoothstep(t_harsh)
@@ -1227,10 +1229,10 @@ def updateScene():
 
     debris=ui.getLum("Debris")
     animationtime=ui.getLum("AnimationTime")
-    if debris > 0.5 and VIRUP.videomode:
-        Universe.setRenderSpacecrafts(True)
-    else:
-        Universe.setRenderSpacecrafts(False)
+    #if debris > 0.5 and Universe.videomode:
+    #    Universe.setRenderSpacecrafts(True)
+    #else:
+    #    Universe.setRenderSpacecrafts(False)
     Universe.setAnimationTime(animationtime)
 
     Universe.camYaw = shiftangle
