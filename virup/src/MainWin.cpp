@@ -503,6 +503,11 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 	if(pathId == "cosmo")
 	{
+		if(QSettings().value("scripting/rootdir").toString() == "movie")
+		{
+			PythonQtHandler::evalScript("updateTimer("
+			                            + QString::number(frameTiming) + ")");
+		}
 		if(cursorTimer.elapsed() > 2000
 		   && cursor().shape() == Qt::CursorShape::ArrowCursor)
 		{

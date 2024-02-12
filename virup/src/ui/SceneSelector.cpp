@@ -128,7 +128,10 @@ void SceneSelector::update()
 
 	int id(animator.getCurrentTransitionId());
 	QString currentScene
-	    = id < 0 ? "" : animator.getTransitions()[id].getName();
+	    = (id < 0
+	       || static_cast<unsigned int>(id) >= animator.getTransitions().size())
+	          ? ""
+	          : animator.getTransitions()[id].getName();
 	for(auto& button : buttons)
 	{
 		QPalette pal = button->palette();
