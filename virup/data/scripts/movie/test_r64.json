@@ -1,0 +1,401 @@
+{
+    "entries": [
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "labels/new_local_group.csv",
+            "name": "Labels",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.299956,
+                "y": 0,
+                "z": 0.027
+            },
+            "type": "cosmolabels",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "labels/new_local_group2.csv",
+            "name": "Labels2",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.299956,
+                "y": 0,
+                "z": 0.027
+            },
+            "type": "cosmolabels",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1000000,
+            "confile": "hygdata/constellations.txt",
+            "customzaxis": null,
+            "file": "hygdata/hygdata_clean.csv",
+            "name": "Hipparcos",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "csvstars",
+            "unit": 0.001
+        },
+        {
+            "atlasfile": "sdss/atlas.png",
+            "brightnessmul": 17000000000,
+            "customzaxis": null,
+            "file": "sdss/sdss_comoving.csv",
+            "name": "SDSS",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "csvgalaxies",
+            "unit": 1000
+        },
+        {
+            "brightnessmul": 6000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "volumetric/darkmatter.dat",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "volumetric/gas.dat",
+            "loaddarkmatter": true,
+            "name": "Volumetric AGORA",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.29995608,
+                "y": 0,
+                "z": 0.027
+            },
+            "starscolor": "#fff693",
+            "starsfile": "volumetric/stars.octree",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 6000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "AGORA/Ha",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "AGORA/HI",
+            "loaddarkmatter": true,
+            "name": "Dynamic AGORA",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.29995608,
+                "y": 0,
+                "z": 0.027
+            },
+            "starscolor": "#fff693",
+            "starsfile": "AGORA/stars",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 60000000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "MWANDR/gas",
+            "loaddarkmatter": false,
+            "name": "MWAndr",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": 189.2,
+                "y": -346.5,
+                "z": 166.5
+            },
+            "starscolor": "#fff693",
+            "starsfile": "MWANDR/stars",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 60000000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "MWANDR/gas/gas_3664.octree",
+            "loaddarkmatter": false,
+            "name": "MWAndrEnd",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": 189.2,
+                "y": -346.5,
+                "z": 166.5
+            },
+            "starscolor": "#fff693",
+            "starsfile": "MWANDR/stars/stars_3664.octree",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 6000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "NewLocalGroup/Ha.dat",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "NewLocalGroup/HI.dat",
+            "loaddarkmatter": true,
+            "name": "LG Dwarves",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": {
+                "x": -8.29995608,
+                "y": 0,
+                "z": 0.027
+            },
+            "starscolor": "#fff693",
+            "starsfile": "NewLocalGroup/merged.octree",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 6000000,
+            "customzaxis": {
+                "x": -0.17818406,
+                "y": 0.65291861,
+                "z": -0.73617099
+            },
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "volumetric/darkmatter_M31.dat",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "volumetric/gas_M31.dat",
+            "loaddarkmatter": false,
+            "name": "Andromeda",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": {
+                "x": -482.19478929,
+                "y": -90.9663576,
+                "z": -430.62306287
+            },
+            "starscolor": "#fff693",
+            "starsfile": "volumetric/stars_M31.octree",
+            "type": "cosmosim",
+            "unit": 1.2
+        },
+        {
+            "brightnessmul": 30000,
+            "customzaxis": {
+                "x": 0.44875499,
+                "y": 0.87728685,
+                "z": 0.17025491
+            },
+            "darkmattercolor": "#ff1453",
+            "darkmatterfile": "volumetric/darkmatter_M33.dat",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "volumetric/gas_M33.dat",
+            "loaddarkmatter": false,
+            "name": "M33",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": {
+                "x": -1203.03983887,
+                "y": -522.16062307,
+                "z": -777.46291861
+            },
+            "starscolor": "#fff693",
+            "starsfile": "volumetric/stars_M33.octree",
+            "type": "cosmosim",
+            "unit": 0.55556
+        },
+        {
+            "brightnessmul": 1000000,
+            "customzaxis": null,
+            "darkmattercolor": "#000000",
+            "darkmatterfile": "",
+            "file": "",
+            "gascolor": "#000000",
+            "gasfile": "",
+            "loaddarkmatter": null,
+            "name": "Gaia",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "starscolor": "#000000",
+            "starsfile": "Gaia/hdf5/Gaia.octree",
+            "type": "cosmosim",
+            "unit": 0.001
+        },
+        {
+            "brightnessmul": 38400000000000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ffa875",
+            "darkmatterfile": "Illustris_subsampled/dm.r64.octree",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "Illustris_subsampled/gas.r64.octree",
+            "loaddarkmatter": true,
+            "name": "IllustrisTNG",
+            "referenceframe": "ecliptic",
+            "solarsyslocalpos": {
+                "x": 102500,
+                "y": 102500,
+                "z": 102500
+            },
+            "starscolor": "#fff693",
+            "starsfile": "Illustris_subsampled/stars.r64.octree",
+            "type": "cosmosim",
+            "unit": 1.46341463415
+        },
+        {
+            "brightnessmul": 2000000000000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ffa875",
+            "darkmatterfile": "CosmoDynamics/dm",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "CosmoDynamics/gas",
+            "loaddarkmatter": true,
+            "name": "CosmoDynamics",
+            "referenceframe": "ecliptic",
+            "solarsyslocalpos": {
+                "x": 10000,
+                "y": 10000,
+                "z": 10000
+            },
+            "starscolor": "#fff693",
+            "starsfile": "CosmoDynamics/stars",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 2000000000000000,
+            "customzaxis": null,
+            "darkmattercolor": "#ffa875",
+            "darkmatterfile": "",
+            "file": "",
+            "gascolor": "#55aaff",
+            "gasfile": "Karime/gas",
+            "loaddarkmatter": true,
+            "name": "ClusterDynamics",
+            "referenceframe": "ecliptic",
+            "solarsyslocalpos": {
+                "x": 9515,
+                "y": 15132,
+                "z": 15293
+            },
+            "starscolor": "#fff693",
+            "starsfile": "Karime/stars",
+            "type": "cosmosim",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 100,
+            "cullfrontfaces": true,
+            "customzaxis": null,
+            "file": "CMB.jpg",
+            "name": "CMB",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": null,
+            "type": "texsphere",
+            "unit": 13964881
+        },
+        {
+            "brightnessmul": 1,
+            "confile": "",
+            "customzaxis": null,
+            "file": "Gaia/RRLyrae/RRLyrae.csv",
+            "name": "RR Lyrae",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "csvstars",
+            "unit": 0.001
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#00ff00",
+            "customzaxis": null,
+            "file": "Gaia/RRLyrae/globular_clusters.csv",
+            "name": "ClustersLabels",
+            "referenceframe": "galactic",
+            "solarsyslocalpos": null,
+            "type": "cosmolabels",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 30000,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "sine3.png",
+            "name": "Radio",
+            "referenceframe": "ecliptic",
+            "solarsyslocalpos": null,
+            "type": "texsphere",
+            "unit": 0.0306601394
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits0.png",
+            "name": "Credits0",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits1.png",
+            "name": "Credits1",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits2.png",
+            "name": "Credits2",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits3.png",
+            "name": "Credits3",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits4.png",
+            "name": "Credits4",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        },
+        {
+            "brightnessmul": 1,
+            "color": "#ff0000",
+            "customzaxis": null,
+            "file": "credits/credits5.png",
+            "name": "Credits5",
+            "referenceframe": "equatorial",
+            "solarsyslocalpos": null,
+            "type": "credits",
+            "unit": 1
+        }
+    ]
+}
