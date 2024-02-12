@@ -103,11 +103,11 @@ def interpolateSpatialData(s0, s1, t, simTime0, simTime1):
 
     if s0.bodyName != '' and s1.bodyName != '' and s0.bodyName != s1.bodyName :
         longanimation = True
-        bn = VIRUP.getClosestCommonAncestorName(s0.bodyName, s1.bodyName)
-        planetpos = VIRUP.interpolateCoordinates(s0.bodyName, s1.bodyName, t)
+        bn = Universe.getClosestCommonAncestorName(s0.bodyName, s1.bodyName)
+        planetpos = Universe.interpolateCoordinates(s0.bodyName, s1.bodyName, t)
 
-        start=VIRUP.getCelestialBodyPosition(s0.bodyName, bn, simTime0)
-        end=VIRUP.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
+        start=Universe.getCelestialBodyPosition(s0.bodyName, bn, simTime0)
+        end=Universe.getCelestialBodyPosition(s1.bodyName, bn, simTime1)
 
         dist = (end-start).length()
         ### FOR MOVIE
@@ -239,7 +239,7 @@ def intro(t, t_harsh):
     fade_factor = fade_in_factor(t_harsh) * fade_out_factor(t_harsh)
     scale0=scenes[id-1].spatialData.scale
     scale1=scenes[id].spatialData.scale
-    VIRUP.scale=interpolateLog(scale0, scale1, t_harsh)
+    Universe.scale=interpolateLog(scale0, scale1, t_harsh)
 
 def black(t, t_harsh):
     global fade_factor
@@ -247,11 +247,11 @@ def black(t, t_harsh):
 
 def intro_phobos(t, t_harsh):
     intro(t, t_harsh)
-    pos=VIRUP.getCelestialBodyPosition("Mars", "Phobos", VIRUP.simulationTime).getUnitForm()
+    pos=Universe.getCelestialBodyPosition("Mars", "Phobos", Universe.simulationTime).getUnitForm()
     if not isnan(pos[0]) and not isnan(pos[1]) and not isnan(pos[2]):
-        VIRUP.camYaw = atan2(-pos[1], -pos[0])
-        VIRUP.camPitch=asin(pos[2])
-        VIRUP.planetPosition = -60000.0*pos - 30000*Vector3.crossProduct(pos, Vector3(0.0, 0.0, 1.0)) - getPlanetShift()
+        Universe.camYaw = atan2(-pos[1], -pos[0])
+        Universe.camPitch=asin(pos[2])
+        Universe.planetPosition = -60000.0*pos - 30000*Vector3.crossProduct(pos, Vector3(0.0, 0.0, 1.0)) - getPlanetShift()
 
 def intro_mw(t, t_harsh):
     global shiftangle
@@ -266,8 +266,8 @@ def intro_sdss(t, t_harsh):
 
 def lookatiss(t, t_harsh):
     direc=(Universe.getCameraCurrentRelPosToBody("ISS")+Vector3(-80, 50, 0) - getPlanetShift()).getUnitForm()
-    VIRUP.camYaw = atan2(-direc[1], -direc[0])
-    VIRUP.camPitch=asin(direc[2])
+    Universe.camYaw = atan2(-direc[1], -direc[0])
+    Universe.camPitch=asin(direc[2])
 
 def lookatiss_surface(t, t_harsh):
     global fade_factor
@@ -285,8 +285,8 @@ def isszoomout0(t, t_harsh):
     t_new = smoothstep(t_harsh * coeff) / smoothstep(coeff)
     """
     t_new = smoothstep(t_harsh, 0.0, 10.0)
-    VIRUP.scale = interpolateLog(scenebeg.spatialData.scale, scenemid.spatialData.scale, t_new)
-    VIRUP.planetPosition = spatialData.planetPos
+    Universe.scale = interpolateLog(scenebeg.spatialData.scale, scenemid.spatialData.scale, t_new)
+    Universe.planetPosition = spatialData.planetPos
 
 def isszoomout1(t, t_harsh):
     scenebeg=scenes[getIdFromName("ISS3")]
@@ -298,8 +298,8 @@ def isszoomout1(t, t_harsh):
     t_new = smoothstep(t_harsh * coeff + tmid) - smoothstep(tmid)
     """
     t_new = smoothstep(t_harsh, 10.0, 0.0)
-    VIRUP.scale = interpolateLog(scenebeg.spatialData.scale, scenemid.spatialData.scale, t_new)
-    VIRUP.planetPosition = sceneend.spatialData.planetPos
+    Universe.scale = interpolateLog(scenebeg.spatialData.scale, scenemid.spatialData.scale, t_new)
+    Universe.planetPosition = sceneend.spatialData.planetPos
 
 
 planetposbak = Vector3()
@@ -311,30 +311,30 @@ def triptoiss(t, t_harsh):
 
     shiftangle = pi
     t_new = t**0.1
-    VIRUP.scale = interpolateLog(1.0, 100.0, t_new)
+    Universe.scale = interpolateLog(1.0, 100.0, t_new)
     Universe.setLabelsOrbitsOnly(["ISS"])
 
     departure0=Vector3(-1.8695e+06, -1.80667e+06, 5.81506e+06)
-    arrival0=(VIRUP.getCelestialBodyPosition("ISS", "Earth", VIRUP.simulationTime)+Vector3(-80, 50, 0))
+    arrival0=(Universe.getCelestialBodyPosition("ISS", "Earth", Universe.simulationTime)+Vector3(-80, 50, 0))
     target0="Earth"
 
     if t_new < 0.8:
-        VIRUP.planetTarget=target0
-        VIRUP.planetPosition= t_new*arrival0+(1-t_new)*departure0
-        planetposbak = VIRUP.planetPosition
+        Universe.planetTarget=target0
+        Universe.planetPosition= t_new*arrival0+(1-t_new)*departure0
+        planetposbak = Universe.planetPosition
         departure1 = Vector3()
         lookatiss(t, t_harsh)
         return
 
-    departure1=departure0+(VIRUP.getCelestialBodyPosition("Earth", "ISS", VIRUP.simulationTime)-Vector3(-80, 50, 0))
+    departure1=departure0+(Universe.getCelestialBodyPosition("Earth", "ISS", Universe.simulationTime)-Vector3(-80, 50, 0))
 
     if departure1[0] == 0 and departure1[1] == 0 and departure1[2] == 0:
-        departure1=planetposbak-VIRUP.getCelestialBodyPosition("ISS", "Earth", VIRUP.simulationTime)
+        departure1=planetposbak-Universe.getCelestialBodyPosition("ISS", "Earth", Universe.simulationTime)
     arrival1=Vector3(-229.81, 50, 7.5) #- Vector3(70, 50, 7.52)
     target1="ISS"
 
-    VIRUP.planetTarget=target1
-    VIRUP.planetPosition= t_new*arrival1+(1-t_new)*departure1
+    Universe.planetTarget=target1
+    Universe.planetPosition= t_new*arrival1+(1-t_new)*departure1
     lookatiss(t, t_harsh)
 
 def turnaroundiss(t, t_harsh):
@@ -348,14 +348,14 @@ def turnaroundiss(t, t_harsh):
         shiftvertangle=interpolateLinear(pi/4, 0.05, smoothstep((t_harsh-0.5)*2.0))
 
     if t_harsh < 0.01:
-        print(VIRUP.planetPosition + getPlanetShift())
+        print(Universe.planetPosition + getPlanetShift())
 
 
 def issout(t, t_harsh):
     departure=Vector3(-80, 50, 0)
-    arrival=VIRUP.getCelestialBodyPosition("Earth", "ISS", VIRUP.simulationTime)
+    arrival=Universe.getCelestialBodyPosition("Earth", "ISS", Universe.simulationTime)
     t_new = t**10
-    VIRUP.planetPosition = t_new*arrival+(1-t_new)*departure
+    Universe.planetPosition = t_new*arrival+(1-t_new)*departure
 
 def earthtomoon(t, t_harsh):
     global shiftangle
@@ -363,44 +363,44 @@ def earthtomoon(t, t_harsh):
     id1=getIdFromName("moon")
     if t < 0.5:
         t_new = smoothstep(t_harsh*2.0)
-        VIRUP.scale = interpolateLog(scenes[id0].spatialData.scale, 1.0/180000000, t_new)
+        Universe.scale = interpolateLog(scenes[id0].spatialData.scale, 1.0/180000000, t_new)
     else:
         t_new = smoothstep((t_harsh-0.5)*2.0)**5
-        VIRUP.scale = interpolateLog(1.0/180000000, scenes[id1].spatialData.scale, t_new)
+        Universe.scale = interpolateLog(1.0/180000000, scenes[id1].spatialData.scale, t_new)
     departure=Vector3(0, 0, 0)
-    arrival=VIRUP.getCelestialBodyPosition("Moon", "Earth", VIRUP.simulationTime)
+    arrival=Universe.getCelestialBodyPosition("Moon", "Earth", Universe.simulationTime)
     t_new = t_harsh*1.2
     t_new = clamp(t_new, 0.0, 1.0)
     t_new = smoothstep(t_new)
-    VIRUP.planetPosition = interpolateLinear(departure, arrival, t_new**0.9)
+    Universe.planetPosition = interpolateLinear(departure, arrival, t_new**0.9)
     shiftangle=interpolateLinear(0.0, 1.13*pi/2, t**6.0)
     pos=-1*getPlanetShift().getUnitForm()
-    nextpos=(-1*VIRUP.planetPosition-1*getPlanetShift()).getUnitForm()
+    nextpos=(-1*Universe.planetPosition-1*getPlanetShift()).getUnitForm()
     pos=interpolateLinear(pos, nextpos, t**2)
     if not isnan(pos[0]) and not isnan(pos[1]) and not isnan(pos[2]):
-        VIRUP.camYaw = atan2(-pos[1], -pos[0])
-        VIRUP.camPitch=asin(pos[2])
+        Universe.camYaw = atan2(-pos[1], -pos[0])
+        Universe.camPitch=asin(pos[2])
 
 def moon(t, t_harsh):
     global shiftangle
     shiftangle=interpolateLinear(1.13*pi/2, 0.0, t)
-    pos=(-1*getPlanetShift()+VIRUP.getCelestialBodyPosition("Earth", "Moon", VIRUP.simulationTime)).getUnitForm()
+    pos=(-1*getPlanetShift()+Universe.getCelestialBodyPosition("Earth", "Moon", Universe.simulationTime)).getUnitForm()
     nextpos=-1*getPlanetShift().getUnitForm()
     pos=interpolateLinear(pos, nextpos, t**0.5)
     if not isnan(pos[0]) and not isnan(pos[1]) and not isnan(pos[2]):
-        VIRUP.camYaw = atan2(-pos[1], -pos[0])
-        VIRUP.camPitch=asin(pos[2])
+        Universe.camYaw = atan2(-pos[1], -pos[0])
+        Universe.camPitch=asin(pos[2])
 
 def showOrbitsWhileTraveling(t, t_harsh):
     if t_harsh > 0.3 and t_harsh < 0.7:
-        VIRUP.renderLabels = 1.0
-        VIRUP.renderOrbits = 1.0
+        Universe.setVisibility("PlanetsLabels", 1.0)
+        Universe.setVisibility("Orbits", 1.0)
     elif t_harsh <= 0.3:
-        VIRUP.renderLabels = (t_harsh*3)**5
-        VIRUP.renderOrbits = (t_harsh*3)**5
+        Universe.setVisibility("PlanetsLabels", (t_harsh*3)**5)
+        Universe.setVisibility("Orbits", (t_harsh*3)**5)
     elif t_harsh >= 0.7:
-        VIRUP.renderLabels = (1.0 - (t_harsh-0.7)*3)**5
-        VIRUP.renderOrbits = (1.0 - (t_harsh-0.7)*3)**5
+        Universe.setVisibility("PlanetsLabels", (1.0 - (t_harsh-0.7)*3)**5)
+        Universe.setVisibility("Orbits", (1.0 - (t_harsh-0.7)*3)**5)
 
 moondt=0.0
 moonscale=0.0
@@ -408,35 +408,35 @@ def moontophobos(t, t_harsh):
     global moondt
     global moonscale
     if moondt==0.0:
-        moondt = VIRUP.simulationTime
-        moonscale=VIRUP.scale
-    VIRUP.simulationTime = interpolateDateTime(moondt, phobosdt, t)
+        moondt = Universe.simulationTime
+        moonscale=Universe.scale
+    Universe.simulationTime = interpolateDateTime(moondt, phobosdt, t)
     showOrbitsWhileTraveling(t, 0.6*(t_harsh-0.5) + 0.5)
     Universe.setLabelsOrbitsOnly(["Moon", "Earth", "Mars", "Mercury", "Venus", "Jupiter", "Phobos", "Deimos", "Saturn", "Uranus", "Neptune", "Sun"])
     if t_harsh < 1.0/2.0:
         t_new = smoothstep(2*t_harsh)
-        VIRUP.scale = interpolateLog(moonscale, 4e-12, t_new)
+        Universe.scale = interpolateLog(moonscale, 4e-12, t_new)
     elif t_harsh > 1.0/2.0:
         t_new = 1.0 - smoothstep(2*(t_harsh-1.0/2.0))
-        VIRUP.scale = interpolateLog(1.0/3000000, 4e-12, t_new)
+        Universe.scale = interpolateLog(1.0/3000000, 4e-12, t_new)
     else:
-        VIRUP.scale = 4e-12
+        Universe.scale = 4e-12
 
     if t_harsh < 1.0/3.0 or t_harsh > 2.0/3.0:
         if t_harsh < 1.0 / 3.0:
-            VIRUP.planetTarget = "Moon"
+            Universe.planetTarget = "Moon"
         else:
-            VIRUP.planetTarget = "Phobos"
-        VIRUP.planetPosition = Vector3()
+            Universe.planetTarget = "Phobos"
+        Universe.planetPosition = Vector3()
     else:
         t_new = smoothstep((t_harsh-1.0/3.0)*3.0)
-        VIRUP.planetTarget = "Sun"
-        moonpos=VIRUP.getCelestialBodyPosition("Moon", "Sun", VIRUP.simulationTime)
-        phobospos=VIRUP.getCelestialBodyPosition("Phobos", "Sun", VIRUP.simulationTime)
-        VIRUP.planetPosition=interpolateLinear(moonpos, phobospos, t_new)
+        Universe.planetTarget = "Sun"
+        moonpos=Universe.getCelestialBodyPosition("Moon", "Sun", Universe.simulationTime)
+        phobospos=Universe.getCelestialBodyPosition("Phobos", "Sun", Universe.simulationTime)
+        Universe.planetPosition=interpolateLinear(moonpos, phobospos, t_new)
 
 def phobosorbit(t, t_harsh):
-    pos=VIRUP.getCelestialBodyPosition("Mars", "Phobos", VIRUP.simulationTime).getUnitForm()
+    pos=Universe.getCelestialBodyPosition("Mars", "Phobos", Universe.simulationTime).getUnitForm()
     nextpos=-1*getPlanetShift().getUnitForm()
     if t < 0.5:
         t_new = t_harsh*2.0
@@ -445,8 +445,8 @@ def phobosorbit(t, t_harsh):
     t_new = smoothstep(t_new)
     pos = t_new*pos + (1.0-t_new)*nextpos
     if not isnan(pos[0]) and not isnan(pos[1]) and not isnan(pos[2]):
-        VIRUP.camYaw = atan2(-pos[1], -pos[0])
-        VIRUP.camPitch=asin(pos[2])
+        Universe.camYaw = atan2(-pos[1], -pos[0])
+        Universe.camPitch=asin(pos[2])
 
 def phobosend(t, t_harsh):
     global id
@@ -454,16 +454,16 @@ def phobosend(t, t_harsh):
     scale0=scenes[id-1].spatialData.scale
     scale1=scenes[id].spatialData.scale
     if t_harsh < 0.5:
-        VIRUP.scale = interpolateLog(scale0, scale1, t)
+        Universe.scale = interpolateLog(scale0, scale1, t)
     else:
-        VIRUP.scale = interpolateLog(scale0, scale1, t_harsh)
+        Universe.scale = interpolateLog(scale0, scale1, t_harsh)
 
 def phobosToVoyager(t, t_harsh):
     black(t, t_harsh)
-    VIRUP.planetTarget = "Voyager 2"
-    VIRUP.planetPosition = Vector3(-11.593, -16.4098, -0.12561)
-    VIRUP.camYaw = -0.903532683849
-    VIRUP.camPitch = -0.0416171476245
+    Universe.planetTarget = "Voyager 2"
+    Universe.planetPosition = Vector3(-11.593, -16.4098, -0.12561)
+    Universe.camYaw = -0.903532683849
+    Universe.camPitch = -0.0416171476245
 
 def voyagerCamera(t, t_harsh):
     global id
@@ -490,11 +490,11 @@ def voyagerCamera(t, t_harsh):
         newcamyaw = atan2(-pos[1], -pos[0])
         newcampitch = asin(pos[2])
 
-        VIRUP.camYaw = newcamyaw
-        VIRUP.camPitch= newcampitch
-        VIRUP.planetPosition = -15.0*pos - 7.5*Vector3.crossProduct(pos, Vector3(0.0, 0.0, 1.0)) - getPlanetShift()
+        Universe.camYaw = newcamyaw
+        Universe.camPitch= newcampitch
+        Universe.planetPosition = -15.0*pos - 7.5*Vector3.crossProduct(pos, Vector3(0.0, 0.0, 1.0)) - getPlanetShift()
         if last:
-            VIRUP.planetPosition *= (1-t)
+            Universe.planetPosition *= (1-t)
 
 def voyagerToSS1(t, t_harsh):
     if t < 0.2:
@@ -508,10 +508,10 @@ def voyagerToSS2(t, t_harsh):
     global shiftvertangle
     shiftvertangle = interpolateLinear(0.05, 0.2, t)
 
-    VIRUP.planetTarget = "Sun"
-    departure=VIRUP.getCelestialBodyPosition("Voyager 2", "Sun", VIRUP.simulationTime)
+    Universe.planetTarget = "Sun"
+    departure=Universe.getCelestialBodyPosition("Voyager 2", "Sun", Universe.simulationTime)
     arrival=Vector3(0.0, 0.0, 0.0)
-    VIRUP.planetPosition = interpolateLinear(departure, arrival, t)
+    Universe.planetPosition = interpolateLinear(departure, arrival, t)
 
     obts=["Uranus", "Neptune", "Pluto", "Haumea", "Makemake", "Eris", "FarFarOut", "New Horizons", "Voyager 1", "Voyager 2", "Pioneer 10", "Pioneer 11", "Sun"]
     Universe.setLabelsOrbitsOnly(obts)
@@ -529,7 +529,7 @@ def alpCen(t, t_harsh):
         obts=["Proxima Centauri", "Proxima Centauri b", "Proxima Centauri c", "Proxima Centauri d"]
         if t_harsh < 0.35:
             alpCendt = QDateTime(QDate(2031, 11, 11), QTime(0, 0, 0))
-            VIRUP.simulationTime = alpCendt
+            Universe.simulationTime = alpCendt
     else:
         obts=["Uranus", "Neptune", "Pluto", "Haumea", "Makemake", "Eris", "FarFarOut", "New Horizons", "Voyager 1", "Voyager 2", "Pioneer 10", "Pioneer 11", "Sun"]
     Universe.setLabelsOrbitsOnly(obts)
@@ -551,7 +551,7 @@ def peg51(t, t_harsh):
         Universe.setVisibility("Orbits", 0.0)
         if t_harsh < 0.55:
             peg51dt = QDateTime(QDate(2031, 12, 20), QTime(9, 0, 0))
-            VIRUP.simulationTime = peg51dt
+            Universe.simulationTime = peg51dt
     else:
         obts=["Proxima Centauri", "Proxima Centauri b", "Proxima Centauri c", "Proxima Centauri d"]
         Universe.setLabelsOrbitsOnly(obts)
@@ -565,17 +565,17 @@ currCosmoPos=Vector3(-1, 0, 0)
 def radio(t, t_harsh):
     global currCosmoPos
     if currCosmoPos == Vector3(-1, 0, 0):
-        currCosmoPos = VIRUP.cosmoPosition
+        currCosmoPos = Universe.cosmoPosition
     id51Peg2=getIdFromName("51peg2")
     pos0=scenes[id51Peg2].spatialData.cosmoPos
     pos1=Vector3()
     scale0=scenes[id51Peg2].spatialData.scale
     scale1=scenes[id51Peg2+1].spatialData.scale
-    VIRUP.scale = interpolateLog(scale0, scale1, t**0.5)
+    Universe.scale = interpolateLog(scale0, scale1, t**0.5)
     if t_harsh > 0.7:
-        VIRUP.cosmoPosition = interpolateLinear(pos0, pos1, smoothstep((t_harsh-0.7)/0.3))
-    elif currCosmoPos != VIRUP.cosmoPosition:
-        VIRUP.cosmoPosition = currCosmoPos
+        Universe.cosmoPosition = interpolateLinear(pos0, pos1, smoothstep((t_harsh-0.7)/0.3))
+    elif currCosmoPos != Universe.cosmoPosition:
+        Universe.cosmoPosition = currCosmoPos
 
 def radio2(t, t_harsh):
     global shiftangle
@@ -585,7 +585,7 @@ def radioToMW(t, t_harsh):
     idRadio2=getIdFromName("radio2")
     scale0=scenes[idRadio2].spatialData.scale
     scale1=scenes[idRadio2+1].spatialData.scale
-    VIRUP.scale = interpolateLog(scale0, scale1, t**0.4)
+    Universe.scale = interpolateLog(scale0, scale1, t**0.4)
 
 def makeOneTurnBef(t, t_harsh):
     global shiftangle
@@ -603,9 +603,9 @@ def mwscalerot(t, t_harsh, scale=10.0):
     scale0=scenes[getIdFromName("mw")].spatialData.scale
     scale1=scale0*scale
     if t_harsh < 0.5:
-        VIRUP.scale=interpolateLog(scale0, scale1, smoothstep(t_harsh*2.0))
+        Universe.scale=interpolateLog(scale0, scale1, smoothstep(t_harsh*2.0))
     else:
-        VIRUP.scale=interpolateLog(scale1, scale0, smoothstep(t_harsh*2.0 - 1.0))
+        Universe.scale=interpolateLog(scale1, scale0, smoothstep(t_harsh*2.0 - 1.0))
 
 def mwpart1(t, t_harsh):
     global shiftangle
@@ -675,11 +675,11 @@ def mwandr(t, t_harsh):
     Universe.setAnimationTime(t_new)
     scale0=scenes[getIdFromName("mwandrbeg")].spatialData.scale
     scale1=scenes[getIdFromName("mwandr")].spatialData.scale
-    VIRUP.scale = interpolateLog(scale0, scale1, t_new)
+    Universe.scale = interpolateLog(scale0, scale1, t_new)
 
     pos0=scenes[getIdFromName("mwandrbeg")].spatialData.cosmoPos
     pos1=scenes[getIdFromName("mwandr")].spatialData.cosmoPos
-    VIRUP.cosmoPosition = interpolateLinear(pos0, pos1, t_new**2)
+    Universe.cosmoPosition = interpolateLinear(pos0, pos1, t_new**2)
 
 valBAK=0.0
 timeBAK=0.0
@@ -720,22 +720,22 @@ def cubeevolstart2(t, t_harsh):
     shiftangle = interpolateLinear(pi/4.0, 0.0, t)
 
 def cosmodyn(t, t_harsh):
-    comov_dist = (VIRUP.cosmoPosition-getCosmoShift()).length()
+    comov_dist = (Universe.cosmoPosition-getCosmoShift()).length()
     Universe.setAnimationTime(getAnimationTimeFromComovDist(comov_dist))
 
 def lgback(t, t_harsh):
     scale0=scenes[getIdFromName("lgback")-1].spatialData.scale
     scale1=scenes[getIdFromName("lgback")].spatialData.scale
     t_new = smoothstep(t_harsh, 0.0, 10.0)
-    VIRUP.scale = interpolateLog(scale0, scale1, t_new)
-    debugSmooth(t_harsh, log(VIRUP.scale))
+    Universe.scale = interpolateLog(scale0, scale1, t_new)
+    debugSmooth(t_harsh, log(Universe.scale))
 
 def mwback(t, t_harsh):
     scale0=scenes[getIdFromName("mwback")-1].spatialData.scale
     scale1=scenes[getIdFromName("mwback")].spatialData.scale
     t_new = smoothstep(t_harsh, 3.11, 10.0)
-    VIRUP.scale = interpolateLog(scale0, scale1, t_new)
-    debugSmooth(t_harsh, log(VIRUP.scale))
+    Universe.scale = interpolateLog(scale0, scale1, t_new)
+    debugSmooth(t_harsh, log(Universe.scale))
 
 def ssback(t, t_harsh):
     global shiftvertangle
@@ -744,8 +744,8 @@ def ssback(t, t_harsh):
     scale0=scenes[getIdFromName("ssback")-1].spatialData.scale
     scale1=scenes[getIdFromName("ssback")].spatialData.scale
     t_new = smoothstep(t_harsh, 0.325, 1.0)
-    VIRUP.scale = interpolateLog(scale0, scale1, t_new)
-    debugSmooth(t_harsh, log(VIRUP.scale))
+    Universe.scale = interpolateLog(scale0, scale1, t_new)
+    debugSmooth(t_harsh, log(Universe.scale))
 
 def earthback(t, t_harsh):
     global shiftvertangle
@@ -755,8 +755,8 @@ def earthback(t, t_harsh):
     scale0=scenes[getIdFromName("earthback")-1].spatialData.scale
     scale1=scenes[getIdFromName("earthback")].spatialData.scale
     t_new = smoothstep(t_harsh, 5.88, 0.0)
-    VIRUP.scale = interpolateLog(scale0, scale1, t_new)
-    debugSmooth(t_harsh, log(VIRUP.scale))
+    Universe.scale = interpolateLog(scale0, scale1, t_new)
+    debugSmooth(t_harsh, log(Universe.scale))
 
 def end1(t, t_harsh):
     global shiftangle
@@ -1052,7 +1052,7 @@ fade_factor=1.0
 def getCosmoShift():
     global shiftangle
     global shiftvertangle
-    val=personheight*3.24078e-20 / VIRUP.scale
+    val=personheight*3.24078e-20 / Universe.scale
     try:
         VRHandler
     except NameError:
@@ -1066,7 +1066,7 @@ def getCosmoShift():
 def getPlanetShift():
     global shiftangle
     global shiftvertangle
-    val=personheight / VIRUP.scale
+    val=personheight / Universe.scale
     try:
         VRHandler
     except NameError:
@@ -1091,8 +1091,8 @@ def setSceneId(newid):
         currentscene = scenes[id]
     else:
         if oldid == -1:
-            currentscene=Scene(SpatialData(VIRUP.cosmoPosition - getCosmoShift(), 1.0 / VIRUP.scale, VIRUP.planetTarget, VIRUP.planetarySystemName),
-               TemporalData(VIRUP.timeCoeff, VIRUP.simulationTime), scenes[oldid].ui)
+            currentscene=Scene(SpatialData(Universe.cosmoPosition - getCosmoShift(), 1.0 / Universe.scale, Universe.planetTarget, Universe.planetarySystemName),
+               TemporalData(Universe.timeCoeff, Universe.simulationTime), scenes[oldid].ui)
         else:
             currentscene=scenes[oldid]
         if scenes[id].spatialData.systemName == currentscene.spatialData.systemName and (scenes[id].spatialData.cosmoPos - currentscene.spatialData.cosmoPos).length() > 0.1:
@@ -1144,7 +1144,7 @@ def initScene():
     global longanimation
     global currentscene
 
-    VIRUP.simulationTime = isspassdt
+    Universe.simulationTime = isspassdt
     timer = Timer()
     longanimation = False
     currentscene = None
@@ -1193,21 +1193,21 @@ def updateScene():
         nextid = id+1
 
     spatialData = scene.spatialData
-    VIRUP.scale = spatialData.scale
-    if spatialData.systemName != '':
-        VIRUP.planetarySystemName = spatialData.systemName
-
-    if spatialData.bodyName != '' and VIRUP.planetarySystemLoaded:
-        VIRUP.planetTarget = spatialData.bodyName
-        VIRUP.planetPosition = spatialData.planetPos
+    Universe.scale = spatialData.scale
+    if spatialData.systemName != "" and spatialData.bodyName != "" and Universe.planetarySystemLoaded:
+        if Universe.planetarySystemName == spatialData.systemName:
+            Universe.planetTarget = spatialData.bodyName
+            Universe.planetPosition = spatialData.planetPos
+        else:
+            Universe.cosmoPosition = Universe.getSystemAbsolutePosition(systemName)
     else:
-        VIRUP.cosmoPosition = spatialData.cosmoPos
+        Universe.cosmoPosition = spatialData.cosmoPos
 
     temporalData = scene.temporalData
-    VIRUP.timeCoeff = temporalData.timeCoeff
+    Universe.timeCoeff = temporalData.timeCoeff
     if temporalData.simulationTime != None:
         if temporalData.simulationTime.isValid() and t <= 1:
-            VIRUP.simulationTime = temporalData.simulationTime
+            Universe.simulationTime = temporalData.simulationTime
 
     ui = scene.ui
     for label in Universe.getUniverseElementsNames():
@@ -1233,8 +1233,8 @@ def updateScene():
         Universe.setRenderSpacecrafts(False)
     Universe.setAnimationTime(animationtime)
 
-    VIRUP.camYaw = shiftangle
-    VIRUP.camPitch = -shiftvertangle
+    Universe.camYaw = shiftangle
+    Universe.camPitch = -shiftvertangle
     shiftangle = 0.0
     shiftvertangle = 0.05
 
@@ -1244,20 +1244,20 @@ def updateScene():
 
     """
     print(id)
-    print(VIRUP.camYaw)
-    print(VIRUP.camPitch)
-    print(VIRUP.planetPosition)
-    print(VIRUP.planetTarget)
+    print(Universe.camYaw)
+    print(Universe.camPitch)
+    print(Universe.planetPosition)
+    print(Universe.planetTarget)
     print("")
     """
     if nextid != -1 and nextid < len(scenes) and autoplaymovie:
         setSceneId(nextid)
 
-    if spatialData.bodyName != '' and VIRUP.planetarySystemLoaded:
-        VIRUP.planetPosition += getPlanetShift()
+    if spatialData.bodyName != '' and Universe.planetarySystemLoaded:
+        Universe.planetPosition += getPlanetShift()
     else:
-        VIRUP.cosmoPosition += getCosmoShift()
+        Universe.cosmoPosition += getCosmoShift()
 
     # Synra dome
-    #if VIRUP.projection == "domemaster180":
-    #    VIRUP.camPitch += 45 * pi / 180
+    #if Universe.projection == "domemaster180":
+    #    Universe.camPitch += 45 * pi / 180
