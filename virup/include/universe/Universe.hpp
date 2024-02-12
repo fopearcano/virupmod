@@ -341,6 +341,10 @@ class Universe : public QObject
 
   public slots:
 	/**
+	 * @brief Returns planetary system @param systemName cosmo position.
+	 */
+	Vector3 getSystemAbsolutePosition(QString const& systemName);
+	/**
 	 * @brief Returns closest common ancestor between two planetary bodies.
 	 */
 	QString

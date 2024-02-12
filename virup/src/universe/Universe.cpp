@@ -187,6 +187,12 @@ void Universe::setCamYaw(float yaw)
 	camCosmo.yaw  = yaw;
 	camPlanet.yaw = yaw;
 }
+
+Vector3 Universe::getSystemAbsolutePosition(QString const& systemName)
+{
+	return planetSystems->getAbsolutePosition(systemName);
+}
+
 QString Universe::getClosestCommonAncestorName(
     QString const& celestialBodyName0, QString const& celestialBodyName1) const
 {
