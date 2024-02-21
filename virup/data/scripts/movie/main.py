@@ -470,6 +470,47 @@ def voyagerCamera(t, t_harsh):
     global jupiterendid
     global fade_factor
 
+    # attempt to accelerate for t = 0.5
+    def newt_(t, a):
+        if t < 0.5:
+            return (1.0 - 2.0 * t)**a * -0.5 + 0.5
+        return (2.0 * t - 1.0)**a * 0.5 + 0.5
+
+    # moves derivatives to t0 and t1 (while maintaining values for 0.0 and 1.0 -> 0.0 and 1.0)
+    def smoothremap(t, t0, t1):
+        return (smoothstep(t * (t1 - t0) + t0) - smoothstep(t0)) / (smoothstep(t1) - smoothstep(t0))
+
+    newt = t_harsh
+    if id == jupiterendid: # jupiter
+        newt = t_harsh
+    elif id == jupiterendid + 1: # saturntransfer
+        newt = smoothremap(newt_(t_harsh, 0.4), 0.0081, 0.9935)
+        # newt = t_harsh
+    elif id == jupiterendid + 2: # saturn
+        newt = t_harsh
+    elif id == jupiterendid + 3: # uranustransfer
+        newt = smoothremap(newt_(t_harsh, 0.4), 0.0043, 0.9981)
+    elif id == jupiterendid + 4: # uranus
+        newt = t_harsh
+    elif id == jupiterendid + 5: # neptunetransfer
+        newt = smoothremap(newt_(t_harsh, 0.4), 0.0021, 0.9961)
+    elif id == jupiterendid + 6: # neptune
+        # smoothstep(0.72402) == 1.19771 * 0.72402
+        # smoothstep'(0.72402) = 1.19771
+        if t_harsh < 0.72402:
+            newt = 1.197771 * t_harsh
+        else:
+            newt = smoothstep(t_harsh)
+    else:
+        newt = smoothstep(t_harsh)
+
+    tempData0 = scenes[id-1].temporalData
+    tempData1 = scenes[id].temporalData
+    simTime = interpolateTemporalData(tempData0, tempData1, newt).simulationTime
+    if simTime != None:
+        if simTime.isValid() and t <= 1:
+            Universe.simulationTime = simTime
+
     ToneMappingModel.exposure = 0.3 * (Universe.getCameraCurrentRelPosToBody("Sun").length() / 4.0e+11)**2#7.779e+11)**2
     if id == jupiterendid and t_harsh < 0.333:
         fade_factor = fade_in_factor(t_harsh*3)
