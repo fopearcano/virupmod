@@ -34,6 +34,7 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 	for(auto entry : dataJsonRepresentation["entries"].toArray())
 	{
 		auto entryObj(entry.toObject());
+		qDebug() << "Loading" << entryObj["name"].toString();
 		std::unique_ptr<UniverseElement> newElem;
 		if(entryObj["type"] == "cosmolabels")
 		{
