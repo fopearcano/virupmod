@@ -356,6 +356,12 @@ void TreeMethodLOD::loadOctreeFromFile(std::string const& path,
 	}
 	auto file = std::make_shared<std::ifstream>();
 	file->open(path, std::fstream::in | std::fstream::binary);
+	if(!file->is_open())
+	{
+		qCritical() << "Can't open octree from path:" << path.c_str();
+		QCoreApplication::quit();
+		return;
+	}
 
 	container.emplace_back(shaderProgram);
 	auto& octree = container[container.size() - 1];
