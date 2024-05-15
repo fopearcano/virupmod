@@ -164,7 +164,8 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 					    currentPosSum,
 					    LabelRenderer{currentName, QColor(0, 230, 255), false});
 				}
-				currentName   = line.simplified();
+				currentName = line.simplified();
+				currentName.replace(QString{"\\n"}, QString{'\n'});
 				currentPosSum = Vector3();
 				posNumber     = 0;
 				line          = file.readLine().data();
