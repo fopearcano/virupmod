@@ -58,6 +58,7 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 			QString line       = in.readLine();
 			QStringList fields = line.split(",");
 			QString label(fields[0]);
+			label.replace(QString{"\\n"}, QString{'\n'});
 			Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
 			                fields[3].toDouble());
 
