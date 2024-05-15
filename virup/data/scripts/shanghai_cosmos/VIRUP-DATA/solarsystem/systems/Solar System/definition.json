@@ -1,0 +1,1519 @@
+{
+    "stars": [
+        {
+            "name": "Sun",
+            "mass": 1.989100052673832e+30,
+            "radius": 696342016,
+            "temperature": 5778.0,
+            "magV": -26.74,
+            "spacecrafts": [
+                {
+                    "name": "Cassini",
+                    "color": {
+                        "alpha": 255,
+                        "b": 128,
+                        "g": 128,
+                        "r": 128
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": 1,
+                        "z": 0
+                    },
+                    "radius": 11,
+                    "modelPath": "/models/Cassini/Cassini_66.blend",
+                    "displayName": "Cassini\\n卡西尼号飞船"
+                },
+                {
+                    "name": "Dawn",
+                    "color": {
+                        "alpha": 255,
+                        "b": 128,
+                        "g": 128,
+                        "r": 128
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": 1,
+                        "z": 0
+                    },
+                    "radius": 10,
+                    "modelPath": "/models/Dawn/Dawn.obj",
+                    "displayName": "Dawn\\n曙光号飞船"
+                },
+                {
+                    "name": "Juno Spacecraft",
+                    "color": {
+                        "alpha": 255,
+                        "b": 128,
+                        "g": 128,
+                        "r": 128
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "radius": 10,
+                    "modelPath": "/models/Juno/Juno.obj",
+                    "displayName": "Juno Spacecraft\\n朱诺号飞船"
+                },
+                {
+                    "name": "Kepler",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "antennaDir": {
+                        "x": -1,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "radius": 3,
+                    "modelPath": "/models/Kepler/kepler_v009.blend",
+                    "displayName": "Kepler\\n开普勒号飞船"
+                },
+                {
+                    "name": "MAVEN",
+                    "color": {
+                        "alpha": 255,
+                        "b": 128,
+                        "g": 128,
+                        "r": 128
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": 1,
+                        "z": 0
+                    },
+                    "radius": 9,
+                    "modelPath": "/models/MAVEN/Maven.blend",
+                    "displayName": "MAVEN\\n专家号飞船"
+                },
+                {
+                    "name": "MESSENGER",
+                    "color": {
+                        "alpha": 255,
+                        "b": 128,
+                        "g": 128,
+                        "r": 128
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Sun",
+                    "antennaDir": {
+                        "x": 1,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 4,
+                    "modelPath": "/models/MESSENGER/MESSENGER.obj",
+                    "modelScale": 0.86,
+                    "displayName": "MESSENGER\\n信使号飞船"
+                },
+                {
+                    "name": "New Horizons",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "northPoleDeclination": 0.669052,
+                    "northPoleRightAsc": -1.49243,
+                    "antennaTarget": "Earth",
+                    "radius": 2,
+                    "modelPath": "/models/New Horizons/NewHorizons.obj",
+                    "displayName": "New Horizons\\n新视野号飞船"
+                },
+                {
+                    "name": "Parker Solar Probe",
+                    "color": {
+                        "alpha": 255,
+                        "b": 50,
+                        "g": 50,
+                        "r": 50
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Sun",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 1,
+                        "z": 0
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "radius": 5,
+                    "modelPath": "/models/Parker Solar Probe/ParkerSolarProbe.blend",
+                    "displayName": "Parker Solar Probe\\n帕克太阳探测器"
+                },
+                {
+                    "name": "Pioneer 10",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 15,
+                    "modelPath": "/models/Voyager/Voyager_17.blend",
+                    "displayName": "Pioneer 10\\n先驱者10号飞船"
+                },
+                {
+                    "name": "Pioneer 11",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 15,
+                    "modelPath": "/models/Voyager/Voyager_17.blend",
+                    "displayName": "Pioneer 11\\n先驱者11号飞船"
+                },
+                {
+                    "name": "Rosetta",
+                    "color": {
+                        "alpha": 255,
+                        "b": 25,
+                        "g": 25,
+                        "r": 25
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 16,
+                    "modelPath": "/models/Rosetta/Rosetta.obj",
+                    "displayName": "Rosetta\\n罗塞塔号飞船"
+                },
+                {
+                    "name": "Voyager 1",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Earth",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 15,
+                    "modelPath": "/models/Voyager/Voyager_17.blend",
+                    "displayName": "Voyager 1\\n旅行者1号飞船"
+                },
+                {
+                    "name": "Voyager 2",
+                    "color": {
+                        "alpha": 255,
+                        "b": 0,
+                        "g": 215,
+                        "r": 255
+                    },
+                    "mass": 419700,
+                    "antennaTarget": "Sun",
+                    "antennaDir": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 1
+                    },
+                    "up": {
+                        "x": 0,
+                        "y": -1,
+                        "z": 0
+                    },
+                    "radius": 15,
+                    "modelPath": "/models/Voyager/Voyager_17.blend",
+                    "displayName": "Voyager 2\\n旅行者2号飞船"
+                }
+            ],
+            "planets": [
+                {
+                    "name": "Mercury",
+                    "albedo": 0.14,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 80,
+                        "g": 77,
+                        "r": 75
+                    },
+                    "innerRing": 0,
+                    "mass": 3.3011e+23,
+                    "northPoleDeclination": 1.0725048253505156,
+                    "northPoleRightAsc": 4.904549731029265,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 2439700,
+                    "siderealRotationPeriod": 5067014.4,
+                    "siderealTimeAtEpoch": 6.069321130640849,
+                    "type": "terrestrial",
+                    "displayName": "Mercury\\n水星"
+                },
+                {
+                    "name": "Venus",
+                    "albedo": 0.69,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 98,
+                        "g": 190,
+                        "r": 244
+                    },
+                    "innerRing": 0,
+                    "mass": 4.8675e+24,
+                    "northPoleDeclination": -1.1721631256393916,
+                    "northPoleRightAsc": 1.61896741414994,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 6101800,
+                    "siderealRotationPeriod": 380234.594,
+                    "siderealTimeAtEpoch": 3.3587532198310948,
+                    "type": "gazgiant",
+                    "displayName": "Venus\\n金星"
+                },
+                {
+                    "name": "Earth",
+                    "albedo": 0.43,
+                    "atmosphere": {
+                        "HR0": 8000.0,
+                        "HM0": 1200.0,
+                        "O3height": 25000.0,
+                        "O3width": 30000.0,
+                        "betaR": {
+                            "x": 5.802e-06,
+                            "y": 1.3558e-05,
+                            "z": 3.31e-05
+                        },
+                        "betaM": 8.4e-06,
+                        "betaO3": {
+                            "x": 6.5e-07,
+                            "y": 1.881e-06,
+                            "z": 8.5e-08
+                        },
+                        "clouds": 8000.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 112,
+                        "g": 91,
+                        "r": 69
+                    },
+                    "innerRing": 0,
+                    "mass": 5.97237e+24,
+                    "northPoleDeclination": 1.5707963267948966,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9966604474686819
+                    },
+                    "outerRing": 0,
+                    "radius": 6378100,
+                    "siderealRotationPeriod": 86164.10035200001,
+                    "siderealTimeAtEpoch": 1.7593363924107448,
+                    "type": "terrestrial",
+                    "planets": [
+                        {
+                            "name": "Moon",
+                            "albedo": 0.136,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 146,
+                                "g": 146,
+                                "r": 153
+                            },
+                            "innerRing": 0,
+                            "mass": 7.342e+22,
+                            "northPoleDeclination": 1.145634121009078,
+                            "northPoleRightAsc": 4.6575856418720685,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 0.9987917841320983
+                            },
+                            "outerRing": 0,
+                            "radius": 1738100,
+                            "siderealRotationPeriod": 2360591.5103999996,
+                            "siderealTimeAtEpoch": 0.6009311785663192,
+                            "type": "terrestrial",
+                            "displayName": "Moon\\n月球"
+                        }
+                    ],
+                    "spacecrafts": [
+                        {
+                            "name": "ISS",
+                            "color": {
+                                "alpha": 255,
+                                "b": 255,
+                                "g": 255,
+                                "r": 255
+                            },
+                            "mass": 419700,
+                            "antennaDir": {
+                                "x": 0,
+                                "y": -1,
+                                "z": 0
+                            },
+                            "up": {
+                                "x": 1,
+                                "y": 0,
+                                "z": 0
+                            },
+                            "radius": 40,
+                            "modelPath": "/models/ISS/scene.gltf",
+                            "modelScale": 7.54,
+                            "displayName": "ISS\\n国际空间站"
+                        },
+                        {
+                            "name": "Hubble",
+                            "color": {
+                                "alpha": 255,
+                                "b": 255,
+                                "g": 255,
+                                "r": 255
+                            },
+                            "mass": 419700,
+                            "antennaTarget": "Sun",
+                            "antennaDir": {
+                                "x": -1,
+                                "y": 0,
+                                "z": 0
+                            },
+                            "up": {
+                                "x": 0,
+                                "y": 0,
+                                "z": -1
+                            },
+                            "radius": 4,
+                            "modelPath": "/models/Hubble/Hubble.obj",
+                            "modelScale": 2.54,
+                            "displayName": "Hubble\\n哈勃太空望远镜"
+                        }
+                    ],
+                    "displayName": "Earth\\n地球"
+                },
+                {
+                    "name": "Mars",
+                    "albedo": 0.17,
+                    "atmosphere": {
+                        "HR0": 11100.0,
+                        "HM0": 10000.0,
+                        "betaR": {
+                            "x": 7.70549914e-06,
+                            "y": 5.9724081e-06,
+                            "z": 4.200491e-06
+                        },
+                        "betaM": 2.155e-05
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 55,
+                        "g": 108,
+                        "r": 163
+                    },
+                    "innerRing": 0,
+                    "mass": 6.4171e+23,
+                    "northPoleDeclination": 0.9230435548559811,
+                    "northPoleRightAsc": 5.544586925943889,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9941110653082857
+                    },
+                    "outerRing": 0,
+                    "radius": 3396200,
+                    "siderealRotationPeriod": 88642.6848,
+                    "siderealTimeAtEpoch": 0.7040061418814729,
+                    "type": "terrestrial",
+                    "planets": [
+                        {
+                            "name": "Phobos",
+                            "albedo": 0.071,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 110,
+                                "g": 112,
+                                "r": 113
+                            },
+                            "innerRing": 0,
+                            "mass": 1.0659e+16,
+                            "northPoleDeclination": 0.9230435548559811,
+                            "northPoleRightAsc": 5.544586925943889,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 11266.7,
+                            "siderealRotationPeriod": 27553.843872,
+                            "siderealTimeAtEpoch": 4.023685663761321,
+                            "type": "terrestrial",
+                            "displayName": "Phobos\\n火卫一"
+                        },
+                        {
+                            "name": "Deimos",
+                            "albedo": 0.068,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 111,
+                                "g": 137,
+                                "r": 156
+                            },
+                            "innerRing": 0,
+                            "mass": 1476200000000000.0,
+                            "northPoleDeclination": 0.9230435548559811,
+                            "northPoleRightAsc": 5.544586925943889,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 6200,
+                            "siderealRotationPeriod": 109123.2,
+                            "siderealTimeAtEpoch": 5.852159600397493,
+                            "type": "terrestrial",
+                            "displayName": "Deimos\\n火卫二"
+                        }
+                    ],
+                    "displayName": "Mars\\n火星"
+                },
+                {
+                    "name": "Ceres",
+                    "albedo": 0.09,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 48,
+                        "g": 57,
+                        "r": 54
+                    },
+                    "innerRing": 0,
+                    "mass": 9.393e+20,
+                    "northPoleDeclination": 1.165251621801494,
+                    "northPoleRightAsc": 5.086368358658223,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9233319519270617
+                    },
+                    "outerRing": 0,
+                    "radius": 482600,
+                    "siderealRotationPeriod": 32667.840000000004,
+                    "siderealTimeAtEpoch": 3.422892798391968,
+                    "type": "terrestrial",
+                    "displayName": "Ceres\\n谷神星"
+                },
+                {
+                    "name": "Pallas",
+                    "albedo": 0.159,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 54,
+                        "g": 54,
+                        "r": 54
+                    },
+                    "innerRing": 0,
+                    "mass": 2.11e+20,
+                    "northPoleDeclination": 0.1745329201221466,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 256000,
+                    "siderealRotationPeriod": 28127.52,
+                    "siderealTimeAtEpoch": 3.532654368722707,
+                    "type": "terrestrial",
+                    "displayName": "Pallas\\n智神星"
+                },
+                {
+                    "name": "Juno",
+                    "albedo": 0.238,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 63,
+                        "g": 63,
+                        "r": 63
+                    },
+                    "innerRing": 0,
+                    "mass": 2.67e+19,
+                    "northPoleDeclination": 0.1745329201221466,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 123298,
+                    "siderealRotationPeriod": 25954.56,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "Juno\\n婚神星"
+                },
+                {
+                    "name": "Vesta",
+                    "albedo": 0.423,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 89,
+                        "g": 89,
+                        "r": 89
+                    },
+                    "innerRing": 0,
+                    "mass": 2.59076e+20,
+                    "northPoleDeclination": 0.8377580409572782,
+                    "northPoleRightAsc": 5.375614096142535,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 262700,
+                    "siderealRotationPeriod": 19232.64,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "Vesta\\n灶神星"
+                },
+                {
+                    "name": "Churyumov-Gerasimenko",
+                    "albedo": 0.06,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 89,
+                        "g": 89,
+                        "r": 89
+                    },
+                    "innerRing": 0,
+                    "mass": 9982000000000.0,
+                    "northPoleDeclination": 1.1187560505283651,
+                    "northPoleRightAsc": 1.2095131716320704,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 3000,
+                    "siderealRotationPeriod": 44655.48,
+                    "siderealTimeAtEpoch": 6.1143410271804575,
+                    "type": "terrestrial",
+                    "displayName": "Churyumov-Gerasimenko\\n丘留莫夫-格拉西缅科彗星"
+                },
+                {
+                    "name": "Jupiter",
+                    "albedo": 0.54,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 149,
+                        "g": 152,
+                        "r": 141
+                    },
+                    "innerRing": 0,
+                    "mass": 1.8982e+27,
+                    "northPoleDeclination": 1.125650101073743,
+                    "northPoleRightAsc": 4.67847723301844,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9351256084596878
+                    },
+                    "outerRing": 0,
+                    "radius": 71492000,
+                    "siderealRotationPeriod": 35744.2,
+                    "siderealTimeAtEpoch": 2.443460952792061,
+                    "type": "gazgiant",
+                    "planets": [
+                        {
+                            "name": "Io",
+                            "albedo": 0.63,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 152,
+                                "g": 189,
+                                "r": 208
+                            },
+                            "innerRing": 0,
+                            "mass": 8.931938e+22,
+                            "northPoleDeclination": 1.125650101073743,
+                            "northPoleRightAsc": 4.67847723301844,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 1821600,
+                            "siderealRotationPeriod": 152853.50471039998,
+                            "siderealTimeAtEpoch": 1.7118221447865978,
+                            "type": "terrestrial",
+                            "displayName": "Io\\n木卫一"
+                        },
+                        {
+                            "name": "Europa",
+                            "albedo": 0.67,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 189,
+                                "g": 219,
+                                "r": 230
+                            },
+                            "innerRing": 0,
+                            "mass": 4.799844e+22,
+                            "northPoleDeclination": 1.125650101073743,
+                            "northPoleRightAsc": 4.67847723301844,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 1560800,
+                            "siderealRotationPeriod": 306822.0384,
+                            "siderealTimeAtEpoch": 6.008339408633722,
+                            "type": "terrestrial",
+                            "displayName": "Europa\\n木卫二"
+                        },
+                        {
+                            "name": "Ganymede",
+                            "albedo": 0.43,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 103,
+                                "g": 124,
+                                "r": 130
+                            },
+                            "innerRing": 0,
+                            "mass": 1.4819e+23,
+                            "northPoleDeclination": 1.125650101073743,
+                            "northPoleRightAsc": 4.67847723301844,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 2634100,
+                            "siderealRotationPeriod": 618153.375744,
+                            "siderealTimeAtEpoch": 0.3161974813725083,
+                            "type": "terrestrial",
+                            "displayName": "Ganymede\\n木卫三"
+                        },
+                        {
+                            "name": "Callisto",
+                            "albedo": 0.22,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 51,
+                                "g": 99,
+                                "r": 129
+                            },
+                            "innerRing": 0,
+                            "mass": 1.075938e+23,
+                            "northPoleDeclination": 1.125650101073743,
+                            "northPoleRightAsc": 4.67847723301844,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 2410300,
+                            "siderealRotationPeriod": 1441931.18976,
+                            "siderealTimeAtEpoch": 4.322661995256511,
+                            "type": "terrestrial",
+                            "displayName": "Callisto\\n木卫四"
+                        }
+                    ],
+                    "displayName": "Jupiter\\n木星"
+                },
+                {
+                    "name": "Saturn",
+                    "albedo": 0.5,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 154,
+                        "g": 219,
+                        "r": 240
+                    },
+                    "innerRing": 73788720,
+                    "mass": 5.6834e+26,
+                    "northPoleDeclination": 1.457995697238503,
+                    "northPoleRightAsc": 0.7084116900919784,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9020375655405853
+                    },
+                    "outerRing": 139595640,
+                    "radius": 60268000,
+                    "siderealRotationPeriod": 38018,
+                    "siderealTimeAtEpoch": 1.4399218441265502,
+                    "type": "gazgiant",
+                    "planets": [
+                        {
+                            "name": "Mimas",
+                            "albedo": 0.962,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 116,
+                                "g": 117,
+                                "r": 116
+                            },
+                            "innerRing": 0,
+                            "mass": 3.7493e+19,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 198200,
+                            "siderealRotationPeriod": 81388.8,
+                            "siderealTimeAtEpoch": 1.2155833485761178,
+                            "type": "terrestrial",
+                            "displayName": "Mimas\\n土卫一"
+                        },
+                        {
+                            "name": "Enceladus",
+                            "albedo": 1.375,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 155,
+                                "g": 156,
+                                "r": 156
+                            },
+                            "innerRing": 0,
+                            "mass": 1.08022e+20,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 252100,
+                            "siderealRotationPeriod": 118386.8352,
+                            "siderealTimeAtEpoch": 0.13550134480931364,
+                            "type": "terrestrial",
+                            "displayName": "Enceladus\\n土卫二"
+                        },
+                        {
+                            "name": "Tethys",
+                            "albedo": 1.229,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 156,
+                                "g": 166,
+                                "r": 166
+                            },
+                            "innerRing": 0,
+                            "mass": 6.17449e+20,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 531100,
+                            "siderealRotationPeriod": 163106.0928,
+                            "siderealTimeAtEpoch": 0.8407241612918419,
+                            "type": "terrestrial",
+                            "displayName": "Tethys\\n土卫三"
+                        },
+                        {
+                            "name": "Dione",
+                            "albedo": 0.998,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 123,
+                                "g": 126,
+                                "r": 126
+                            },
+                            "innerRing": 0,
+                            "mass": 1.095452e+21,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 561400,
+                            "siderealRotationPeriod": 236469.456,
+                            "siderealTimeAtEpoch": 1.1236765986768573,
+                            "type": "terrestrial",
+                            "displayName": "Dione\\n土卫四"
+                        },
+                        {
+                            "name": "Rhea",
+                            "albedo": 0.949,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 94,
+                                "g": 107,
+                                "r": 106
+                            },
+                            "innerRing": 0,
+                            "mass": 2.306518e+21,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 763800,
+                            "siderealRotationPeriod": 390373.5168,
+                            "siderealTimeAtEpoch": 1.4800620020294997,
+                            "type": "terrestrial",
+                            "displayName": "Rhea\\n土卫五"
+                        },
+                        {
+                            "name": "Titan",
+                            "albedo": 0.22,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 56,
+                                "g": 175,
+                                "r": 254
+                            },
+                            "innerRing": 0,
+                            "mass": 1.3452e+23,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 2774730,
+                            "siderealRotationPeriod": 1377648,
+                            "siderealTimeAtEpoch": 5.251245365815998,
+                            "type": "gazgiant",
+                            "displayName": "Titan\\n土卫六"
+                        },
+                        {
+                            "name": "Hyperion",
+                            "albedo": 0.3,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 101,
+                                "g": 142,
+                                "r": 187
+                            },
+                            "innerRing": 0,
+                            "mass": 5.6199e+18,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 135000,
+                            "siderealRotationPeriod": 1123200,
+                            "siderealTimeAtEpoch": 0,
+                            "type": "terrestrial",
+                            "displayName": "Hyperion\\n土卫七"
+                        },
+                        {
+                            "name": "Iapetus",
+                            "albedo": 0.25,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 116,
+                                "g": 123,
+                                "r": 131
+                            },
+                            "innerRing": 0,
+                            "mass": 1.805635e+21,
+                            "northPoleDeclination": 1.457995697238503,
+                            "northPoleRightAsc": 0.7084116900919784,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 734500,
+                            "siderealRotationPeriod": 6853377.6,
+                            "siderealTimeAtEpoch": 0.6189284346518459,
+                            "type": "terrestrial",
+                            "displayName": "Iapetus\\n土卫八"
+                        }
+                    ],
+                    "displayName": "Saturn\\n土星"
+                },
+                {
+                    "name": "Uranus",
+                    "albedo": 0.49,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 222,
+                        "g": 212,
+                        "r": 185
+                    },
+                    "innerRing": 31059237.74,
+                    "mass": 8.681e+25,
+                    "northPoleDeclination": 0.2648537139901395,
+                    "northPoleRightAsc": 1.3493314980093358,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9770726554247037
+                    },
+                    "outerRing": 123076756.26,
+                    "radius": 25559000,
+                    "siderealRotationPeriod": 62063.712,
+                    "siderealTimeAtEpoch": 0.22880273383759028,
+                    "type": "gazgiant",
+                    "planets": [
+                        {
+                            "name": "Miranda",
+                            "albedo": 0.32,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 127,
+                                "g": 133,
+                                "r": 142
+                            },
+                            "innerRing": 0,
+                            "mass": 6.59e+19,
+                            "northPoleDeclination": 0.2648537139901395,
+                            "northPoleRightAsc": 1.3493314980093358,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 0.9822859552931253
+                            },
+                            "outerRing": 0,
+                            "radius": 237100,
+                            "siderealRotationPeriod": 122124.5856,
+                            "siderealTimeAtEpoch": 3.4079336130672515,
+                            "type": "terrestrial",
+                            "displayName": "Miranda\\n天卫五"
+                        },
+                        {
+                            "name": "Ariel",
+                            "albedo": 0.53,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 116,
+                                "g": 116,
+                                "r": 132
+                            },
+                            "innerRing": 0,
+                            "mass": 1.4e+21,
+                            "northPoleDeclination": 0.2648537139901395,
+                            "northPoleRightAsc": 1.3493314980093358,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 0.9960310612597068
+                            },
+                            "outerRing": 0,
+                            "radius": 579500,
+                            "siderealRotationPeriod": 217728,
+                            "siderealTimeAtEpoch": 0.7353285244469319,
+                            "type": "terrestrial",
+                            "displayName": "Ariel\\n天卫一"
+                        },
+                        {
+                            "name": "Umbriel",
+                            "albedo": 0.26,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 78,
+                                "g": 81,
+                                "r": 84
+                            },
+                            "innerRing": 0,
+                            "mass": 1.172e+21,
+                            "northPoleDeclination": 0.2648537139901395,
+                            "northPoleRightAsc": 1.3493314980093358,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 584700,
+                            "siderealRotationPeriod": 358041.6,
+                            "siderealTimeAtEpoch": 3.313362003400425,
+                            "type": "terrestrial",
+                            "displayName": "Umbriel\\n天卫二"
+                        },
+                        {
+                            "name": "Titania",
+                            "albedo": 0.35,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 92,
+                                "g": 106,
+                                "r": 126
+                            },
+                            "innerRing": 0,
+                            "mass": 3.527e+21,
+                            "northPoleDeclination": 0.2648537139901395,
+                            "northPoleRightAsc": 1.3493314980093358,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 788400,
+                            "siderealRotationPeriod": 752218.6176,
+                            "siderealTimeAtEpoch": 4.618360842157154,
+                            "type": "terrestrial",
+                            "displayName": "Titania\\n天卫三"
+                        },
+                        {
+                            "name": "Oberon",
+                            "albedo": 0.31,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 81,
+                                "g": 93,
+                                "r": 102
+                            },
+                            "innerRing": 0,
+                            "mass": 3.014e+21,
+                            "northPoleDeclination": 0.2648537139901395,
+                            "northPoleRightAsc": 1.3493314980093358,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 761400,
+                            "siderealRotationPeriod": 1163223.4176,
+                            "siderealTimeAtEpoch": 5.862611035753226,
+                            "type": "terrestrial",
+                            "displayName": "Oberon\\n天卫四"
+                        }
+                    ],
+                    "displayName": "Uranus\\n天王星"
+                },
+                {
+                    "name": "Neptune",
+                    "albedo": 0.44,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 232,
+                        "g": 142,
+                        "r": 97
+                    },
+                    "innerRing": 0,
+                    "mass": 1.02413e+26,
+                    "northPoleDeclination": 0.7496189137315646,
+                    "northPoleRightAsc": 5.223770451219028,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 0.9829187530285899
+                    },
+                    "outerRing": 0,
+                    "radius": 24764000,
+                    "siderealRotationPeriod": 58000.32,
+                    "siderealTimeAtEpoch": 0.29515412512381,
+                    "type": "gazgiant",
+                    "planets": [
+                        {
+                            "name": "Triton",
+                            "albedo": 0.76,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 125,
+                                "g": 153,
+                                "r": 167
+                            },
+                            "innerRing": 0,
+                            "mass": 2.14e+22,
+                            "northPoleDeclination": -0.7496189137315646,
+                            "northPoleRightAsc": 2.0821777976292353,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 1353400,
+                            "siderealRotationPeriod": 507760.1856,
+                            "siderealTimeAtEpoch": 0.5654432608671653,
+                            "type": "terrestrial",
+                            "displayName": "Triton\\n海卫一"
+                        }
+                    ],
+                    "displayName": "Neptune\\n海王星"
+                },
+                {
+                    "name": "Pluto",
+                    "albedo": 0.6,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 66,
+                        "g": 106,
+                        "r": 151
+                    },
+                    "innerRing": 0,
+                    "mass": 1.303e+22,
+                    "northPoleDeclination": -0.10756464180041053,
+                    "northPoleRightAsc": 2.3211657321048187,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 1188300,
+                    "siderealRotationPeriod": 551856.672,
+                    "siderealTimeAtEpoch": 1.3928349482951936,
+                    "type": "terrestrial",
+                    "planets": [
+                        {
+                            "name": "Charon",
+                            "albedo": 0.35,
+                            "atmosphere": {
+                                "HR0": 0.0
+                            },
+                            "color": {
+                                "alpha": 255,
+                                "b": 94,
+                                "g": 103,
+                                "r": 119
+                            },
+                            "innerRing": 0,
+                            "mass": 1.586e+21,
+                            "northPoleDeclination": -0.10756464180041053,
+                            "northPoleRightAsc": 2.3211657321048187,
+                            "oblateness": {
+                                "x": 1,
+                                "y": 1,
+                                "z": 1
+                            },
+                            "outerRing": 0,
+                            "radius": 606000,
+                            "siderealRotationPeriod": 551856.70656,
+                            "siderealTimeAtEpoch": 4.536447817866964,
+                            "type": "terrestrial",
+                            "displayName": "Charon\\n冥卫一"
+                        }
+                    ],
+                    "displayName": "Pluto\\n冥王星"
+                },
+                {
+                    "name": "Makemake",
+                    "albedo": 0.81,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 78,
+                        "g": 86,
+                        "r": 106
+                    },
+                    "innerRing": 0,
+                    "mass": 4.4e+21,
+                    "northPoleDeclination": 1.5707963267948966,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 725000,
+                    "siderealRotationPeriod": 82175.76,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "Makemake\\n鸟神星"
+                },
+                {
+                    "name": "Haumea",
+                    "albedo": 0.6,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 191,
+                        "g": 205,
+                        "r": 215
+                    },
+                    "innerRing": 2252000,
+                    "mass": 4.006e+21,
+                    "northPoleDeclination": 1.5707963705062866,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 0.8020833333333334,
+                        "z": 0.515625
+                    },
+                    "outerRing": 2322000,
+                    "radius": 960000,
+                    "siderealRotationPeriod": 14095.8144,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "Haumea\\n妊神星"
+                },
+                {
+                    "name": "Eris",
+                    "albedo": 0.96,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 184,
+                        "g": 204,
+                        "r": 214
+                    },
+                    "innerRing": 0,
+                    "mass": 1.66e+22,
+                    "northPoleDeclination": 1.5707963267948966,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 1163000,
+                    "siderealRotationPeriod": 93240,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "Eris\\n阋神星"
+                },
+                {
+                    "name": "FarFarOut",
+                    "albedo": 0.18,
+                    "atmosphere": {
+                        "HR0": 0.0
+                    },
+                    "color": {
+                        "alpha": 255,
+                        "b": 184,
+                        "g": 204,
+                        "r": 214
+                    },
+                    "innerRing": 0,
+                    "mass": 1e+21,
+                    "northPoleDeclination": 1.5707963267948966,
+                    "northPoleRightAsc": 0,
+                    "oblateness": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "outerRing": 0,
+                    "radius": 250000,
+                    "siderealRotationPeriod": 93240,
+                    "siderealTimeAtEpoch": 0,
+                    "type": "terrestrial",
+                    "displayName": "FarFarOut\\nFarFarOut"
+                }
+            ],
+            "displayName": "Sun\\n太阳"
+        }
+    ],
+    "declinationTilt": 0.4090926294945,
+    "distance": 4.84814e-06
+}

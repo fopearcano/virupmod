@@ -1,0 +1,261 @@
+Andromeda\n仙女座
+	Bet And,Ups And,Gam And
+	Bet And,Del And,Alp And
+	Bet And,Mu And,Nu And
+	Ups And,51 And
+Antlia\n唧筒座
+	Iot Ant,Alp Ant,The Ant,Eps Ant
+Apus\n天燕座
+	Bet Aps,Gam Aps,Del Aps,Alp Aps
+Aquarius\n宝瓶座
+	88 Aqr,Del Aqr,Tau Aqr,Lam Aqr,Phi Aqr,Zet Aqr,Gam Aqr,Alp Aqr,Bet Aqr,Mu Aqr,Eps Aqr
+	Alp Aqr,The Aqr,Iot Aqr
+Aquila\n天鹰座
+	Eps Aql,Zet Aql,Gam Aql,Alp Aql,Bet Aql,The Aql,Eta Aql,Del Aql,Zet Aql
+	Del Aql,Lam Aql,12 Aql
+Ara\n天坛座
+	Del Ara,Gam Ara,Bet Ara,Alp Ara,Eps Ara,Zet Ara,Eta Ara
+	Zet Ara,Gam Ara
+Aries\n白羊座
+	41 Ari,Alp Ari,Bet Ari,5 Ari
+Auriga\n御夫座
+	Alp Aur,Del Aur,Bet Aur,37 Aur,Bet Tau,Iot Aur,Eta Aur,Alp Aur
+	Bet Aur,Alp Aur,Eps Aur,Zet Aur
+Boötes\n牧夫座
+	Gam Boo,Bet Boo,Del Boo,Eps Boo,Alp Boo,Pi Boo,Zet Boo
+	Ups Boo,Tau Boo,Eta Boo,Alp Boo,Rho Boo,Gam Boo,Lam Boo,Kap-2 Boo
+	Del Boo,Mu Boo
+Caelum\n雕具座
+	Alp Cae,Bet Cae
+Camelopardalis\n鹿豹座
+	7 Cam,Bet Cam,Alp Cam,Gam Cam
+Cancer\n巨蟹座
+	Alp Cnc,Del Cnc,Gam Cnc,Iot Cnc
+	Del Cnc,Bet Cnc
+Canes Venatici\n猎犬座
+	Alp CVn,Bet CVn
+Canis Major\n大犬座
+	Bet CMa,Alp CMa,Iot CMa,Gam CMa,The CMa,Alp CMa
+	Alp CMa,Omi-2 CMa,Del CMa,Sig CMa,Eps CMa,Zet CMa
+	Del CMa,Ome CMa,Eta CMa
+	Ome CMa,Tau CMa
+Canis Minor\n小犬座
+	Alp CMi,Bet CMi
+Capricornus\n摩羯座
+	Alp Cap,Bet Cap,Psi Cap,Ome Cap,24 Cap,Zet Cap,Eps Cap,Del Cap,Gam Cap,Iot Cap,The Cap,Bet Cap
+Carina\n船底座
+	Alp Car,Eps Car,Iot Car,Q Car,P Car,The Car,Ome Car,Bet Car,Ups Car,Iot Car
+Cassiopeia\n仙后座
+	Eps Cas,Del Cas,Gam Cas,Alp Cas,Bet Cas
+Centaurus\n半人马座
+	Iot Cen,D Cen,Nu Cen
+	The Cen,Nu Cen
+	Kap Cen,Eta Cen,Nu Cen,Mu Cen,Zet Cen,Eps Cen,Gam Cen,Sig Cen,Del Cen,Rho Cen,Pi Cen,Lam Cen
+	Bet Cen,Eps Cen,Alp Cen
+Cepheus\n仙王座
+	The Cep,Eta Cep,Alp Cep,Bet Cep,Gam Cep,Iot Cep,Zet Cep,Alp Cep
+	Zet Cep,Eps Cep,Del Cep
+Cetus\n鲸鱼座
+	Gam Cet,Alp Cet,Lam Cet,Mu Cet,Xi-2 Cet,Nu Cet,Gam Cet,Del Cet,Omi Cet,Zet Cet,The Cet,Eta Cet,Iot Cet,Bet Cet,Tau Cet,Zet Cet
+Chamaeleon\n蝘蜓座
+	Alp Cha,Gam Cha,Bet Cha,Del-2 Cha,The Cha,Alp Cha
+Circinus\n圆规座
+	Bet Cir,Alp Cir,Gam Cir
+Columba\n天鸽座
+	Eps Col,Alp Col,Bet Col,Gam Col,Kap Col,Del Col
+	Bet Col,Eta Col
+Coma Berenices\n后发座
+	Alp Com,Bet Com,Gam Com
+Corona Australis\n南冕座
+	Eps CrA,Gam CrA,Alp CrA,Bet CrA,Del CrA,Zet CrA
+Corona Borealis\n北冕座
+	The CrB,Bet CrB,Alp CrB,Gam CrB,Del CrB,Eps CrB,Iot CrB
+Corvus\n乌鸦座
+	Alp Crv,Eps Crv,Gam Crv,Del Crv,Bet Crv,Eps Crv
+Crater\n巨爵座
+	Eta Crt,Zet Crt,Gam Crt,Del Crt,Eps Crt,The Crt
+	Gam Crt,Bet Crt,Alp Crt,Del Crt
+Crux\n南十字座
+	Alp Cru,Gam Cru
+	Bet Cru,Del Cru
+Cygnus\n天鹅座
+	Kap Cyg,Iot Cyg,The Cyg,Del Cyg,Gam Cyg,Eps Cyg,Zet Cyg
+	Alp Cyg,Gam Cyg,Eta Cyg,Bet Cyg
+Delphinus\n海豚座
+	Eps Del,Bet Del,Del Del,Gam Del,Alp Del,Bet Del
+Dorado\n剑鱼座
+	Gam Dor,Alp Dor,Zet Dor,Bet Dor,Del Dor
+	Bet Dor
+Draco\n天龙座
+	Nu Dra,Bet Dra,Gam Dra,Xi Dra,Nu Dra
+	Xi Dra,Del Dra,Eps Dra,Chi Dra,Zet Dra,Eta Dra,The Dra,Iot Dra,Alp Dra,Kap Dra,Lam Dra
+Equuleus\n小马座
+	Del Equ,Bet Equ,Alp Equ,Gam Equ
+Eridanus\n波江座
+	Lam Eri,Bet Eri,Ome Eri,Mu Eri,Nu Eri,Omi Eri,Gam Eri,Pi Eri,Del Eri,Eps Eri,Eta Eri,Tau Eri,Tau-2 Eri,Tau-3 Eri,Tau-4 Eri,Tau-5 Eri,Tau-6 Eri,Tau-9 Eri,Ups Eri,Ups-2 Eri,43 Eri,41 Eri,G Eri,F Eri,E Eri,The Eri,Iot Eri,S Eri,Kap Eri,Phi Eri,Chi Eri,Alp Eri
+Fornax\n天炉座
+	Alp For,Bet For,Nu For
+Gemini\n双子座
+	Bet Gem,Ups Gem,Del Gem,Zet Gem,Gam Gem
+	1 Gem,Eta Gem,Mu Gem,Eps Gem,Tau Gem,Rho Gem,Alp Gem
+	Del Gem,Lam Gem,51 Gem,Xi Gem
+	Nu Gem,Eps Gem
+	Tau Gem,The Gem
+	Ups Gem,Kap Gem
+	Ups Gem,Iot Gem,Tau Gem
+Grus\n天鹤座
+	Gam Gru,Lam Gru,Mu Gru,Del Gru,Bet Gru,Eps Gru,Zet Gru
+	Alp Gru,Bet Gru,Iot Gru,The Gru
+Hercules\n武仙座
+	Pi Her,Eps Her,Zet Her
+	Phi Her,Sig Her,Eta Her,Zet Her,Bet Her,Gam Her
+	Bet Her,Alp Her
+	Iot Her,The Her,Rho Her,Pi Her,Eta Her
+	Eps Her,Del Her,Lam Her,Mu Her,Xi Her,Omi Her,Nu Her
+	Omi Her,109 Her,110 Her,111 Her
+	109 Her,102 Her
+Horologium\n时钟座
+	Alp Hor,Iot Hor,Eta Hor,Zet Hor,Mu Hor,Bet Hor
+Hydra\n长蛇座
+	Gam Hya,Bet Hya,Xi Hya
+	Pi Hya,Gam Hya
+	Xi Hya,Nu Hya,Mu Hya,Lam Hya,Ups-2 Hya,Ups Hya,Alp Hya,Iot Hya,The Hya,Zet Hya,Eta Hya,Sig Hya,Del Hya,Eps Hya,Zet Hya
+Hydrus\n水蛇座
+	Gam Hyi,Bet Hyi,Alp Hyi,Gam Hyi
+Indus\n印第安座
+	Alp Ind,The Ind,Del Ind
+	The Ind,Bet Ind
+Lacerta\n蝎虎座
+	1 Lac,6 Lac,2 Lac,5 Lac,4 Lac,Alp Lac,Bet Lac
+Leo\n狮子座
+	Gam Leo,Eps Leo,Mu Leo,Zet Leo,Gam Leo,Eta Leo,Alp Leo,The Leo,Bet Leo,Del Leo,Gam Leo
+	Alp Leo,Omi Leo
+	The Leo,Iot Leo,Sig Leo
+Leo Minor\n小狮座
+	46 LMi,Bet LMi,21 LMi
+Lepus\n天兔座
+	Mu Lep,Alp Lep,Zet Lep,Eta Lep
+	Alp Lep,Bet Lep
+	Del Lep,Gam Lep,Bet Lep,Eps Lep
+Libra\n天秤座
+	Sig Lib,Bet Lib
+	48 Lib,The Lib,Eta Lib,Gam Lib,Bet Lib,Alp-2 Lib,Sig Lib,Ups Lib,Tau Lib
+Lupus\n豺狼座
+	The Lup,Eta Lup,Gam Lup,Eps Lup,Kap Lup,Zet Lup,Alp Lup,Bet Lup,Del Lup,Phi Lup,Chi Lup
+	Gam Lup,Del Lup
+Lynx\n天猫座
+	Alp Lyn,38 Lyn,31 Lyn,21 Lyn,15 Lyn,2 Lyn
+Lyra\n天琴座
+	Eps Lyr,Alp Lyr,Zet Lyr,Bet Lyr,Gam Lyr,Del Lyr,Zet Lyr
+	Alp Lyr,Kap Lyr
+Mensa\n山案座
+	Alp Men,Gam Men,Eta Men,Bet Men
+Microscopium\n显微镜座
+	The Mic,Eps Mic,Gam Mic,Alp Mic
+Monoceros\n麒麟座
+	Zet Mon,Alp Mon,Del Mon,Bet Mon,Gam Mon
+	Del Mon,18 Mon,8 Mon,13 Mon
+Musca\n苍蝇座
+	Del Mus,Alp Mus,Gam Mus
+	Bet Mus,Alp Mus,Eps Mus,Mu Mus
+Norma\n矩尺座
+	Eps Nor,Gam Nor,Gam-2 Nor,Eta Nor
+Octans\n南极座
+	Del Oct,Nu Oct,Eps Oct,Bet Oct,Del Oct
+Ophiuchus\n蛇夫座
+	Kap Oph,Alp Oph,Bet Oph,Eta Oph
+	45 Oph,The Oph,44 Oph,Xi Oph,Eta Oph,Zet Oph,Eps Oph,Del Oph,Kap Oph
+	Bet Oph,Gam Oph,67 Oph,70 Oph
+	Gam Oph,Nu Oph
+Orion\n猎户座
+	Xi Ori,Mu Ori,Alp Ori,Zet Ori,Kap Ori,Bet Ori,Del Ori,Gam Ori,Lam Ori,Alp Ori
+	Chi-2 Ori,Nu Ori,Xi Ori,68 Ori
+	Gam Ori,Pi-3 Ori,Pi-4 Ori,Pi-5 Ori,Pi-6 Ori
+	Pi-3 Ori,Pi-2 Ori,Pi Ori
+	Zet Ori,Eps Ori,Del Ori
+Pavo\n孔雀座
+	Alp Pav,Bet Pav,Ups Pav,Eps Pav,Zet Pav,Eta Pav,Pi Pav,Xi Pav,Lam Pav,Del Pav,Bet Pav,Gam Pav
+Pegasus\n飞马座
+	Eps Peg,The Peg,Zet Peg,Xi Peg,Alp Peg,Gam Peg
+	Kap Peg,Iot Peg,Eta Peg,Bet Peg,Mu Peg,Lam Peg,9 Peg
+	Alp Peg,Bet Peg,Alp And,Gam Peg
+Perseus\n英仙座
+	Alp Per,Gam Per,Eta Per
+	Alp Per,Iot Per,Kap Per,Bet Per,Rho Per,20 Per,16 Per
+	Alp Per,Psi Per,Del Per,Nu Per,Eps Per,Xi Per,Zet Per,Omi Per
+	Del Per,48 Per,Mu Per,Lam Per
+	Iot Per,The Per
+Phoenix\n凤凰座
+	Del Phe,Gam Phe,Nu Phe,Bet Phe,Alp Phe,Eps Phe,Bet Phe,Zet Phe,Del Phe
+Pictor\n绘架座
+	Alp Pic,Gam Pic,Bet Pic
+Pisces\n双鱼座
+	Tau Psc,Ups Psc,Phi Psc,Eta Psc,Omi Psc,Alp Psc,Nu Psc,Mu Psc,Eps Psc,Del Psc,Ome Psc,Iot Psc,The Psc,Gam Psc,Kap Psc,Lam Psc,Iot Psc
+Piscis Austrinus\n南鱼座
+	Alp PsA,Eps PsA,Lam PsA,The PsA,Iot PsA,Mu PsA,Bet PsA,Gam PsA,Del PsA,Alp PsA
+Puppis\n船舻座
+	Xi Pup,K Pup,Pi Pup,Nu Pup,Tau Pup,Sig Pup,Zet Pup
+	Rho Pup,11 Pup,Xi Pup
+	11 Pup,16 Pup
+Pyxis\n罗盤座
+	Bet Pyx,Alp Pyx,Gam Pyx
+Reticulum\n网罟座
+	Bet Ret,Alp Ret,Eps Ret,Iot Ret,Del Ret,Bet Ret
+Sagitta\n天箭座
+	Eta Sge,Gam Sge,Del Sge,Bet Sge
+	Del Sge,Alp Sge
+Sagittarius\n人马座
+	Phi Sgr,Del Sgr
+	Bet-2 Sgr,Iot Sgr,Alp Sgr
+	Iot Sgr,The Sgr,The-2 Sgr,62 Sgr,59 Sgr,52 Sgr,Psi Sgr,Tau Sgr,Zet Sgr,Phi Sgr,Sig Sgr,Tau Sgr
+	Sig Sgr,Omi Sgr,Pi Sgr,53 Sgr,Rho Sgr
+	Omi Sgr
+	Phi Sgr,Lam Sgr,Mu Sgr
+	Lam Sgr,Del Sgr,Eps Sgr,Eta Sgr
+	Del Sgr,Gam Sgr,3 Sgr
+	Zet Sgr,Eps Sgr,Gam Sgr
+Scorpius\n天蝎座
+	Del Sco,Sig Sco,Alp Sco,Tau Sco,Eps Sco,Mu Sco,Zet Sco,Eta Sco,The Sco,Iot Sco,Kap Sco,Lam Sco
+	Bet-2 Sco,Ome Sco,Nu Sco,11 Sco,Bet-2 Sco,Del Sco,Pi Sco,Rho Sco
+	Iot Sco,G Sco
+Sculptor\n玉夫座
+	Alp Scl,Iot Scl,Del Scl,Gam Scl,Bet Scl
+Scutum\n盾牌座
+	Bet Sct,Alp Sct,Gam Sct
+	Alp Sct,Zet Sct
+Serpens Caput\n巨蛇座蛇头
+	Mu Ser,Ome Ser,Eps Ser,Alp Ser,Del Ser,Bet Ser,Gam Ser,Kap Ser,Bet Ser
+Serpens Cauda\n巨蛇座蛇尾
+	Nu Ser,Xi Ser,Omi Ser
+	Omi Ser,Eta Ser,The Ser
+Sextans\n六分仪座
+	Bet Sex,Alp Sex,Gam Sex
+Taurus\n金牛座
+	Bet Tau,Tau Tau,Eps Tau,68 Tau,Del Tau,Gam Tau,The-2 Tau,Alp Tau,Zet Tau
+	Gam Tau,Lam Tau,47 Tau,Mu Tau,Nu Tau
+	Lam Tau,5 Tau,Xi Tau,Omi Tau
+	Alp Tau,Eps Tau
+Telescopium\n远镜座
+	Zet Tel,Alp Tel
+	Alp Tel,Eps Tel
+Triangulum\n三角座
+	Alp Tri,Eps Tri,Bet Tri,Gam Tri,Alp Tri
+Triangulum Australe\n南三角座
+	Bet TrA,Eps TrA,Gam TrA,Alp TrA,Bet TrA
+Tucana\n杜鹃座
+	Del Tuc,Alp Tuc,Gam Tuc,Eps Tuc,Zet Tuc,Bet Tuc,Gam Tuc
+Ursa Major\n大熊座
+	Eta UMa,Zet UMa,Eps UMa,Del UMa,Gam UMa,Bet UMa,Alp UMa,Del UMa
+Ursa Minor\n小熊座
+	Alp UMi,Del UMi,Eps UMi,Zet UMi,Bet UMi,Gam UMi,Eta UMi,Zet UMi
+Vela\n船帆座
+	Mu Vel,Psi Vel,Lam Vel,Gam-2 Vel,Del Vel,Kap Vel,Phi Vel,Mu Vel
+Virgo\n室女座
+	Bet Vir,Eta Vir,Gam Vir,Del Vir,Eps Vir
+	Del Vir,Zet Vir,Alp Vir,The Vir,Gam Vir
+	Zet Vir,Tau Vir,109 Vir
+	Alp Vir,Kap Vir,Iot Vir,Mu Vir
+Volans\n飞鱼座
+	Alp Vol,Bet Vol,Eps Vol,Del Vol,Gam Vol,Zet Vol,Eps Vol
+Vulpecula\n狐狸座
+	13 Vul,Alp Vul,1 Vul
