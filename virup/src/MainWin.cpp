@@ -735,7 +735,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	          .length();
 }
 
-void MainWin::renderGui(QSize const& targetSize)
+void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 {
 	// will get disabled by QOpenGLPaintDevice anyway
 	GLStateSet glState({{GL_DEPTH_TEST, false}});
@@ -760,15 +760,10 @@ void MainWin::renderGui(QSize const& targetSize)
 	str += tr("Scale (real meter / sim meter) : ")
 	       + QString::number(universe->getScale(), 'g', 5) + '\n';
 
-	QOpenGLPaintDevice d(size());
-	QPainter painter(&d);
-	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setRenderHint(QPainter::TextAntialiasing);
 	QPen pen(Qt::red);
 	painter.setPen(pen);
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
 	                 Qt::AlignLeft | Qt::AlignTop, str);
-	painter.end();
 }
 
 void MainWin::applyPostProcShaderParams(

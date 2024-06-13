@@ -51,7 +51,7 @@ void Credits::render(Camera const& camera, ToneMappingModel const& tmm)
 	shader.setUniform("color", QVector3D(10000.0, 0.0, 0.0));
 
 	auto size = tex->getSize();
-	shader.setUniform("aspectratio", size.width() / size.height());
+	shader.setUniform("aspectratio", size[0] / size[1]);
 
 	// Conserve credits center position and Keep parallel to view "up"
 	QMatrix4x4 model;
