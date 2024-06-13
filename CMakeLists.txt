@@ -243,6 +243,37 @@ endmacro()
 # Attempt to locate any packages that are required and report the missing ones in CONAN_REQUIRED_LIBS
 hydrogenvr_find_packages()
 
+
+# Determine OpenVR version
+set(OPENVR_HEADER "${OPENVR_INCLUDE_DIRS}/openvr/openvr.h")
+# Read the lines containing version information
+file(STRINGS ${OPENVR_HEADER} OPENVR_VERSION_LINES
+     REGEX "k_nSteamVRVersion(Major|Minor|Build)")
+# Initialize version components
+set(OPENVR_VERSION_MAJOR "0")
+set(OPENVR_VERSION_MINOR "0")
+set(OPENVR_VERSION_BUILD "0")
+# Extract the version components
+foreach(version_line ${OPENVR_VERSION_LINES})
+    if(version_line MATCHES "k_nSteamVRVersionMajor = ([0-9]+);")
+        set(OPENVR_VERSION_MAJOR "${CMAKE_MATCH_1}")
+    elseif(version_line MATCHES "k_nSteamVRVersionMinor = ([0-9]+);")
+        set(OPENVR_VERSION_MINOR "${CMAKE_MATCH_1}")
+    elseif(version_line MATCHES "k_nSteamVRVersionBuild = ([0-9]+);")
+        set(OPENVR_VERSION_BUILD "${CMAKE_MATCH_1}")
+    endif()
+endforeach()
+
+# Compose the full version string
+set(OPENVR_VERSION "${OPENVR_VERSION_MAJOR}.${OPENVR_VERSION_MINOR}.${OPENVR_VERSION_BUILD}")
+message(STATUS "OpenVR Version: ${OPENVR_VERSION}")
+
+# Pass OpenVR version to compiler
+add_definitions(-DOPENVR_VERSION_MAJOR=${OPENVR_VERSION_MAJOR})
+add_definitions(-DOPENVR_VERSION_MINOR=${OPENVR_VERSION_MINOR})
+add_definitions(-DOPENVR_VERSION_BUILD=${OPENVR_VERSION_BUILD})
+
+
 # Qt5 requires that we find individual component
 find_package(Qt5 COMPONENTS Widgets Concurrent Test Network)
 if(NOT Qt5_FOUND)

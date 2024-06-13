@@ -463,13 +463,18 @@ GLTexture::GLTexture(std::array<QString, 6> const& texturesPaths, bool sRGB)
 
 std::array<int, 3> GLTexture::getSize(unsigned int level) const
 {
+	GLenum target = glTarget;
+	if(type == Type::TEXCUBEMAP)
+	{
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+	}
 	GLint width, height, depth;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
-	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level, GL_TEXTURE_WIDTH,
+	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH,
 	                                          &width);
-	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level,
-	                                          GL_TEXTURE_HEIGHT, &height);
-	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level, GL_TEXTURE_DEPTH,
+	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT,
+	                                          &height);
+	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_DEPTH,
 	                                          &depth);
 	GLHandler::glf().glBindTexture(glTarget, 0);
 

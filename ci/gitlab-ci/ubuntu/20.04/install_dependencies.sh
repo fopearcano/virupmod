@@ -1,6 +1,6 @@
-#/bin/bash
+#!/bin/bash
 
-./ci/gitlab-ci/commons/install_dependencies.sh
+./ci/gitlab-ci/ubuntu/install_dependencies.sh
 cd deps;
 git clone https://github.com/Orochimarufan/PythonQt ;
 cd PythonQt ;

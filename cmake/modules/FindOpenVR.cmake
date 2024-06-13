@@ -69,4 +69,3 @@ endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OpenVR REQUIRED_VARS OPENVR_LIBRARIES OPENVR_INCLUDE_DIRS)
-

@@ -85,9 +85,9 @@ void Dialog3DWheel::vrEvent(VRHandler::Event const& e)
 	}
 }
 
-void Dialog3DWheel::render()
+void Dialog3DWheel::renderWheel()
 {
-	Dialog3D::render(vrHandler, tmm);
+	render(vrHandler, tmm);
 	for(auto d3d : dialog3Ds)
 	{
 		d3d->render(vrHandler, tmm);

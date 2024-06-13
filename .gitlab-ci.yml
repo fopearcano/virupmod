@@ -17,7 +17,7 @@ dockerbuild:focal:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/commons/install_dependencies.sh
+            - ci/gitlab-ci/ubuntu/install_dependencies.sh
             - ci/gitlab-ci/ubuntu/20.04/Dockerfile
             - ci/gitlab-ci/ubuntu/20.04/install_dependencies.sh
             - .gitlab-ci.yml
@@ -39,7 +39,7 @@ dockerbuild:jammy:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/commons/install_dependencies.sh
+            - ci/gitlab-ci/ubuntu/install_dependencies.sh
             - ci/gitlab-ci/ubuntu/22.04/Dockerfile
             - ci/gitlab-ci/ubuntu/22.04/install_dependencies.sh
             - .gitlab-ci.yml
@@ -51,6 +51,27 @@ dockerbuild:jammy:
         - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/install_dependencies.sh; fi
         - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:jammy -f ./ci/gitlab-ci/ubuntu/22.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:jammy
+
+dockerbuild:archlinux:
+    image: docker:20.10.15
+    services:
+      - docker:20.10.15-dind
+    stage: dockerbuild
+    only:
+        refs:
+            - pushes
+        changes:
+            - ci/gitlab-ci/archlinux/install_dependencies.sh
+            - ci/gitlab-ci/archlinux/Dockerfile
+            - .gitlab-ci.yml
+            - '**/ci/gitlab-ci/install_dependencies.sh'
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
+        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/install_dependencies.sh
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:archlinux -f ./ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
+        - docker push $CI_REGISTRY_IMAGE:archlinux
 
 build:focal:
     image: $CI_REGISTRY_IMAGE:focal
@@ -90,13 +111,21 @@ build:jammy:
             - build/*.deb
         expire_in: 1h
 
+build:archlinux:
+    image: $CI_REGISTRY_IMAGE:archlinux
+    stage: build
+    only:
+        - pushes
+    script:
+        - ./ci/gitlab-ci/archlinux/build.sh
+
 test:focal:
     image: ubuntu:20.04
     stage: test
     dependencies:
         - build:focal
     script:
-        - ./ci/gitlab-ci/commons/test_deb.sh
+        - ./ci/gitlab-ci/ubuntu/test_deb.sh
     artifacts:
         paths:
             - build/*.deb
@@ -108,7 +137,7 @@ test:jammy:
     dependencies:
         - build:jammy
     script:
-        - ./ci/gitlab-ci/commons/test_deb.sh
+        - ./ci/gitlab-ci/ubuntu/test_deb.sh
     artifacts:
         paths:
             - build/*.deb
@@ -121,7 +150,7 @@ checkcode:
         refs:
             - pushes
     script:
-        - ./ci/gitlab-ci/commons/checkcode.sh
+        - ./ci/gitlab-ci/ubuntu/checkcode.sh
 
 deploy:focal:
     image: registry.gitlab.com/gitlab-org/release-cli:latest

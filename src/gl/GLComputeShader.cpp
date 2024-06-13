@@ -56,11 +56,23 @@ void GLComputeShader::exec(
 		if(textures[i].second != DataAccessMode::SAMPLER)
 		{
 			GLint format;
-			GLHandler::glf().glGetTexLevelParameteriv(
-			    textures[i].first->getGLTarget(), 0, GL_TEXTURE_INTERNAL_FORMAT,
-			    &format);
+			GLboolean layered;
+			if(textures[i].first->getType() == GLTexture::Type::TEXCUBEMAP)
+			{
+				GLHandler::glf().glGetTexLevelParameteriv(
+				    GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0,
+				    GL_TEXTURE_INTERNAL_FORMAT, &format);
+				layered = GL_TRUE;
+			}
+			else
+			{
+				GLHandler::glf().glGetTexLevelParameteriv(
+				    textures[i].first->getGLTarget(), 0,
+				    GL_TEXTURE_INTERNAL_FORMAT, &format);
+				layered = GL_FALSE;
+			}
 			GLHandler::glf().glBindImageTexture(
-			    i, textures[i].first->getGLTexture(), 0, GL_FALSE, 0,
+			    i, textures[i].first->getGLTexture(), 0, layered, 0,
 			    textures[i].second, format);
 		}
 	}

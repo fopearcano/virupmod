@@ -45,7 +45,8 @@ void Renderer::init(Dialog3DWheel& dialog3dWheel)
 
 	auto defaultCam = std::make_unique<BasicCamera>(vrHandler);
 	defaultCam->lookAt({1, 1, 1}, {0, 0, 0}, {0, 0, 1});
-	appendSceneRenderPath("default", RenderPath(std::move(defaultCam)));
+	sceneRenderPipeline_.emplace_back("default",
+	                                  RenderPath(std::move(defaultCam)));
 
 	reloadPostProcessingTargets();
 	updateFOV();
@@ -129,6 +130,7 @@ QImage Renderer::getLastFrame() const
 
 void Renderer::appendSceneRenderPath(QString const& id, RenderPath path)
 {
+	path.camera->setPerspectiveProj(vFOV, getAspectRatioFromFOV());
 	sceneRenderPipeline_.emplace_back(id, std::move(path));
 }
 
@@ -246,7 +248,7 @@ void Renderer::renderVRControls() const
 	{
 		vrHandler.renderControllers();
 		vrHandler.renderHands();
-		dialog3dWheel->render();
+		dialog3dWheel->renderWheel();
 	}
 }
 

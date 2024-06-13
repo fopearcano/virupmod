@@ -30,7 +30,7 @@ class Dialog3DWheel : public Dialog3D
 	Dialog3DWheel(VRHandler const& vrHandler, ToneMappingModel const& tmm);
 	void addDialog3D(QString const& name, Dialog3D& dialog3d);
 	void vrEvent(VRHandler::Event const& e);
-	void render();
+	void renderWheel();
 
   private:
 	VRHandler const& vrHandler;
