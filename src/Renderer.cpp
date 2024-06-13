@@ -19,6 +19,8 @@
 #include "Renderer.hpp"
 
 #include "AbstractMainWin.hpp"
+#include "paint/AdvancedPainter.hpp"
+#include "paint/OpenGL4PaintDevice.hpp"
 
 Renderer::Renderer(AbstractMainWin& window, VRHandler& vrHandler)
     : window(window)
@@ -573,8 +575,30 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 		mainRenderTarget->postProcessingTargets
 		    .at(postProcessingPipeline_.size() % 2)
 		    .bind();
-		window.renderGui(
-		    mainRenderTarget->postProcessingTargets.at(0).getSize());
+
+		// render GUI
+		{
+			auto targetSize(
+			    mainRenderTarget->postProcessingTargets.at(0).getSize());
+
+			// will get disabled by QOpenGLPaintDevice anyway
+			GLStateSet glState({{GL_DEPTH_TEST, false}});
+			OpenGL4PaintDevice d(targetSize);
+			AdvancedPainter painter(&d);
+			painter.setRenderHint(QPainter::Antialiasing);
+			painter.setRenderHint(QPainter::TextAntialiasing);
+
+			int screenHeight(window.screen()->geometry().height()
+			                 * window.screen()->devicePixelRatio());
+			QFont font = painter.font();
+			font.setPointSize(font.pointSize() * screenHeight / 1080);
+			painter.setFont(font);
+			painter.beginNativePainting();
+			window.renderGui(targetSize, painter);
+
+			painter.endNativePainting();
+		}
+
 		// blit result on screen
 		mainRenderTarget->postProcessingTargets
 		    .at(postProcessingPipeline_.size() % 2)

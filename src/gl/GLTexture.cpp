@@ -461,17 +461,19 @@ GLTexture::GLTexture(std::array<QString, 6> const& texturesPaths, bool sRGB)
 {
 }
 
-QSize GLTexture::getSize(unsigned int level) const
+std::array<int, 3> GLTexture::getSize(unsigned int level) const
 {
-	GLint width, height;
+	GLint width, height, depth;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level, GL_TEXTURE_WIDTH,
 	                                          &width);
 	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level,
 	                                          GL_TEXTURE_HEIGHT, &height);
+	GLHandler::glf().glGetTexLevelParameteriv(glTarget, level, GL_TEXTURE_DEPTH,
+	                                          &depth);
 	GLHandler::glf().glBindTexture(glTarget, 0);
 
-	return {width, height};
+	return {width, height, depth};
 }
 
 QString GLTexture::getTypeStr() const
@@ -509,14 +511,16 @@ void GLTexture::generateMipmap(unsigned int baseLevel,
 
 unsigned int GLTexture::getHighestMipmapLevel() const
 {
-	QSize size(getSize());
+	auto s(getSize());
+	QSize size(s[0], s[1]);
 	return static_cast<unsigned int>(
 	    log2(size.width() > size.height() ? size.width() : size.height()));
 }
 
 QImage GLTexture::getContentAsImage(unsigned int level) const
 {
-	QSize size(getSize(level));
+	auto s(getSize(level));
+	QSize size(s[0], s[1]);
 
 	GLint internalFormat;
 	GLenum target(glTarget);
@@ -562,7 +566,8 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 
 std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 {
-	QSize size(getSize(level));
+	auto s(getSize(level));
+	QSize size(s[0], s[1]);
 
 	GLint internalFormat;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
@@ -583,7 +588,8 @@ float GLTexture::getAverageLuminance() const
 {
 	generateMipmap();
 	unsigned int lvl = getHighestMipmapLevel() - 3;
-	auto size        = getSize(lvl);
+	auto s(getSize(lvl));
+	QSize size(s[0], s[1]);
 	auto buff(getContentAsData(lvl));
 	float lastFrameAverageLuminance = 0.f;
 	if(!buff.empty())

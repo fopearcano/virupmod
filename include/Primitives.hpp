@@ -26,6 +26,7 @@ class Primitives
   public:
 	Primitives() = delete;
 
+	// defined on x,y; -0.5->0.5
 	static void setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
 	                      PrimitiveType primitiveType
 	                      = PrimitiveType::TRIANGLE_STRIP);

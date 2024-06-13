@@ -24,6 +24,7 @@
 #include "Renderer.hpp"
 #include "RenderingWindow.hpp"
 #include "ShaderProgram.hpp"
+#include "Timings.hpp"
 #include "ToneMappingModel.hpp"
 #include "camera/BasicCamera.hpp"
 #include "camera/DebugCamera.hpp"
@@ -32,6 +33,7 @@
 #include "gui/ShaderSelector.hpp"
 #include "gui/textures/TextureSelector.hpp"
 #include "memory.hpp"
+#include "paint/AdvancedPainter.hpp"
 #include "vr/OpenVRHandler.hpp"
 #include "vr/StereoBeamerHandler.hpp"
 
@@ -119,6 +121,12 @@ class AbstractMainWin : public RenderingWindow
 	 */
 	Q_PROPERTY(bool wireframe READ getWireframe WRITE setWireframe)
 	/**
+	 * @brief Wether the engine renders diagnostics data or not.
+	 *
+	 * @accessors getDiagnostics(), setDiagnostics()
+	 */
+	Q_PROPERTY(bool diagnostics READ getDiagnostics WRITE setDiagnostics)
+	/**
 	 * @brief Wether VR mode is enabled or not.
 	 *
 	 * @accessors vrIsEnabled(), setVR()
@@ -187,6 +195,14 @@ class AbstractMainWin : public RenderingWindow
 	 */
 	void setWireframe(bool wireframe) { renderer.wireframe = wireframe; };
 	/**
+	 * @getter{diagnostics}
+	 */
+	bool getDiagnostics() const { return diagnostics; };
+	/**
+	 * @setter{diagnostics}
+	 */
+	void setDiagnostics(bool diagnostics) { this->diagnostics = diagnostics; };
+	/**
 	 * @getter{vr}
 	 */
 	bool vrIsEnabled() const;
@@ -210,6 +226,10 @@ class AbstractMainWin : public RenderingWindow
 	 * @toggle{wireframe}
 	 */
 	void toggleWireframe();
+	/**
+	 * @toggle{diagnostics}
+	 */
+	void toggleDiagnostics();
 	void toggleCalibrationCompass() { renderer.toggleCalibrationCompass(); };
 	void toggleCalibrationCompassMode()
 	{
@@ -335,7 +355,7 @@ class AbstractMainWin : public RenderingWindow
 	virtual void renderScene(BasicCamera const& camera, QString const& pathId)
 	    = 0;
 
-	virtual void renderGui(QSize const& /*targetSize*/){};
+	virtual void renderGui(QSize const& targetSize, AdvancedPainter& painter);
 	/**
 	 * @brief Gets called before applying a specific post-processing shader.
 	 *
@@ -423,6 +443,15 @@ class AbstractMainWin : public RenderingWindow
 
 	std::unique_ptr<ShaderSelector> shaderSelector;
 	std::unique_ptr<TextureSelector> textureSelector;
+
+	bool diagnostics = false;
+	// FPS plotter
+	std::array<float, 256> fpsHistory   = {};
+	unsigned int currentFrame           = 0;
+	float avgFPS                        = 0.f;
+	const unsigned int avgFPSWindowSize = 10;
+	// timings
+	QList<QPair<QString, QPair<uint64_t, uint64_t>>> timingsNs;
 
   private:
 	void initializeGL();

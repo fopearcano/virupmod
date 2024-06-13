@@ -61,6 +61,7 @@ class GLFramebufferObject
 
 	// screen
 	GLFramebufferObject() { ++instancesCount(); };
+	explicit GLFramebufferObject(GLTexture&& colorAttachment, int level = 0);
 	explicit GLFramebufferObject(GLTexture::Tex1DProperties const& properties,
 	                             GLTexture::Sampler const& sampler
 	                             = {GL_LINEAR, GL_MIRRORED_REPEAT});
@@ -85,8 +86,20 @@ class GLFramebufferObject
 	{
 		return *texColorBuffer;
 	};
+	void setColorAttachmentTexture(std::unique_ptr<GLTexture>&& texture)
+	{
+		texColorBuffer = std::move(texture);
+	}
+	std::unique_ptr<GLTexture> detachColorAttachmentTexture()
+	{
+		return std::move(texColorBuffer);
+	}
 	void bind(GLTexture::CubemapFace face = GLTexture::CubemapFace::FRONT,
 	          GLint layer                 = 0) const;
+	void blitColorBufferToCurrent() const;
+	void blitColorBufferToCurrent(int srcX0, int srcY0, int srcX1, int srcY1,
+	                              int dstX0, int dstY0, int dstX1,
+	                              int dstY1) const;
 	void blitColorBufferTo(GLFramebufferObject const& to) const;
 	void blitColorBufferTo(GLFramebufferObject const& to, int srcX0, int srcY0,
 	                       int srcX1, int srcY1, int dstX0, int dstY0,
@@ -121,6 +134,26 @@ class GLFramebufferObject
 
 	virtual ~GLFramebufferObject() { cleanUp(); };
 
+	/**
+	 * @brief Returns the size of the currently bound FBO
+	 */
+	static std::array<int, 3> getCurrentSize();
+
+	/**
+	 * @brief Saves the currently bound read/draw FBOs ids onto the bind stack.
+	 */
+	static void pushCurrentOnBindStack();
+	/**
+	 * @brief Restores the currently bound read/draw FBOs ids from the bind
+	 * stack but doesn't pop the stack.
+	 */
+	static void applyCurrentFromBindStack();
+	/**
+	 * @brief Restores the currently bound read/draw FBOs ids from the bind
+	 * stack and pops the stack.
+	 */
+	static void popCurrentFromBindStack();
+
   protected:
 	/**
 	 * @brief Frees the underlying OpenGL buffers.
@@ -139,6 +172,8 @@ class GLFramebufferObject
 
 	bool doClean = true;
 	static unsigned int& instancesCount();
+
+	static QList<QPair<GLint, GLint>>& bindStack();
 };
 
 #endif // GLFRAMEBUFFEROBJECT_HPP

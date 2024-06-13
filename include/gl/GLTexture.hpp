@@ -262,7 +262,7 @@ class GLTexture
 	QString getName() const { return name; };
 	void setName(QString const& name) { this->name = name; };
 	// level = level of mipmapping
-	QSize getSize(unsigned int level = 0) const;
+	std::array<int, 3> getSize(unsigned int level = 0) const;
 	Type getType() const { return type; };
 	QString getTypeStr() const;
 	QMap<QString, QVariant> const& getMetadata() const { return metadata; };

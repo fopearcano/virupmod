@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Checking if at least three arguments are passed
-if [ $# -lt 3 ]
+if [ $# -lt 2 ]
 then
-    echo "Usage: $0 <command> <dir_paths> <file1> [file2] ..."
+    echo "Usage: $0 <command> <dir_paths> [file1] [file2] ..."
     exit 1
 fi
 

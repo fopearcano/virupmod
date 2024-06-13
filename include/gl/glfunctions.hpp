@@ -38,7 +38,7 @@
 	CAT(CAT(CAT(CAT(CAT(QOpenGLFunctions_, OPENGL_MAJOR_VERSION), _), \
 	            OPENGL_MINOR_VERSION),                                \
 	        _),                                                       \
-	    OPENGL_PROFILE)
+	    Core)
 
 #define QSURFACEFORMATPROFILE CAT(OPENGL_PROFILE, Profile)
 

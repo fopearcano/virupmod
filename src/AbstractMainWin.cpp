@@ -176,6 +176,10 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action const& a,
 	{
 		toggleWireframe();
 	}
+	else if(a.id == "togglediagnostics")
+	{
+		toggleDiagnostics();
+	}
 	else if(a.id == "reloadpythonengine")
 	{
 		reloadPythonEngine();
@@ -301,6 +305,39 @@ void AbstractMainWin::setupPythonAPI()
 	PythonQtHandler::addObject("HydrogenVR", this);
 }
 
+void AbstractMainWin::renderGui(QSize const& targetSize,
+                                AdvancedPainter& painter)
+{
+	if(!diagnostics)
+	{
+		return;
+	}
+
+	painter.setPen(QPen{Qt::blue});
+	painter.drawFunction({10, 10, 256, 256}, 0, fpsHistory.size(), 0, 120.f,
+	                     [this](float x)
+	                     {
+		                     return fpsHistory.at(
+		                         static_cast<int>(floor(x + currentFrame + 1))
+		                         % fpsHistory.size());
+	                     });
+	painter.setPen(QPen{Qt::red});
+	painter.drawRect(QRect{10, 10, 256, 256});
+
+	QString timingsStr;
+	for(auto const& pair : timingsNs)
+	{
+		timingsStr += pair.first + ": "
+		              + QString::number(pair.second.first / 1.e6f) + "CPUms "
+		              + QString::number(pair.second.second / 1.e6f) + "GPUms\n";
+	}
+	timingsStr += "Full frame (full loop): "
+	              + QString::number(frameTiming * 1.e3f) + "ms\n";
+	painter.drawText(
+	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 256},
+	    timingsStr);
+}
+
 void AbstractMainWin::applyPostProcShaderParams(
     QString const& id, GLShaderProgram const& shader,
     GLFramebufferObject const& /*currentTarget*/) const
@@ -364,6 +401,11 @@ std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
 void AbstractMainWin::toggleWireframe()
 {
 	setWireframe(!getWireframe());
+}
+
+void AbstractMainWin::toggleDiagnostics()
+{
+	setDiagnostics(!getDiagnostics());
 }
 
 void AbstractMainWin::initializeGL()
@@ -510,6 +552,8 @@ void AbstractMainWin::paintGL()
 		initializeGL();
 	}
 
+	Timings::start("Full frame (no swap)");
+
 	if(!videomode)
 	{
 		frameTiming_ = frameTimer.nsecsElapsed() * 1.e-9f;
@@ -520,8 +564,19 @@ void AbstractMainWin::paintGL()
 	}
 	frameTimer.restart();
 
-	setTitle(QString(PROJECT_NAME) + " - "
-	         + QString::number(round(1.f / frameTiming)) + " FPS");
+	// update fps history
+	float curVal = 1.f / frameTiming;
+	avgFPS
+	    -= fpsHistory.at((currentFrame - avgFPSWindowSize) % fpsHistory.size())
+	       / avgFPSWindowSize;
+	avgFPS += curVal / avgFPSWindowSize;
+
+	fpsHistory.at(currentFrame % fpsHistory.size()) = curVal;
+	++currentFrame;
+	currentFrame = currentFrame % fpsHistory.size();
+
+	setTitle(QString(PROJECT_NAME) + " - " + QString::number(round(avgFPS))
+	         + " FPS");
 
 	// update menubar visibility
 	auto cursorPos(QCursor::pos() - position());
@@ -785,12 +840,17 @@ void AbstractMainWin::paintGL()
 		currentVideoFrame++;
 	}
 
+	Timings::end("Full frame (no swap)");
 	// Trigger a repaint immediatly
 	m_context.swapBuffers(this);
 	for(auto const& w : secondaryWindows)
 	{
 		m_context.swapBuffers(w.get());
 	}
+
+	// Retrieve GPU timings after swapBuffers to use swapBuffers as the CPU/GPU
+	// sync, otherwise we would need to wait for the result then swapBuffers.
+	timingsNs = Timings::getTimingsNanosecond();
 }
 
 AbstractMainWin::~AbstractMainWin()
@@ -802,6 +862,8 @@ AbstractMainWin::~AbstractMainWin()
 	    "if \"cleanUpScene\" in dir():\n\tcleanUpScene()");
 	vrHandler->close();
 	PythonQtHandler::clean();
+
+	Timings::cleanUp();
 }
 
 void AbstractMainWin::reloadBloomTargets()

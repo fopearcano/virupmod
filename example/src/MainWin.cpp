@@ -453,27 +453,25 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	largeGridMesh->render();*/
 }
 
-void MainWin::renderGui(QSize const& targetSize)
+void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 {
-	// will get disabled by QOpenGLPaintDevice anyway
-	GLStateSet glState({{GL_DEPTH_TEST, false}});
-	QOpenGLPaintDevice d(targetSize);
-	QPainter painter(&d);
-	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setRenderHint(QPainter::TextAntialiasing);
-
-	int screenHeight(this->screen()->geometry().height()
-	                 * this->screen()->devicePixelRatio());
-	QFont font = painter.font();
-	font.setPointSize(font.pointSize() * screenHeight / 1080);
-	painter.setFont(font);
-
-	QPen pen(Qt::red);
-	painter.setPen(pen);
+	painter.setPen(QPen{Qt::red});
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
 	                 Qt::AlignRight | Qt::AlignBottom,
 	                 QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION));
-	painter.end();
+	painter.setPen(QPen{Qt::green});
+	painter.drawRects(QVector<QRect>{{0, 0, 64, 64}, {64, 64, 64, 64}});
+	QImage image("data/example/images/cc.png");
+	QRectF target(256.0, 0.0, image.width(), image.height());
+	QRectF source(image.width() * 0.5, 0.0, image.width() * 0.5,
+	              image.height() * 0.5);
+	painter.drawImage(target, image, source);
+
+	painter.setPen(QPen{Qt::blue});
+	QRectF r{128, 128, 128, 128};
+	painter.drawEllipse(r);
+
+	AbstractMainWin::renderGui(targetSize, painter);
 }
 
 void MainWin::applyPostProcShaderParams(

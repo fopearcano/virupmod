@@ -25,6 +25,7 @@
 #include "gl/GLFramebufferObject.hpp"
 #include "gl/GLMesh.hpp"
 #include "gl/GLPixelBufferObject.hpp"
+#include "gl/GLQuery.hpp"
 #include "gl/GLShaderProgram.hpp"
 #include "gl/GLStateSet.hpp"
 #include "gl/GLTexture.hpp"

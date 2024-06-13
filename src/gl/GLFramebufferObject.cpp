@@ -28,6 +28,29 @@ unsigned int& GLFramebufferObject::instancesCount()
 	return instancesCount;
 }
 
+QList<QPair<GLint, GLint>>& GLFramebufferObject::bindStack()
+{
+	static QList<QPair<GLint, GLint>> bindStack;
+	return bindStack;
+}
+
+GLFramebufferObject::GLFramebufferObject(GLTexture&& colorAttachment, int level)
+    : width(colorAttachment.getSize()[0])
+    , height(colorAttachment.getSize()[1])
+    , depth(colorAttachment.getSize()[2])
+{
+	++instancesCount();
+
+	GLHandler::glf().glGenFramebuffers(1, &fbo);
+	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	// bind texture to framebuffer
+	texColorBuffer = std::make_unique<GLTexture>(std::move(colorAttachment));
+	GLHandler::glf().glFramebufferTexture2D(
+	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texColorBuffer->getGLTarget(),
+	    texColorBuffer->getGLTexture(), level);
+}
+
 GLFramebufferObject::GLFramebufferObject(GLFramebufferObject&& other) noexcept
     : fbo(other.fbo)
     , texColorBuffer(std::move(other.texColorBuffer))
@@ -247,6 +270,24 @@ void GLFramebufferObject::bind(GLTexture::CubemapFace face, GLint layer) const
 	}
 }
 
+void GLFramebufferObject::blitColorBufferToCurrent() const
+{
+	auto curSize(getCurrentSize());
+	// Now 'width' and 'height' hold the dimensions of the color attachment
+	blitColorBufferToCurrent(0, 0, width, height, 0, 0, curSize[0], curSize[1]);
+}
+
+void GLFramebufferObject::blitColorBufferToCurrent(int srcX0, int srcY0,
+                                                   int srcX1, int srcY1,
+                                                   int dstX0, int dstY0,
+                                                   int dstX1, int dstY1) const
+{
+	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	GLHandler::glf().glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0,
+	                                   dstX1, dstY1, GL_COLOR_BUFFER_BIT,
+	                                   GL_LINEAR);
+}
+
 void GLFramebufferObject::blitColorBufferTo(GLFramebufferObject const& to) const
 {
 	blitColorBufferTo(to, 0, 0, width, height, 0, 0, to.width, to.height);
@@ -263,6 +304,7 @@ void GLFramebufferObject::blitColorBufferTo(GLFramebufferObject const& to,
 	                                   dstX1, dstY1, GL_COLOR_BUFFER_BIT,
 	                                   GL_LINEAR);
 }
+
 void GLFramebufferObject::blitDepthBufferTo(GLFramebufferObject const& to) const
 {
 	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -309,8 +351,70 @@ void GLFramebufferObject::cleanUp()
 		return;
 	}
 	--instancesCount();
-	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	GLHandler::glf().glDeleteRenderbuffers(1, &renderBuffer);
 	GLHandler::glf().glDeleteFramebuffers(1, &fbo);
 	doClean = false;
+}
+
+std::array<int, 3> GLFramebufferObject::getCurrentSize()
+{
+	// Get the object name bound to the color attachment
+	GLint attachmentObjectName;
+	GLHandler::glf().glGetFramebufferAttachmentParameteriv(
+	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+	    GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &attachmentObjectName);
+
+	// Check if the attachment is a texture or renderbuffer
+	GLint attachmentObjectType;
+	GLHandler::glf().glGetFramebufferAttachmentParameteriv(
+	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+	    GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &attachmentObjectType);
+
+	GLint curWidth = -1, curHeight = -1, curDepth = -1;
+	if(attachmentObjectType == GL_TEXTURE)
+	{
+		// TODO(florian) get the correct glTarget!
+		// Bind the texture and get its size
+		GLHandler::glf().glBindTexture(GL_TEXTURE_2D, attachmentObjectName);
+		GLHandler::glf().glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+		                                          GL_TEXTURE_WIDTH, &curWidth);
+		GLHandler::glf().glGetTexLevelParameteriv(
+		    GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &curHeight);
+		GLHandler::glf().glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+		                                          GL_TEXTURE_HEIGHT, &curDepth);
+	}
+	else if(attachmentObjectType == GL_RENDERBUFFER)
+	{
+		// Bind the renderbuffer and get its size
+		GLHandler::glf().glBindRenderbuffer(GL_RENDERBUFFER,
+		                                    attachmentObjectName);
+		GLHandler::glf().glGetRenderbufferParameteriv(
+		    GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &curWidth);
+		GLHandler::glf().glGetRenderbufferParameteriv(
+		    GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &curHeight);
+		curDepth = 1;
+	}
+
+	return {curWidth, curHeight, curDepth};
+}
+
+void GLFramebufferObject::pushCurrentOnBindStack()
+{
+	GLint curFboR, curFboW;
+	GLHandler::glf().glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &curFboR);
+	GLHandler::glf().glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &curFboW);
+	bindStack().push_back({curFboR, curFboW});
+}
+
+void GLFramebufferObject::applyCurrentFromBindStack()
+{
+	auto pair = bindStack().back();
+	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, pair.first);
+	GLHandler::glf().glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pair.second);
+}
+
+void GLFramebufferObject::popCurrentFromBindStack()
+{
+	applyCurrentFromBindStack();
+	bindStack().pop_back();
 }

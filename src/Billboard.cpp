@@ -50,15 +50,17 @@ Billboard::Billboard(GLTexture&& texture, GLShaderProgram&& shader)
 {
 	Primitives::setAsQuad(quad, this->shader, PrimitiveType::TRIANGLE_STRIP);
 
-	if(tex.getSize().width() > tex.getSize().height())
+	auto s(tex.getSize());
+	QSize size(s[0], s[1]);
+
+	if(size.width() > size.height())
 	{
-		aspectratio.scale(1.f, static_cast<float>(tex.getSize().height())
-		                           / tex.getSize().width());
+		aspectratio.scale(1.f,
+		                  static_cast<float>(size.height()) / size.width());
 	}
 	else
 	{
-		aspectratio.scale(static_cast<float>(tex.getSize().width())
-		                      / tex.getSize().height(),
+		aspectratio.scale(static_cast<float>(size.width()) / size.height(),
 		                  1.f);
 	}
 }
