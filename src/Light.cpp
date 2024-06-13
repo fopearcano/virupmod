@@ -33,6 +33,7 @@ Light::Light()
     , shadowShader("shadow")
     , def("default")
 {
+	shadowMap.setColorAttachmentName("ShadowMap");
 	Primitives::setAsUnitSphere(mesh, def, 100, 100);
 }
 

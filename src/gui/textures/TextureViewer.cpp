@@ -55,6 +55,11 @@ void TextureViewer::render()
 	shader.use();
 	GLStateSet glState({{GL_CULL_FACE, false}});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
+
+	// crappy way to force update
+	auto size = geometry().size();
+	resize(size.width() + 1, size.height() + 1);
+	resize(size.width(), size.height());
 }
 
 TextureDisplayWindow& TextureViewer::getTextureDisplayWindow()

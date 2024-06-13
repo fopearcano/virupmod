@@ -35,6 +35,7 @@ class Model
 	      QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
 	GLShaderProgram const& getShader() const { return shader; };
 	float getBoundingSphereRadius() { return boundingSphereRadius; };
+	std::vector<std::pair<GLMesh const&, QMatrix4x4>> getMeshes() const;
 	void generateShadowMap(QMatrix4x4 const& model, Light& light);
 	// cameraPosition : in same space as geometricSpace
 	void render(QVector3D const& cameraPosition,

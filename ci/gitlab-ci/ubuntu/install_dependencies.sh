@@ -5,10 +5,10 @@ DEBIAN_FRONTEND=noninteractive apt-get install -yq build-essential wget cmake gi
 
 mkdir deps ; cd deps
 # install leap motion sdk
-wget --no-verbose --content-disposition https://warehouse.leapmotion.com/apps/4185/download ;
-tar xzf Leap_Motion_SDK_Linux_*.tgz ;
-cp ./LeapDeveloperKit*/LeapSDK/include/Leap*.h /usr/include ;
-cp ./LeapDeveloperKit*/LeapSDK/lib/x64/libLeap.so /usr/lib ;
+#wget --no-verbose --content-disposition https://warehouse.leapmotion.com/apps/4185/download ;
+#tar xzf Leap_Motion_SDK_Linux_*.tgz ;
+#cp ./LeapDeveloperKit*/LeapSDK/include/Leap*.h /usr/include ;
+#cp ./LeapDeveloperKit*/LeapSDK/lib/x64/libLeap.so /usr/lib ;
 # install libktx
 git clone --branch v4.2.1 https://github.com/KhronosGroup/KTX-Software.git
 mkdir KTX-Software/build ; cd KTX-Software/build

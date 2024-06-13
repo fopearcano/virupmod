@@ -371,7 +371,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	movingCube->update();
 
 	modelModel = QMatrix4x4();
-	modelModel.scale(0.5 / model->getBoundingSphereRadius());
+	modelModel.scale(1.5 / model->getBoundingSphereRadius());
 	float secs(timer.elapsed() / 5000.f);
 	light->color
 	    = QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0) / 255.f;

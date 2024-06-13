@@ -86,6 +86,10 @@ class GLFramebufferObject
 	{
 		return *texColorBuffer;
 	};
+	void setColorAttachmentName(QString const& name)
+	{
+		texColorBuffer->setName(name);
+	};
 	void setColorAttachmentTexture(std::unique_ptr<GLTexture>&& texture)
 	{
 		texColorBuffer = std::move(texture);

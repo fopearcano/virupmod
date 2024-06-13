@@ -56,6 +56,16 @@ Model::Model(QString const& modelName, GLShaderProgram&& shader,
 	this->shader.setUniform("shadowmap", 8);
 }
 
+std::vector<std::pair<GLMesh const&, QMatrix4x4>> Model::getMeshes() const
+{
+	std::vector<std::pair<GLMesh const&, QMatrix4x4>> result;
+	for(auto const& mesh : meshes)
+	{
+		result.emplace_back(mesh.mesh, mesh.transform);
+	}
+	return result;
+}
+
 void Model::generateShadowMap(QMatrix4x4 const& model, Light& light)
 {
 	std::vector<GLMesh const*> glMeshes;

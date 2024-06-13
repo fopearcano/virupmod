@@ -27,6 +27,8 @@ class FPSCamera : public BasicCamera
 {
   public:
 	FPSCamera(VRHandler const& vrHandler);
+	QVector3D getPosition() const { return position; };
+	void setPosition(QVector3D const& position) { this->position = position; };
 	void actionEvent(BaseInputManager::Action const& a, bool pressed);
 	void mousePressEvent(QMouseEvent* e, QRect const& winGeometry);
 	void mouseReleaseEvent(QMouseEvent* e);

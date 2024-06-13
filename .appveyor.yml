@@ -49,7 +49,7 @@ install:
 
 cache:
     - '%APPVEYOR_BUILD_FOLDER%\deps\openvr -> **\install_scripts\openvr.bat'
-    - '%APPVEYOR_BUILD_FOLDER%\deps\leap -> **\install_scripts\leap.bat'
+    #- '%APPVEYOR_BUILD_FOLDER%\deps\leap -> **\install_scripts\leap.bat'
     - '%APPVEYOR_BUILD_FOLDER%\deps\pythonqt -> **\install_scripts\pythonqt.bat'
     - '%APPVEYOR_BUILD_FOLDER%\deps\assimp -> **\install_scripts\assimp.bat'
     - '%APPVEYOR_BUILD_FOLDER%\deps\KTX-Software -> **\install_scripts\libktx.bat'
@@ -106,7 +106,7 @@ after_build:
     - copy %OPENVR_SHARED% %RELEASE_DIR%
     - copy %ASSIMP_SHARED% %RELEASE_DIR%
     - copy %LIBKTX_SHARED% %RELEASE_DIR%
-    - copy %LEAPMOTION_SHARED% %RELEASE_DIR%
+    # - copy %LEAPMOTION_SHARED% %RELEASE_DIR%
     - copy %PYTHON_PATH%\python37.dll %RELEASE_DIR%
     - copy %PYTHONQT_SHARED% %RELEASE_DIR%
     - copy %PYTHONQT_QTALL_SHARED% %RELEASE_DIR%
