@@ -42,22 +42,22 @@ GLComputeShader::GLComputeShader(QString const& fileName,
 	}
 }
 
-void GLComputeShader::exec(
-    std::vector<std::pair<GLTexture const*, DataAccessMode>> const& textures,
-    std::array<unsigned int, 3> const& globalGroupSize,
-    bool waitForFinish) const
+void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
+                           std::array<unsigned int, 3> const& globalGroupSize,
+                           bool waitForFinish) const
 {
 	use();
 
-	for(unsigned int i(0); i < textures.size(); ++i)
+	for(unsigned int i(0); i < textureBindings.size(); ++i)
 	{
-		textures[i].first->use(GL_TEXTURE0 + i);
+		auto const& binding(textureBindings[i]);
+		binding.texture.use(GL_TEXTURE0 + i);
 
-		if(textures[i].second != DataAccessMode::SAMPLER)
+		if(binding.accessMode != DataAccessMode::SAMPLER)
 		{
 			GLint format;
 			GLboolean layered;
-			if(textures[i].first->getType() == GLTexture::Type::TEXCUBEMAP)
+			if(binding.texture.getType() == GLTexture::Type::TEXCUBEMAP)
 			{
 				GLHandler::glf().glGetTexLevelParameteriv(
 				    GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0,
@@ -67,13 +67,13 @@ void GLComputeShader::exec(
 			else
 			{
 				GLHandler::glf().glGetTexLevelParameteriv(
-				    textures[i].first->getGLTarget(), 0,
+				    binding.texture.getGLTarget(), 0,
 				    GL_TEXTURE_INTERNAL_FORMAT, &format);
 				layered = GL_FALSE;
 			}
 			GLHandler::glf().glBindImageTexture(
-			    i, textures[i].first->getGLTexture(), 0, layered, 0,
-			    textures[i].second, format);
+			    i, binding.texture.getGLTexture(), binding.level, layered, 0,
+			    binding.accessMode, format);
 		}
 	}
 	std::array<unsigned int, 3> dispatchSize{};

@@ -82,7 +82,8 @@ bool BasicCamera::shouldBeCulledBoudingSphere(QString const& angleShift,
 {
 	for(unsigned int i(0); i < 6; ++i)
 	{
-		if(QVector4D::dotProduct(clippingPlanes[angleShift].at(i), center)
+		if(QVector4D::dotProduct(clippingPlanes[angleShift].at(i),
+		                         QVector4D(center, 1.0))
 		   < -radius)
 		{
 			return true;
@@ -196,19 +197,26 @@ void BasicCamera::updateClippingPlanes(QMatrix4x4 const& angleShiftMat)
 	// planes from the world-view-projection matrix.
 	// http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
 	clippingPlanes[k][LEFT_PLANE]
-	    = (fullTransform.row(3) + fullTransform.row(0)).normalized();
+	    = (fullTransform.row(3) + fullTransform.row(0));
 	clippingPlanes[k][RIGHT_PLANE]
-	    = (fullTransform.row(3) - fullTransform.row(0)).normalized();
+	    = (fullTransform.row(3) - fullTransform.row(0));
 
 	clippingPlanes[k][BOTTOM_PLANE]
-	    = (fullTransform.row(3) + fullTransform.row(1)).normalized();
+	    = (fullTransform.row(3) + fullTransform.row(1));
 	clippingPlanes[k][TOP_PLANE]
-	    = (fullTransform.row(3) - fullTransform.row(1)).normalized();
+	    = (fullTransform.row(3) - fullTransform.row(1));
 
 	clippingPlanes[k][NEAR_PLANE]
-	    = (fullTransform.row(3) + fullTransform.row(2)).normalized();
+	    = (fullTransform.row(3) + fullTransform.row(2));
 	clippingPlanes[k][FAR_PLANE]
-	    = (fullTransform.row(3) - fullTransform.row(2)).normalized();
+	    = (fullTransform.row(3) - fullTransform.row(2));
+
+	// normalize
+	for(auto& plane : clippingPlanes[k])
+	{
+		auto l = plane.toVector3D().length();
+		plane /= l;
+	}
 }
 
 QVector3D BasicCamera::getWorldSpacePosition() const

@@ -572,7 +572,6 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 {
 	auto s(getSize(level));
-	QSize size(s[0], s[1]);
 
 	GLint internalFormat;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
@@ -582,8 +581,14 @@ std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 	std::vector<GLfloat> result;
 	if(internalFormat == GL_RGBA32F) // determine what type GL texture has...
 	{
-		result.resize(size.width() * size.height() * 4);
+		result.resize(s[0] * s[1] * s[2] * 4);
 		GLHandler::glf().glGetTexImage(glTarget, level, GL_RGBA, GL_FLOAT,
+		                               result.data());
+	}
+	else if(internalFormat == GL_R32F)
+	{
+		result.resize(s[0] * s[1] * s[2]);
+		GLHandler::glf().glGetTexImage(glTarget, level, GL_RED, GL_FLOAT,
 		                               result.data());
 	}
 	return result;

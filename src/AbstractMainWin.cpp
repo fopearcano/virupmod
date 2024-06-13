@@ -364,7 +364,7 @@ void AbstractMainWin::applyPostProcShaderParams(
 	}
 }
 
-std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
+std::vector<GLComputeShader::TextureBinding>
     AbstractMainWin::getPostProcessingUniformTextures(
         QString const& id, GLShaderProgram const& /*shader*/,
         GLFramebufferObject const& currentTarget) const
@@ -388,11 +388,11 @@ std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
 				                       *bloomTargets.at((i + 1) % 2));
 			}
 
-			return {{&bloomTargets[0]->getColorAttachmentTexture(),
+			return {{bloomTargets[0]->getColorAttachmentTexture(),
 			         GLComputeShader::DataAccessMode::R}};
 		}
 		GLHandler::beginRendering(*bloomTargets[0]);
-		return {{&bloomTargets[0]->getColorAttachmentTexture(),
+		return {{bloomTargets[0]->getColorAttachmentTexture(),
 		         GLComputeShader::DataAccessMode::R}};
 	}
 	return {};

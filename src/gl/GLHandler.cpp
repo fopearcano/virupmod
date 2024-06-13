@@ -149,14 +149,12 @@ void GLHandler::postProcess(
 
 void GLHandler::postProcess(
     GLComputeShader const& shader, GLFramebufferObject const& inplace,
-    std::vector<
-        std::pair<GLTexture const*, GLComputeShader::DataAccessMode>> const&
-        uniformTextures)
+    std::vector<GLComputeShader::TextureBinding> const& uniformTextures)
 {
-	std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
-	    texs;
-	texs.emplace_back(&inplace.getColorAttachmentTexture(),
-	                  GLComputeShader::DataAccessMode::RW);
+	std::vector<GLComputeShader::TextureBinding> texs;
+	texs.emplace_back(
+	    GLComputeShader::TextureBinding{inplace.getColorAttachmentTexture(),
+	                                    GLComputeShader::DataAccessMode::RW});
 	// TODO(florian) performance
 	for(auto tex : uniformTextures)
 	{
@@ -170,16 +168,13 @@ void GLHandler::postProcess(
 void GLHandler::postProcess(
     GLComputeShader const& shader, GLFramebufferObject const& from,
     GLFramebufferObject const& to,
-    std::vector<
-        std::pair<GLTexture const*, GLComputeShader::DataAccessMode>> const&
-        uniformTextures)
+    std::vector<GLComputeShader::TextureBinding> const& uniformTextures)
 {
-	std::vector<std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
-	    texs;
-	texs.emplace_back(&from.getColorAttachmentTexture(),
-	                  GLComputeShader::DataAccessMode::R);
-	texs.emplace_back(&to.getColorAttachmentTexture(),
-	                  GLComputeShader::DataAccessMode::W);
+	std::vector<GLComputeShader::TextureBinding> texs;
+	texs.emplace_back(GLComputeShader::TextureBinding{
+	    from.getColorAttachmentTexture(), GLComputeShader::DataAccessMode::R});
+	texs.emplace_back(GLComputeShader::TextureBinding{
+	    to.getColorAttachmentTexture(), GLComputeShader::DataAccessMode::W});
 	// TODO(florian) performance
 	for(auto tex : uniformTextures)
 	{

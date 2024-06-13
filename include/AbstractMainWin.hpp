@@ -385,8 +385,7 @@ class AbstractMainWin : public RenderingWindow
 	 * processing.
 	 * @param shader The actual shader program.
 	 */
-	virtual std::vector<
-	    std::pair<GLTexture const*, GLComputeShader::DataAccessMode>>
+	virtual std::vector<GLComputeShader::TextureBinding>
 	    getPostProcessingUniformTextures(
 	        QString const& id, GLShaderProgram const& shader,
 	        GLFramebufferObject const& currentTarget) const;

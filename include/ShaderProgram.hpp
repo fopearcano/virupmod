@@ -80,11 +80,9 @@ class ShaderProgram
 	QString toStr() const { return glShader->toStr(); };
 	/** @brief Only valid for compute shaders, will crash otherwise
 	 */
-	void exec(
-	    std::vector<std::pair<GLTexture const*,
-	                          GLComputeShader::DataAccessMode>> const& textures,
-	    std::array<unsigned int, 3> const& globalGroupSize,
-	    bool waitForFinish = true) const
+	void exec(std::vector<GLComputeShader::TextureBinding> const& textures,
+	          std::array<unsigned int, 3> const& globalGroupSize,
+	          bool waitForFinish = true) const
 	{
 		dynamic_cast<GLComputeShader*>(glShader.get())
 		    ->exec(textures, globalGroupSize, waitForFinish);

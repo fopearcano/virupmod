@@ -41,6 +41,12 @@ class GLComputeShader : public GLShaderProgram
 		W       = GL_WRITE_ONLY,
 		RW      = GL_READ_WRITE,
 	};
+	struct TextureBinding
+	{
+		GLTexture const& texture;
+		DataAccessMode accessMode;
+		int level = 0;
+	};
 
 	explicit GLComputeShader(QString const& fileName,
 	                         QMap<QString, QString> const& defines = {});
@@ -48,8 +54,7 @@ class GLComputeShader : public GLShaderProgram
 	// size, the immediatly higher multiple of the
 	// shader's local group size will be used as globalGroupSize ; do the
 	// appropriate checks in the shader if needed
-	void exec(std::vector<std::pair<GLTexture const*, DataAccessMode>> const&
-	              textures,
+	void exec(std::vector<TextureBinding> const& textureBindings,
 	          std::array<unsigned int, 3> const& globalGroupSize,
 	          bool waitForFinish = true) const;
 
