@@ -112,13 +112,12 @@ int GLShaderProgram::getAttribLocationFromName(const char* attributeName) const
 }
 
 void GLShaderProgram::setUnusedAttributesValues(
-    std::vector<QPair<const char*, std::vector<float>>> const& defaultValues)
-    const
+    std::vector<QPair<QString, std::vector<float>>> const& defaultValues) const
 {
 	for(auto attribute : defaultValues)
 	{
-		GLint posAttrib = GLHandler::glf().glGetAttribLocation(glShaderProgram,
-		                                                       attribute.first);
+		GLint posAttrib = GLHandler::glf().glGetAttribLocation(
+		    glShaderProgram, attribute.first.toLatin1().data());
 		if(posAttrib != -1)
 		{
 			GLHandler::glf().glDisableVertexAttribArray(posAttrib);
@@ -151,7 +150,7 @@ void GLShaderProgram::setUnusedAttributesValues(
     QStringList const& names,
     std::vector<std::vector<float>> const& values) const
 {
-	std::vector<QPair<const char*, std::vector<float>>> defaultValues;
+	std::vector<QPair<QString, std::vector<float>>> defaultValues;
 	for(unsigned int i(0); i < values.size(); ++i)
 	{
 		defaultValues.emplace_back(names[i].toLatin1().constData(), values[i]);

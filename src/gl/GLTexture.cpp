@@ -630,9 +630,9 @@ void GLTexture::setSampler(Sampler const& sampler) const
 {
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MIN_FILTER,
-	                                 sampler.filter);
+	                                 sampler.magfilter);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MAG_FILTER,
-	                                 sampler.filter);
+	                                 sampler.minfilter);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_S,
 	                                 sampler.wraps);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_T,

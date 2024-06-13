@@ -44,6 +44,7 @@ enum class PrimitiveType
 	LINE_LOOP      = GL_LINE_LOOP,
 	TRIANGLES      = GL_TRIANGLES,
 	TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+	TRIANGLE_FAN   = GL_TRIANGLE_FAN,
 	AUTO // if no ebo, POINTS, else TRIANGLES
 };
 
@@ -61,6 +62,21 @@ enum class PrimitiveType
 class GLMesh
 {
   public:
+	struct VertexAttrib
+	{
+		explicit VertexAttrib() = default;
+		explicit VertexAttrib(QString const& name, int size, size_t stride,
+		                      size_t offset)
+		    : name(name)
+		    , size(size)
+		    , stride(stride)
+		    , offset(offset){};
+		QString name;
+		int size;      // size in floats
+		size_t stride; // stride in floats
+		size_t offset; // offset in floats
+	};
+
 	// implement those in protected if and only if they're needed for the Python
 	// API
 	GLMesh(GLMesh const& other)            = delete;
@@ -80,6 +96,13 @@ class GLMesh
 	GLMesh();
 	GLBuffer& getVBO() { return vbo; };
 	GLBuffer& getEBO() { return ebo; };
+	PrimitiveType getPrimitiveType() const { return primitiveType; };
+	void setPrimitiveType(PrimitiveType primitiveType)
+	{
+		this->primitiveType = primitiveType;
+	};
+	void setVertexShaderMapping(GLShaderProgram const& shaderProgram,
+	                            std::vector<VertexAttrib> const& mapping);
 	void setVertexShaderMapping(
 	    GLShaderProgram const& shaderProgram,
 	    std::vector<QPair<const char*, unsigned int>> const& mapping);
@@ -188,12 +211,30 @@ class GLMesh
 	 * use has already been passed to @ref setUpRender with the correct
 	 * parameters before.
 	 *
-	 * @param mesh @ref Mesh to be drawn.
-	 * @param primitiveType @ref PrimitiveType of the mesh. If AUTO and the mesh
-	 * doesn't have elements, POINTS will be assumed, but if the mesh has
+	 * The render will use the @ref PrimitiveType (see @ref getPrimitiveType and
+	 * @ref setPrimitiveType) of the mesh. If AUTO and the mesh doesn't have
+	 * elements, POINTS will be assumed, but if the mesh has elements, TRIANGLES
+	 * will be assumed.
+	 */
+	void render() const;
+	/**
+	 * @brief Draws a mesh on the current render target.
+	 *
+	 * @attention Make sure you called @ref setUpRender accordingly before
+	 * calling this method.
+	 *
+	 * @attention This rendering will use the last @ref GLShaderProgram passed
+	 * to
+	 * @ref setUpRender to draw the mesh. You can override the used shader
+	 * program by usinga @ref useShader. Just make sure the shader you want to
+	 * use has already been passed to @ref setUpRender with the correct
+	 * parameters before.
+	 *
+	 * @param primitiveType @ref PrimitiveType for this render. If AUTO and the
+	 * mesh doesn't have elements, POINTS will be assumed, but if the mesh has
 	 * elements, TRIANGLES will be assumed.
 	 */
-	void render(PrimitiveType primitiveType = PrimitiveType::AUTO) const;
+	void render(PrimitiveType primitiveType) const;
 	virtual ~GLMesh() { cleanUp(); };
 
   protected:
@@ -206,7 +247,8 @@ class GLMesh
 	GLuint vao = 0;
 	GLBuffer vbo;
 	GLBuffer ebo;
-	unsigned int vertexSize = 0; // in bytes
+	unsigned int vertexSize     = 0; // in bytes
+	PrimitiveType primitiveType = PrimitiveType::AUTO;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();

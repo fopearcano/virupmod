@@ -132,8 +132,8 @@ class GLShaderProgram
 	 * type (1 = float, 2 = vec2, 3 = vec3 and 4 = vec4).
 	 */
 	void setUnusedAttributesValues(
-	    std::vector<QPair<const char*, std::vector<float>>> const&
-	        defaultValues) const;
+	    std::vector<QPair<QString, std::vector<float>>> const& defaultValues)
+	    const;
 	/**
 	 * @brief Convenient version of the @ref
 	 * setShaderUnusedAttributesValues(GLShaderProgram, std::vector<QPair<const

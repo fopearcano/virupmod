@@ -37,9 +37,11 @@ class Light
 	                       float boundingSphereRadius,
 	                       std::vector<QMatrix4x4> const& models,
 	                       QMatrix4x4 const& model);
+	// renders a bright sphere at infinity, default is angular size of the sun
+	void render(float angularSizeRad = 0.542f * M_PI / 180.f);
 
 	QVector3D direction;
-	QColor color;
+	QVector3D color; // linear RGB in luminance units
 	float ambiantFactor;
 
   private:
@@ -47,6 +49,10 @@ class Light
 	GLShaderProgram shadowShader;
 
 	static unsigned int getResolution();
+
+	// for rendering
+	GLShaderProgram def;
+	GLMesh mesh;
 };
 
 #endif // LIGHT_HPP

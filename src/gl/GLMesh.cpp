@@ -74,11 +74,39 @@ void GLMesh::cleanUp()
 	doClean = false;
 }
 
+void GLMesh::setVertexShaderMapping(GLShaderProgram const& shaderProgram,
+                                    std::vector<VertexAttrib> const& mapping)
+{
+	GLHandler::glf().glBindVertexArray(vao);
+
+	vertexSize = 0;
+	for(auto const& map : mapping)
+	{
+		// map position
+		GLint posAttrib = shaderProgram.getAttribLocationFromName(
+		    map.name.toStdString().c_str());
+		if(posAttrib != -1)
+		{
+			GLHandler::glf().glEnableVertexAttribArray(posAttrib);
+			vbo.bind(); // binds the vbo to the vao attrib pointer
+			GLHandler::glf().glVertexAttribPointer(
+			    posAttrib, map.size, GL_FLOAT, GL_FALSE,
+			    map.stride * sizeof(float),
+			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			    reinterpret_cast<void*>(map.offset * sizeof(float)));
+		}
+		vertexSize += map.size * sizeof(float);
+	}
+
+	ebo.bind();
+	GLHandler::glf().glBindVertexArray(0);
+}
+
 void GLMesh::setVertexShaderMapping(
     GLShaderProgram const& shaderProgram,
     std::vector<QPair<const char*, unsigned int>> const& mapping)
 {
-	GLHandler::glf().glBindVertexArray(vao);
+	std::vector<VertexAttrib> finalMapping;
 
 	size_t offset = 0, stride = 0;
 	for(auto map : mapping)
@@ -87,24 +115,11 @@ void GLMesh::setVertexShaderMapping(
 	}
 	for(auto map : mapping)
 	{
-		// map position
-		GLint posAttrib = shaderProgram.getAttribLocationFromName(map.first);
-		if(posAttrib != -1)
-		{
-			GLHandler::glf().glEnableVertexAttribArray(posAttrib);
-			vbo.bind(); // binds the vbo to the vao attrib pointer
-			GLHandler::glf().glVertexAttribPointer(
-			    posAttrib, map.second, GL_FLOAT, GL_FALSE,
-			    stride * sizeof(float),
-			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			    reinterpret_cast<void*>(offset * sizeof(float)));
-		}
+		finalMapping.emplace_back(map.first, map.second, stride, offset);
 		offset += map.second;
 	}
-	vertexSize = offset * sizeof(float);
 
-	ebo.bind();
-	GLHandler::glf().glBindVertexArray(0);
+	setVertexShaderMapping(shaderProgram, finalMapping);
 }
 
 void GLMesh::setVertexShaderMapping(
@@ -161,6 +176,11 @@ void GLMesh::drawArrays(unsigned int first, size_t count,
 	GLHandler::glf().glDrawArrays(static_cast<GLenum>(primitiveType), first,
 	                              count);
 	GLHandler::glf().glBindVertexArray(0);
+}
+
+void GLMesh::render() const
+{
+	render(primitiveType);
 }
 
 void GLMesh::render(PrimitiveType primitiveType) const

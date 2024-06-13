@@ -170,7 +170,8 @@ class GLTexture
 		Sampler(GLint filter = GL_LINEAR, GLint wrap = GL_CLAMP_TO_EDGE,
 		        GLfloat anisotropicFilterSamples
 		        = getMaxAnisotropicFilterSamples())
-		    : filter(filter)
+		    : magfilter(filter)
+		    , minfilter(filter)
 		    , wraps(wrap)
 		    , wrapt(wrap)
 		    , wrapr(wrap)
@@ -178,7 +179,8 @@ class GLTexture
 		Sampler(GLint filter, GLint wraps, GLint wrapt,
 		        GLfloat anisotropicFilterSamples
 		        = getMaxAnisotropicFilterSamples())
-		    : filter(filter)
+		    : magfilter(filter)
+		    , minfilter(filter)
 		    , wraps(wraps)
 		    , wrapt(wrapt)
 		    , wrapr(wrapt)
@@ -186,12 +188,14 @@ class GLTexture
 		Sampler(GLint filter, GLint wraps, GLint wrapt, GLint wrapr,
 		        GLfloat anisotropicFilterSamples
 		        = getMaxAnisotropicFilterSamples())
-		    : filter(filter)
+		    : magfilter(filter)
+		    , minfilter(filter)
 		    , wraps(wraps)
 		    , wrapt(wrapt)
 		    , wrapr(wrapr)
 		    , anisotropicFilterSamples(anisotropicFilterSamples){};
-		GLint filter;
+		GLint magfilter;
+		GLint minfilter;
 		GLint wraps;
 		GLint wrapt;
 		GLint wrapr;

@@ -17,6 +17,7 @@
 */
 
 #include "Light.hpp"
+#include "Primitives.hpp"
 
 unsigned int Light::getResolution()
 {
@@ -25,12 +26,14 @@ unsigned int Light::getResolution()
 
 Light::Light()
     : direction(-1.f, 0.f, 0.f)
-    , color(255, 255, 255)
+    , color(1.0, 1.0, 1.0)
     , ambiantFactor(0.05f)
     , shadowMap(GLTexture::Tex2DProperties(getResolution(), getResolution(),
                                            GL_DEPTH_COMPONENT32))
     , shadowShader("shadow")
+    , def("default")
 {
+	Primitives::setAsUnitSphere(mesh, def, 100, 100);
 }
 
 QMatrix4x4 Light::getTransformation(float boundingSphereRadius,
@@ -86,4 +89,17 @@ void Light::generateShadowMap(std::vector<GLMesh const*> const& meshes,
 		shadowShader.setUniform("camera", lightSpace * models[i]);
 		meshes[i]->render();
 	}
+}
+
+void Light::render(float angularSizeRad)
+{
+	def.setUniform("color", color);
+
+	QMatrix4x4 model;
+	model.translate(-direction.normalized());
+	model.scale(tan(0.5 * angularSizeRad));
+
+	GLStateSet glState({{GL_DEPTH_TEST, false}});
+	GLHandler::setUpRender(def, model, GLHandler::GeometricSpace::SKYBOX);
+	mesh.render();
 }

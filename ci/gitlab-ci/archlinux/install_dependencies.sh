@@ -36,3 +36,6 @@ makepkg -si --noconfirm
 cd ..
 
 cd ..
+
+# install project additional deps
+/project_install_dependencies.sh

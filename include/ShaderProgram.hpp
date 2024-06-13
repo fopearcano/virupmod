@@ -62,8 +62,8 @@ class ShaderProgram
 	void reload();
 	static void reloadAllShaderPrograms();
 	void setUnusedAttributesValues(
-	    std::vector<QPair<const char*, std::vector<float>>> const&
-	        defaultValues) const
+	    std::vector<QPair<QString, std::vector<float>>> const& defaultValues)
+	    const
 	{
 		glShader->setUnusedAttributesValues(defaultValues);
 	};

@@ -21,12 +21,12 @@ dockerbuild:focal:
             - ci/gitlab-ci/ubuntu/20.04/Dockerfile
             - ci/gitlab-ci/ubuntu/20.04/install_dependencies.sh
             - .gitlab-ci.yml
-            - '**/ci/gitlab-ci/install_dependencies.sh'
+            - '**/ci/gitlab-ci/ubuntu/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
-        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/install_dependencies.sh; fi
+        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
         - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:focal -f ./ci/gitlab-ci/ubuntu/20.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:focal
 
@@ -43,12 +43,12 @@ dockerbuild:jammy:
             - ci/gitlab-ci/ubuntu/22.04/Dockerfile
             - ci/gitlab-ci/ubuntu/22.04/install_dependencies.sh
             - .gitlab-ci.yml
-            - '**/ci/gitlab-ci/install_dependencies.sh'
+            - '**/ci/gitlab-ci/ubuntu/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
-        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/install_dependencies.sh; fi
+        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
         - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:jammy -f ./ci/gitlab-ci/ubuntu/22.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:jammy
 
@@ -64,12 +64,12 @@ dockerbuild:archlinux:
             - ci/gitlab-ci/archlinux/install_dependencies.sh
             - ci/gitlab-ci/archlinux/Dockerfile
             - .gitlab-ci.yml
-            - '**/ci/gitlab-ci/install_dependencies.sh'
+            - '**/ci/gitlab-ci/archlinux/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
-        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/install_dependencies.sh; fi
+        - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/archlinux/install_dependencies.sh
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/archlinux/install_dependencies.sh; fi
         - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:archlinux -f ./ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:archlinux
 

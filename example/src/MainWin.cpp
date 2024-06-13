@@ -374,8 +374,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	modelModel.scale(0.5 / model->getBoundingSphereRadius());
 	float secs(timer.elapsed() / 5000.f);
 	light->color
-	    = QColor(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0);
-	light->color = QColor(255, 255, 255);
+	    = QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0) / 255.f;
+	light->color = QVector3D(255, 255, 255) / 255.f;
 	if(vrHandler->isEnabled())
 	{
 		modelModel.translate(0.f, 1.4f * model->getBoundingSphereRadius(), 0.f);
