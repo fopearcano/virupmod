@@ -805,8 +805,8 @@ std::vector<GLComputeShader::TextureBinding>
 	}
 	if(id == "lensing")
 	{
-		return {{*lenseDistortionMap.get(),
-		         GLComputeShader::DataAccessMode::SAMPLER}};
+		return {
+		    {*lenseDistortionMap, GLComputeShader::DataAccessMode::SAMPLER}};
 	}
 	return {};
 }
