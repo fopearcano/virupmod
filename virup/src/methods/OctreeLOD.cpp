@@ -597,7 +597,7 @@ void OctreeLOD::ramToVideo()
 {
 	mesh = std::make_unique<GLMesh>();
 	std::vector<QPair<const char*, unsigned int>> mapping = {{"position", 3}};
-	std::vector<QPair<const char*, std::vector<float>>> unused;
+	std::vector<QPair<QString, std::vector<float>>> unused;
 	if((getFlags() & Flags::STORE_RADIUS) != Flags::NONE)
 	{
 		mapping.emplace_back("radius", 1);
