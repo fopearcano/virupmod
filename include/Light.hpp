@@ -26,27 +26,39 @@
 class Light
 {
   public:
-	Light();
-	QMatrix4x4 getTransformation(float boundingSphereRadius,
-	                             QMatrix4x4 const& model,
+	Light(QVector3D const& direction = {-1.f, 0.f, 0.f},
+	      float boundingSphereRadius = 1.f);
+	QVector3D getCenter() const { return center; };
+	void setCenter(QVector3D const& center);
+	QVector3D getDirection() const { return direction; };
+	void setDirection(QVector3D const& direction);
+	float getBoundingSphereRadius() const { return boundingSphereRadius; };
+	void setBoundingSphereRadius(float boundingSphereRadius);
+
+	QMatrix4x4 getTransformation(QMatrix4x4 const& model,
 	                             bool biased = false) const;
-	void setUpShader(GLShaderProgram const& shader, float boundingSphereRadius,
+	void setUpShader(GLShaderProgram const& shader,
 	                 QMatrix4x4 const& model) const;
 	GLTexture const& getShadowMap() const;
 	void generateShadowMap(std::vector<GLMesh const*> const& meshes,
-	                       float boundingSphereRadius,
 	                       std::vector<QMatrix4x4> const& models,
-	                       QMatrix4x4 const& model);
+	                       QMatrix4x4 const& model = {}) const;
 	// renders a bright sphere at infinity, default is angular size of the sun
 	void render(float angularSizeRad = 0.542f * M_PI / 180.f);
 
-	QVector3D direction;
 	QVector3D color; // linear RGB in luminance units
 	float ambiantFactor;
 
   private:
 	GLFramebufferObject shadowMap;
 	GLShaderProgram shadowShader;
+
+	QVector3D center;
+	QVector3D direction;
+	float boundingSphereRadius = 1.f;
+	QMatrix4x4 bias;
+	QMatrix4x4 proj;
+	QMatrix4x4 view;
 
 	static unsigned int getResolution();
 

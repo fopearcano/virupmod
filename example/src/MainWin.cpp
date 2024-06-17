@@ -378,17 +378,23 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	light->color = QVector3D(255, 255, 255) / 255.f;
 	if(vrHandler->isEnabled())
 	{
-		modelModel.translate(0.f, 1.4f * model->getBoundingSphereRadius(), 0.f);
+		QVector3D t(0.f, 1.4f * model->getBoundingSphereRadius(), 0.f);
+		modelModel.translate(t);
 		modelModel.rotate(180.f, QVector3D(0.f, 1.f, 0.f));
 		// light->direction = QVector3D(cos(secs), 0.f, sin(secs));
+		light->setBoundingSphereRadius(1.5);
+		light->setCenter(t * 1.5 / model->getBoundingSphereRadius());
 	}
 	else
 	{
-		modelModel.translate(0.f, 0.f, -50.f);
+		QVector3D t(0.f, 0.f, -50.f);
+		modelModel.translate(t);
 		modelModel.rotate(180.f, QVector3D(0.f, 0.f, 1.f));
 		modelModel.rotate(120.f, QVector3D(1.f, 1.f, 1.f).normalized());
 		modelModel.scale(0.3);
 		// light->direction = QVector3D(sin(secs), cos(secs), 0.f);
+		light->setBoundingSphereRadius(1.5 * 0.3);
+		light->setCenter(t * 1.5 / model->getBoundingSphereRadius());
 	}
 	modelModel.rotate(100.f * secs, QVector3D(0.f, 1.f, 0.f));
 	model->generateShadowMap(modelModel, *light);

@@ -66,7 +66,7 @@ std::vector<std::pair<GLMesh const&, QMatrix4x4>> Model::getMeshes() const
 	return result;
 }
 
-void Model::generateShadowMap(QMatrix4x4 const& model, Light& light)
+void Model::generateShadowMap(QMatrix4x4 const& model, Light const& light) const
 {
 	std::vector<GLMesh const*> glMeshes;
 	std::vector<QMatrix4x4> models;
@@ -75,12 +75,12 @@ void Model::generateShadowMap(QMatrix4x4 const& model, Light& light)
 		glMeshes.emplace_back(&mesh.mesh);
 		models.push_back(mesh.transform);
 	}
-	light.generateShadowMap(glMeshes, boundingSphereRadius, models, model);
+	light.generateShadowMap(glMeshes, models, model);
 }
 
 void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
                    std::vector<GLTexture const*> const& shadowMaps,
-                   GLHandler::GeometricSpace geometricSpace)
+                   GLHandler::GeometricSpace geometricSpace) const
 {
 	shader.setUniform("cameraPosition", model.inverted() * cameraPosition);
 
@@ -107,9 +107,10 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 }
 
 void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
-                   Light const& light, GLHandler::GeometricSpace geometricSpace)
+                   Light const& light,
+                   GLHandler::GeometricSpace geometricSpace) const
 {
-	light.setUpShader(shader, boundingSphereRadius, model);
+	light.setUpShader(shader, model);
 	render(cameraPosition, model, {&light.getShadowMap()}, geometricSpace);
 }
 

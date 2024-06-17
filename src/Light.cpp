@@ -24,9 +24,8 @@ unsigned int Light::getResolution()
 	return 1u << (9 + QSettings().value("graphics/shadowsquality").toUInt());
 }
 
-Light::Light()
-    : direction(-1.f, 0.f, 0.f)
-    , color(1.0, 1.0, 1.0)
+Light::Light(QVector3D const& direction, float boundingSphereRadius)
+    : color(1.0, 1.0, 1.0)
     , ambiantFactor(0.05f)
     , shadowMap(GLTexture::Tex2DProperties(getResolution(), getResolution(),
                                            GL_DEPTH_COMPONENT32))
@@ -35,38 +34,58 @@ Light::Light()
 {
 	shadowMap.setColorAttachmentName("ShadowMap");
 	Primitives::setAsUnitSphere(mesh, def, 100, 100);
+
+	bias = {};
+	bias.translate(0.5f, 0.5f, 0.5f);
+	bias.scale(0.5);
+
+	setDirection(direction);
+	setBoundingSphereRadius(boundingSphereRadius);
 }
 
-QMatrix4x4 Light::getTransformation(float boundingSphereRadius,
-                                    QMatrix4x4 const& model, bool biased) const
+void Light::setCenter(QVector3D const& center)
 {
-	QMatrix4x4 lightSpace;
+	this->center = center;
+
+	view = {};
+	view.lookAt(center, center + direction, QVector3D(0.f, 0.f, 1.f));
+}
+
+void Light::setDirection(QVector3D const& direction)
+{
+	this->direction = direction.normalized();
+
+	view = {};
+	view.lookAt(center, center + direction, QVector3D(0.f, 0.f, 1.f));
+}
+
+void Light::setBoundingSphereRadius(float boundingSphereRadius)
+{
+	this->boundingSphereRadius = boundingSphereRadius;
+
+	proj = {};
+	proj.ortho(-1.f * boundingSphereRadius, boundingSphereRadius,
+	           -1.f * boundingSphereRadius, boundingSphereRadius,
+	           -1.f * boundingSphereRadius, boundingSphereRadius);
+}
+
+QMatrix4x4 Light::getTransformation(QMatrix4x4 const& model, bool biased) const
+{
 	if(biased)
 	{
-		lightSpace.translate(0.5f, 0.5f, 0.5f);
-		lightSpace.scale(0.5);
+		return bias * proj * view * model;
 	}
-	lightSpace.ortho(-1.f * boundingSphereRadius, boundingSphereRadius,
-	                 -1.f * boundingSphereRadius, boundingSphereRadius,
-	                 -1.f * boundingSphereRadius, boundingSphereRadius);
-	lightSpace.lookAt(
-	    QVector3D(0.f, 0.f, 0.f),
-	    QVector3D(model.inverted() * QVector4D(direction, 0.f)).normalized(),
-	    QVector3D(0.f, 0.f, 1.f));
-
-	return lightSpace;
+	return proj * view * model;
 }
 
 void Light::setUpShader(GLShaderProgram const& shader,
-                        float boundingSphereRadius,
                         QMatrix4x4 const& model) const
 {
 	QVector3D relDir = QVector3D(model.inverted() * QVector4D(direction, 0.f));
 	shader.setUniform("lightDirection", relDir.normalized());
 	shader.setUniform("lightColor", color);
 	shader.setUniform("lightAmbiantFactor", ambiantFactor);
-	shader.setUniform("lightspace",
-	                  getTransformation(boundingSphereRadius, model, true));
+	shader.setUniform("lightspace", getTransformation(model, true));
 	shader.setUniform("boundingSphereRadius", boundingSphereRadius);
 }
 
@@ -76,15 +95,14 @@ GLTexture const& Light::getShadowMap() const
 }
 
 void Light::generateShadowMap(std::vector<GLMesh const*> const& meshes,
-                              float boundingSphereRadius,
                               std::vector<QMatrix4x4> const& models,
-                              QMatrix4x4 const& model)
+                              QMatrix4x4 const& model) const
 {
 	// see third comment :
 	// https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 	GLStateSet glState({{GL_CULL_FACE, false}});
 	GLHandler::beginRendering(GL_DEPTH_BUFFER_BIT, shadowMap);
-	QMatrix4x4 lightSpace(getTransformation(boundingSphereRadius, model));
+	QMatrix4x4 lightSpace(getTransformation(model));
 	for(unsigned int i(0); i < meshes.size(); ++i)
 	{
 		shadowShader.setUniform("camera", lightSpace * models[i]);

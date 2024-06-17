@@ -36,18 +36,18 @@ class Model
 	GLShaderProgram const& getShader() const { return shader; };
 	float getBoundingSphereRadius() { return boundingSphereRadius; };
 	std::vector<std::pair<GLMesh const&, QMatrix4x4>> getMeshes() const;
-	void generateShadowMap(QMatrix4x4 const& model, Light& light);
+	void generateShadowMap(QMatrix4x4 const& model, Light const& light) const;
 	// cameraPosition : in same space as geometricSpace
 	void render(QVector3D const& cameraPosition,
 	            QMatrix4x4 const& model                         = QMatrix4x4(),
 	            std::vector<GLTexture const*> const& shadowMaps = {},
 	            GLHandler::GeometricSpace geometricSpace
-	            = GLHandler::GeometricSpace::WORLD);
+	            = GLHandler::GeometricSpace::WORLD) const;
 	void render(QVector3D const& cameraPosition,
 	            QMatrix4x4 const& model = QMatrix4x4(),
 	            Light const& light      = Light(),
 	            GLHandler::GeometricSpace geometricSpace
-	            = GLHandler::GeometricSpace::WORLD);
+	            = GLHandler::GeometricSpace::WORLD) const;
 
   private:
 	static QMap<QString, QString> setUpShaderDefines();
