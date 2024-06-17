@@ -427,7 +427,7 @@ QMatrix4x4
 
 void OpenVRHandler::resetPos()
 {
-#if OPENVR_VERSION_MINOR > 12
+#if OPENVR_VERSION_MINOR > 12 || OPENVR_VERSION_MAJOR > 1
 	vr::VRChaperone()->ResetZeroPose(
 	    vr::ETrackingUniverseOrigin::TrackingUniverseSeated);
 #else

@@ -26,6 +26,7 @@
 #include <QVector4D>
 #include <array>
 
+#include "camera/BoundingVolumes.hpp"
 #include "gl/GLHandler.hpp"
 
 class BoundingSphere;
@@ -259,6 +260,7 @@ class BasicCamera : public QObject
 	 * @getter{pixelSolidAngle}
 	 */
 	float pixelSolidAngle() const;
+	QSize getWindowSize() const { return windowSize; };
 	void setWindowSize(QSize const& windowSize)
 	{
 		this->windowSize = windowSize;

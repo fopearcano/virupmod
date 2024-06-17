@@ -18,8 +18,6 @@
 
 #include "camera/BasicCamera.hpp"
 
-#include "camera/BoundingVolumes.hpp"
-
 BasicCamera::BasicCamera(VRHandler const& vrHandler)
     : vrHandler(vrHandler)
     , eyeDistanceFactor(1.0f)

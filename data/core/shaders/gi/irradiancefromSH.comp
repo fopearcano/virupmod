@@ -1,0 +1,153 @@
+#version 420 core
+#extension GL_ARB_compute_shader : enable
+#extension GL_ARB_shader_image_load_store : enable
+#extension GL_ARB_shader_image_size : enable
+#extension GL_ARB_shader_storage_buffer_object : enable
+#extension GL_NV_shader_atomic_float : enable
+
+layout(local_size_x = 2, local_size_y = 2, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform writeonly imageCube dataOut;
+layout(std430, binding = 1) buffer SHCoeffs
+{
+	vec4 shCoeffs[];
+};
+
+const float PI = 3.14159265359;
+
+vec3 computeDirectionFromTexel(ivec3 texelCoords, int cubemapSize)
+{
+	// Determine which face of the cubemap the texel is on
+	int face = texelCoords.z;
+
+	// Normalize texel coordinates to [-1, 1]
+	vec2 coord = (vec2(texelCoords.xy) / float(cubemapSize - 1)) * 2.0 - 1.0;
+
+	// Compute direction based on the face
+	vec3 direction;
+	switch(face)
+	{
+		case 0:
+			direction = vec3(1.0, -coord.y, -coord.x);
+			break; // Positive X
+		case 1:
+			direction = vec3(-1.0, -coord.y, coord.x);
+			break; // Negative X
+		case 2:
+			direction = vec3(coord.x, 1.0, coord.y);
+			break; // Positive Y
+		case 3:
+			direction = vec3(coord.x, -1.0, -coord.y);
+			break; // Negative Y
+		case 4:
+			direction = vec3(coord.x, -coord.y, 1.0);
+			break; // Positive Z
+		case 5:
+			direction = vec3(-coord.x, -coord.y, -1.0);
+			break; // Negative Z
+		default:
+			break;
+	}
+
+	return normalize(direction);
+}
+
+// Ramamoorthi, R., & Hanrahan, P. (2001, August).
+// An efficient representation for irradiance environment maps.
+// In Proceedings of the 28th annual conference on Computer graphics and interactive techniques (pp. 497-500).
+void ProjectOntoSH(in vec3 n, out float sh[9])
+{
+	float x = n.x, y = n.y, z = n.z;
+	float x2 = x*x, y2 = y*y, z2 = z*z;
+	float x3 = x2*x, y3 = y2*y, z3 = z2*z;
+	float z4 = z2*z2;
+
+	// Band 0
+	sh[0] = 0.282095;
+
+	// Band 1
+	sh[1] = 0.488603 * x;
+	sh[2] = 0.488603 * z;
+	sh[3] = 0.488603 * y;
+
+	// Band 2
+	sh[4] = 0.546274 * (x2-y2);
+	sh[5] = 1.092548 * x * z;
+	sh[6] = 0.315392 * (3.0 * z2 - 1.0);
+	sh[7] = 1.092548 * y * z;
+	sh[8] = 1.092548 * x * y;
+
+	/*// Band 3
+	sh[9] = 0.590044 * (x * (x2 - 3.0 * y2));
+	sh[10] = 2.8906114 * 0.5 * z * (x2 - y2);
+	sh[11] = 0.457046 * x * (5.0*z2 - 1.0);
+	sh[12] = 0.373176 * (5.0*z3 - 3.0*z);
+	sh[13] = 0.457046 * y * (5.0*z2 - 1.0);
+	sh[14] = 2.8906114 * x*y*z;
+	sh[15] =0.590043 * y * (3.0*x2 - y2);
+
+	// Band 4
+	sh[16] = 3.0*sqrt(35.0/PI)/16.0 * (x2*(x2 - 3.0*y2) - y2*(3*x2-y2));
+	sh[17] = 0.75*sqrt(0.5*35.0/PI) * x * (x2 - 3.0*y2) * z;
+	sh[18] = 3.0*sqrt(5.0/PI)/8.0 * (x2 - y2) * (7.0*z2 - 1.0);
+	sh[19] = 0.75*sqrt(2.5/PI) * x * (7.0*z3 - 3.0*z);
+	sh[20] = 3.0*sqrt(1.0/PI)/16.0 * (35.0*z4 - 30.0*z2 + 3.0);
+	sh[21] = 0.75*sqrt(2.5/PI) * y * (7.0*z3 - 3.0*z);
+	sh[22] = 0.75*sqrt(5.0/PI) * x * y * (7.0*z2 - 1.0);
+	sh[23] = 0.75*sqrt(0.5*35.0/PI) * y * (3.0*x2 - y2) * z;
+	sh[24] = 0.75*sqrt(35.0/PI) * x*y*(x2-y2);*/
+}
+
+void main()
+{
+	ivec3 pixel_coords = ivec3(gl_GlobalInvocationID.xyz);
+
+	vec3 normal
+	    = computeDirectionFromTexel(pixel_coords, imageSize(dataOut).x);
+
+	float Ylm[9];
+	ProjectOntoSH(normal, Ylm);
+
+	vec3 AhatlLlm[9];
+	AhatlLlm[0] = 3.141593 * shCoeffs[0].rgb;
+
+	AhatlLlm[1] = 2.094395 * shCoeffs[1].rgb;
+	AhatlLlm[2] = 2.094395 * shCoeffs[2].rgb;
+	AhatlLlm[3] = 2.094395 * shCoeffs[3].rgb;
+
+	AhatlLlm[4] = 0.785398 * shCoeffs[4].rgb;
+	AhatlLlm[5] = 0.785398 * shCoeffs[5].rgb;
+	AhatlLlm[6] = 0.785398 * shCoeffs[6].rgb;
+	AhatlLlm[7] = 0.785398 * shCoeffs[7].rgb;
+	AhatlLlm[8] = 0.785398 * shCoeffs[8].rgb;
+
+	/*AhatlLlm[9] = vec3(0.0);
+	AhatlLlm[10] = vec3(0.0);
+	AhatlLlm[11] = vec3(0.0);
+	AhatlLlm[12] = vec3(0.0);
+	AhatlLlm[13] = vec3(0.0);
+	AhatlLlm[14] = vec3(0.0);
+	AhatlLlm[15] = vec3(0.0);
+
+	AhatlLlm[16] = -0.1309 * shCoeffs[16].rgb;
+	AhatlLlm[17] = -0.1309 * shCoeffs[17].rgb;
+	AhatlLlm[18] = -0.1309 * shCoeffs[18].rgb;
+	AhatlLlm[19] = -0.1309 * shCoeffs[19].rgb;
+	AhatlLlm[20] = -0.1309 * shCoeffs[20].rgb;
+	AhatlLlm[21] = -0.1309 * shCoeffs[21].rgb;
+	AhatlLlm[22] = -0.1309 * shCoeffs[22].rgb;
+	AhatlLlm[23] = -0.1309 * shCoeffs[23].rgb;
+	AhatlLlm[24] = -0.1309 * shCoeffs[24].rgb;*/
+
+	vec3 result = vec3(0.0);
+	for(int i = 0; i < 9; ++i)
+	{
+		result += AhatlLlm[i] * Ylm[i];
+	}
+	result /= 3.1415;
+
+	// ??????????
+	// result *= 65.0;
+
+	imageStore(dataOut, pixel_coords, vec4(result, 1.0));
+}

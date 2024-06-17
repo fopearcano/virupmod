@@ -334,7 +334,7 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 	timingsStr += "Full frame (full loop): "
 	              + QString::number(frameTiming * 1.e3f) + "ms\n";
 	painter.drawText(
-	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 256},
+	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 276},
 	    timingsStr);
 	if(logProfAction->isChecked())
 	{

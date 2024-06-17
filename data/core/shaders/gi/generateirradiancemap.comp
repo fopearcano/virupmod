@@ -1,0 +1,88 @@
+#version 420 core
+#extension GL_ARB_compute_shader : enable
+#extension GL_ARB_shader_image_load_store : enable
+#extension GL_ARB_shader_image_size : enable
+
+layout(local_size_x = 2, local_size_y = 2,
+       local_size_z = 1) in;
+
+uniform samplerCube environmentMap;
+layout(rgba32f, binding = 1) uniform writeonly imageCube dataOut;
+
+const float PI = 3.14159265359;
+
+vec3 computeDirectionFromTexel(ivec3 texelCoords, int cubemapSize)
+{
+	// Determine which face of the cubemap the texel is on
+	int face = texelCoords.z;
+
+	// Normalize texel coordinates to [-1, 1]
+	vec2 coord = (vec2(texelCoords.xy) / float(cubemapSize - 1)) * 2.0 - 1.0;
+
+	// Compute direction based on the face
+	vec3 direction;
+	switch(face)
+	{
+		case 0:
+			direction = vec3(1.0, -coord.y, -coord.x);
+			break; // Positive X
+		case 1:
+			direction = vec3(-1.0, -coord.y, coord.x);
+			break; // Negative X
+		case 2:
+			direction = vec3(coord.x, 1.0, coord.y);
+			break; // Positive Y
+		case 3:
+			direction = vec3(coord.x, -1.0, -coord.y);
+			break; // Negative Y
+		case 4:
+			direction = vec3(coord.x, -coord.y, 1.0);
+			break; // Positive Z
+		case 5:
+			direction = vec3(-coord.x, -coord.y, -1.0);
+			break; // Negative Z
+		default:
+			break;
+	}
+
+	return normalize(direction);
+}
+
+void main()
+{
+	ivec3 pixel_coords = ivec3(gl_GlobalInvocationID.xyz);
+
+	vec3 normal = computeDirectionFromTexel(pixel_coords, imageSize(dataOut).x);
+
+	vec3 irradiance = vec3(0.0);
+
+	vec3 up    = vec3(0.0, 0.0, 1.0);
+	vec3 right = normalize(cross(up, normal));
+	up         = normalize(cross(normal, right));
+
+	float sampleDelta = 0.025;
+	int nrSamples   = 0;
+	for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
+	{
+		float sP = sin(phi);
+		float cP = cos(phi);
+		for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta)
+		{
+			float sT = sin(theta);
+			float cT = cos(theta);
+			// spherical to cartesian (in tangent space)
+			vec3 tangentSample = vec3(sT * cP,
+			                          sT * sP, cT);
+			// tangent space to world
+			vec3 sampleVec = tangentSample.x * right + tangentSample.y * up
+			                 + tangentSample.z * normal;
+
+			irradiance += texture(environmentMap, sampleVec).rgb * cT
+			              * sT;
+			nrSamples++;
+		}
+	}
+	irradiance *= PI * (1.0 / float(nrSamples));
+
+	imageStore(dataOut, pixel_coords, vec4(irradiance, 0.0));
+}
