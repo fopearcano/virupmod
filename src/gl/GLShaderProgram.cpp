@@ -175,12 +175,30 @@ void GLShaderProgram::setUniform(const char* paramName, int value) const
 	    value);
 }
 
+void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
+                                 int const* values) const
+{
+	use();
+	GLHandler::glf().glUniform1iv(
+	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), size,
+	    values);
+}
+
 void GLShaderProgram::setUniform(const char* paramName, float value) const
 {
 	use();
 	GLHandler::glf().glUniform1f(
 	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName),
 	    value);
+}
+
+void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
+                                 float const* values) const
+{
+	use();
+	GLHandler::glf().glUniform1fv(
+	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), size,
+	    values);
 }
 
 void GLShaderProgram::setUniform(const char* paramName,
@@ -251,6 +269,23 @@ void GLShaderProgram::setUniform(const char* paramName,
 	GLHandler::glf().glUniformMatrix4fv(
 	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), 1,
 	    GL_FALSE, value.data());
+}
+
+void GLShaderProgram::setUniform(const char* paramName, unsigned int size,
+                                 QMatrix4x4 const* values) const
+{
+	use();
+	std::unique_ptr<GLfloat[]> data(new GLfloat[16 * size]);
+	for(unsigned int i(0); i < size; ++i)
+	{
+		for(unsigned int j(0); j < 16; ++j)
+		{
+			data[i * 16 + j] = values[i].data()[j];
+		}
+	}
+	GLHandler::glf().glUniformMatrix4fv(
+	    GLHandler::glf().glGetUniformLocation(glShaderProgram, paramName), size,
+	    GL_FALSE, data.get());
 }
 
 void GLShaderProgram::setUniform(const char* paramName, QColor const& value,

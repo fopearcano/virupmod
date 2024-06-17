@@ -336,6 +336,41 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 	painter.drawText(
 	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 256},
 	    timingsStr);
+	if(logProfAction->isChecked())
+	{
+		QFile profLog("profiling.txt");
+		bool exists(profLog.exists());
+		profLog.open(QIODevice::WriteOnly | QIODevice::Append);
+		if(!exists)
+		{
+			profLog.write(QString("Full frame (full loop) (ms),").toLatin1());
+			for(auto const& pair : timingsNs)
+			{
+				profLog.write(
+				    (pair.first + " (CPUms)," + pair.first + " (GPUms),")
+				        .toLatin1());
+			}
+			profLog.write(QString('\n').toLatin1());
+		}
+		profLog.write((QString::number(frameTiming * 1.e3f) + ',').toLatin1());
+		for(auto const& pair : timingsNs)
+		{
+			QString timings;
+			timings += QString::number(pair.second.first / 1.e6f) + ',';
+			timings += QString::number(pair.second.second / 1.e6f) + ',';
+			profLog.write(timings.toLatin1());
+		}
+		if(frameTiming > 0.015f)
+		{
+			profLog.write(QString("<--------------").toLatin1());
+		}
+		profLog.write(QString('\n').toLatin1());
+	}
+	timingsStr += "Full frame (full loop): "
+	              + QString::number(frameTiming * 1.e3f) + "ms\n";
+	painter.drawText(
+	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 256},
+	    timingsStr);
 }
 
 void AbstractMainWin::applyPostProcShaderParams(
@@ -458,6 +493,11 @@ void AbstractMainWin::initializeGL()
 		                  this->textureSelector->setVisible(
 		                      !this->textureSelector->isVisible());
 	                  });
+
+	logProfAction = engine->addAction(tr("Log Profiling Timings"));
+	logProfAction->setCheckable(true);
+	QFile profLog("profiling.txt");
+	profLog.remove();
 
 	menuBar->show();
 

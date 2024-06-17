@@ -28,6 +28,7 @@
 
 #include "gl/GLHandler.hpp"
 
+class BoundingSphere;
 class VRHandler;
 
 /**
@@ -339,8 +340,7 @@ class BasicCamera : public QObject
 	 * @param center The center of the bounding sphere.
 	 * @param radius The radius of the bounding sphere.
 	 */
-	bool shouldBeCulledBoudingSphere(QVector3D const& center,
-	                                 float radius) const;
+	bool shouldBeCulled(BoundingSphere const& boundingSphere) const;
 
   public:
 	/**
@@ -532,9 +532,8 @@ class BasicCamera : public QObject
 	QSize windowSize;
 
   private:
-	bool shouldBeCulledBoudingSphere(QString const& angleShift,
-	                                 QVector3D const& center,
-	                                 float radius) const;
+	bool shouldBeCulled(QString const& angleShift,
+	                    BoundingSphere const& boundingSphere) const;
 	// compute on update
 	float pixVertFOV = 0.f;
 

@@ -25,6 +25,7 @@
 #include <QVBoxLayout>
 
 #include "gui/textures/TEX2DViewer.hpp"
+#include "gui/textures/TEXCUBEMAPViewer.hpp"
 #include "memory.hpp"
 
 TextureSelector::TextureSelector(QWidget* parent)
@@ -116,6 +117,12 @@ void TextureSelector::selectElement(QListWidgetItem* item)
 		case GLTexture::Type::TEX3D:
 		case GLTexture::Type::TEXMULTISAMPLE:
 		case GLTexture::Type::TEXCUBEMAP:
+		{
+			viewer = make_qt_unique<TEXCUBEMAPViewer>(*this, *t);
+			viewer->show();
+			connect(viewer, &QDialog::finished, [this]() { viewer = nullptr; });
+		}
+		break;
 		default:
 			QMessageBox::warning(
 			    this, tr("Unsupported texture type"),

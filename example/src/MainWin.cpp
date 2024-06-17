@@ -279,6 +279,8 @@ void MainWin::initScene()
 
 	volume
 	    = std::make_unique<Volume>(GLTexture("data/example/images/volume.ktx"));
+	image = QImage("data/example/images/cc.png");
+
 
 	/*
 	largeGridShader = std::make_unique<GLShaderProgram>("grid");
@@ -467,7 +469,6 @@ void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 	                 QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION));
 	painter.setPen(QPen{Qt::green});
 	painter.drawRects(QVector<QRect>{{0, 0, 64, 64}, {64, 64, 64, 64}});
-	QImage image("data/example/images/cc.png");
 	QRectF target(256.0, 0.0, image.width(), image.height());
 	QRectF source(image.width() * 0.5, 0.0, image.width() * 0.5,
 	              image.height() * 0.5);

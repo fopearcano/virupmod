@@ -165,11 +165,27 @@ class GLShaderProgram
 	void setUniform(const char* paramName, int value) const;
 	/**
 	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
+	 * array of values of size @size.
+	 *
+	 * The uniform must be an array of type int.
+	 */
+	void setUniform(const char* paramName, unsigned int size,
+	                int const* values) const;
+	/**
+	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
 	 * value.
 	 *
 	 * The uniform must be of type float.
 	 */
 	void setUniform(const char* paramName, float value) const;
+	/**
+	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
+	 * array of values of size @size.
+	 *
+	 * The uniform must be an array of type float.
+	 */
+	void setUniform(const char* paramName, unsigned int size,
+	                float const* value) const;
 	/**
 	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
 	 * value.
@@ -214,6 +230,14 @@ class GLShaderProgram
 	 * The uniform must be of type mat4.
 	 */
 	void setUniform(const char* paramName, QMatrix4x4 const& value) const;
+	/**
+	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
+	 * array of values of size @size.
+	 *
+	 * The uniform must be an array of type mat4.
+	 */
+	void setUniform(const char* paramName, unsigned int size,
+	                QMatrix4x4 const* values) const;
 	/**
 	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
 	 * value.

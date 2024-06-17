@@ -18,6 +18,8 @@
 
 #include "camera/BasicCamera.hpp"
 
+#include "camera/BoundingVolumes.hpp"
+
 BasicCamera::BasicCamera(VRHandler const& vrHandler)
     : vrHandler(vrHandler)
     , eyeDistanceFactor(1.0f)
@@ -63,12 +65,11 @@ QVector4D BasicCamera::project(QVector4D const& vertex) const
 	return fullTransform * vertex;
 }
 
-bool BasicCamera::shouldBeCulledBoudingSphere(QVector3D const& center,
-                                              float radius) const
+bool BasicCamera::shouldBeCulled(BoundingSphere const& boundingSphere) const
 {
 	for(auto const& angleShift : clippingPlanes.keys())
 	{
-		if(!shouldBeCulledBoudingSphere(angleShift, center, radius))
+		if(!shouldBeCulled(angleShift, boundingSphere))
 		{
 			return false;
 		}
@@ -76,15 +77,14 @@ bool BasicCamera::shouldBeCulledBoudingSphere(QVector3D const& center,
 	return true;
 }
 
-bool BasicCamera::shouldBeCulledBoudingSphere(QString const& angleShift,
-                                              QVector3D const& center,
-                                              float radius) const
+bool BasicCamera::shouldBeCulled(QString const& angleShift,
+                                 BoundingSphere const& boundingSphere) const
 {
 	for(unsigned int i(0); i < 6; ++i)
 	{
 		if(QVector4D::dotProduct(clippingPlanes[angleShift].at(i),
-		                         QVector4D(center, 1.0))
-		   < -radius)
+		                         QVector4D(boundingSphere.position, 1.0))
+		   < -boundingSphere.radius)
 		{
 			return true;
 		}

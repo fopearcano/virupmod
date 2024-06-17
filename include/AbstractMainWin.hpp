@@ -436,6 +436,7 @@ class AbstractMainWin : public RenderingWindow
 
 	// Menu Bar
 	std::unique_ptr<QMenuBar> menuBar;
+	QAction* logProfAction = nullptr;
 
 	// Dialog3Ds Wheel
 	std::unique_ptr<Dialog3DWheel> dialog3dWheel;

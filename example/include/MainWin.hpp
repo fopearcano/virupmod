@@ -138,6 +138,8 @@ class MainWin : public AbstractMainWin
 
 	std::unique_ptr<Volume> volume;
 
+	QImage image;
+
 	/* TEST ANISOTROPIC FILTERING
 	std::unique_ptr<GLShaderProgram> largeGridShader;
 	std::unique_ptr<GLTexture> largeGridTex;
