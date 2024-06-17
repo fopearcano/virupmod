@@ -247,9 +247,11 @@ void MainWin::initScene()
 		playarea->setVertices(vertices, indices);
 	}
 
-	model                = std::make_unique<Model>("models/drone/scene.gltf");
-	light                = std::make_unique<Light>();
-	light->ambiantFactor = 0.05f;
+	model                 = std::make_unique<Model>("models/drone/scene.gltf");
+	light0                = std::make_unique<Light>();
+	light0->ambiantFactor = 0.05f;
+	light1                = std::make_unique<Light>();
+	light1->ambiantFactor = 0.05f;
 
 	GLTexture tex("data/example/images/cc.ktx");
 	tex.setName("cc.ktx");
@@ -280,7 +282,6 @@ void MainWin::initScene()
 	volume
 	    = std::make_unique<Volume>(GLTexture("data/example/images/volume.ktx"));
 	image = QImage("data/example/images/cc.png");
-
 
 	/*
 	largeGridShader = std::make_unique<GLShaderProgram>("grid");
@@ -375,17 +376,21 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	modelModel = QMatrix4x4();
 	modelModel.scale(1.5 / model->getBoundingSphereRadius());
 	float secs(timer.elapsed() / 5000.f);
-	light->color
-	    = QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0) / 255.f;
-	light->color = QVector3D(255, 255, 255) / 255.f;
+	light0->setDirection(QVector3D(cos(secs / 4.0), sin(secs / 4.0), 0.0));
+	light0->color = {0.f, 1.f, 0.f};
+	    /*= QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0)
+	      / 255.f;*/
+	light1->color = QVector3D(255, 255, 255) / 255.f;
 	if(vrHandler->isEnabled())
 	{
 		QVector3D t(0.f, 1.4f * model->getBoundingSphereRadius(), 0.f);
 		modelModel.translate(t);
 		modelModel.rotate(180.f, QVector3D(0.f, 1.f, 0.f));
 		// light->direction = QVector3D(cos(secs), 0.f, sin(secs));
-		light->setBoundingSphereRadius(1.5);
-		light->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light0->setBoundingSphereRadius(1.5);
+		light1->setBoundingSphereRadius(1.5);
+		light0->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light1->setCenter(t * 1.5 / model->getBoundingSphereRadius());
 	}
 	else
 	{
@@ -395,11 +400,13 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 		modelModel.rotate(120.f, QVector3D(1.f, 1.f, 1.f).normalized());
 		modelModel.scale(0.3);
 		// light->direction = QVector3D(sin(secs), cos(secs), 0.f);
-		light->setBoundingSphereRadius(1.5 * 0.3);
-		light->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light0->setBoundingSphereRadius(1.5 * 0.3);
+		light1->setBoundingSphereRadius(1.5 * 0.3);
+		light0->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light1->setCenter(t * 1.5 / model->getBoundingSphereRadius());
 	}
 	modelModel.rotate(100.f * secs, QVector3D(0.f, 1.f, 0.f));
-	model->generateShadowMap(modelModel, *light);
+	model->generateShadowMap(modelModel, {light0.get(), light1.get()});
 }
 
 void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
@@ -439,12 +446,14 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 	{
 		model->render(camera.standingTrackedSpaceToWorldTransform().inverted()
 		                  * camera.getWorldSpacePosition(),
-		              modelModel, *light,
+		              modelModel,
+		              std::vector<const Light*>{light0.get(), light1.get()},
 		              GLHandler::GeometricSpace::STANDINGTRACKED);
 	}
 	else
 	{
-		model->render(camera.getWorldSpacePosition(), modelModel, *light);
+		model->render(camera.getWorldSpacePosition(), modelModel,
+		              std::vector<const Light*>{light0.get(), light1.get()});
 	}
 
 	widget3d->render(*toneMappingModel);

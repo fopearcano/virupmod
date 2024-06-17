@@ -33,7 +33,7 @@ Model::Model(QString const& modelName, QColor const& defaultDiffuseColor)
 	shader.setUniform("shininess", 5);
 	shader.setUniform("opacity", 6);
 	shader.setUniform("lightmap", 7);
-	shader.setUniform("shadowmap", 8);
+	shader.setUniform("shadowmap", 2, std::array<int, 2>{8, 9}.data());
 }
 
 Model::Model(QString const& modelName, GLShaderProgram&& shader,
@@ -53,7 +53,7 @@ Model::Model(QString const& modelName, GLShaderProgram&& shader,
 	this->shader.setUniform("shininess", 5);
 	this->shader.setUniform("opacity", 6);
 	this->shader.setUniform("lightmap", 7);
-	this->shader.setUniform("shadowmap", 8);
+	this->shader.setUniform("shadowmap", 2, std::array<int, 2>{8, 9}.data());
 }
 
 std::vector<std::pair<GLMesh const&, QMatrix4x4>> Model::getMeshes() const
@@ -66,7 +66,8 @@ std::vector<std::pair<GLMesh const&, QMatrix4x4>> Model::getMeshes() const
 	return result;
 }
 
-void Model::generateShadowMap(QMatrix4x4 const& model, Light const& light) const
+void Model::generateShadowMap(QMatrix4x4 const& model,
+                              std::vector<Light const*> const& lights) const
 {
 	std::vector<GLMesh const*> glMeshes;
 	std::vector<QMatrix4x4> models;
@@ -75,7 +76,10 @@ void Model::generateShadowMap(QMatrix4x4 const& model, Light const& light) const
 		glMeshes.emplace_back(&mesh.mesh);
 		models.push_back(mesh.transform);
 	}
-	light.generateShadowMap(glMeshes, models, model);
+	for(auto light : lights)
+	{
+		light->generateShadowMap(glMeshes, models, model);
+	}
 }
 
 void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
@@ -107,11 +111,17 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 }
 
 void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
-                   Light const& light,
+                   std::vector<Light const*> const& lights,
                    GLHandler::GeometricSpace geometricSpace) const
 {
-	light.setUpShader(shader, model);
-	render(cameraPosition, model, {&light.getShadowMap()}, geometricSpace);
+	Light::setUpShader(shader, lights, model);
+	std::vector<GLTexture const*> shadowMaps;
+	shadowMaps.reserve(lights.size());
+	for(auto light : lights)
+	{
+		shadowMaps.push_back(&light->getShadowMap());
+	}
+	render(cameraPosition, model, shadowMaps, geometricSpace);
 }
 
 QMap<QString, QString> Model::setUpShaderDefines()

@@ -49,6 +49,10 @@ class Light
 	QVector3D color; // linear RGB in luminance units
 	float ambiantFactor;
 
+	static void setUpShader(GLShaderProgram const& shader,
+	                        std::vector<Light const*> const& lights,
+	                        QMatrix4x4 const& model);
+
   private:
 	GLFramebufferObject shadowMap;
 	GLShaderProgram shadowShader;

@@ -1,4 +1,5 @@
-#version 150 core
+#version 420 core
+#define LIGHTS_NB 2
 
 uniform sampler2D diffuse;
 uniform sampler2D specular;
@@ -9,17 +10,17 @@ uniform sampler2D shininess;
 uniform sampler2D opacity;
 uniform sampler2D lightmap;
 
-uniform sampler2DShadow shadowmap;
+uniform sampler2DShadow shadowmap[LIGHTS_NB];
 
 in vec3 f_position;
 in vec3 f_tangent;
 in vec3 f_normal;
 in vec2 f_texcoord;
-in vec4 f_lightrelpos;
+in vec4 f_lightrelpos[LIGHTS_NB];
 
-uniform vec3 lightDirection;
-uniform vec3 lightColor;
-uniform float lightAmbiantFactor;
+uniform vec3 lightDirection[LIGHTS_NB];
+uniform vec3 lightColor[LIGHTS_NB];
+uniform float lightAmbiantFactor[LIGHTS_NB];
 uniform vec3 cameraPosition;
 
 out vec4 outColor;
@@ -56,25 +57,29 @@ void main()
 	vec4 lightmapColor  = texture(lightmap, f_texcoord);
 
 	vec3 normal = normalize(fromtangentspace * (normalColor.rgb * 2.0 - 1.0));
-
-	// todo use normalmap
-	float lightcoeff = max(0.0, dot(normal, -1.0 * lightDirection));
-
-	// shadow map
-	float shadow = computeShadow(f_lightrelpos, shadowmap);
-	lightcoeff *= shadow;
-
-	// diffuse
-	outColor.rgb
-	    = max(lightAmbiantFactor, lightcoeff) * diffuseColor.rgb * lightColor;
-
-	// specular
 	vec3 viewDir    = normalize(cameraPosition - f_position);
-	vec3 reflectDir = reflect(lightDirection, normal);
-	float spec      = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-	outColor.rgb
-	    += spec * lightColor * max(0.0, lightcoeff) * specularColor.rgb;
-	outColor /= 2.0;
+
+	outColor = vec4(0.0, 0.0, 0.0, 1.0);
+	for(int i = 0; i < LIGHTS_NB; ++i)
+	{
+		// todo use normalmap
+		float lightcoeff = max(0.0, dot(normal, -1.0 * lightDirection[i]));
+
+		// shadow map
+		float shadow = computeShadow(f_lightrelpos[i], shadowmap[i]);
+		lightcoeff *= shadow;
+
+		// diffuse
+		vec3 Lo = max(lightAmbiantFactor[i], lightcoeff) * diffuseColor.rgb
+		          * lightColor[i];
+
+		// specular
+		vec3 reflectDir = reflect(lightDirection[i], normal);
+		float spec      = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+		Lo += spec * lightColor[i] * max(0.0, lightcoeff) * specularColor.rgb;
+		Lo /= 2.0;
+		outColor.rgb += Lo;
+	}
 
 	outColor.rgb += emissiveColor.rgb;
 
@@ -83,4 +88,5 @@ void main()
 
 	// lightmap
 	outColor.rgb *= lightmapColor.r;
+
 }

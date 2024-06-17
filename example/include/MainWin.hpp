@@ -127,7 +127,8 @@ class MainWin : public AbstractMainWin
 	ShaderProgram playareaShader;
 
 	std::unique_ptr<Model> model;
-	std::unique_ptr<Light> light;
+	std::unique_ptr<Light> light0;
+	std::unique_ptr<Light> light1;
 	QMatrix4x4 modelModel;
 
 	std::unique_ptr<Billboard> bill;

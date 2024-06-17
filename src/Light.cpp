@@ -122,3 +122,34 @@ void Light::render(float angularSizeRad)
 	GLHandler::setUpRender(def, model, GLHandler::GeometricSpace::SKYBOX);
 	mesh.render();
 }
+
+void Light::setUpShader(GLShaderProgram const& shader,
+                        std::vector<Light const*> const& lights,
+                        QMatrix4x4 const& model)
+{
+	std::vector<QVector3D> lightDirections;
+	std::vector<QVector3D> lightColors;
+	std::vector<float> lightAmbiantFactors;
+	std::vector<QMatrix4x4> lightspaces;
+	std::vector<float> boundingSphereRadii;
+
+	for(auto light : lights)
+	{
+		QVector3D relDir
+		    = QVector3D(model.inverted() * QVector4D(light->direction, 0.f));
+		lightDirections.emplace_back(relDir.normalized());
+		lightColors.emplace_back(light->color);
+		lightAmbiantFactors.emplace_back(light->ambiantFactor);
+		lightspaces.emplace_back(light->getTransformation(model, true));
+		boundingSphereRadii.emplace_back(light->boundingSphereRadius);
+	}
+
+	shader.setUniform("lightDirection", lightDirections.size(),
+	                  lightDirections.data());
+	shader.setUniform("lightColor", lightColors.size(), lightColors.data());
+	shader.setUniform("lightAmbiantFactor", lightAmbiantFactors.size(),
+	                  lightAmbiantFactors.data());
+	shader.setUniform("lightspace", lightspaces.size(), lightspaces.data());
+	shader.setUniform("boundingSphereRadius", boundingSphereRadii.size(),
+	                  boundingSphereRadii.data());
+}
