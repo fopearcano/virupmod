@@ -576,7 +576,8 @@ void Universe::updatePlanetarySystem()
 	// but if it was, loadClosestSystem would have been called (20 lines above)
 	// and systemRenderer would have been set
 	// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
-	systemRenderer->updateMesh(currentUt, camPlanet);
+	systemRenderer->setUT(currentUt);
+	systemRenderer->update(camPlanet);
 }
 
 void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
@@ -604,7 +605,7 @@ void Universe::renderPlanetarySystem()
 
 void Universe::renderPlanetarySystemTransparent()
 {
-	systemRenderer->renderTransparent(camPlanet);
+	// systemRenderer->renderTransparent(camPlanet);
 }
 
 void Universe::updateBoundingBox(BBox const& elementBoundingbox)
