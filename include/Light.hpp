@@ -35,14 +35,10 @@ class Light
 	float getBoundingSphereRadius() const { return boundingSphereRadius; };
 	void setBoundingSphereRadius(float boundingSphereRadius);
 
-	QMatrix4x4 getTransformation(QMatrix4x4 const& model,
-	                             bool biased = false) const;
-	void setUpShader(GLShaderProgram const& shader,
-	                 QMatrix4x4 const& model) const;
+	QMatrix4x4 getTransformation(bool biased = false) const;
 	GLTexture const& getShadowMap() const;
 	void generateShadowMap(std::vector<GLMesh const*> const& meshes,
-	                       std::vector<QMatrix4x4> const& models,
-	                       QMatrix4x4 const& model = {}) const;
+	                       std::vector<QMatrix4x4> const& models) const;
 	// renders a bright sphere at infinity, default is angular size of the sun
 	void render(float angularSizeRad = 0.542f * M_PI / 180.f);
 
@@ -50,8 +46,7 @@ class Light
 	float ambiantFactor;
 
 	static void setUpShader(GLShaderProgram const& shader,
-	                        std::vector<Light const*> const& lights,
-	                        QMatrix4x4 const& model);
+	                        std::vector<Light const*> const& lights);
 
   private:
 	GLFramebufferObject shadowMap;

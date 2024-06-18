@@ -119,7 +119,7 @@ void PBRMaterial::update(QMatrix4x4 const& modelMatrix,
 	shader.setUniform("model", modelMatrix);
 	shader.setUniform("campos", cameraWorldPos);
 
-	Light::setUpShader(shader, lights, {});
+	Light::setUpShader(shader, lights);
 }
 
 void PBRMaterial::setUpTextures(GLTexture const& irradiancemap,

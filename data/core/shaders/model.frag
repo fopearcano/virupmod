@@ -21,7 +21,9 @@ in vec4 f_lightrelpos[LIGHTS_NB];
 uniform vec3 lightDirection[LIGHTS_NB];
 uniform vec3 lightColor[LIGHTS_NB];
 uniform float lightAmbiantFactor[LIGHTS_NB];
-uniform vec3 cameraPosition;
+
+uniform mat4 model;
+uniform vec3 campos;
 
 out vec4 outColor;
 
@@ -57,7 +59,8 @@ void main()
 	vec4 lightmapColor  = texture(lightmap, f_texcoord);
 
 	vec3 normal = normalize(fromtangentspace * (normalColor.rgb * 2.0 - 1.0));
-	vec3 viewDir    = normalize(cameraPosition - f_position);
+	normal = normalize((model * vec4(normal, 0.0)).xyz); // to world
+	vec3 viewDir    = normalize(campos - (model * vec4(f_position, 1.0)).xyz);
 
 	outColor = vec4(0.0, 0.0, 0.0, 1.0);
 	for(int i = 0; i < LIGHTS_NB; ++i)

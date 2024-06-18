@@ -69,24 +69,13 @@ void Light::setBoundingSphereRadius(float boundingSphereRadius)
 	           -1.f * boundingSphereRadius, boundingSphereRadius);
 }
 
-QMatrix4x4 Light::getTransformation(QMatrix4x4 const& model, bool biased) const
+QMatrix4x4 Light::getTransformation(bool biased) const
 {
 	if(biased)
 	{
-		return bias * proj * view * model;
+		return bias * proj * view;
 	}
-	return proj * view * model;
-}
-
-void Light::setUpShader(GLShaderProgram const& shader,
-                        QMatrix4x4 const& model) const
-{
-	QVector3D relDir = QVector3D(model.inverted() * QVector4D(direction, 0.f));
-	shader.setUniform("lightDirection", relDir.normalized());
-	shader.setUniform("lightColor", color);
-	shader.setUniform("lightAmbiantFactor", ambiantFactor);
-	shader.setUniform("lightspace", getTransformation(model, true));
-	shader.setUniform("boundingSphereRadius", boundingSphereRadius);
+	return proj * view;
 }
 
 GLTexture const& Light::getShadowMap() const
@@ -95,14 +84,13 @@ GLTexture const& Light::getShadowMap() const
 }
 
 void Light::generateShadowMap(std::vector<GLMesh const*> const& meshes,
-                              std::vector<QMatrix4x4> const& models,
-                              QMatrix4x4 const& model) const
+                              std::vector<QMatrix4x4> const& models) const
 {
 	// see third comment :
 	// https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
 	GLStateSet glState({{GL_CULL_FACE, false}});
 	GLHandler::beginRendering(GL_DEPTH_BUFFER_BIT, shadowMap);
-	QMatrix4x4 lightSpace(getTransformation(model));
+	QMatrix4x4 lightSpace(getTransformation());
 	for(unsigned int i(0); i < meshes.size(); ++i)
 	{
 		shadowShader.setUniform("camera", lightSpace * models[i]);
@@ -124,8 +112,7 @@ void Light::render(float angularSizeRad)
 }
 
 void Light::setUpShader(GLShaderProgram const& shader,
-                        std::vector<Light const*> const& lights,
-                        QMatrix4x4 const& model)
+                        std::vector<Light const*> const& lights)
 {
 	std::vector<QVector3D> lightDirections;
 	std::vector<QVector3D> lightColors;
@@ -135,12 +122,10 @@ void Light::setUpShader(GLShaderProgram const& shader,
 
 	for(auto light : lights)
 	{
-		QVector3D relDir
-		    = QVector3D(model.inverted() * QVector4D(light->direction, 0.f));
-		lightDirections.emplace_back(relDir.normalized());
+		lightDirections.emplace_back(light->direction.normalized());
 		lightColors.emplace_back(light->color);
 		lightAmbiantFactors.emplace_back(light->ambiantFactor);
-		lightspaces.emplace_back(light->getTransformation(model, true));
+		lightspaces.emplace_back(light->getTransformation(true));
 		boundingSphereRadii.emplace_back(light->boundingSphereRadius);
 	}
 

@@ -74,11 +74,11 @@ void Model::generateShadowMap(QMatrix4x4 const& model,
 	for(auto const& mesh : meshes)
 	{
 		glMeshes.emplace_back(&mesh.mesh);
-		models.push_back(mesh.transform);
+		models.push_back(model * mesh.transform);
 	}
 	for(auto light : lights)
 	{
-		light->generateShadowMap(glMeshes, models, model);
+		light->generateShadowMap(glMeshes, models);
 	}
 }
 
@@ -86,7 +86,7 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
                    std::vector<GLTexture const*> const& shadowMaps,
                    GLHandler::GeometricSpace geometricSpace) const
 {
-	shader.setUniform("cameraPosition", model.inverted() * cameraPosition);
+	shader.setUniform("campos", cameraPosition);
 
 	for(auto& mesh : meshes)
 	{
@@ -104,7 +104,7 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 			texs.push_back(sMap);
 		}
 		GLHandler::useTextures(texs);
-		shader.setUniform("localTransform", mesh.transform);
+		shader.setUniform("model", model * mesh.transform);
 		GLHandler::setUpRender(shader, model * mesh.transform, geometricSpace);
 		mesh.mesh.render();
 	}
@@ -114,7 +114,7 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
                    std::vector<Light const*> const& lights,
                    GLHandler::GeometricSpace geometricSpace) const
 {
-	Light::setUpShader(shader, lights, model);
+	Light::setUpShader(shader, lights);
 	std::vector<GLTexture const*> shadowMaps;
 	shadowMaps.reserve(lights.size());
 	for(auto light : lights)

@@ -18,9 +18,10 @@
 
 #include "scene/AssimpNode.hpp"
 
-AssimpNode::AssimpNode(QString const& src, std::map<QString, Node*>& nodesDict)
+AssimpNode::AssimpNode(QString const& src, std::map<QString, Node*>& nodesDict,
+                       QColor const& defaultDiffuseColor)
     : Node(nodesDict, src.split('/').last())
-    , model(src)
+    , model(src, defaultDiffuseColor)
 {
 	boundingSphere = {{}, model.getBoundingSphereRadius()};
 }
