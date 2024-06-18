@@ -82,11 +82,11 @@ void Model::generateShadowMap(QMatrix4x4 const& model,
 	}
 }
 
-void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
+void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
                    std::vector<GLTexture const*> const& shadowMaps,
                    GLHandler::GeometricSpace geometricSpace) const
 {
-	shader.setUniform("campos", cameraPosition);
+	shader.setUniform("campos", camera.getWorldSpacePosition());
 
 	for(auto& mesh : meshes)
 	{
@@ -110,7 +110,7 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 	}
 }
 
-void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
+void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
                    std::vector<Light const*> const& lights,
                    GLHandler::GeometricSpace geometricSpace) const
 {
@@ -121,7 +121,7 @@ void Model::render(QVector3D const& cameraPosition, QMatrix4x4 const& model,
 	{
 		shadowMaps.push_back(&light->getShadowMap());
 	}
-	render(cameraPosition, model, shadowMaps, geometricSpace);
+	render(camera, model, shadowMaps, geometricSpace);
 }
 
 QMap<QString, QString> Model::setUpShaderDefines()

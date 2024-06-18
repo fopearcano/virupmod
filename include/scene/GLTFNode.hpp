@@ -28,7 +28,8 @@ class GLTFNode : public Node
 	GLTFNode(QString src, std::map<QString, Node*>& nodesDict);
 	virtual std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	    getShadowCastingMeshes() const override;
-	bool setTransform(QString const& subNodeName, QMatrix4x4 const& transform);
+	virtual bool setTransform(QString const& subNodeName,
+	                          QMatrix4x4 const& transform) override;
 
   protected:
 	QMatrix4x4 preMultiplyTransform() const override;

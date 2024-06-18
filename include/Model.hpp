@@ -34,17 +34,20 @@ class Model
 	Model(QString const& modelName, GLShaderProgram&& shader,
 	      QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
 	GLShaderProgram const& getShader() const { return shader; };
-	float getBoundingSphereRadius() { return boundingSphereRadius; };
+	BoundingSphere getBoundingSphere() const
+	{
+		return {{}, boundingSphereRadius};
+	};
 	std::vector<std::pair<GLMesh const&, QMatrix4x4>> getMeshes() const;
 	void generateShadowMap(QMatrix4x4 const& model,
 	                       std::vector<Light const*> const& lights) const;
 	// cameraPosition : in same space as geometricSpace
-	void render(QVector3D const& cameraPosition,
+	void render(BasicCamera const& camera,
 	            QMatrix4x4 const& model                         = QMatrix4x4(),
 	            std::vector<GLTexture const*> const& shadowMaps = {},
 	            GLHandler::GeometricSpace geometricSpace
 	            = GLHandler::GeometricSpace::WORLD) const;
-	void render(QVector3D const& cameraPosition,
+	void render(BasicCamera const& camera,
 	            QMatrix4x4 const& model                 = QMatrix4x4(),
 	            std::vector<Light const*> const& lights = {},
 	            GLHandler::GeometricSpace geometricSpace

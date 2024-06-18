@@ -18,12 +18,19 @@
 
 #include "scene/AssimpNode.hpp"
 
-AssimpNode::AssimpNode(QString const& src, std::map<QString, Node*>& nodesDict,
+AssimpNode::AssimpNode(std::map<QString, Node*>& nodesDict, QString const& src,
+                       QColor const& defaultDiffuseColor)
+    : AssimpNode(nodesDict, src, GLShaderProgram("model"), defaultDiffuseColor)
+{
+}
+
+AssimpNode::AssimpNode(std::map<QString, Node*>& nodesDict, QString const& src,
+                       GLShaderProgram&& shader,
                        QColor const& defaultDiffuseColor)
     : Node(nodesDict, src.split('/').last())
-    , model(src, defaultDiffuseColor)
+    , model(src, std::move(shader), defaultDiffuseColor)
 {
-	boundingSphere = {{}, model.getBoundingSphereRadius()};
+	boundingSphere = model.getBoundingSphere();
 }
 
 std::vector<std::pair<GLMesh const&, QMatrix4x4>>
@@ -49,5 +56,5 @@ void AssimpNode::doRender(BasicCamera const& cam,
                           std::vector<Light const*> const& lights,
                           GLTexture const& /*brdfLUT*/)
 {
-	model.render(cam.getWorldSpacePosition(), getModel(), lights);
+	model.render(cam, getModel(), lights);
 }

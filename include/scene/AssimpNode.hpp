@@ -25,7 +25,10 @@
 class AssimpNode : public Node
 {
   public:
-	AssimpNode(QString const& src, std::map<QString, Node*>& nodesDict,
+	AssimpNode(std::map<QString, Node*>& nodesDict, QString const& src,
+	           QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
+	AssimpNode(std::map<QString, Node*>& nodesDict, QString const& src,
+	           GLShaderProgram&& shader,
 	           QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
 	virtual std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	    getShadowCastingMeshes() const override;

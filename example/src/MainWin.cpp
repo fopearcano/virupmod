@@ -374,7 +374,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	movingCube->update();
 
 	modelModel = QMatrix4x4();
-	modelModel.scale(1.5 / model->getBoundingSphereRadius());
+	modelModel.scale(1.5 / model->getBoundingSphere().radius);
 	float secs(timer.elapsed() / 5000.f);
 	light0->setDirection(QVector3D(cos(secs / 4.0), sin(secs / 4.0), 0.0));
 	light0->color = {0.f, 1.f, 0.f};
@@ -383,14 +383,14 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	light1->color = QVector3D(255, 255, 255) / 255.f;
 	if(vrHandler->isEnabled())
 	{
-		QVector3D t(0.f, 1.4f * model->getBoundingSphereRadius(), 0.f);
+		QVector3D t(0.f, 1.4f * model->getBoundingSphere().radius, 0.f);
 		modelModel.translate(t);
 		modelModel.rotate(180.f, QVector3D(0.f, 1.f, 0.f));
 		// light->direction = QVector3D(cos(secs), 0.f, sin(secs));
 		light0->setBoundingSphereRadius(1.5);
 		light1->setBoundingSphereRadius(1.5);
-		light0->setCenter(t * 1.5 / model->getBoundingSphereRadius());
-		light1->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light0->setCenter(t * 1.5 / model->getBoundingSphere().radius);
+		light1->setCenter(t * 1.5 / model->getBoundingSphere().radius);
 	}
 	else
 	{
@@ -402,8 +402,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 		// light->direction = QVector3D(sin(secs), cos(secs), 0.f);
 		light0->setBoundingSphereRadius(1.5 * 0.3);
 		light1->setBoundingSphereRadius(1.5 * 0.3);
-		light0->setCenter(t * 1.5 / model->getBoundingSphereRadius());
-		light1->setCenter(t * 1.5 / model->getBoundingSphereRadius());
+		light0->setCenter(t * 1.5 / model->getBoundingSphere().radius);
+		light1->setCenter(t * 1.5 / model->getBoundingSphere().radius);
 	}
 	modelModel.rotate(100.f * secs, QVector3D(0.f, 1.f, 0.f));
 	model->generateShadowMap(modelModel, {light0.get(), light1.get()});
@@ -444,15 +444,15 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& /*pathId*/)
 
 	if(vrHandler->isEnabled())
 	{
-		model->render(camera.standingTrackedSpaceToWorldTransform().inverted()
-		                  * camera.getWorldSpacePosition(),
+		model->render(/*camera.standingTrackedSpaceToWorldTransform().inverted()
+		                  * */camera/*.getWorldSpacePosition()*/,
 		              modelModel,
-		              std::vector<const Light*>{light0.get(), light1.get()},
-		              GLHandler::GeometricSpace::STANDINGTRACKED);
+		              std::vector<const Light*>{light0.get(), light1.get()}/*,
+		              GLHandler::GeometricSpace::STANDINGTRACKED*/);
 	}
 	else
 	{
-		model->render(camera.getWorldSpacePosition(), modelModel,
+		model->render(camera, modelModel,
 		              std::vector<const Light*>{light0.get(), light1.get()});
 	}
 

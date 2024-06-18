@@ -40,6 +40,11 @@ class Node
 
 	virtual std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	    getShadowCastingMeshes() const = 0;
+	virtual bool setTransform(QString const& /*subNodeName*/,
+	                          QMatrix4x4 const& /*transform*/)
+	{
+		return false;
+	};
 	BoundingSphere getBoundingSphere() const { return boundingSphere; };
 	virtual bool usesGlobalIllumination() const { return true; };
 	void setModel(QMatrix4x4 model);
