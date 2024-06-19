@@ -24,7 +24,7 @@
 namespace gltf
 {
 
-Buffer::Buffer(QJsonObject const& json)
+Buffer::Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk)
 {
 	for(auto const& key : json.keys())
 	{
@@ -42,6 +42,7 @@ Buffer::Buffer(QJsonObject const& json)
 
 	if(uri == "")
 	{
+		data = std::move(glbBinBufferChunk);
 		return;
 	}
 
@@ -255,22 +256,44 @@ GLint Sampler::convertWrap(int wrap)
 	return -1;
 }
 
-Image::Image(QJsonObject const& json)
+Image::Image(QJsonObject const& json,
+             std::vector<BufferView> const& globalBufferViews)
 {
 	for(auto const& key : json.keys())
 	{
-		if(key != "uri" && key != "name" && key != "mimeType")
+		if(key != "uri" && key != "name" && key != "mimeType"
+		   && key != "bufferView")
 		{
 			qWarning() << "gltf::Image key" << key
 			           << "parsing not implemented. In this case contains:"
 			           << json[key];
 		}
 	}
-	QString uri      = json["uri"].toString();
-	QString mimeType = json["mimeType"].toString();
-	data.load(
-	    uri,
-	    mimeType.toLatin1()); // TODO(florian): solve when this is over network
+	if(json.contains("uri"))
+	{
+		QString uri      = json["uri"].toString();
+		QString mimeType = json["mimeType"].toString();
+		data.load(
+		    uri,
+		    mimeType
+		        .toLatin1()); // TODO(florian): solve when this is over network
+	}
+	else
+	{
+		int idx = json["bufferView"].toInt(-1);
+		if(idx >= 0)
+		{
+			auto const& bufferView = globalBufferViews[idx];
+			QString mimeType       = json["mimeType"].toString();
+			auto const* dataPtr
+			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			    = reinterpret_cast<uchar const*>(bufferView.buffer.data.data());
+			dataPtr += bufferView.byteOffset;
+			data.loadFromData(dataPtr, bufferView.byteLength,
+			                  mimeType.toLatin1());
+		}
+	}
+
 	name = json["name"].toString();
 }
 
@@ -633,7 +656,8 @@ void Asset::load(QJsonObject const& json)
 	minVersion = json["minVersion"].toString();
 }
 
-bool CPUData::load(QJsonObject const& json)
+bool CPUData::load(QJsonObject const& json,
+                   std::vector<char>&& glbBinBufferChunk)
 {
 	for(auto const& key : json.keys())
 	{
@@ -659,10 +683,10 @@ bool CPUData::load(QJsonObject const& json)
 
 	for(auto const& bufferJSON : json["buffers"].toArray())
 	{
-		buffers.emplace_back(bufferJSON.toObject());
+		buffers.emplace_back(bufferJSON.toObject(), glbBinBufferChunk);
 	}
 	// add default empty buffer for undefined indices
-	buffers.emplace_back(QJsonObject{});
+	buffers.emplace_back();
 
 	for(auto const& bufferViewJSON : json["bufferViews"].toArray())
 	{
@@ -684,7 +708,7 @@ bool CPUData::load(QJsonObject const& json)
 
 	for(auto const& imageJSON : json["images"].toArray())
 	{
-		images.emplace_back(imageJSON.toObject());
+		images.emplace_back(imageJSON.toObject(), bufferViews);
 	}
 
 	for(auto const& textureJSON : json["textures"].toArray())

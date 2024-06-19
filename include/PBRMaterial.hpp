@@ -21,6 +21,13 @@
 
 #include "gl/GLHandler.hpp"
 
+// wtf MSVC ; OPAQUE is defined somehow and can't be used in enum
+#ifdef Q_OS_WIN
+#ifdef OPAQUE
+#undef OPAQUE
+#endif
+#endif
+
 class Light;
 
 class PBRMaterial
@@ -103,7 +110,7 @@ class PBRMaterial
 		const QImage image;
 		const GLTexture::Sampler sampler;
 	};
-	enum AlphaMode
+	enum class AlphaMode
 	{
 		OPAQUE,
 		MASK,

@@ -52,20 +52,26 @@ int main(int argc, char* argv[])
 #else
 	versionOss << "OFF" << std::endl;
 #endif
+	versionOss << "\tlibzstd support : ";
+#ifdef LIBZSTD
+	versionOss << "ON" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
 	if(argc == 2 && std::string(argv[1]) == "--version")
 	{
 		std::cout << versionOss.str();
 		return EXIT_SUCCESS;
 	}
 
+	// Set config file names for QSettings
+	QCoreApplication::setOrganizationName(PROJECT_NAME);
+	QCoreApplication::setApplicationName("config");
+
 	// setup logging
 	Logger::init();
 
 	qDebug() << versionOss.str().c_str();
-
-	// Set config file names for QSettings
-	QCoreApplication::setOrganizationName(PROJECT_NAME);
-	QCoreApplication::setApplicationName("config");
 
 	QApplication a(argc, argv);
 

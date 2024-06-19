@@ -31,6 +31,12 @@
  */
 class GLStateSet
 {
+	struct GlobalState
+	{
+		GlobalState();
+		std::unordered_map<int, bool> map;
+	};
+
   public:
 	GLStateSet()                  = delete;
 	GLStateSet(GLStateSet const&) = delete;

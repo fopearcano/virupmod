@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-pacman -Sy --noconfirm
+pacman -Suy --noconfirm
 
 pacman -S --noconfirm git base-devel cmake assimp openvr qt5-base qt5-gamepad
 
@@ -19,12 +19,11 @@ line_number=$(grep -n 'MAKEFLAGS=' /etc/makepkg.conf | cut -f1 -d:)
 sed -i "${line_number}cMAKEFLAGS=\"-j\$\(nproc\)\"" /etc/makepkg.conf
 
 # KTX
-git clone https://aur.archlinux.org/ktx_software-git.git
-cd ktx_software-git
-# Fix : https://aur.archlinux.org/packages/ktx_software-git#comment-911429
-sed -i "s/master/main?tag=v4.1.0/" PKGBUILD
-makepkg -si --noconfirm
-cd ..
+git clone --branch v4.3.2 https://github.com/KhronosGroup/KTX-Software.git
+mkdir KTX-Software/build ; cd KTX-Software/build
+cmake .. -DKTX_FEATURE_STATIC_LIBRARY=ON
+make install -j $(nproc)
+cd ../..
 
 
 # PythonQt
@@ -36,6 +35,8 @@ makepkg -si --noconfirm
 cd ..
 
 cd ..
+
+rm -rf deps
 
 # install project additional deps
 /project_install_dependencies.sh

@@ -18,6 +18,11 @@
 
 #include "Logger.hpp"
 
+#include <QDir>
+#include <QMessageBox>
+#include <QStandardPaths>
+#include <QtDebug>
+
 Logger::NoFormatGuard::NoFormatGuard()
 {
 	Logger::format() = false;
@@ -42,7 +47,16 @@ bool& Logger::format()
 
 void Logger::init()
 {
-	logFile().open("log.txt", std::ofstream::out | std::ofstream::trunc);
+	auto dirPath
+	    = QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation)
+	          .first();
+	QDir dir(dirPath);
+	dir.cdUp();
+	dirPath = dir.absolutePath();
+	dir.mkpath(".");
+
+	logFile().open(dirPath.toStdString() + "/log.txt",
+	               std::ofstream::out | std::ofstream::trunc);
 	logFile() << QDateTime::currentDateTime().toString().toStdString()
 	          << std::endl;
 	qInstallMessageHandler(log);
@@ -102,6 +116,17 @@ void Logger::log(QtMsgType type, const QMessageLogContext& context,
 	          << shortFile << ":" << context.line << ", " << function << ":"
 	          << std::endl
 	          << "\t" << localMsg.constData() << std::endl;
+
+	if(type == QtCriticalMsg || type == QtFatalMsg)
+	{
+		std::string messageBoxStr("<em>" + std::string(shortFile) + ':'
+		                          + QString::number(context.line).toStdString()
+		                          + "<br/>" + function + "</em><br/><br/>"
+		                          + localMsg.constData());
+
+		QMessageBox::critical(nullptr, messageTypeStr.c_str(),
+		                      messageBoxStr.c_str());
+	}
 }
 
 void Logger::close()

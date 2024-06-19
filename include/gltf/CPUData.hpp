@@ -21,6 +21,13 @@
 
 #include "gl/GLHandler.hpp"
 
+// wtf MSVC ; OPAQUE is defined somehow and can't be used in enum
+#ifdef Q_OS_WIN
+#ifdef OPAQUE
+#undef OPAQUE
+#endif
+#endif
+
 namespace gltf
 {
 struct Asset
@@ -33,7 +40,10 @@ struct Asset
 };
 struct Buffer
 {
-	Buffer(QJsonObject const& json);
+	// default buffer
+	Buffer() = default;
+	// ! might std::move glbBinBufferChunk
+	Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk);
 	QString name;
 	std::vector<char> data;
 };
@@ -91,7 +101,8 @@ struct Sampler
 };
 struct Image
 {
-	Image(QJsonObject const& json);
+	Image(QJsonObject const& json,
+	      std::vector<BufferView> const& globalBufferViews);
 	QImage data;
 	QString name;
 };
@@ -187,7 +198,7 @@ struct CPUData
 	std::vector<Scene> scenes;
 	Scene const* scene = nullptr;
 
-	bool load(QJsonObject const& json);
+	bool load(QJsonObject const& json, std::vector<char>&& glbBinBufferChunk);
 };
 
 } // namespace gltf

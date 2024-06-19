@@ -36,6 +36,7 @@ class Timings
 		bool ended   = false;
 		QElapsedTimer cpuTimer;
 		uint64_t cpuTime;
+		bool persistent = false;
 	};
 
 	struct QStringHash
@@ -48,7 +49,7 @@ class Timings
 
   public:
 	Timings() = delete;
-	static void start(QString const& timerName);
+	static void start(QString const& timerName, bool persistent = false);
 	static void end(QString const& timerName);
 
   private:

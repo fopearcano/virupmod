@@ -45,7 +45,8 @@ enum class PrimitiveType
 	TRIANGLES      = GL_TRIANGLES,
 	TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
 	TRIANGLE_FAN   = GL_TRIANGLE_FAN,
-	AUTO // if no ebo, POINTS, else TRIANGLES
+	QUAD           = GL_PATCHES, // QUAD PATCH for tesselation shader
+	AUTO,                        // if no ebo, POINTS, else TRIANGLES
 };
 
 /** @ingroup pywrap
@@ -94,6 +95,7 @@ class GLMesh
 	 * @brief Allocates a new @ref Mesh.
 	 */
 	GLMesh();
+	GLBuffer const& getVBO() const { return vbo; };
 	GLBuffer& getVBO() { return vbo; };
 	GLBuffer& getEBO() { return ebo; };
 	PrimitiveType getPrimitiveType() const { return primitiveType; };

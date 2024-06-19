@@ -94,6 +94,21 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 			}
 		}
 	}
+	else if(primitiveType == PrimitiveType::QUAD)
+	{
+		for(unsigned int i(1); i < size; ++i)
+		{
+			for(unsigned int j(1); j < size; ++j)
+			{
+				unsigned int id = j + size * i;
+
+				elements.push_back(id - size - 1);
+				elements.push_back(id - size);
+				elements.push_back(id);
+				elements.push_back(id - 1);
+			}
+		}
+	}
 	mesh.setVertexShaderMapping(shader, {{"position", 2}});
 	mesh.setVertices(vertices, elements);
 }

@@ -92,9 +92,9 @@ QMatrix4x4
                                              Side eye, float nearPlan,
                                              float farPlan) const
 {
-	QVector3D deltaRel(QSettings()
-	                       .value("vr/virtualcamshift")
-	                       .value<QVector3D>()); // move cam in height units
+	auto deltaRel(QSettings()
+	                  .value("vr/virtualcamshift")
+	                  .value<QVector3D>()); // move cam in height units
 
 	// add eye displacement
 	double screenHeight = QSettings().value("vr/screenheight").toDouble(); // m

@@ -23,6 +23,8 @@
 #include "GamepadHandler.hpp"
 #include "camera/BasicCamera.hpp"
 
+class QMouseEvent;
+
 class FPSCamera : public BasicCamera
 {
   public:

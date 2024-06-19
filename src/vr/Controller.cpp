@@ -102,8 +102,8 @@ Controller::Controller(vr::IVRSystem* vr_pointer, unsigned int nDevice,
 	if(error != vr::VRRenderModelError_None)
 	{
 		qWarning() << QString("Unable to load render texture id ")
-		                  + model->diffuseTextureId + " for render model "
-		                  + render_model_name.c_str();
+		                  + QString::number(model->diffuseTextureId)
+		                  + " for render model " + render_model_name.c_str();
 		vr::VRRenderModels()->FreeRenderModel(model);
 		return;
 	}

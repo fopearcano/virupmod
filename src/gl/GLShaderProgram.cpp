@@ -348,7 +348,7 @@ QString GLShaderProgram::getFullPreprocessedSource(
 	QString source(in.readAll().toLocal8Bit());
 
 	// add source name at the beginning and end of the file
-	source.insert(source.indexOf('\n'), QString(" ///!BEGSRC " + path));
+	source.insert(source.indexOf('\n'), " ///!BEGSRC " + path);
 	source.insert(source.lastIndexOf('\n'), QString(" ///!ENDSRC"));
 
 	// include other preprocessed sources within source

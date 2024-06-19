@@ -391,13 +391,14 @@ QComboBox* SettingsWidget::addStringAmongListSetting(
 {
 	QString fullName(currentGroup + '/' + name);
 
-	if(!settings.contains(fullName))
-	{
-		settings.setValue(fullName, values[defaultIndex]);
-	}
-
 	QString currentVal(settings.value(fullName).toString());
 	int currentIndex(values.indexOf(currentVal));
+
+	if(!settings.contains(fullName) || currentIndex < 0)
+	{
+		settings.setValue(fullName, values[defaultIndex]);
+		currentIndex = defaultIndex;
+	}
 
 	auto comboBox = make_qt_unique<QComboBox>(*this);
 	for(int i(0); i < strLabels.size(); ++i)
@@ -529,7 +530,7 @@ void SettingsWidget::addVector3DSetting(QString const& name,
 		settings.setValue(fullName, defaultVal);
 	}
 
-	QVector3D stored(settings.value(fullName).value<QVector3D>());
+	auto stored(settings.value(fullName).value<QVector3D>());
 
 	auto w                                = make_qt_unique<QWidget>(*this);
 	auto layout                           = make_qt_unique<QHBoxLayout>(*w);
@@ -574,7 +575,7 @@ void SettingsWidget::addColorSetting(QString const& name,
 		settings.setValue(fullName, defaultVal);
 	}
 
-	QColor stored(settings.value(fullName).value<QColor>());
+	auto stored(settings.value(fullName).value<QColor>());
 
 	auto colorSelector = make_qt_unique<ColorSelector>(*this, label);
 

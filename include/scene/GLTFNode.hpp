@@ -38,6 +38,8 @@ class GLTFNode : public Node
 	              GLTexture const& brdfLUT, bool environment) override;
 
   private:
+	static QJsonObject unpack(QString const& src,
+	                          std::vector<char>& readBinBuffer);
 	void loadCPU();
 	void loadGPU();
 

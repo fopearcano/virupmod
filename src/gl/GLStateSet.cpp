@@ -20,51 +20,56 @@
 
 #include "gl/GLHandler.hpp"
 
+GLStateSet::GlobalState::GlobalState()
+{
+	// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
+	map[GL_BLEND]                         = false;
+	map[GL_CLIP_DISTANCE0]                = false;
+	map[GL_CLIP_DISTANCE1]                = false;
+	map[GL_CLIP_DISTANCE2]                = false;
+	map[GL_CLIP_DISTANCE3]                = false;
+	map[GL_CLIP_DISTANCE4]                = false;
+	map[GL_CLIP_DISTANCE5]                = false;
+	map[GL_CLIP_DISTANCE6]                = false;
+	map[GL_CLIP_DISTANCE7]                = false;
+	map[GL_COLOR_LOGIC_OP]                = false;
+	map[GL_CULL_FACE]                     = false;
+	map[GL_DEBUG_OUTPUT]                  = false;
+	map[GL_DEBUG_OUTPUT_SYNCHRONOUS]      = false;
+	map[GL_DEPTH_CLAMP]                   = false;
+	map[GL_DEPTH_TEST]                    = false;
+	map[GL_DITHER]                        = true;
+	map[GL_FRAMEBUFFER_SRGB]              = false;
+	map[GL_LINE_SMOOTH]                   = false;
+	map[GL_MULTISAMPLE]                   = true;
+	map[GL_POLYGON_OFFSET_FILL]           = false;
+	map[GL_POLYGON_OFFSET_LINE]           = false;
+	map[GL_POLYGON_OFFSET_POINT]          = false;
+	map[GL_POLYGON_SMOOTH]                = false;
+	map[GL_PRIMITIVE_RESTART]             = false;
+	map[GL_PRIMITIVE_RESTART_FIXED_INDEX] = false;
+	map[GL_RASTERIZER_DISCARD]            = false;
+	map[GL_SAMPLE_ALPHA_TO_COVERAGE]      = false;
+	map[GL_SAMPLE_ALPHA_TO_ONE]           = false;
+	map[GL_SAMPLE_COVERAGE]               = false;
+	map[GL_SAMPLE_SHADING]                = false;
+	map[GL_SAMPLE_MASK]                   = false;
+	map[GL_SCISSOR_TEST]                  = false;
+	map[GL_STENCIL_TEST]                  = false;
+	map[GL_TEXTURE_CUBE_MAP_SEAMLESS]     = false;
+	map[GL_PROGRAM_POINT_SIZE]            = false;
+
+	// apply GLHandler defaults
+	map[GL_CULL_FACE]  = true;
+	map[GL_DEPTH_TEST] = true;
+}
+
 std::unordered_map<int, bool>& GLStateSet::globalState()
 {
 	// https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
-	static std::unordered_map<int, bool> globalState;
-	globalState[GL_BLEND]                         = false;
-	globalState[GL_CLIP_DISTANCE0]                = false;
-	globalState[GL_CLIP_DISTANCE1]                = false;
-	globalState[GL_CLIP_DISTANCE2]                = false;
-	globalState[GL_CLIP_DISTANCE3]                = false;
-	globalState[GL_CLIP_DISTANCE4]                = false;
-	globalState[GL_CLIP_DISTANCE5]                = false;
-	globalState[GL_CLIP_DISTANCE6]                = false;
-	globalState[GL_CLIP_DISTANCE7]                = false;
-	globalState[GL_COLOR_LOGIC_OP]                = false;
-	globalState[GL_CULL_FACE]                     = false;
-	globalState[GL_DEBUG_OUTPUT]                  = false;
-	globalState[GL_DEBUG_OUTPUT_SYNCHRONOUS]      = false;
-	globalState[GL_DEPTH_CLAMP]                   = false;
-	globalState[GL_DEPTH_TEST]                    = false;
-	globalState[GL_DITHER]                        = true;
-	globalState[GL_FRAMEBUFFER_SRGB]              = false;
-	globalState[GL_LINE_SMOOTH]                   = false;
-	globalState[GL_MULTISAMPLE]                   = true;
-	globalState[GL_POLYGON_OFFSET_FILL]           = false;
-	globalState[GL_POLYGON_OFFSET_LINE]           = false;
-	globalState[GL_POLYGON_OFFSET_POINT]          = false;
-	globalState[GL_POLYGON_SMOOTH]                = false;
-	globalState[GL_PRIMITIVE_RESTART]             = false;
-	globalState[GL_PRIMITIVE_RESTART_FIXED_INDEX] = false;
-	globalState[GL_RASTERIZER_DISCARD]            = false;
-	globalState[GL_SAMPLE_ALPHA_TO_COVERAGE]      = false;
-	globalState[GL_SAMPLE_ALPHA_TO_ONE]           = false;
-	globalState[GL_SAMPLE_COVERAGE]               = false;
-	globalState[GL_SAMPLE_SHADING]                = false;
-	globalState[GL_SAMPLE_MASK]                   = false;
-	globalState[GL_SCISSOR_TEST]                  = false;
-	globalState[GL_STENCIL_TEST]                  = false;
-	globalState[GL_TEXTURE_CUBE_MAP_SEAMLESS]     = false;
-	globalState[GL_PROGRAM_POINT_SIZE]            = false;
+	static GlobalState globalState;
 
-	// apply GLHandler defaults
-	globalState[GL_CULL_FACE]  = true;
-	globalState[GL_DEPTH_TEST] = true;
-
-	return globalState;
+	return globalState.map;
 }
 
 GLStateSet::GLStateSet(std::unordered_map<int, bool> const& stateSet)

@@ -16,8 +16,8 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef SCENE_HPP
-#define SCENE_HPP
+#ifndef HVR_SCENE_HPP
+#define HVR_SCENE_HPP
 
 #include "Light.hpp"
 #include "memory.hpp"
@@ -27,6 +27,8 @@
 
 class BasicCamera;
 
+namespace hvr
+{
 class Scene
 {
   public:
@@ -54,5 +56,6 @@ class Scene
 	std::mt19937_64 generator;
 	std::uniform_real_distribution<float> distribution;
 };
+} // namespace hvr
 
-#endif // SCENE_HPP
+#endif // HVR_SCENE_HPP

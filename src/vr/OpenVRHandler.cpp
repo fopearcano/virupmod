@@ -280,7 +280,7 @@ void OpenVRHandler::prepareRendering(Side eye)
 
 	if(error != vr::VRCompositorError_None)
 	{
-		qCritical() << QString("ERROR in prepare: ") + error;
+		qCritical() << QString("ERROR in prepare: ") + QString::number(error);
 	}
 }
 
@@ -334,7 +334,7 @@ void OpenVRHandler::submitRendering(GLFramebufferObject const& fbo)
 	    = vr_compositor->Submit(getEye(currentRenderingEye), &texture);
 	if(error != vr::VRCompositorError_None)
 	{
-		qCritical() << QString("ERROR in submit: ") + error;
+		qCritical() << QString("ERROR in submit: ") + QString::number(error);
 	}
 }
 

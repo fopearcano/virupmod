@@ -25,7 +25,7 @@ std::unordered_map<QString, Timings::Timer, Timings::QStringHash>&
 	return timers;
 }
 
-void Timings::start(QString const& timerName)
+void Timings::start(QString const& timerName, bool persistent)
 {
 	if(timers().count(timerName) == 0)
 	{
@@ -46,7 +46,8 @@ void Timings::start(QString const& timerName)
 	}
 	timer.startQuery.queryCounter();
 	timer.cpuTimer.restart();
-	timer.started = true;
+	timer.started    = true;
+	timer.persistent = persistent;
 }
 
 void Timings::end(QString const& timerName)
@@ -82,7 +83,8 @@ QList<QPair<QString, QPair<uint64_t, uint64_t>>> Timings::getTimingsNanosecond()
 
 	for(auto& pair : timers())
 	{
-		if(!pair.second.started || !pair.second.ended)
+		if((!pair.second.started || !pair.second.ended)
+		   && !pair.second.persistent)
 		{
 			// badly used timer or ignored timer, remove it
 			toRemove.push_back(pair.first);

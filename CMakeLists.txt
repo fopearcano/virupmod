@@ -40,16 +40,16 @@ endforeach()
 project(${PROJECT_NAME} CXX)
 set(CMAKE_PROJECT_DESCRIPTION ${PROJECT_DESCRIPTION})
 
-# C++ 14
+# C++ 17
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=gnu++14" COMPILER_SUPPORTS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=gnu++17" COMPILER_SUPPORTS_CXX17)
 CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
-if(COMPILER_SUPPORTS_CXX14)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+if(COMPILER_SUPPORTS_CXX17)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
 elseif(COMPILER_SUPPORTS_CXX1Y)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 endif()
 
 # For clang - tidy to use(clang - tidy - p)
@@ -195,6 +195,7 @@ macro(hydrogenvr_find_packages)
 		"PythonQt          0.0.0       N/A               false"
 		"PythonQt_QtAll    0.0.0       N/A               false"
 		"libktx            0.0.0       N/A               false"
+		"ZSTD              0.0.0       N/A               false"
     )
 
 	foreach(PACKAGE ${REQUIRED_LIBS})
@@ -373,6 +374,13 @@ else()
 	message(STATUS "libktx not found")
 endif()
 
+# libzstd
+if(ZSTD_FOUND)
+	message(STATUS "libzstd found")
+else()
+	message(STATUS "libzstd not found")
+endif()
+
 #Additional
 if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
 	include(${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
@@ -396,6 +404,10 @@ if(libktx_FOUND)
 	add_definitions(-DLIBKTX)
 	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${LIBKTX_INCLUDE_DIRS})
 endif()
+if(ZSTD_FOUND)
+	add_definitions(-DLIBZSTD)
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${ZSTD_INCLUDE_DIRS})
+endif()
 
 include_directories(${COMMON_INCLUDES} ${THIRDPARTY_INCLUDES} ${PROJECT_INCLUDES} ${TEST_INCLUDES} SYSTEM ${EXTERNAL_LIBS_INCLUDE_DIRS})
 
@@ -412,6 +424,9 @@ if(PythonQt_QtAll_FOUND)
 endif()
 if(libktx_FOUND)
 	set(LD_LIBS ${LD_LIBS} ${LIBKTX_LIBRARIES})
+endif()
+if(ZSTD_FOUND)
+	set(LD_LIBS ${LD_LIBS} ${ZSTD_LIBRARIES})
 endif()
 
 # Find .so in working directory

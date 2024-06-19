@@ -144,7 +144,7 @@ float Node::computeVisibility(BasicCamera const& camera)
 }
 
 void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
-                         Scene& scene)
+                         hvr::Scene& scene)
 {
 	GLStateSet glState({{GL_TEXTURE_CUBE_MAP_SEAMLESS, true}});
 	computedEnvOnce = true;
@@ -281,4 +281,9 @@ void Node::renderTransparent(BasicCamera const& cam,
 Node::~Node()
 {
 	nodesDict.erase(name);
+}
+
+QMatrix4x4 Node::getModel() const
+{
+	return ignorePreMultiply ? model : model * preMultiplyTransform();
 }

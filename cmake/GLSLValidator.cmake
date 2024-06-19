@@ -5,7 +5,11 @@ add_custom_target(validate-glsl)
 find_program(GLSLANG_VALIDATOR glslangValidator)
 
 if (GLSLANG_VALIDATOR)
-	file(GLOB_RECURSE GLSL_SOURCE_FILES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.vert ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.frag)
+	file(GLOB_RECURSE GLSL_SOURCE_FILES
+		${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.glsl
+		${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.vert
+		${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.frag
+		${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders/*.comp)
 
 	file(GLOB THIRDPARTY_DATA_DIRS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/data LIST_DIRECTORIES true)
 	set(GLSL_PATH_LIST "${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders")

@@ -44,6 +44,98 @@ GLTFNode::GLTFNode(QString src, std::map<QString, Node*>& nodesDict)
 	boundingSphere = bs;
 }
 
+QJsonObject GLTFNode::unpack(QString const& src,
+                             std::vector<char>& readBinBuffer)
+{
+	// unpack gltf (JSON only)
+	if(src.endsWith(".gltf"))
+	{
+		QFile file(src);
+		if(!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Cannot open file:" << src;
+			return {};
+		}
+		return QJsonDocument::fromJson(file.readAll()).object();
+	}
+	// unpack glb (JSON + BIN buffer)
+	if(src.endsWith(".glb"))
+	{
+		QFile file(src);
+		if(!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Cannot open file:" << src;
+			return {};
+		}
+
+		// Reading the header
+		quint32 magic, version, length;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		file.read(reinterpret_cast<char*>(&version), sizeof(version));
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		file.read(reinterpret_cast<char*>(&length), sizeof(length));
+
+		if(magic != 0x46546C67)
+		{ // Comparing with 'glTF'
+			qWarning() << "Not a valid GLB file (magic number):" << src;
+			return {};
+		}
+		if(version != 2)
+		{
+			qWarning()
+			    << "Only GLB version 2 is supported. This file's version is"
+			    << version;
+		}
+
+		// Reading the JSON chunk header
+		quint32 chunkLength, chunkType;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		file.read(reinterpret_cast<char*>(&chunkLength), sizeof(chunkLength));
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		file.read(reinterpret_cast<char*>(&chunkType), sizeof(chunkType));
+
+		if(chunkType != 0x4E4F534A)
+		{ // Comparing with 'JSON'
+			qWarning() << "First chunk is not a JSON chunk:" << src;
+			return {};
+		}
+
+		// Reading the JSON chunk data
+		QByteArray jsonData   = file.read(chunkLength);
+		QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+
+		if(!jsonDoc.isObject())
+		{
+			qWarning() << "JSON chunk does not contain a valid JSON object:"
+			           << src;
+			return {};
+		}
+
+		// continue reading if BIN chunk available
+		if(file.pos() < length)
+		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			file.read(reinterpret_cast<char*>(&chunkLength),
+			          sizeof(chunkLength));
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			file.read(reinterpret_cast<char*>(&chunkType), sizeof(chunkType));
+			if(chunkType != 0x004E4942)
+			{ // Comparing with 'BIN'
+			  // Don't warn and don't fail as extensions might use this
+			  // (https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#chunks-overview)
+				return jsonDoc.object();
+			}
+			readBinBuffer.resize(chunkLength);
+			file.read(readBinBuffer.data(), chunkLength);
+		}
+		return jsonDoc.object();
+	}
+	qWarning() << "Not a valid glTF/GLB file (extension):" << src;
+	return {};
+}
+
 void GLTFNode::loadCPU()
 {
 	gltfModel.setColumn(0, QVector4D(0.f, 1.f, 0.f, 0.f));
@@ -54,19 +146,17 @@ void GLTFNode::loadCPU()
 	QString srcDir(QFileInfo(src).absoluteDir().absolutePath());
 	QString currentDir(QDir::current().absolutePath());
 
-	QJsonObject json;
+	std::vector<char> binBuffer;
+	auto json(unpack(src, binBuffer));
+	if(json.isEmpty())
 	{
-		QFile file(src);
-		json = QJsonDocument::fromJson(file.open(QIODevice::ReadOnly)
-		                                   ? file.readAll()
-		                                   : QByteArray())
-		           .object();
+		return;
 	}
 
 	// metadata
 	qDebug() << "Loading" << src;
 	QDir::setCurrent(srcDir);
-	if(!cpuData.load(json))
+	if(!cpuData.load(json, std::move(binBuffer)))
 	{
 		QDir::setCurrent(currentDir);
 		return;

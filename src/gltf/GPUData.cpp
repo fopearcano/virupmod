@@ -132,6 +132,11 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 		QString name(pair.first.toLower());
 		unusedAttributes.remove(name);
 		int size(pair.second->typeDimensions());
+		if(name == "color_0" && size > 3)
+		{
+			qWarning() << "Attribute color_0 is of dimension" << size
+			           << "but only size 3 is supported for now.";
+		}
 		size_t stride(pair.second->bufferView->byteStride / sizeof(float));
 		size_t offset((pair.second->bufferView->byteOffset - globalOffset)
 		              + pair.second->byteOffset);

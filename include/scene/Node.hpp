@@ -25,7 +25,10 @@
 #include "gl/GLHandler.hpp"
 
 class BasicCamera;
+namespace hvr
+{
 class Scene;
+} // namespace hvr
 class VRHandler;
 class Light;
 
@@ -48,6 +51,15 @@ class Node
 	BoundingSphere getBoundingSphere() const { return boundingSphere; };
 	virtual bool usesGlobalIllumination() const { return true; };
 	virtual bool isDirectLightSource() const { return false; };
+	/** @brief Returns if the pre-multiplied transform matrix is ignored or not.
+	 * By default, it is NOT ignored.
+	 *
+	 * This matrix is mostly used to convert from Y-up to Z-up for GLTF models
+	 * for example. i.e. If you want to work with a Y-up model, set this to true
+	 * to ignore conversion.
+	 */
+	bool isPreMultiplyIgnored() const { return ignorePreMultiply; };
+	void setIgnorePreMultiply(bool ignore) { ignorePreMultiply = ignore; };
 	void setModel(QMatrix4x4 model);
 	void addChild(std::unique_ptr<Node>&& child);
 	void eraseChild(unsigned int id);
@@ -55,7 +67,7 @@ class Node
 	bool hasComputedEnvOnce() const { return computedEnvOnce; };
 	float computeVisibility(BasicCamera const& camera);
 	void computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
-	                   Scene& scene);
+	                   hvr::Scene& scene);
 	void render(BasicCamera const& cam, std::vector<Light const*> const& lights,
 	            GLTexture const& brdfLUT, bool environment = false);
 	void renderTransparent(BasicCamera const& cam,
@@ -64,7 +76,7 @@ class Node
 	virtual ~Node();
 
   protected:
-	QMatrix4x4 getModel() const { return model * preMultiplyTransform(); };
+	QMatrix4x4 getModel() const;
 	GLTexture const& getIrradianceMap() const { return irradiancemap; };
 	GLTexture const& getPrefilteredMap() const { return prefilteredmap; };
 	virtual QMatrix4x4 preMultiplyTransform() const { return {}; };
@@ -86,6 +98,7 @@ class Node
 	std::vector<std::unique_ptr<Node>> children;
 
 	QString name;
+	bool ignorePreMultiply = false;
 	QMatrix4x4 model;
 	BoundingSphere transformedBoundingSphere;
 

@@ -5,8 +5,9 @@ if [ ! -f "./build.conf" ]; then
 else
 	. ./build.conf
 fi
-ls build/
+cd build
+ls
 apt-get update
-dpkg -i build/*.deb || { apt-get -fy install; dpkg -i build/*.deb; }
+DEBIAN_FRONTEND=noninteractive apt-get -yq install ./*.deb
 ldd $(which $PROJECT_NAME)
 $PROJECT_NAME --version

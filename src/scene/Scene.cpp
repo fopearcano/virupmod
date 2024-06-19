@@ -21,7 +21,8 @@
 #include "camera/BasicCamera.hpp"
 
 #include <ctime>
-
+namespace hvr
+{
 Scene::Scene()
     : envmap(GLTexture::TexCubemapProperties(512, GL_RGBA32F))
     , brdfLUT(GLTexture::Tex2DProperties(512, 512, GL_RGBA32F))
@@ -141,3 +142,4 @@ std::vector<Node*> Scene::sortedNodes() const
 	}
 	return result;
 }
+} // namespace hvr

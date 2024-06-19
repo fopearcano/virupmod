@@ -95,9 +95,10 @@ std::vector<AssetLoader::TexturedMesh>
 			// discard additional textures, keep only one per type
 			if(tMesh.textures.count(tex.first) == 0 && !tex.second.empty())
 			{
-				tMesh.textures.emplace(
-				    tex.first, GLTexture{tex.second.c_str(),
-				                         tex.first == TextureType::DIFFUSE});
+				GLTexture gpuTex{tex.second.c_str(),
+				                 tex.first == TextureType::DIFFUSE};
+				gpuTex.generateMipmap();
+				tMesh.textures.emplace(tex.first, std::move(gpuTex));
 			}
 		}
 		// complete with default textures

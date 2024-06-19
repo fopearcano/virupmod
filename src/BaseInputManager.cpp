@@ -60,9 +60,9 @@ void BaseInputManager::addAction(QKeySequence const& defaultKey, Action action)
 void BaseInputManager::addAction(QKeySequence const& defaultKey, Action action,
                                  bool engine)
 {
-	QKeySequence dKey = QSettings()
-	                        .value("controls/" + action.id, defaultKey)
-	                        .value<QKeySequence>();
+	auto dKey = QSettings()
+	                .value("controls/" + action.id, defaultKey)
+	                .value<QKeySequence>();
 	mapping[dKey.toString()] = std::move(action);
 	if(engine)
 	{

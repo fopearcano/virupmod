@@ -2,7 +2,7 @@
 ::# Install libktx 4.2.1
 ::############################################################################
 if NOT EXIST KTX-Software\ (
-	git clone https://github.com/KhronosGroup/KTX-Software.git --branch=v4.2.1
+	git clone https://github.com/KhronosGroup/KTX-Software.git --branch=v4.3.2
 	cd KTX-Software
 	mkdir build
 	cd build
