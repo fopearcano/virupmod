@@ -85,20 +85,18 @@ class SceneWrapper : public PythonQtWrapper
 	Scene* new_Scene(Scene const& s) { return new Scene(s); }
 	Scene* new_Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui)
 	{
-		return new Scene(std::move(sd), std::move(td), std::move(ui));
+		return new Scene(sd, td, ui);
 	}
 	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
 	                 SceneUI const& ui, SceneCameraData const& cd)
 	{
-		return new Scene(std::move(sd), std::move(td), std::move(ui),
-		                 std::move(cd));
+		return new Scene(sd, td, ui, cd);
 	}
 	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
 	                 SceneUI const& ui, SceneCameraData const& cd,
 	                 SceneToneMappingData const& tm)
 	{
-		return new Scene(std::move(sd), std::move(td), std::move(ui),
-		                 std::move(cd), std::move(tm));
+		return new Scene(sd, td, ui, cd, tm);
 	}
 
 	void delete_Scene(Scene* s) { delete s; }
