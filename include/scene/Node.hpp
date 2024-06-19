@@ -49,6 +49,9 @@ class Node
 	virtual bool usesGlobalIllumination() const { return true; };
 	virtual bool isDirectLightSource() const { return false; };
 	void setModel(QMatrix4x4 model);
+	void addChild(std::unique_ptr<Node>&& child);
+	void eraseChild(unsigned int id);
+	void eraseChild(QString const& name);
 	bool hasComputedEnvOnce() const { return computedEnvOnce; };
 	float computeVisibility(BasicCamera const& camera);
 	void computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
@@ -58,7 +61,7 @@ class Node
 	void renderTransparent(BasicCamera const& cam,
 	                       std::vector<Light const*> const& lights,
 	                       GLTexture const& brdfLUT, bool environment = false);
-	virtual ~Node() = default;
+	virtual ~Node();
 
   protected:
 	QMatrix4x4 getModel() const { return model * preMultiplyTransform(); };
@@ -74,9 +77,13 @@ class Node
 	    GLTexture const& /*brdfLUT*/, bool /*environment*/){};
 
 	BoundingSphere boundingSphere;
+	Node* getChild(unsigned int id);
+	Node* getChild(QString const& name);
+
+	std::map<QString, Node*>& nodesDict;
 
   private:
-	std::map<QString, Node*>& nodesDict;
+	std::vector<std::unique_ptr<Node>> children;
 
 	QString name;
 	QMatrix4x4 model;

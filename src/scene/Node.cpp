@@ -76,6 +76,59 @@ void Node::setModel(QMatrix4x4 model)
 	transformedBoundingSphere = boundingSphere.transformed(model);
 }
 
+void Node::addChild(std::unique_ptr<Node>&& child)
+{
+	children.emplace_back(std::move(child));
+}
+
+Node* Node::getChild(unsigned int id)
+{
+	if(id >= children.size())
+	{
+		return nullptr;
+	}
+
+	return children[id].get();
+}
+
+Node* Node::getChild(QString const& name)
+{
+	for(auto const& childUqPtr : children)
+	{
+		if(childUqPtr->name == name)
+		{
+			return childUqPtr.get();
+		}
+	}
+	return nullptr;
+}
+
+void Node::eraseChild(unsigned int id)
+{
+	if(id >= children.size())
+	{
+		return;
+	}
+	children.erase(children.begin() + id);
+}
+
+void Node::eraseChild(QString const& name)
+{
+	Node* targetChild = nodesDict[name];
+	if(targetChild == nullptr)
+	{
+		return;
+	}
+	for(unsigned int i(0); i < children.size(); ++i)
+	{
+		if(children[i].get() == targetChild)
+		{
+			children.erase(children.begin() + i);
+			break;
+		}
+	}
+}
+
 float Node::computeVisibility(BasicCamera const& camera)
 {
 	if(camera.shouldBeCulled(transformedBoundingSphere))
@@ -223,4 +276,9 @@ void Node::renderTransparent(BasicCamera const& cam,
 	    GLHandler::setUpRender(bsShader, bsModel);
 	    bsMesh.render();
 	}*/
+}
+
+Node::~Node()
+{
+	nodesDict.erase(name);
 }

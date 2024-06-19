@@ -37,7 +37,7 @@ Scene::Scene()
 
 void Scene::addNode(std::unique_ptr<Node>&& newNode)
 {
-	nodes.emplace_back(std::move(newNode));
+	rootNodes.emplace_back(std::move(newNode));
 }
 
 void Scene::addLight(std::unique_ptr<Light>&& newLight)
@@ -51,8 +51,9 @@ void Scene::update(BasicCamera& camera)
 
 	std::vector<GLMesh const*> shadowCastMeshes;
 	std::vector<QMatrix4x4> shadowCastModels;
-	for(auto const& node : nodes)
+	for(auto const& pair : nodesDict)
 	{
+		auto node = pair.second;
 		for(auto const& pair : node->getShadowCastingMeshes())
 		{
 			shadowCastMeshes.push_back(&pair.first);
@@ -67,15 +68,16 @@ void Scene::update(BasicCamera& camera)
 	// determine which node will get updated for this frame
 	float sum = 0.f;
 	std::vector<std::pair<Node*, float>> visibilities;
-	for(auto const& node : nodes)
+	for(auto const& pair : nodesDict)
 	{
-		auto v = node->computeVisibility(camera);
+		auto node = pair.second;
+		auto v    = node->computeVisibility(camera);
 		if(v <= 0.f || !node->usesGlobalIllumination())
 		{
 			continue;
 		}
 		sum += v;
-		visibilities.emplace_back(node.get(), v);
+		visibilities.emplace_back(node, v);
 	}
 
 	// if there is anything to update
@@ -132,8 +134,8 @@ void Scene::render(BasicCamera const& cam, bool environment)
 std::vector<Node*> Scene::sortedNodes() const
 {
 	std::vector<Node*> result;
-	result.reserve(nodes.size());
-	for(auto const& node : nodes)
+	result.reserve(rootNodes.size());
+	for(auto const& node : rootNodes)
 	{
 		result.push_back(node.get());
 	}

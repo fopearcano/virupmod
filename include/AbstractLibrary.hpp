@@ -19,10 +19,13 @@
 #ifndef ABSTRACT_LIBRARY_HPP
 #define ABSTRACT_LIBRARY_HPP
 
+class SettingsWidget;
+
 class AbstractLibrary
 {
   public:
 	AbstractLibrary() = default;
+	virtual void setupSettings(SettingsWidget& /*settingsWidget*/){};
 	virtual void setupPythonAPI(){};
 	virtual ~AbstractLibrary(){};
 };

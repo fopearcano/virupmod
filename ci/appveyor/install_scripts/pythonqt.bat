@@ -15,8 +15,11 @@ if NOT EXIST pythonqt\ (
 	move %APPVEYOR_BUILD_FOLDER%\misc\python.prf .\build\python.prf
 	move %APPVEYOR_BUILD_FOLDER%\misc\PythonQt.prf .\build\PythonQt.prf
 	move %APPVEYOR_BUILD_FOLDER%\misc\PythonQt_QtAll.prf .\build\PythonQt_QtAll.prf
-	IF "%BUILD_TYPE%" == "64bit" (set ARCH=x64) ELSE (set ARCH=x86)
-	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%
+	IF "%BUILD_TYPE%" == "64bit" (
+		call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+	) ELSE (
+		call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+	)
 	qmake
 	nmake
 	echo "PythonQt installed..."

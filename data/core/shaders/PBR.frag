@@ -11,6 +11,7 @@ uniform sampler2D metallicRoughness;
 uniform sampler2D normalTex;
 uniform sampler2DShadow shadowmap[LIGHTS_NB];
 
+uniform float alphaCutoff;
 uniform float occlusionBase;
 uniform float occlusionStrength;
 uniform vec3 emissiveBase;
@@ -49,13 +50,13 @@ vec2 posToCoord(vec3 pos)
 	return f_texcoord_0;
 }
 
-vec3 getAlbedo(vec3 pos)
+vec4 getAlbedo(vec3 pos)
 {
 #ifdef TEXTURED_ALBEDO
-	return texture(albedo, posToCoord(pos)).rgb;
+	return texture(albedo, posToCoord(pos));
 
 #else
-	return f_color_0;
+	return vec4(f_color_0, 1.0);
 #endif
 }
 
@@ -182,14 +183,19 @@ void main()
 	vec3 V        = normalize(campos - worldpos);
 	vec3 N        = normalize(getNormal(f_position));
 
-	vec3 albedo            = getAlbedo(f_position);
+	vec4 albedo            = getAlbedo(f_position);
 	vec2 metallicRoughness = getMetallicRoughness(f_position);
 
 	vec3 F0       = vec3(0.04);
-	F0            = mix(F0, albedo, metallicRoughness.x);
+	F0            = mix(F0, albedo.rgb, metallicRoughness.x);
 
 	// DIRECT LIGHTING
-	outColor = vec4(0.0, 0.0, 0.0, 1.0);
+	float alpha = albedo.a;
+	if(alphaCutoff >= 0.0)
+	{
+		alpha = step(alphaCutoff, alpha);
+	}
+	outColor = vec4(0.0, 0.0, 0.0, alpha);
 	for(int i = 0; i < LIGHTS_NB; ++i)
 	{
 		if(lightColor[i] == vec3(0.0))
@@ -222,9 +228,9 @@ void main()
 		kD *= 1.0 - metallicRoughness.x;
 
 		float NdotL = max(dot(N, L), 0.0);
-		vec3 Lo     = (kD * albedo / PI + specular) * radiance * NdotL;
+		vec3 Lo     = (kD * albedo.rgb / PI + specular) * radiance * NdotL;
 
-		outColor += vec4(Lo, 1.0);
+		outColor.rgb += Lo;
 	}
 
 	// INDIRECT LIGHTING
@@ -235,7 +241,7 @@ void main()
 	kD *= 1.0 - metallicRoughness.x;
 
 	// diffuse
-	vec3 indirectLighting = kD * texture(irradiance, N).rgb * albedo;
+	vec3 indirectLighting = kD * texture(irradiance, N).rgb * albedo.rgb;
 
 	// specular
 	vec3 R = reflect(-V, N);

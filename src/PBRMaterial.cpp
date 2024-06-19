@@ -37,6 +37,7 @@ PBRMaterial::PBRMaterial(AlbedoSpec const& albedoSpec,
 	shader.setUniform("normalTex", 7);
 	shader.setUniform("shadowmap", 2, std::array<int, 2>{8, 9}.data());
 
+	shader.setUniform("alphaCutoff", alphaCutoff);
 	shader.setUniform("occlusionBase", occlusionSpec.occlusion);
 	shader.setUniform("occlusionStrength", occlusionSpec.strength);
 	shader.setUniform("emissiveBase", emissiveSpec.emissiveBase);
@@ -107,9 +108,16 @@ PBRMaterial::PBRMaterial(QString const& directory)
 	shader.setUniform("normalTex", 7);
 	shader.setUniform("shadowmap", 2, std::array<int, 2>{8, 9}.data());
 
+	shader.setUniform("alphaCutoff", alphaCutoff);
 	shader.setUniform("occlusionStrength", 1.f);
 	shader.setUniform("emissiveBase", QColor(0, 0, 0));
 	shader.setUniform("emissiveFactor", QVector3D(0.f, 0.f, 0.f));
+}
+
+void PBRMaterial::setAlphaCutoff(float alphaCutoff)
+{
+	this->alphaCutoff = alphaCutoff;
+	shader.setUniform("alphaCutoff", alphaCutoff);
 }
 
 void PBRMaterial::update(QMatrix4x4 const& modelMatrix,

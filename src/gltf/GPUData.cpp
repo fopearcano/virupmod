@@ -70,6 +70,15 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	}
 	material = std::make_unique<PBRMaterial>(
 	    *albedoSpec, *occlusionSpec, *emissiveSpec, *mRSpec, *normalSpec);
+	if(prim.material->alphaMode == Material::AlphaMode::MASK)
+	{
+		material->setAlphaMode(PBRMaterial::AlphaMode::MASK);
+		material->setAlphaCutoff(prim.material->alphaCutoff);
+	}
+	if(prim.material->alphaMode == Material::AlphaMode::BLEND)
+	{
+		material->setAlphaMode(PBRMaterial::AlphaMode::BLEND);
+	}
 	material->setDoubleSided(prim.material->doubleSided);
 
 	// set bounding sphere
@@ -160,7 +169,6 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	}
 
 	mesh.setVertexShaderMapping(material->getShader(), mapping);
-	std::vector<QPair<QString, std::vector<float>>> unusedAttrVec;
 	for(auto const& key : unusedAttributes.keys())
 	{
 		unusedAttrVec.push_back(
@@ -168,7 +176,6 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 		     {unusedAttributes[key].x(), unusedAttributes[key].y(),
 		      unusedAttributes[key].z()}});
 	}
-	material->getShader().setUnusedAttributesValues(unusedAttrVec);
 
 	if(prim.indices == nullptr)
 	{
@@ -231,6 +238,8 @@ void GPUMesh::Primitive::render(BasicCamera const& cam,
 		stateSet[GL_CULL_FACE] = false;
 	}
 	GLStateSet glState(stateSet);
+	// could be overwritten between different materials
+	material->getShader().setUnusedAttributesValues(unusedAttrVec);
 	material->getShader().setUniform("debug", 1);
 	material->update(nodeModel, cam.getWorldSpacePosition(), lights);
 	std::vector<GLTexture const*> shadowmaps;
@@ -241,7 +250,15 @@ void GPUMesh::Primitive::render(BasicCamera const& cam,
 	}
 	material->setUpTextures(irradiance, prefiltered, brdfLUT, shadowmaps);
 	GLHandler::setUpRender(material->getShader(), nodeModel);
-	mesh.render();
+	if(material->getAlphaMode() != PBRMaterial::AlphaMode::OPAQUE)
+	{
+		GLBlendSet glBlend(GLBlendSet::BlendState{});
+		mesh.render();
+	}
+	else
+	{
+		mesh.render();
+	}
 }
 
 GLMesh::VertexAttrib

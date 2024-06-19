@@ -39,6 +39,7 @@ struct GPUMesh
 		            GLTexture const& prefiltered,
 		            GLTexture const& brdfLUT) const;
 		GLMesh mesh;
+		std::vector<QPair<QString, std::vector<float>>> unusedAttrVec;
 		std::unique_ptr<PBRMaterial> material;
 		BoundingSphere boundingSphere;
 

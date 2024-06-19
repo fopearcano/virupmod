@@ -292,9 +292,14 @@ void Material::PBRMetallicRoughness::load(
 	{
 		QColor c;
 		c.setRedF(json["baseColorFactor"].toArray()[0].toDouble(1.0));
-		c.setGreenF(json["baseColorFactor"].toArray()[1].toDouble(0.0));
+		c.setGreenF(json["baseColorFactor"].toArray()[1].toDouble(1.0));
 		c.setBlueF(json["baseColorFactor"].toArray()[2].toDouble(1.0));
-		c.setAlphaF(json["baseColorFactor"].toArray()[3].toDouble(0.0));
+		c.setAlphaF(json["baseColorFactor"].toArray()[3].toDouble(1.0));
+		if(c.alphaF() != 1.f)
+		{
+			qWarning() << "Non 1.0 alpha specified for baseColorFactor. This "
+			              "is unsupported as of now.";
+		}
 		baseColorFactor = c;
 	}
 	for(auto const& key : json["baseColorTexture"].toObject().keys())
@@ -340,6 +345,7 @@ void Material::load(QJsonObject const& json,
 		if(key != "name" && key != "pbrMetallicRoughness"
 		   && key != "normalTexture" && key != "occlusionTexture"
 		   && key != "emissiveTexture" && key != "emissiveFactor"
+		   && key != "alphaMode" && key != "alphaCutoff"
 		   && key != "doubleSided")
 		{
 			qWarning() << "gltf::Material key" << key
@@ -403,6 +409,18 @@ void Material::load(QJsonObject const& json,
 		{
 			emissiveFactor[i] = json["emissiveFactor"].toArray()[i].toDouble();
 		}
+	}
+	QString alphaModeStr = json["alphaMode"].toString("OPAQUE");
+	alphaMode            = AlphaMode::OPAQUE;
+	alphaCutoff          = -1.f;
+	if(alphaModeStr == "MASK")
+	{
+		alphaMode   = AlphaMode::MASK;
+		alphaCutoff = json["alphaCutoff"].toDouble(0.5);
+	}
+	else if(alphaModeStr == "BLEND")
+	{
+		alphaMode = AlphaMode::BLEND;
 	}
 	doubleSided = json["doubleSided"].toBool(false);
 }

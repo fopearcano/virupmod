@@ -60,13 +60,9 @@ class SettingsWidget : public QTabWidget
 	QSize getMaxWidgetSize() const { return maxWidgetSize; };
 	~SettingsWidget() = default;
 
-  signals:
-	void maxWidgetSizeChanged(QSize const& maxWidgetSize);
-
-  protected:
 	void addGroup(QString const& name, QString const& label);
 	void insertGroup(QString const& name, QString const& label, int index);
-	void editGroup(QString const& name);
+	void editGroup(QString const& name, bool ignoreEngineSeparation = false);
 	void addCustomGroup(QString const& name, QString const& label, QWidget* w);
 	void insertCustomGroup(QString const& name, QString const& label, int index,
 	                       QWidget* w);
@@ -115,6 +111,10 @@ class SettingsWidget : public QTabWidget
 	                        QString const& label
 	                        = tr("Language (needs restart)"));
 
+  signals:
+	void maxWidgetSizeChanged(QSize const& maxWidgetSize);
+
+  protected:
 	virtual void showEvent(QShowEvent* event) override;
 
   private:

@@ -105,9 +105,16 @@ struct Texture
 };
 struct Material
 {
+	enum AlphaMode
+	{
+		OPAQUE,
+		MASK,
+		BLEND,
+	};
+
 	struct PBRMetallicRoughness
 	{
-		QColor baseColorFactor                  = QColor(255, 0, 255);
+		QColor baseColorFactor                  = QColor(255, 255, 255);
 		Texture const* baseColorTexture         = nullptr;
 		float metallicFactor                    = 1.f;
 		float roughnessFactor                   = 1.f;
@@ -122,7 +129,9 @@ struct Material
 	float occlusionStrength         = 1.f;
 	Texture const* emissiveTexture  = nullptr;
 	QVector3D emissiveFactor;
-	bool doubleSided = false;
+	AlphaMode alphaMode = AlphaMode::OPAQUE;
+	float alphaCutoff   = -1.f;
+	bool doubleSided    = false;
 	void load(QJsonObject const& json,
 	          std::vector<Texture> const& globalTextures);
 };

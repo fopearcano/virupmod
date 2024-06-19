@@ -230,7 +230,7 @@ void SettingsWidget::insertGroup(QString const& name, QString const& label,
 	orderedGroups.insert(index, name);
 }
 
-void SettingsWidget::editGroup(QString const& name)
+void SettingsWidget::editGroup(QString const& name, bool ignoreEngineSeparation)
 {
 	currentGroup = name;
 
@@ -240,6 +240,11 @@ void SettingsWidget::editGroup(QString const& name)
 	    dynamic_cast<QScrollArea*>(QTabWidget::widget(index))
 	        ->widget()
 	        ->layout());
+
+	if(ignoreEngineSeparation)
+	{
+		return;
+	}
 
 	currentForm->insertRow(0, tr("ENGINE"), make_qt_unique<QWidget>(*this));
 	currentForm->addRow(" ", make_qt_unique<QWidget>(*this));

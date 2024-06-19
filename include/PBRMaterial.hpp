@@ -103,6 +103,12 @@ class PBRMaterial
 		const QImage image;
 		const GLTexture::Sampler sampler;
 	};
+	enum AlphaMode
+	{
+		OPAQUE,
+		MASK,
+		BLEND,
+	};
 
 	PBRMaterial(AlbedoSpec const& albedoSpec,
 	            OcclusionSpec const& occlusionSpec,
@@ -110,6 +116,10 @@ class PBRMaterial
 	            MetallicRoughnessSpec const& metallicRoughnessSpec,
 	            NormalSpec const& normalSpec);
 	PBRMaterial(QString const& directory);
+	AlphaMode getAlphaMode() const { return alphaMode; };
+	void setAlphaMode(AlphaMode alphaMode) { this->alphaMode = alphaMode; };
+	float getAlphaCutoff() const { return alphaCutoff; };
+	void setAlphaCutoff(float alphaCutoff);
 	bool isDoubleSided() const { return doubleSided; };
 	void setDoubleSided(bool doubleSided) { this->doubleSided = doubleSided; };
 	void update(QMatrix4x4 const& modelMatrix, QVector3D const& cameraWorldPos,
@@ -122,8 +132,10 @@ class PBRMaterial
   private:
 	GLShaderProgram shader;
 
-	bool doubleSided = false;
-	bool textured    = false;
+	AlphaMode alphaMode = AlphaMode::OPAQUE;
+	float alphaCutoff   = -1.f;
+	bool doubleSided    = false;
+	bool textured       = false;
 	std::unique_ptr<GLTexture> albedoTex;
 	std::unique_ptr<GLTexture> occlusionTex;
 	std::unique_ptr<GLTexture> emissiveTex;
