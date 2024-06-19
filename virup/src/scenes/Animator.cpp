@@ -332,7 +332,7 @@ void Animator::restart()
 {
 	animationsDisabled = true;
 	stop();
-	voiceover.setMedia(QUrl(mainWin.getVoiceoverUrl()));
+	voiceover.setMedia(mainWin.getVoiceoverUrl());
 	play();
 	animationsDisabled = false;
 }

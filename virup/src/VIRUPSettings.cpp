@@ -112,8 +112,7 @@ void DataListWidget::importJsonFromPath(QString const& path)
 	{
 		return;
 	}
-	dataJsonRepresentation
-	    = QJsonDocument(QJsonDocument::fromJson(in.readAll())).object();
+	dataJsonRepresentation = QJsonDocument::fromJson(in.readAll()).object();
 	saveJsonRepresentation();
 	delete layout;
 	loadMainLayout();

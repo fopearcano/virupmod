@@ -596,10 +596,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	}
 	if(pathId == "planet")
 	{
-		auto& cam     = dynamic_cast<OrbitalSystemCamera&>(camera);
-		QVector3D pos = QSettings()
-		                    .value("misc/uilabelspos")
-		                    .value<QVector3D>(); //(-0.3f, 0.25f, -0.4f);
+		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
+		auto pos  = QSettings()
+		               .value("misc/uilabelspos")
+		               .value<QVector3D>(); //(-0.3f, 0.25f, -0.4f);
 		pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
 
 		auto billboardPos = pos;

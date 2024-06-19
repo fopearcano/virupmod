@@ -81,8 +81,8 @@ class UniverseElementEditor : public QDialog
 {
   public:
 	explicit UniverseElementEditor(UniverseElement* universeElement,
-	                               QWidget* parent   = nullptr,
-	                               Qt::WindowFlags f = Qt::WindowFlags())
+	                               Qt::WindowFlags f = Qt::WindowFlags(),
+	                               QWidget* parent   = nullptr)
 	    : QDialog(parent, f)
 	    , json(universeElement->getJson())
 	{
@@ -138,6 +138,7 @@ class UniverseElementEditor : public QDialog
 void UniverseElementSelector::editElement(QListWidgetItem* item)
 {
 	UniverseElement* elem(universe.getElement(item->text()));
-	auto editor = new UniverseElementEditor(elem, this);
+	auto editor
+	    = make_qt_unique<UniverseElementEditor>(*this, elem, Qt::WindowFlags{});
 	editor->show();
 }
