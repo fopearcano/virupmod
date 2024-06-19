@@ -108,9 +108,11 @@ int main(int argc, char* argv[])
 	}
 
 	// set translation
-	QString localeName(QSettings()
-	                       .value("window/language", QLocale::system().name())
-	                       .toString());
+	QString localeName(
+	    QSettings()
+	        .value("window/language", QLocale::system().name().left(2))
+	        .toString());
+	QLocale::setDefault(localeName);
 	QTranslator qtTranslator;
 	qtTranslator.load("qt_" + localeName,
 	                  QLibraryInfo::location(QLibraryInfo::TranslationsPath));

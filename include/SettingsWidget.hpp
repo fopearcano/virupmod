@@ -107,7 +107,7 @@ class SettingsWidget : public QTabWidget
 	                           QString const& label);
 	void addLanguageSetting(QString const& name = "language",
 	                        QString const& defaultVal
-	                        = QLocale::system().name(),
+	                        = QLocale::system().name().left(2),
 	                        QString const& label
 	                        = tr("Language (needs restart)"));
 
