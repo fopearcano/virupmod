@@ -32,6 +32,7 @@ class AssimpNode : public Node
 	           QColor const& defaultDiffuseColor = {0xff, 0x09, 0xf7});
 	virtual std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	    getShadowCastingMeshes() const override;
+	virtual bool usesGlobalIllumination() const override { return false; };
 
   protected:
 	virtual QMatrix4x4 preMultiplyTransform() const override;

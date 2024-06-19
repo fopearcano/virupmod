@@ -110,6 +110,8 @@ class PBRMaterial
 	            MetallicRoughnessSpec const& metallicRoughnessSpec,
 	            NormalSpec const& normalSpec);
 	PBRMaterial(QString const& directory);
+	bool isDoubleSided() const { return doubleSided; };
+	void setDoubleSided(bool doubleSided) { this->doubleSided = doubleSided; };
 	void update(QMatrix4x4 const& modelMatrix, QVector3D const& cameraWorldPos,
 	            std::vector<Light const*> const& lights);
 	GLShaderProgram const& getShader() const { return shader; };
@@ -120,7 +122,8 @@ class PBRMaterial
   private:
 	GLShaderProgram shader;
 
-	bool textured = false;
+	bool doubleSided = false;
+	bool textured    = false;
 	std::unique_ptr<GLTexture> albedoTex;
 	std::unique_ptr<GLTexture> occlusionTex;
 	std::unique_ptr<GLTexture> emissiveTex;

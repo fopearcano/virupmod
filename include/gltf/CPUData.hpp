@@ -122,6 +122,7 @@ struct Material
 	float occlusionStrength         = 1.f;
 	Texture const* emissiveTexture  = nullptr;
 	QVector3D emissiveFactor;
+	bool doubleSided = false;
 	void load(QJsonObject const& json,
 	          std::vector<Texture> const& globalTextures);
 };

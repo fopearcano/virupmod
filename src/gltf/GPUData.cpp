@@ -23,9 +23,9 @@
 
 namespace gltf
 {
-GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
+GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
+                              QString const& meshName)
 {
-	auto prim = gltfmesh.primitives.front();
 	auto albedoSpec(std::make_unique<PBRMaterial::AlbedoSpec>(
 	    prim.material->pbrMetallicRoughness.baseColorFactor));
 	auto tex = prim.material->pbrMetallicRoughness.baseColorTexture;
@@ -70,10 +70,11 @@ GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
 	}
 	material = std::make_unique<PBRMaterial>(
 	    *albedoSpec, *occlusionSpec, *emissiveSpec, *mRSpec, *normalSpec);
+	material->setDoubleSided(prim.material->doubleSided);
 
 	// set bounding sphere
-	auto const &minVec(prim.attributes["POSITION"]->min),
-	    &maxVec(prim.attributes["POSITION"]->max);
+	auto const &minVec(prim.attributes.at("POSITION")->min),
+	    &maxVec(prim.attributes.at("POSITION")->max);
 	QVector3D min(minVec[0], minVec[1], minVec[2]),
 	    max(maxVec[0], maxVec[1], maxVec[2]);
 	boundingSphere = {0.5f * (min + max), 0.5f * (max - min).length()};
@@ -129,7 +130,7 @@ GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
 		mapping.emplace_back(name, size, stride, offset);
 	}
 
-	auto const& view = *prim.attributes["POSITION"]->bufferView;
+	auto const& view = *prim.attributes.at("POSITION")->bufferView;
 	// hardcoded float; GLushort and * 1
 	auto vertexDataBuff
 	    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -140,16 +141,18 @@ GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
 	std::vector<float> res;
 	if(unusedAttributes.contains("normal"))
 	{
-		auto va
-		    = computeNormals(*prim.attributes["POSITION"], prim.indices, res);
+		auto va = computeNormals(*prim.attributes.at("POSITION"), prim.indices,
+		                         res);
 		vertexDataBuff = &res[0];
 		vertexDataSize = res.size();
 		mapping.push_back(va);
 		unusedAttributes.remove("normal");
 	}
-	if(unusedAttributes.contains("tangent"))
+	if(unusedAttributes.contains("tangent")
+	   && prim.material->normalTexture != nullptr)
 	{
 		qWarning()
+		    << "Mesh" << meshName
 		    << "glTF model doesn't contain tangents. The way they will "
 		       "be computed might be wrong in the current state of the "
 		       "implementation. A quick fix for this would be to open the "
@@ -214,15 +217,22 @@ GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
 	}
 }
 
-void GPUMesh::render(BasicCamera const& cam,
-                     std::vector<Light const*> const& lights,
-                     QMatrix4x4 const& nodeModel, GLTexture const& irradiance,
-                     GLTexture const& prefiltered,
-                     GLTexture const& brdfLUT) const
+void GPUMesh::Primitive::render(BasicCamera const& cam,
+                                std::vector<Light const*> const& lights,
+                                QMatrix4x4 const& nodeModel,
+                                GLTexture const& irradiance,
+                                GLTexture const& prefiltered,
+                                GLTexture const& brdfLUT) const
 {
+	std::unordered_map<int, bool> stateSet;
+	stateSet[GL_TEXTURE_CUBE_MAP_SEAMLESS] = true;
+	if(material->isDoubleSided())
+	{
+		stateSet[GL_CULL_FACE] = false;
+	}
+	GLStateSet glState(stateSet);
 	material->getShader().setUniform("debug", 1);
 	material->update(nodeModel, cam.getWorldSpacePosition(), lights);
-	GLStateSet glState({{GL_TEXTURE_CUBE_MAP_SEAMLESS, true}});
 	std::vector<GLTexture const*> shadowmaps;
 	shadowmaps.reserve(lights.size());
 	for(auto light : lights)
@@ -235,9 +245,9 @@ void GPUMesh::render(BasicCamera const& cam,
 }
 
 GLMesh::VertexAttrib
-    GPUMesh::computeNormals(gltf::Accessor const& positionAccessor,
-                            gltf::Accessor const* indicesAccessor,
-                            std::vector<float>& newBuffer)
+    GPUMesh::Primitive::computeNormals(gltf::Accessor const& positionAccessor,
+                                       gltf::Accessor const* indicesAccessor,
+                                       std::vector<float>& newBuffer)
 {
 	std::vector<unsigned int> indices;
 	if(indicesAccessor != nullptr)
@@ -343,6 +353,30 @@ GLMesh::VertexAttrib
 	                                / sizeof(float)};
 }
 
+GPUMesh::GPUMesh(gltf::Mesh const& gltfmesh)
+{
+	boundingSphere = {{}, 0.f};
+	for(auto const& prim : gltfmesh.primitives)
+	{
+		primitives.emplace_back(prim, gltfmesh.name);
+		boundingSphere
+		    = boundingSphere.merged(primitives.back().boundingSphere);
+		glMeshes.emplace_back(&primitives.back().mesh);
+	}
+}
+
+void GPUMesh::render(BasicCamera const& cam,
+                     std::vector<Light const*> const& lights,
+                     QMatrix4x4 const& nodeModel, GLTexture const& irradiance,
+                     GLTexture const& prefiltered,
+                     GLTexture const& brdfLUT) const
+{
+	for(auto const& prim : primitives)
+	{
+		prim.render(cam, lights, nodeModel, irradiance, prefiltered, brdfLUT);
+	}
+}
+
 GPUNode::GPUNode(gltf::Node const& node, std::map<QString, GPUNode*>& nodesDict)
     : baseModel(node.matrix)
     , nodesDict(nodesDict)
@@ -382,8 +416,11 @@ std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	std::vector<std::pair<GLMesh const&, QMatrix4x4>> result;
 	if(gpuMesh != nullptr)
 	{
-		result.emplace_back(gpuMesh->mesh,
-		                    parentNodeModel * baseModel * transform);
+		for(auto const& glMesh : gpuMesh->glMeshes)
+		{
+			result.emplace_back(*glMesh,
+			                    parentNodeModel * baseModel * transform);
+		}
 	}
 	for(auto const& child : children)
 	{

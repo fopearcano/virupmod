@@ -99,6 +99,13 @@ vec3 getNormal(vec3 pos)
 {
 	vec3 normal    = normalize(f_normal);
 	vec3 tangent   = normalize(f_tangent.xyz);
+
+	if(!gl_FrontFacing)
+	{
+		normal *= -1.0;
+		tangent *= -1.0;
+	}
+
 	vec3 bitangent = normalize(f_tangent.w * cross(normal, tangent));
 
 	vec3 localNormal = texture(normalTex, posToCoord(pos)).rgb * 2.0 - 1.0;
@@ -111,7 +118,12 @@ vec3 getNormal(vec3 pos)
 #else
 vec3 getNormal(vec3 pos)
 {
-	return normalize((model * vec4(normalize(f_normal), 0.0)).xyz);
+	vec3 normal = f_normal;
+	if(!gl_FrontFacing)
+	{
+		normal *= -1.0;
+	}
+	return normalize((model * vec4(normalize(normal), 0.0)).xyz);
 }
 #endif
 
@@ -189,9 +201,9 @@ void main()
 		{
 			// shadow = 1.0;
 		}
-		vec3 radiance = shadow * lightColor[i]; // 1.0e5 * vec3(1.0, 1.0, 1.0);
+		vec3 radiance = shadow * lightColor[i];
 
-		vec3 L = -lightDirection[i]; // normalize(lightpos - worldpos);
+		vec3 L = -lightDirection[i];
 
 		vec3 H = normalize(V + L);
 
@@ -223,7 +235,7 @@ void main()
 	kD *= 1.0 - metallicRoughness.x;
 
 	// diffuse
-	outColor.rgb += kD * texture(irradiance, N).rgb * albedo;
+	vec3 indirectLighting = kD * texture(irradiance, N).rgb * albedo;
 
 	// specular
 	vec3 R = reflect(-V, N);
@@ -242,9 +254,9 @@ void main()
 	vec3 specular = prefilteredColor
 	           * (F * max(0.0, envBRDF.x) + max(vec3(0.0), vec3(envBRDF.y)));
 
-	outColor.rgb += kS * specular;
+	indirectLighting += kS * specular;
 
-	outColor.rgb *= getOcclusion(f_position);
+	indirectLighting *= getOcclusion(f_position);
 
-	outColor.rgb += getEmissive(f_position);
+	outColor.rgb += indirectLighting + getEmissive(f_position);
 }

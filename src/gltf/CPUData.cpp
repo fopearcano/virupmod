@@ -259,15 +259,18 @@ Image::Image(QJsonObject const& json)
 {
 	for(auto const& key : json.keys())
 	{
-		if(key != "uri" && key != "name")
+		if(key != "uri" && key != "name" && key != "mimeType")
 		{
 			qWarning() << "gltf::Image key" << key
 			           << "parsing not implemented. In this case contains:"
 			           << json[key];
 		}
 	}
-	QString uri = json["uri"].toString();
-	data.load(uri); // TODO(florian): solve when this is over network
+	QString uri      = json["uri"].toString();
+	QString mimeType = json["mimeType"].toString();
+	data.load(
+	    uri,
+	    mimeType.toLatin1()); // TODO(florian): solve when this is over network
 	name = json["name"].toString();
 }
 
@@ -336,7 +339,8 @@ void Material::load(QJsonObject const& json,
 	{
 		if(key != "name" && key != "pbrMetallicRoughness"
 		   && key != "normalTexture" && key != "occlusionTexture"
-		   && key != "emissiveTexture" && key != "emissiveFactor")
+		   && key != "emissiveTexture" && key != "emissiveFactor"
+		   && key != "doubleSided")
 		{
 			qWarning() << "gltf::Material key" << key
 			           << "parsing not implemented. In this case contains:"
@@ -400,6 +404,7 @@ void Material::load(QJsonObject const& json,
 			emissiveFactor[i] = json["emissiveFactor"].toArray()[i].toDouble();
 		}
 	}
+	doubleSided = json["doubleSided"].toBool(false);
 }
 
 void Mesh::Primitive::load(QJsonObject const& json,
@@ -503,7 +508,8 @@ void Node::load(QJsonObject const& json, std::vector<Mesh> const& globalMeshes)
 	for(auto const& key : json.keys())
 	{
 		if(key != "name" && key != "mesh" && key != "translation"
-		   && key != "matrix" && key != "children" && key != "rotation")
+		   && key != "matrix" && key != "children" && key != "rotation"
+		   && key != "scale")
 		{
 			qWarning() << "gltf::GLTFNode key" << key
 			           << "parsing not implemented. In this case contains:"
@@ -546,7 +552,7 @@ void Node::load(QJsonObject const& json, std::vector<Mesh> const& globalMeshes)
 			++i;
 		}
 		matrix.translate(translation);
-		QVector4D rotation;
+		QVector4D rotation{0.f, 0.f, 0.f, 1.f};
 		i = 0;
 		for(auto const& rotVal : json["rotation"].toArray())
 		{
@@ -554,6 +560,14 @@ void Node::load(QJsonObject const& json, std::vector<Mesh> const& globalMeshes)
 			++i;
 		}
 		matrix.rotate(QQuaternion{rotation});
+		QVector3D scale{1.f, 1.f, 1.f};
+		i = 0;
+		for(auto const& scaleVal : json["scale"].toArray())
+		{
+			scale[i] = scaleVal.toDouble();
+			++i;
+		}
+		matrix.scale(scale);
 	}
 }
 

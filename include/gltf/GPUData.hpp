@@ -30,19 +30,33 @@ namespace gltf
 {
 struct GPUMesh
 {
+	struct Primitive
+	{
+		Primitive(gltf::Mesh::Primitive const& prim, QString const& meshName);
+		void render(BasicCamera const& cam,
+		            std::vector<Light const*> const& lights,
+		            QMatrix4x4 const& nodeModel, GLTexture const& irradiance,
+		            GLTexture const& prefiltered,
+		            GLTexture const& brdfLUT) const;
+		GLMesh mesh;
+		std::unique_ptr<PBRMaterial> material;
+		BoundingSphere boundingSphere;
+
+	  private:
+		// returns vertex attrib for appended normals
+		GLMesh::VertexAttrib
+		    computeNormals(gltf::Accessor const& positionAccessor,
+		                   gltf::Accessor const* indicesAccessor,
+		                   std::vector<float>& newBuffer);
+	};
+
 	GPUMesh(gltf::Mesh const& gltfmesh);
-	void render(BasicCamera const& cam, std::vector<Light const*> const& light,
+	void render(BasicCamera const& cam, std::vector<Light const*> const& lights,
 	            QMatrix4x4 const& nodeModel, GLTexture const& irradiance,
 	            GLTexture const& prefiltered, GLTexture const& brdfLUT) const;
-	GLMesh mesh;
-	std::unique_ptr<PBRMaterial> material;
+	std::vector<Primitive> primitives;
+	std::vector<GLMesh const*> glMeshes;
 	BoundingSphere boundingSphere;
-
-  private:
-	// returns vertex attrib for appended normals
-	GLMesh::VertexAttrib computeNormals(gltf::Accessor const& positionAccessor,
-	                                    gltf::Accessor const* indicesAccessor,
-	                                    std::vector<float>& newBuffer);
 };
 struct GPUNode
 {
@@ -55,7 +69,7 @@ struct GPUNode
 	std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 	    getMeshes(QMatrix4x4 const& parentNodeModel) const;
 	BoundingSphere getBoundingSphere() const;
-	void render(BasicCamera const& cam, std::vector<Light const*> const& light,
+	void render(BasicCamera const& cam, std::vector<Light const*> const& lights,
 	            QMatrix4x4 const& parentNodeModel, GLTexture const& irradiance,
 	            GLTexture const& prefiltered, GLTexture const& brdfLUT) const;
 	std::unique_ptr<GPUMesh> gpuMesh;
