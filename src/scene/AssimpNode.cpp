@@ -54,7 +54,7 @@ QMatrix4x4 AssimpNode::preMultiplyTransform() const
 
 void AssimpNode::doRender(BasicCamera const& cam,
                           std::vector<Light const*> const& lights,
-                          GLTexture const& /*brdfLUT*/)
+                          GLTexture const& /*brdfLUT*/, bool /*environment*/)
 {
 	model.render(cam, getModel(), lights);
 }

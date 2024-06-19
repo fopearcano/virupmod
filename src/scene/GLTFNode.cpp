@@ -111,7 +111,7 @@ QMatrix4x4 GLTFNode::preMultiplyTransform() const
 
 void GLTFNode::doRender(BasicCamera const& cam,
                         std::vector<Light const*> const& lights,
-                        GLTexture const& brdfLUT)
+                        GLTexture const& brdfLUT, bool /*environment*/)
 {
 	for(auto const& gpuNode : gpuData->nodes)
 	{

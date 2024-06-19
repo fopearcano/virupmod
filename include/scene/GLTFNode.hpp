@@ -35,7 +35,7 @@ class GLTFNode : public Node
 	QMatrix4x4 preMultiplyTransform() const override;
 	void doRender(BasicCamera const& cam,
 	              std::vector<Light const*> const& lights,
-	              GLTexture const& brdfLUT) override;
+	              GLTexture const& brdfLUT, bool environment) override;
 
   private:
 	void loadCPU();

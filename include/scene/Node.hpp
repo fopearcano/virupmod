@@ -47,16 +47,17 @@ class Node
 	};
 	BoundingSphere getBoundingSphere() const { return boundingSphere; };
 	virtual bool usesGlobalIllumination() const { return true; };
+	virtual bool isDirectLightSource() const { return false; };
 	void setModel(QMatrix4x4 model);
 	bool hasComputedEnvOnce() const { return computedEnvOnce; };
 	float computeVisibility(BasicCamera const& camera);
 	void computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 	                   Scene& scene);
 	void render(BasicCamera const& cam, std::vector<Light const*> const& lights,
-	            GLTexture const& brdfLUT, bool force = false);
+	            GLTexture const& brdfLUT, bool environment = false);
 	void renderTransparent(BasicCamera const& cam,
 	                       std::vector<Light const*> const& lights,
-	                       GLTexture const& brdfLUT, bool force = false);
+	                       GLTexture const& brdfLUT, bool environment = false);
 	virtual ~Node() = default;
 
   protected:
@@ -66,12 +67,11 @@ class Node
 	virtual QMatrix4x4 preMultiplyTransform() const { return {}; };
 	virtual void doRender(BasicCamera const& cam,
 	                      std::vector<Light const*> const& lights,
-	                      GLTexture const& brdfLUT)
+	                      GLTexture const& brdfLUT, bool environment)
 	    = 0;
-	virtual void
-	    doRenderTransparent(BasicCamera const& /*cam*/,
-	                        std::vector<Light const*> const& /*lights*/,
-	                        GLTexture const& /*brdfLUT*/){};
+	virtual void doRenderTransparent(
+	    BasicCamera const& /*cam*/, std::vector<Light const*> const& /*lights*/,
+	    GLTexture const& /*brdfLUT*/, bool /*environment*/){};
 
 	BoundingSphere boundingSphere;
 

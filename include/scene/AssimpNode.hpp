@@ -38,7 +38,7 @@ class AssimpNode : public Node
 	virtual QMatrix4x4 preMultiplyTransform() const override;
 	virtual void doRender(BasicCamera const& cam,
 	                      std::vector<Light const*> const& lights,
-	                      GLTexture const& brdfLUT) override;
+	                      GLTexture const& brdfLUT, bool environment) override;
 
   private:
 	Model model;

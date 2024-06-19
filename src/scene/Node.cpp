@@ -182,36 +182,36 @@ void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 
 void Node::render(BasicCamera const& cam,
                   std::vector<Light const*> const& lights,
-                  GLTexture const& brdfLUT, bool force)
+                  GLTexture const& brdfLUT, bool environment)
 {
-	if(visibility == 0.f && !force)
+	if(visibility == 0.f && !environment)
 	{
 		return;
 	}
 
-	if(envIsRendering)
+	if(envIsRendering || (isDirectLightSource() && environment))
 	{
 		return;
 	}
 
-	doRender(cam, lights, brdfLUT);
+	doRender(cam, lights, brdfLUT, environment);
 }
 
 void Node::renderTransparent(BasicCamera const& cam,
                              std::vector<Light const*> const& lights,
-                             GLTexture const& brdfLUT, bool force)
+                             GLTexture const& brdfLUT, bool environment)
 {
-	if(visibility == 0.f && !force)
+	if(visibility == 0.f && !environment)
 	{
 		return;
 	}
 
-	if(envIsRendering)
+	if(envIsRendering || (isDirectLightSource() && environment))
 	{
 		return;
 	}
 
-	doRenderTransparent(cam, lights, brdfLUT);
+	doRenderTransparent(cam, lights, brdfLUT, environment);
 
 	/*if(showBoundingSphere)
 	{
