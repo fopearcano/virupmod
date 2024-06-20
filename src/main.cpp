@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
 {
 	std::ostringstream versionOss;
 	versionOss << PROJECT_NAME << " version " << PROJECT_VERSION << std::endl;
+	versionOss << "\tCompiled against Qt " << QT_VERSION_STR
+	           << " (Runtime version: " << qVersion() << ")" << std::endl;
 	versionOss << "\tWill request OpenGL version " << OPENGL_MAJOR_VERSION
 	           << "." << OPENGL_MINOR_VERSION << ' '
 	           << STRINGIFY(OPENGL_PROFILE) << std::endl;
