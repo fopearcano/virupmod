@@ -18,22 +18,24 @@
 
 #include "VIRUPSettings.hpp"
 
+#include "LibPlanet.hpp"
+
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
 {
-	auto dlw = make_qt_unique<DataListWidget>(*this);
-	insertCustomGroup("data", tr("Data"), 0, dlw);
+	LibPlanet libplanet;
+	libplanet.setupSettings(*this);
 
-	insertGroup("simulation", tr("Simulation"), 1);
-	addDateTimeSetting("starttime", QDateTime::currentDateTimeUtc(),
-	                   tr("Start time (UTC)"));
-	addBoolSetting("lockedrealtime", false, tr("Lock to Real Time"));
+	editGroup("simulation", true);
 
 	addDirPathSetting("solarsystemdir", "solarsystem/systems/Solar System/",
 	                  tr("Solar System Root Directory"));
 
 	addDirPathSetting("planetsystemdir", "exoplanets/systems",
 	                  tr("Exoplanetary Systems Root Directory"));
+
+	auto dlw = make_qt_unique<DataListWidget>(*this);
+	insertCustomGroup("data", tr("Data"), 0, dlw);
 
 	insertGroup("misc", tr("Miscellaneous"), 3);
 	addDoubleSetting("disttoorigin", 1.5,
@@ -64,12 +66,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addDoubleSetting("ambiancevolume", 0.0,
 	                 tr("Ambiant music volume (0.0-1.0)"), 0.0, 1.0);
 
-	editGroup("graphics");
-	addUIntSetting("texmaxsize", 8, tr("Textures max size (x2048)"), 1, 11);
-	addUIntSetting("gentexload", 1, tr("Texture generation GPU load"), 1, 4);
-	addUIntSetting("atmoquality", 1, tr("Atmosphere rendering quality"), 1, 5);
-	addUIntSetting("maxlightcasters", 1,
-	               tr("Maximum number of light casters per object"), 1, 2);
+	editGroup("graphics", true);
 	addFilePathSetting("customfont", "", tr("Custom font file"));
 
 	editGroup("controls");
