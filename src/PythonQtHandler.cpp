@@ -73,6 +73,9 @@ void PythonQtHandler::addVariable(QString const& name, QVariant const& v)
 {
 #ifdef PYTHONQT
 	mainModule()->addVariable(name, v);
+#else
+	(void) name;
+	(void) v;
 #endif
 }
 
@@ -81,7 +84,8 @@ QVariant PythonQtHandler::getVariable(QString const& name)
 #ifdef PYTHONQT
 	return mainModule()->getVariable(name);
 #else
-	return QVariant();
+	(void) name;
+	return {};
 #endif
 }
 
@@ -89,6 +93,8 @@ void PythonQtHandler::removeVariable(QString const& name)
 {
 #ifdef PYTHONQT
 	mainModule()->removeVariable(name);
+#else
+	(void) name;
 #endif
 }
 
@@ -96,6 +102,9 @@ void PythonQtHandler::addObject(QString const& name, QObject* object)
 {
 #ifdef PYTHONQT
 	mainModule()->addObject(name, object);
+#else
+	(void) name;
+	(void) object;
 #endif
 }
 
@@ -104,7 +113,8 @@ QVariant PythonQtHandler::evalScript(QString const& script)
 #ifdef PYTHONQT
 	return mainModule()->evalScript(script);
 #else
-	return QVariant();
+	(void) script;
+	return {};
 #endif
 }
 
@@ -112,6 +122,8 @@ void PythonQtHandler::evalFile(QString const& filename)
 {
 #ifdef PYTHONQT
 	mainModule()->evalFile(filename);
+#else
+	(void) filename;
 #endif
 }
 

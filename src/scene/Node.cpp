@@ -136,7 +136,7 @@ float Node::computeVisibility(BasicCamera const& camera)
 		visibility = 0.f;
 		return visibility;
 	}
-	visibility = atan2(
+	visibility = std::atan2(
 	    transformedBoundingSphere.radius,
 	    (transformedBoundingSphere.position - camera.getWorldSpacePosition())
 	        .length());

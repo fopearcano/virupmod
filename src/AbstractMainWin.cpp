@@ -317,9 +317,9 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 	painter.drawFunction({10, 10, 256, 256}, 0, fpsHistory.size(), 0, 120.f,
 	                     [this](float x)
 	                     {
-		                     return fpsHistory.at(
-		                         static_cast<int>(floor(x + currentFrame + 1))
-		                         % fpsHistory.size());
+		                     return fpsHistory.at(static_cast<int>(std::floor(
+		                                              x + currentFrame + 1))
+		                                          % fpsHistory.size());
 	                     });
 	painter.setPen(QPen{Qt::red});
 	painter.drawRect(QRect{10, 10, 256, 256});
@@ -366,11 +366,6 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 		}
 		profLog.write(QString('\n').toLatin1());
 	}
-	timingsStr += "Full frame (full loop): "
-	              + QString::number(frameTiming * 1.e3f) + "ms\n";
-	painter.drawText(
-	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 256},
-	    timingsStr);
 }
 
 void AbstractMainWin::applyPostProcShaderParams(
@@ -615,7 +610,7 @@ void AbstractMainWin::paintGL()
 	++currentFrame;
 	currentFrame = currentFrame % fpsHistory.size();
 
-	setTitle(QString(PROJECT_NAME) + " - " + QString::number(round(avgFPS))
+	setTitle(QString(PROJECT_NAME) + " - " + QString::number(std::round(avgFPS))
 	         + " FPS");
 
 	// update menubar visibility
@@ -859,9 +854,9 @@ void AbstractMainWin::paintGL()
 				              / currentVideoFrame);
 				if(remaining > 3600 * 24)
 				{
-					progressStr
-					    += QString::number(floor(remaining / (3600 * 24)))
-					       + "d";
+					progressStr += QString::number(
+					                   std::floor(remaining / (3600.f * 24.f)))
+					               + "d";
 				}
 
 				QTime t(0, 0, 0);

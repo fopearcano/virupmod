@@ -31,7 +31,11 @@ BaseInputManager::BaseInputManager()
 	          true);
 	addAction(Qt::Key_F10, {"screenshot", tr("Take Screenshot")}, true);
 	addAction(Qt::Key_F11, {"togglevr", tr("Toggle Virtual Reality")}, true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	addAction(Qt::ALT | Qt::Key_Return,
+#else
 	addAction(Qt::ALT + Qt::Key_Return,
+#endif
 	          {"togglefullscreen", tr("Toggle Fullscreen")}, true);
 	addAction(Qt::Key_E, {"autoexposure", tr("Toggle Automatic Exposure")},
 	          true);

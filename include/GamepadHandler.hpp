@@ -23,7 +23,7 @@
 #include <QVector2D>
 #include <queue>
 
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 #include <QtGamepad/QGamepad>
 #include <QtGamepad/QGamepadManager>
 #endif
@@ -77,7 +77,7 @@ class GamepadHandler : public QObject
 
   public:
 	GamepadHandler();
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	bool isEnabled() const
 	{
 		return gamepad != nullptr;
@@ -105,7 +105,7 @@ class GamepadHandler : public QObject
 	int desiredDeviceId
 	    = QSettings().value("controls/gamepad").toString().toInt();
 
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	std::unique_ptr<QGamepad> gamepad;
 #endif
 	QString gamepadName;

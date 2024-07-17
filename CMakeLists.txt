@@ -17,6 +17,17 @@
 # INIT
 cmake_minimum_required(VERSION 3.10.0)
 
+# OPTIONS
+option(USE_QT6 "Force using Qt6, else Qt5 will be forced" OFF)
+
+if(USE_QT6)
+	set(QT_CMAKE_FILE "cmake/Qt6.cmake")
+	message(STATUS "Using Qt6...")
+else()
+	set(QT_CMAKE_FILE "cmake/Qt5.cmake")
+	message(STATUS "Using Qt5...")
+endif()
+
 # READ CONFIG FILE AND SET VARIABLES
 set(BUILD_CONF "${CMAKE_CURRENT_SOURCE_DIR}/build.conf")
 if(NOT EXISTS "${BUILD_CONF}")
@@ -187,6 +198,19 @@ endif()
 macro(hydrogenvr_find_packages)
 	set(options FORCE_REQUIRED)
 	cmake_parse_arguments(FN "${options}" "" "" ${ARGN})
+if(USE_QT6)
+	set(REQUIRED_LIBS
+    #   Cmake Pkg Prefix   Version     Conan Pkg         Required
+        "assimp            4.1.0       assimp/5.0.1      true"
+        "OpenVR            1.12.5      openvr/1.12.5     true"
+		"LeapMotion        0.0.0       N/A               false"
+		"PythonQt          0.0.0       N/A               false"
+		"PythonQt_QtAll    0.0.0       N/A               false"
+		"libktx            0.0.0       N/A               false"
+		"ZSTD              0.0.0       N/A               false"
+		"Qt6Gamepad        0.0.0       N/A               false"
+    )
+else()
 	set(REQUIRED_LIBS
     #   Cmake Pkg Prefix   Version     Conan Pkg         Required
         "assimp            4.1.0       assimp/5.0.1      true"
@@ -197,6 +221,7 @@ macro(hydrogenvr_find_packages)
 		"libktx            0.0.0       N/A               false"
 		"ZSTD              0.0.0       N/A               false"
     )
+endif()
 
 	foreach(PACKAGE ${REQUIRED_LIBS})
         string(REGEX REPLACE "[ \t\r\n]+" ";" PACKAGE_SPLIT ${PACKAGE})
@@ -244,6 +269,11 @@ endmacro()
 # Attempt to locate any packages that are required and report the missing ones in CONAN_REQUIRED_LIBS
 hydrogenvr_find_packages()
 
+FOREACH(PATH ${THIRDPARTY_DATA_FILES})
+	get_filename_component(FOO "${PATH}" DIRECTORY)
+	get_filename_component(LIB_NAME "${FOO}" NAME)
+	set(LIBRARIES_DIRS "${LIBRARIES_DIRS} ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/${LIB_NAME}/include ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/${LIB_NAME}/src")
+ENDFOREACH(PATH)
 
 # Determine OpenVR version
 set(OPENVR_HEADER "${OPENVR_INCLUDE_DIRS}/openvr/openvr.h")
@@ -274,17 +304,8 @@ add_definitions(-DOPENVR_VERSION_MAJOR=${OPENVR_VERSION_MAJOR})
 add_definitions(-DOPENVR_VERSION_MINOR=${OPENVR_VERSION_MINOR})
 add_definitions(-DOPENVR_VERSION_BUILD=${OPENVR_VERSION_BUILD})
 
-
-# Qt5 requires that we find individual component
-find_package(Qt5 COMPONENTS Widgets Concurrent Test Network)
-if(NOT Qt5_FOUND)
-    list(APPEND CONAN_REQUIRED_LIBS "qt/5.14.1@bincrafters/stable")
-endif()
-# Make Qt Gamepad optional
-find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
-
-# Additional
-include(${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
+#Qt
+include(${QT_CMAKE_FILE})
 
 # Install any missing dependencies with conan install
 if (CONAN_REQUIRED_LIBS)
@@ -324,45 +345,44 @@ if (CONAN_REQUIRED_LIBS)
 
 	# Now that we've installed what we are missing, try to locate them again
 	hydrogenvr_find_packages(FORCE_REQUIRED)
-	find_package(Qt5 REQUIRED COMPONENTS Widgets Concurrent Test Network)
-	find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
+	include(${QT_CMAKE_FILE})
 endif()
 
-#Qt5 optional components
-if(Qt5Gamepad_FOUND)
-	add_definitions(-DQT5_GAMEPAD)
-	list(APPEND QT5_OPTIONAL_LIBS Qt5::Gamepad)
-	message(STATUS "Gamepad support enabled")
+# LeapMotion
+if(LeapMotion_FOUND)
+	message(STATUS "LeapMotion found")
+	add_definitions(-DLEAP_MOTION)
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${LEAPMOTION_INCLUDE_DIRS})
+	set(LD_LIBS ${LD_LIBS} ${LEAPMOTION_LIBRARIES})
 else()
-	message(STATUS "Gamepad support disabled (Qt5 Gamepad not found)")
+	message(STATUS "LeapMotion not found")
 endif()
 
 # Python
 if((PythonQt_FOUND) OR (PythonQt_QtAll_FOUND))
 	if(PythonQt_FOUND)
 		message(STATUS "PythonQt found")
+		add_definitions(-DPYTHONQT)
+		set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHONQT_INCLUDE_DIRS})
+		set(LD_LIBS ${LD_LIBS} ${PYTHONQT_LIBRARIES})
 	else()
 		message(STATUS "PythonQt NOT found")
 	endif()
 	if(PythonQt_QtAll_FOUND)
 		message(STATUS "PythonQt_QtAll found")
+		add_definitions(-DPYTHONQT_QTALL)
+		set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHONQT_QTALL_INCLUDE_DIRS})
+		set(LD_LIBS ${LD_LIBS} ${PYTHONQT_QTALL_LIBRARIES})
 	else()
 		message(STATUS "PythonQt_QtAll NOT found")
 	endif()
-	if(PYTHONQT_PYTHON2)
-		find_package(Python2 COMPONENTS Interpreter Development)
-		set(PYTHON_INCLUDE_DIRS ${Python2_INCLUDE_DIRS})
-		set(PYTHON_LIBRARIES ${Python2_LIBRARIES})
-		message(STATUS "PythonQt : using Python 2")
-		message(STATUS "PYTHONPATH : ${Python2_STDARCH}")
-		add_definitions(-DPYTHON_VERSION="${Python2_VERSION}")
-	else()
-		find_package(PythonLibs)
-		find_package(Python COMPONENTS Interpreter Development)
-		message(STATUS "PythonQt : using Python 3")
-		message(STATUS "PYTHONPATH : ${Python_STDARCH}")
-		add_definitions(-DPYTHON_VERSION="${Python_VERSION}")
-	endif()
+	find_package(PythonLibs)
+	find_package(Python COMPONENTS Interpreter Development)
+	message(STATUS "PythonQt : using Python 3")
+	message(STATUS "PYTHONPATH : ${Python_STDARCH}")
+	add_definitions(-DPYTHON_VERSION="${Python_VERSION}")
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+	set(LD_LIBS ${LD_LIBS} ${PYTHON_LIBRARIES})
 else()
 	message(STATUS "PythonQt not found")
 endif()
@@ -370,6 +390,9 @@ endif()
 # libktx
 if(libktx_FOUND)
 	message(STATUS "libktx found")
+	add_definitions(-DLIBKTX)
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${LIBKTX_INCLUDE_DIRS})
+	set(LD_LIBS ${LD_LIBS} ${LIBKTX_LIBRARIES})
 else()
 	message(STATUS "libktx not found")
 endif()
@@ -377,6 +400,9 @@ endif()
 # libzstd
 if(ZSTD_FOUND)
 	message(STATUS "libzstd found")
+	add_definitions(-DLIBZSTD)
+	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${ZSTD_INCLUDE_DIRS})
+	set(LD_LIBS ${LD_LIBS} ${ZSTD_LIBRARIES})
 else()
 	message(STATUS "libzstd not found")
 endif()
@@ -384,21 +410,6 @@ endif()
 #Additional
 if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
 	include(${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Dependencies.cmake)
-endif()
-
-# INCLUDE
-set(EXTERNAL_LIBS_INCLUDE_DIRS ${ASSIMP_INCLUDE_DIRS} ${OPENVR_INCLUDE_DIRS} ${PROJECT_INCLUDE_DIRS})
-if(LeapMotion_FOUND)
-	add_definitions(-DLEAP_MOTION)
-	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${LEAPMOTION_INCLUDE_DIRS})
-endif()
-if(PythonQt_FOUND)
-	add_definitions(-DPYTHONQT)
-	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHONQT_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-endif()
-if(PythonQt_QtAll_FOUND)
-	add_definitions(-DPYTHONQT_QTALL)
-	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${PYTHONQT_QTALL_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 endif()
 if(libktx_FOUND)
 	add_definitions(-DLIBKTX)
@@ -409,25 +420,12 @@ if(ZSTD_FOUND)
 	set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${ZSTD_INCLUDE_DIRS})
 endif()
 
+# INCLUDE
+set(EXTERNAL_LIBS_INCLUDE_DIRS ${EXTERNAL_LIBS_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS} ${OPENVR_INCLUDE_DIRS} ${PROJECT_INCLUDE_DIRS})
 include_directories(${COMMON_INCLUDES} ${THIRDPARTY_INCLUDES} ${PROJECT_INCLUDES} ${TEST_INCLUDES} SYSTEM ${EXTERNAL_LIBS_INCLUDE_DIRS})
 
 # LINKING SETUP
-set(LD_LIBS Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network ${QT5_OPTIONAL_LIBS} ${ASSIMP_LIBRARIES} ${OPENVR_LIBRARIES} ${PROJECT_LIBRARIES})
-if(LeapMotion_FOUND)
-	set(LD_LIBS ${LD_LIBS} ${LEAPMOTION_LIBRARIES})
-endif()
-if(PythonQt_FOUND)
-	set(LD_LIBS ${LD_LIBS} ${PYTHONQT_LIBRARIES} ${PYTHON_LIBRARIES})
-endif()
-if(PythonQt_QtAll_FOUND)
-	set(LD_LIBS ${LD_LIBS} ${PYTHONQT_QTALL_LIBRARIES} ${PYTHON_LIBRARIES})
-endif()
-if(libktx_FOUND)
-	set(LD_LIBS ${LD_LIBS} ${LIBKTX_LIBRARIES})
-endif()
-if(ZSTD_FOUND)
-	set(LD_LIBS ${LD_LIBS} ${ZSTD_LIBRARIES})
-endif()
+set(LD_LIBS ${LD_LIBS} ${ASSIMP_LIBRARIES} ${OPENVR_LIBRARIES} ${PROJECT_LIBRARIES})
 
 # Find .so in working directory
 if(NOT WIN32)
@@ -439,13 +437,15 @@ IF((DEFINED WIN32) AND ($ENV{HIDE_CONSOLE}))
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
 ENDIF()
 
-# RUN MOC (FOR QT5)
-qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
-qt5_wrap_cpp(TEST_MOC_FILES ${TEST_HPP_FILES})
+# RUN MOC (defined in Qt specific cmake file)
+run_moc()
 
 # COMMON OBJECTS
 add_library(objects OBJECT ${SRC_FILES} ${MOC_FILES})
 target_link_libraries(objects ${LD_LIBS})
+foreach(EXT_PROJ IN LISTS PROJECT_EXT_PROJECTS)
+	add_dependencies(objects ${EXT_PROJ})
+endforeach()
 
 # TESTS
 add_executable(tests ${TEST_SRC_FILES} ${TEST_MOC_FILES} $<TARGET_OBJECTS:objects>)
@@ -520,11 +520,7 @@ if(NOT WIN32)
 		INSTALL(FILES ${PYTHONQT_QTALL_LIBRARIES} DESTINATION lib/${PROJECT_NAME})
 	endif()
 	INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data DESTINATION share/${PROJECT_NAME})
-	if(PYTHONQT_PYTHON2)
-		INSTALL(DIRECTORY ${Python2_STDARCH}/ DESTINATION share/${PROJECT_NAME}/python)
-	else()
-		INSTALL(DIRECTORY ${Python_STDARCH}/ DESTINATION share/${PROJECT_NAME}/python)
-	endif()
+	INSTALL(DIRECTORY ${Python_STDARCH}/ DESTINATION share/${PROJECT_NAME}/python)
 	if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Install.cmake)
 		include(${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/Install.cmake)
 	endif()
@@ -549,10 +545,9 @@ if(NOT WIN32)
 			VERBATIM)
 endif()
 
-# Copy Qt5 DLL files for windows
+# Copy Qt DLL files for windows
 if(MSVC)
-	include(cmake/CopyQt5Deps.cmake)
-	copy_Qt5_deps(${PROJECT_NAME})
+	copy_Qt_deps(${PROJECT_NAME})
 endif()
 
 # Including extra cmake rules

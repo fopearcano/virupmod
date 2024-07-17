@@ -138,8 +138,8 @@ void CalibrationCompass::renderCircle(QMatrix4x4 const& angleShiftMat,
                                       float latitude)
 {
 	QMatrix4x4 model;
-	model.translate(QVector3D(0.f, sin(latitude), 0.f));
-	model.scale(cos(latitude));
+	model.translate(QVector3D(0.f, std::sin(latitude), 0.f));
+	model.scale(std::cos(latitude));
 
 	GLHandler::setUpRender(shader, angleShiftMat * model,
 	                       GLHandler::GeometricSpace::EYE);

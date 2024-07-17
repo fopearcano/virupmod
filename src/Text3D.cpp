@@ -18,7 +18,11 @@
 
 #include "Text3D.hpp"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtOpenGL/QOpenGLPaintDevice>
+#else
 #include <QOpenGLPaintDevice>
+#endif
 
 Text3D::Text3D(unsigned int width, unsigned int height)
     : Text3D(width, height, GLShaderProgram("billboard"))

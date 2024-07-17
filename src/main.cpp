@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 	           << "." << OPENGL_MINOR_VERSION << ' '
 	           << STRINGIFY(OPENGL_PROFILE) << std::endl;
 	versionOss << "\tGamepad support : ";
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	versionOss << "ON" << std::endl;
 #else
 	versionOss << "OFF" << std::endl;
@@ -114,20 +114,31 @@ int main(int argc, char* argv[])
 	    QSettings()
 	        .value("window/language", QLocale::system().name().left(2))
 	        .toString());
-	QLocale::setDefault(localeName);
+	QLocale::setDefault(QLocale{localeName});
 	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + localeName,
-	                  QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	QCoreApplication::installTranslator(&qtTranslator);
+	if(qtTranslator.load("qt_" + localeName,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	                     QLibraryInfo::path
+#else
+	                     QLibraryInfo::location
+#endif
+	                     (QLibraryInfo::TranslationsPath)))
+	{
+		QCoreApplication::installTranslator(&qtTranslator);
+	}
 
 	QTranslator hvrTranslator;
-	hvrTranslator.load("HydrogenVR_" + localeName, "data/translations/");
-	QCoreApplication::installTranslator(&hvrTranslator);
+	if(hvrTranslator.load("HydrogenVR_" + localeName, "data/translations/"))
+	{
+		QCoreApplication::installTranslator(&hvrTranslator);
+	}
 
 	QTranslator programTranslator;
-	programTranslator.load(QString(PROJECT_NAME) + "_" + localeName,
-	                       "data/translations/");
-	QCoreApplication::installTranslator(&programTranslator);
+	if(programTranslator.load(QString(PROJECT_NAME) + "_" + localeName,
+	                          "data/translations/"))
+	{
+		QCoreApplication::installTranslator(&programTranslator);
+	}
 
 #ifdef Q_OS_UNIX
 // set current dir as application dir path to avoid reading coincidental

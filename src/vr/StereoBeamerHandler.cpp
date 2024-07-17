@@ -103,7 +103,7 @@ QMatrix4x4
 	eyeDisplacement /= screenHeight; // in height unit
 	deltaRel -= eyeDisplacement;
 
-	deltaRel = angleShiftMat * deltaRel;
+	deltaRel = angleShiftMat.mapVector(deltaRel);
 
 	float vFOV(renderer->getVerticalFOV() * 3.1415 / 180.0),
 	    a(renderer->getAspectRatioFromFOV());

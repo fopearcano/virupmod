@@ -80,36 +80,48 @@ GlslSyntaxHighlighter::GlslSyntaxHighlighter(QTextDocument* parent)
 	addPatternFromList(glslRepeat, statementFormat);
 
 	/* Numbers */
-	rule.pattern = QRegExp(R"(\b\d+(u{,1}l{0,2}|ll{,1}u)\b)");
+	// Integer numbers (decimal)
+	rule.pattern = QRegularExpression(R"(\b\d+\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b0x\x+(u{,1}l{0,2}|ll{,1}u)\b)");
+	// Floating-point numbers (decimal)
+	rule.pattern = QRegularExpression(R"(\b\d+\.\d*\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b\d+f\b)");
+	rule.pattern = QRegularExpression(R"(\b\d*\.\d+\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b\d+\.\d*(e[-+]{,1}\d+){,1}[fl]{,1}\b)");
+	// Scientific notation (decimal)
+	rule.pattern = QRegularExpression(R"(\b\d+(\.\d*)?[eE][-+]?\d+\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b\.\d+(e[-+]{,1}\d+){,1}[fl]{,1}\b)");
+	rule.pattern = QRegularExpression(R"(\b\d*\.\d+[eE][-+]?\d+\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b\d+e[-+]{,1}\d+[fl]{,1}\b)");
+	// Hexadecimal numbers
+	rule.pattern = QRegularExpression(R"(\b0x[0-9a-fA-F]+\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp(R"(\b0\o*[89]\d*\b)");
+	// Floating-point numbers with suffix (e.g., 3.14f)
+	rule.pattern = QRegularExpression(R"(\b\d+\.\d*[fF]\b)");
+	rule.format  = numberFormat;
+	highlightingRules.append(rule);
+	rule.pattern = QRegularExpression(R"(\b\d*\.\d+[fF]\b)");
+	rule.format  = numberFormat;
+	highlightingRules.append(rule);
+	// Integer numbers with suffix (e.g., 42u, 42ul, 42ull)
+	rule.pattern = QRegularExpression(R"(\b\d+[uU](ll|[lL]{0,2})\b)");
 	rule.format  = numberFormat;
 	highlightingRules.append(rule);
 
 	/* Swizzles */
-	rule.pattern = QRegExp("\\.[xyzw]{1,4}\\b");
+	rule.pattern = QRegularExpression("\\.[xyzw]{1,4}\\b");
 	rule.format  = swizzleFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp("\\.[rgba]{1,4}\\b");
+	rule.pattern = QRegularExpression("\\.[rgba]{1,4}\\b");
 	rule.format  = swizzleFormat;
 	highlightingRules.append(rule);
-	rule.pattern = QRegExp("\\.[stpq]{1,4}\\b");
+	rule.pattern = QRegularExpression("\\.[stpq]{1,4}\\b");
 	rule.format  = swizzleFormat;
 	highlightingRules.append(rule);
 
@@ -134,8 +146,8 @@ GlslSyntaxHighlighter::GlslSyntaxHighlighter(QTextDocument* parent)
 	glslTypes.append("samplerCUBE");
 	glslTypes.append("sampler1DShadow");
 	glslTypes.append("sampler2DShadow");
-	glslTypes.append("vec4");
-	glslTypes.append("vec4");
+	glslTypes.append("mat3");
+	glslTypes.append("mat4");
 	glslTypes.append("struct");
 	addPatternFromList(glslTypes, typesFormat);
 
@@ -292,19 +304,19 @@ GlslSyntaxHighlighter::GlslSyntaxHighlighter(QTextDocument* parent)
 	addPatternFromList(glslUniform, typesFormat);
 
 	/* preprocessor */
-	// rule.pattern = QRegExp("\\s*#\\.*\\n");
-	rule.pattern = QRegExp("#.*");
+	// rule.pattern = QRegularExpression("\\s*#\\.*\\n");
+	rule.pattern = QRegularExpression("#.*");
 	rule.format  = preprocessorFormat;
 	highlightingRules.append(rule);
 
 	/* single line comments */
-	rule.pattern = QRegExp("//.*");
+	rule.pattern = QRegularExpression("//.*");
 	rule.format  = commentFormat;
 	highlightingRules.append(rule);
 
 	/* multi line comments */
-	commentStartExpression = QRegExp("/\\*");
-	commentEndExpression   = QRegExp("\\*/");
+	commentStartExpression = QRegularExpression("/\\*");
+	commentEndExpression   = QRegularExpression("\\*/");
 }
 
 void GlslSyntaxHighlighter::addPatternFromList(QStringList& list,
@@ -314,8 +326,9 @@ void GlslSyntaxHighlighter::addPatternFromList(QStringList& list,
 
 	for(auto const& pattern : list)
 	{
-		rule.pattern = QRegExp(QString("\\b") + pattern + QString("\\b"));
-		rule.format  = format;
+		rule.pattern
+		    = QRegularExpression(QString("\\b") + pattern + QString("\\b"));
+		rule.format = format;
 		highlightingRules.append(rule);
 	}
 }
@@ -325,11 +338,12 @@ void GlslSyntaxHighlighter::highlightBlock(const QString& text)
 {
 	for(auto& rule : highlightingRules)
 	{
-		QRegExp& expression = rule.pattern;
-		int index           = rule.pattern.indexIn(text);
-		while(index >= 0)
+		QRegularExpression& expression = rule.pattern;
+		auto match                     = expression.match(text);
+		for(int i = 0; i <= match.lastCapturedIndex(); ++i)
 		{
-			int length = expression.matchedLength();
+			auto index = match.capturedStart(i);
+			int length = match.capturedLength(i);
 			if(length <= 0)
 			{
 				std::cerr << "length==0 for "
@@ -338,7 +352,6 @@ void GlslSyntaxHighlighter::highlightBlock(const QString& text)
 				          << index << "\n";
 			}
 			setFormat(index, length, rule.format);
-			index = expression.indexIn(text, index + length);
 		}
 	}
 	setCurrentBlockState(0);
@@ -346,12 +359,15 @@ void GlslSyntaxHighlighter::highlightBlock(const QString& text)
 	int startIndex = 0;
 	if(previousBlockState() != 1)
 	{
-		startIndex = commentStartExpression.indexIn(text);
+		QRegularExpressionMatch match = commentStartExpression.match(text);
+		startIndex = match.hasMatch() ? match.capturedStart() : -1;
 	}
 
 	while(startIndex >= 0)
 	{
-		int endIndex = commentEndExpression.indexIn(text, startIndex);
+		QRegularExpressionMatch match
+		    = commentEndExpression.match(text, startIndex);
+		int endIndex = match.hasMatch() ? match.capturedStart() : -1;
 		int commentLength;
 		if(endIndex == -1)
 		{
@@ -360,12 +376,13 @@ void GlslSyntaxHighlighter::highlightBlock(const QString& text)
 		}
 		else
 		{
-			commentLength
-			    = endIndex - startIndex + commentEndExpression.matchedLength();
+			commentLength = endIndex - startIndex + match.capturedLength();
 		}
 		setFormat(startIndex, commentLength, commentFormat);
-		startIndex
-		    = commentStartExpression.indexIn(text, startIndex + commentLength);
+
+		QRegularExpressionMatch nextMatch
+		    = commentStartExpression.match(text, startIndex + commentLength);
+		startIndex = nextMatch.hasMatch() ? nextMatch.capturedStart() : -1;
 	}
 }
 // NOLINTEND(*)

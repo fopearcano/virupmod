@@ -45,7 +45,14 @@
 #define QUOTEME(M) #M
 #define INCLUDE_FILE(M) QUOTEME(M)
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+// clang-format off
+#include INCLUDE_FILE(QtOpenGL/QOPENGLFUNCTIONS)
+// clang-format on
+#else
 #include INCLUDE_FILE(QOPENGLFUNCTIONS)
+#endif
 
 typedef QOPENGLFUNCTIONS OpenGLFunctions;
 

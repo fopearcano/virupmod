@@ -38,6 +38,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtGui/QSyntaxHighlighter>
 #include <QtGui/QTextCharFormat>
 
+#include <QRegularExpression>
+
 class GlslSyntaxHighlighter: public QSyntaxHighlighter {
 public:
 	GlslSyntaxHighlighter(QTextDocument *parent = 0);
@@ -49,13 +51,13 @@ private:
 	void addPatternFromList(QStringList &list, QTextCharFormat &format);
 
 	struct HighlightingRule {
-		QRegExp pattern;
+		QRegularExpression pattern;
 		QTextCharFormat format;
 	};
 	QVector<HighlightingRule> highlightingRules;
 
-	QRegExp commentStartExpression;
-	QRegExp commentEndExpression;
+	QRegularExpression commentStartExpression;
+	QRegularExpression commentEndExpression;
 
 	QTextCharFormat statementFormat;
 	QTextCharFormat commentFormat;

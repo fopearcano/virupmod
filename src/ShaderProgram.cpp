@@ -187,7 +187,12 @@ void ShaderProgram::reload()
 		}
 		for(auto const& pair : uniformsBackup)
 		{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			auto type(
+			    static_cast<QMetaType::Type>(pair.second.metaType().id()));
+#else
 			auto type(static_cast<QMetaType::Type>(pair.second.type()));
+#endif
 			switch(type)
 			{
 				case QMetaType::Int:
@@ -221,7 +226,12 @@ void ShaderProgram::reload()
 					QVariantList l(pair.second.toList());
 					if(!l.isEmpty())
 					{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+						type = static_cast<QMetaType::Type>(
+						    l[0].metaType().id());
+#else
 						type = static_cast<QMetaType::Type>(l[0].type());
+#endif
 						switch(type)
 						{
 							case QMetaType::QVector3D:

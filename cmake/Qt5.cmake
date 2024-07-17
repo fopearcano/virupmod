@@ -1,4 +1,29 @@
-function(copy_Qt5_deps target_dir)
+# Qt5 requires that we find individual component
+find_package(Qt5 COMPONENTS Widgets Concurrent Test Network)
+find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
+if(NOT Qt5_FOUND)
+    list(APPEND CONAN_REQUIRED_LIBS "qt/5.14.1@bincrafters/stable")
+endif()
+
+#Qt5 optional components
+if(Qt5Gamepad_FOUND)
+	add_definitions(-DQT_GAMEPAD)
+	list(APPEND QT5_OPTIONAL_LIBS Qt5::Gamepad)
+	message(STATUS "Gamepad support enabled")
+else()
+	message(STATUS "Gamepad support disabled (Qt5 Gamepad not found)")
+endif()
+
+set(LD_LIBS ${LD_LIBS} Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network ${QT5_OPTIONAL_LIBS})
+
+function(run_moc)
+	qt5_wrap_cpp(MOC_FILES_ ${HPP_FILES})
+	qt5_wrap_cpp(TEST_MOC_FILES_ ${TEST_HPP_FILES})
+	set(MOC_FILES ${MOC_FILES_} PARENT_SCOPE)
+	set(TEST_MOC_FILES ${TEST_MOC_FILES_} PARENT_SCOPE)
+endfunction(run_moc)
+
+function(copy_Qt_deps target_dir)
     include(Cmake/WindowsCopyFiles.cmake)
 
     set(DLL_DEST "$<TARGET_FILE_DIR:${target_dir}>/")
@@ -32,4 +57,4 @@ function(copy_Qt5_deps target_dir)
 
     windows_copy_files(${target_dir} ${Qt5_PLATFORMS_DIR} ${PLATFORMS} qwindows$<$<CONFIG:Debug>:d>.*)
     windows_copy_files(${target_dir} ${Qt5_IMAGEFORMATS_DIR} ${IMAGEFORMATS} *.dll)
-endfunction(copy_Qt5_deps)
+endfunction(copy_Qt_deps)

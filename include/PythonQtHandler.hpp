@@ -24,7 +24,11 @@
 #ifdef PYTHONQT_QTALL
 #include <PythonQt_QtAll.h>
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <PythonQtScriptingConsole.h>
+#else
 #include <gui/PythonQtScriptingConsole.h>
+#endif
 #endif
 
 #include <QObject>
@@ -87,6 +91,9 @@ void PythonQtHandler::addClass(QString const& name, QString const& package)
 	qRegisterMetaType<T>(name.toLatin1().constData());
 	PythonQt::self()->registerCPPClass(name.toLatin1().constData(), "",
 	                                   package.toLatin1().constData());
+#else
+	(void) name;
+	(void) package;
 #endif
 }
 

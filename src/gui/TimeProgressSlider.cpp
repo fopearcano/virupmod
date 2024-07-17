@@ -47,7 +47,12 @@ void TimeProgressSlider::updateTime(int time)
 void TimeProgressSlider::mouseMoveEvent(QMouseEvent* e)
 {
 	int value(
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->position().x(),
+	                                    width()));
+#else
 	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->x(), width()));
+#endif
 	emit userHoversTime(value);
 	QSlider::mouseMoveEvent(e);
 }
@@ -60,6 +65,11 @@ void TimeProgressSlider::mousePressEvent(QMouseEvent* e)
 		return;
 	}
 	int value(
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->position().x(),
+	                                    width()));
+#else
 	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->x(), width()));
+#endif
 	emit userPickedTime(value);
 }

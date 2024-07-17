@@ -13,7 +13,8 @@ mkdir build
 cd build
 
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
-make install DESTDIR=AppDir -j $(nproc)
+make -j $(nproc)
+make install DESTDIR=AppDir
 
 # now, build AppImage using linuxdeploy and linuxdeploy-plugin-qt
 # download linuxdeploy and its Qt plugin

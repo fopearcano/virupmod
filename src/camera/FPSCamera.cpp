@@ -102,10 +102,18 @@ void FPSCamera::mouseMoveEvent(QMouseEvent* e, QRect const& winGeometry)
 	}
 
 	float dx = (winGeometry.x() + static_cast<float>(winGeometry.width()) / 2
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	            - e->globalPosition().x())
+#else
 	            - e->globalX())
+#endif
 	           / winGeometry.width();
 	float dy = (winGeometry.y() + static_cast<float>(winGeometry.height()) / 2
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	            - e->globalPosition().y())
+#else
 	            - e->globalY())
+#endif
 	           / winGeometry.height();
 	yaw += dx * 3.14f / 3.f;
 	pitch += dy * 3.14f / 3.f;
@@ -148,7 +156,7 @@ void FPSCamera::updateLookAt(float frameTiming,
 	{
 		position[i] += frameTiming
 		               * (noTrans(getView()).inverted()
-		                  * (negVel + posVel + gamepadVel))[i];
+		                  * QVector4D(negVel + posVel + gamepadVel, 1.f))[i];
 	}
 	setView(position, getLookDirection(), QVector3D(0.f, 0.f, 1.f));
 }

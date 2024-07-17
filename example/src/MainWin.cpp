@@ -2,8 +2,6 @@
 #include "MainWin.hpp"
 #include "Logger.hpp"
 
-#include <QOpenGLPaintDevice>
-
 void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(!pressed)
@@ -81,10 +79,18 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 	if(QSettings().value("misc/mouseview").toBool())
 	{
 		float dx = (this->x() + static_cast<float>(windowSize.width()) / 2
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		            - e->globalPosition().x())
+#else
 		            - e->globalX())
+#endif
 		           / width();
 		float dy = (this->y() + static_cast<float>(windowSize.height()) / 2
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		            - e->globalPosition().y())
+#else
 		            - e->globalY())
+#endif
 		           / height();
 		yaw += dx * 3.14f / 3.f;
 		pitch += dy * 3.14f / 3.f;
@@ -347,7 +353,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 		if(cont->getTriggerValue() > 0.5)
 		{
 			QVector4D pos(camera.seatedTrackedSpaceToWorldTransform()
-			              * cont->getPosition());
+			              * QVector4D(cont->getPosition(), 1.f));
 			std::vector<float> points(3);
 			points[0] = pos[0];
 			points[1] = pos[1];
@@ -362,7 +368,7 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 		if(leftHand->isClosed())
 		{
 			QVector4D pos(camera.hmdSpaceToWorldTransform()
-			              * leftHand->palmPosition());
+			              * QVector4D(leftHand->palmPosition(), 1.f));
 			std::vector<float> points(3);
 			points[0] = pos[0];
 			points[1] = pos[1];
@@ -378,8 +384,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 	float secs(timer.elapsed() / 5000.f);
 	light0->setDirection(QVector3D(cos(secs / 4.0), sin(secs / 4.0), 0.0));
 	light0->color = {0.f, 1.f, 0.f};
-	    /*= QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0)
-	      / 255.f;*/
+	/*= QVector3D(128 + 127 * cos(secs / 2.0), 128 + 127 * sin(secs / 2.0), 0)
+	  / 255.f;*/
 	light1->color = QVector3D(255, 255, 255) / 255.f;
 	if(vrHandler->isEnabled())
 	{

@@ -152,8 +152,8 @@ void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 		      * noTrans(vrHandler.getHMDPosMatrix().inverted())
 		      * noTrans(shiftedView);
 
-		pixVertFOV
-		    = atan(1.0f / projLeft.column(1)[1]) * 2.0 / windowSize.height();
+		pixVertFOV = std::atan(1.0f / projLeft.column(1)[1]) * 2.0
+		             / windowSize.height();
 
 		updateClippingPlanes(angleShiftMat);
 
@@ -174,7 +174,8 @@ void BasicCamera::update2D(QMatrix4x4 const& angleShiftMat)
 	fullHmdSpaceTransform             = fullSeatedTrackedSpaceTransform;
 	fullSkyboxSpaceTransform          = proj * noTrans(shiftedView);
 
-	pixVertFOV = atan(1.0f / proj.column(1)[1]) * 2.0 / windowSize.height();
+	pixVertFOV
+	    = std::atan(1.0f / proj.column(1)[1]) * 2.0 / windowSize.height();
 
 	updateClippingPlanes(angleShiftMat);
 }
@@ -226,8 +227,9 @@ QVector3D BasicCamera::getWorldSpacePosition() const
 		    = vrHandler.getEyeViewMatrix(vrHandler.getCurrentRenderingEye());
 	}
 
-	return view.inverted()
-	       * QVector3D((hmdScaledToWorld * eyeViewMatrix.inverted()).column(3));
+	return (view.inverted()
+	        * (hmdScaledToWorld * eyeViewMatrix.inverted()).column(3))
+	    .toVector3D();
 }
 
 QMatrix4x4 BasicCamera::eyeSpaceToWorldTransform() const

@@ -19,7 +19,12 @@
 #ifndef OPENGL4PAINTDEVICE_HPP
 #define OPENGL4PAINTDEVICE_HPP
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtOpenGL/QOpenGLPaintDevice>
+#else
 #include <QOpenGLPaintDevice>
+#endif
 #include <QPaintEngine>
 
 class OpenGL4PaintEngine : public QPaintEngine

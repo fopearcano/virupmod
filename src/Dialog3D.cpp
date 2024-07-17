@@ -327,7 +327,8 @@ void Dialog3D::installEventFilters(QObject* obj)
 QVector3D Dialog3D::intersection(Controller const& controller) const
 {
 	QVector3D pos(widget3d.getAspectRatioMatrix().inverted()
-	              * widget3d.getModel().inverted() * controller.getPosition());
+	              * widget3d.getModel().inverted()
+	              * QVector4D(controller.getPosition(), 1.0));
 	QVector3D dir(widget3d.getAspectRatioMatrix().inverted()
 	              * widget3d.getModel().inverted() * controller.getModel()
 	              * QVector4D(0.f, -sqrt2over2, -sqrt2over2, 0.f));
@@ -345,8 +346,9 @@ QVector3D Dialog3D::intersection(Controller const& controller) const
 	result.setY(0.5f - result.y());
 
 	auto intersectLocal(pos + distLocal * dir);
-	auto intersectGlobal(widget3d.getModel() * widget3d.getAspectRatioMatrix()
-	                     * intersectLocal);
+	QVector3D intersectGlobal(widget3d.getModel()
+	                          * widget3d.getAspectRatioMatrix()
+	                          * QVector4D(intersectLocal, 1.0));
 	float distGlobal(intersectGlobal.distanceToPoint(controller.getPosition()));
 	result.setZ(distGlobal);
 
@@ -359,7 +361,7 @@ QVector3D Dialog3D::intersection(VRHandler const& headset) const
 	QMatrix4x4 hmdModel(headset.getHMDPosMatrix());
 
 	QVector3D pos(widget3d.getAspectRatioMatrix().inverted()
-	              * widget3d.getModel().inverted() * hmdPos);
+	              * widget3d.getModel().inverted() * QVector4D(hmdPos, 1.0));
 	QVector3D dir(widget3d.getAspectRatioMatrix().inverted()
 	              * widget3d.getModel().inverted() * hmdModel
 	              * QVector4D(0.f, 0.f, -1.f, 0.f));
@@ -377,8 +379,9 @@ QVector3D Dialog3D::intersection(VRHandler const& headset) const
 	result.setY(0.5f - result.y());
 
 	auto intersectLocal(pos + distLocal * dir);
-	auto intersectGlobal(widget3d.getModel() * widget3d.getAspectRatioMatrix()
-	                     * intersectLocal);
+	QVector3D intersectGlobal(widget3d.getModel()
+	                          * widget3d.getAspectRatioMatrix()
+	                          * QVector4D(intersectLocal, 1.0));
 	float distGlobal(intersectGlobal.distanceToPoint(hmdPos));
 	result.setZ(distGlobal);
 

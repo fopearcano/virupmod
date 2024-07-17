@@ -28,7 +28,6 @@
 #include "camera/BoundingVolumes.hpp"
 #include "gl/GLHandler.hpp"
 
-class BoundingSphere;
 class VRHandler;
 
 /**

@@ -22,7 +22,7 @@
 
 GamepadHandler::GamepadHandler()
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	if(desiredDeviceId == -1)
 	{
 		return;
@@ -38,7 +38,7 @@ GamepadHandler::GamepadHandler()
 
 QVector2D GamepadHandler::getJoystick(Side side) const
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	if(!isEnabled() || side == Side::NONE)
 	{
 		return {};
@@ -66,7 +66,7 @@ QVector2D GamepadHandler::getJoystick(Side side) const
 
 double GamepadHandler::getTrigger(Side side) const
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	if(!isEnabled() || side == Side::NONE)
 	{
 		return 0.0;
@@ -104,7 +104,7 @@ bool GamepadHandler::pollEvent(Event& e)
 QList<QPair<int, QString>>
     GamepadHandler::getConnectedGamepads(bool noEmptyName)
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	auto gamepadManager = QGamepadManager::instance();
 
 #ifdef Q_OS_WIN
@@ -117,7 +117,7 @@ QList<QPair<int, QString>>
 #endif
 #endif
 	QList<QPair<int, QString>> res;
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	unsigned int i(1);
 	for(auto deviceId : gamepadManager->connectedGamepads())
 	{
@@ -137,7 +137,7 @@ QList<QPair<int, QString>>
 
 void GamepadHandler::updateGamepad()
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	bool previouslyEnabled = isEnabled();
 	gamepad.reset();
 	bool noEmptyName = false;
@@ -190,7 +190,7 @@ void GamepadHandler::updateGamepad()
 
 void GamepadHandler::setupGamepadConnections()
 {
-#ifdef QT5_GAMEPAD
+#ifdef QT_GAMEPAD
 	connect(gamepad.get(), &QGamepad::buttonAChanged,
 	        [this](bool v)
 	        {
