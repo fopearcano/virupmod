@@ -67,9 +67,8 @@ Billboard::Billboard(GLTexture&& texture, GLShaderProgram&& shader)
 
 void Billboard::render(BasicCamera const& camera)
 {
-	QVector3D hmdPos = (camera.hmdSpaceToWorldTransform().inverted()
-	                    * QVector4D(position, 1.0))
-	                       .toVector3D();
+	QVector3D hmdPos = utils::transformPosition(
+	    camera.hmdSpaceToWorldTransform().inverted(), position);
 	QMatrix4x4 model;
 	model.translate(hmdPos);
 	model.scale(width / camera.getEyeDistanceFactor());

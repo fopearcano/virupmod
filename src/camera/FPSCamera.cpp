@@ -152,11 +152,11 @@ void FPSCamera::updateLookAt(float frameTiming,
 	}
 
 	// apply gamepad and keyboard controls
+	auto vec(utils::transformPosition(noTrans(getView()).inverted(),
+	                                  negVel + posVel + gamepadVel));
 	for(unsigned int i(0); i < 3; ++i)
 	{
-		position[i] += frameTiming
-		               * (noTrans(getView()).inverted()
-		                  * QVector4D(negVel + posVel + gamepadVel, 1.f))[i];
+		position[i] += frameTiming * vec[i];
 	}
 	setView(position, getLookDirection(), QVector3D(0.f, 0.f, 1.f));
 }

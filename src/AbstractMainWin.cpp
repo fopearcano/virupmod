@@ -814,9 +814,10 @@ void AbstractMainWin::paintGL()
 		{
 			QDir viddir(QSettings().value("window/viddir").toString());
 			viddir.mkpath(".");
-			QFile::copy("./" + getAbsoluteDataPath("scripts/generate_vids.sh"),
-			            QSettings().value("window/viddir").toString()
-			                + "/generate_vids.sh");
+			QFile::copy(
+			    "./" + utils::getAbsoluteDataPath("scripts/generate_vids.sh"),
+			    QSettings().value("window/viddir").toString()
+			        + "/generate_vids.sh");
 			viddir.mkdir(subdir);
 			QDir projdir(QSettings().value("window/viddir").toString() + "/"
 			             + subdir);

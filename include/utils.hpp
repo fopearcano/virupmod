@@ -41,6 +41,8 @@ void append(std::vector<T>& v1, std::vector<T> const& v2)
 {
 	v1.insert(v1.end(), v2.begin(), v2.end());
 }
+namespace utils
+{
 
 /* if data/projectdir/relativeDataPath exists,
  *   returns data/projectdir/relativeDataPath
@@ -52,5 +54,17 @@ void append(std::vector<T>& v1, std::vector<T> const& v2)
  *   returns relativeDataPath
  */
 QString getAbsoluteDataPath(QString const& relativeDataPath);
+
+/** Transforms a position using a transformation matrix
+ */
+QVector3D transformPosition(QMatrix4x4 const& transform,
+                            QVector3D const& position);
+
+/** Transforms a direction using a transformation matrix (neglects translation)
+ */
+QVector3D transformDirection(QMatrix4x4 const& transform,
+                             QVector3D const& direction);
+
+} // namespace utils
 
 #endif // UTILS_H

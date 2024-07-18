@@ -22,6 +22,8 @@
 #include <array>
 #include <cfloat>
 
+#include "utils.hpp"
+
 BoundingSphere::BoundingSphere()
     : BoundingSphere({}, 1.f)
 {
@@ -71,8 +73,8 @@ BoundingSphere BoundingSphere::transformed(QMatrix4x4 const& transform) const
 {
 	QVector3D pRadius(position + QVector3D(radius, 0.f, 0.f));
 
-	auto p  = (transform * QVector4D(position, 1.f)).toVector3D();
-	pRadius = (transform * QVector4D(pRadius, 1.f)).toVector3D();
+	auto p  = utils::transformPosition(transform, position);
+	pRadius = utils::transformPosition(transform, pRadius);
 
 	return {p, (p - pRadius).length()};
 }

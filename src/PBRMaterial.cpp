@@ -87,16 +87,16 @@ PBRMaterial::PBRMaterial(QString const& directory)
     , textured(true)
 {
 	QString path("images/" + directory + "/");
-	albedoTex
-	    = std::make_unique<GLTexture>(getAbsoluteDataPath(path + "albedo.png"));
+	albedoTex = std::make_unique<GLTexture>(
+	    utils::getAbsoluteDataPath(path + "albedo.png"));
 	albedoTex->generateMipmap();
 	occlusionTex = std::make_unique<GLTexture>(
-	    getAbsoluteDataPath(path + "ao.png"), false);
+	    utils::getAbsoluteDataPath(path + "ao.png"), false);
 	metallicRoughnessTex = std::make_unique<GLTexture>(
-	    getAbsoluteDataPath(path + "metallicRoughness.png"), false);
+	    utils::getAbsoluteDataPath(path + "metallicRoughness.png"), false);
 	metallicRoughnessTex->generateMipmap();
 	normalTex = std::make_unique<GLTexture>(
-	    getAbsoluteDataPath(path + "normal.png"), false);
+	    utils::getAbsoluteDataPath(path + "normal.png"), false);
 	normalTex->generateMipmap();
 
 	shader.setUniform("prefiltered", 1);

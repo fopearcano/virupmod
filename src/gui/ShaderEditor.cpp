@@ -52,7 +52,7 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 		    shader.getDefines(), _f);
 		for(auto const& file : _f)
 		{
-			files.append(getAbsoluteDataPath("shaders/" + file));
+			files.append(utils::getAbsoluteDataPath("shaders/" + file));
 		}
 	}
 	files.removeDuplicates();

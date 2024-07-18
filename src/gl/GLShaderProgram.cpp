@@ -333,10 +333,10 @@ QString GLShaderProgram::getFullPreprocessedSource(
 	unsigned int id(debugFiles.size());
 	debugFiles.push_back(path);
 	// Read source
-	QFile f(getAbsoluteDataPath(path));
+	QFile f(utils::getAbsoluteDataPath(path));
 	if(!f.exists())
 	{
-		f.setFileName(getAbsoluteDataPath("shaders/" + path));
+		f.setFileName(utils::getAbsoluteDataPath("shaders/" + path));
 		if(!f.exists())
 		{
 			qWarning() << "Shader not loaded :\"" << path << "\" not found";

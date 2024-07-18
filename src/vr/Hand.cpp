@@ -63,14 +63,14 @@ void Hand::update(Leap::Hand const& hand)
 	_isClosed = hand.grabStrength() == 1;
 
 	_palmNormal = leapMotionToGLM(hand.palmNormal());
-	_palmNormal = QVector3D(model * QVector4D(_palmNormal, 0.f));
+	_palmNormal = utils::transformDirection(model, _palmNormal);
 	_palmNormal.normalize();
 
 	_palmPosition = leapMotionToGLM(hand.palmPosition());
-	_palmPosition = QVector3D(model * QVector4D(_palmPosition, 1.f));
+	_palmPosition = utils::transformPosition(model, _palmPosition);
 
 	_direction = leapMotionToGLM(hand.direction());
-	_direction = QVector3D(model * QVector4D(_direction, 0.f));
+	_direction = utils::transformDirection(model, _direction);
 	_direction.normalize();
 }
 #endif

@@ -45,7 +45,7 @@ std::pair<float, std::vector<AssetLoader::MeshDescriptor>>
 		modelName = "models/" + modelName;
 	}
 
-	modelName = getAbsoluteDataPath(modelName);
+	modelName = utils::getAbsoluteDataPath(modelName);
 
 	std::string path(modelName.toStdString());
 	std::string directory = path.substr(0, path.find_last_of('/'));
@@ -248,11 +248,10 @@ float AssetLoader::parseMesh(aiMesh const& mesh, aiScene const& scene,
 	{
 		QVector3D vertice(mesh.mVertices[j].x, mesh.mVertices[j].y,
 		                  mesh.mVertices[j].z);
-		if(boundingSphereRadius
-		   < (transform * QVector4D(vertice, 1.f)).length())
+		auto l = utils::transformPosition(transform, vertice).length();
+		if(boundingSphereRadius < l)
 		{
-			boundingSphereRadius
-			    = (transform * QVector4D(vertice, 1.f)).length();
+			boundingSphereRadius = l;
 		}
 		v.push_back(vertice.x());
 		v.push_back(vertice.y());
