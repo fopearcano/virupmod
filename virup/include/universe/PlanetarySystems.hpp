@@ -39,8 +39,8 @@ class PlanetarySystems : public UniverseElement
 	};
 	Vector3 getClosestSystemPosition()
 	{
-		return Utils::fromQt(getRelToAbsTransform()
-		                     * Utils::toQt(positions[closestId]));
+		return Utils::fromQt(utils::transformPosition(
+		    getRelToAbsTransform(), Utils::toQt(positions[closestId])));
 	};
 	OrbitalSystem* getClosestSystem() { return systems[closestId].get(); };
 	Vector3 getAbsolutePosition(QString const& systemName) const;

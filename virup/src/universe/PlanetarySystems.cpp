@@ -136,16 +136,19 @@ QStringList PlanetarySystems::getSystemsNames() const
 Vector3 PlanetarySystems::getAbsolutePosition(QString const& systemName) const
 {
 	auto relativePos(positions[ids.at(systemName)]);
-	return Utils::fromQt(getRelToAbsTransform() * Utils::toQt(relativePos));
+	return Utils::fromQt(utils::transformPosition(getRelToAbsTransform(),
+	                                              Utils::toQt(relativePos)));
 }
 
 void PlanetarySystems::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
 
-	QVector3D pos = useVRCamposForClosest ? campos
-	                                      : getRelToAbsTransform().inverted()
-	                                            * Utils::toQt(camera.position);
+	QVector3D pos
+	    = useVRCamposForClosest
+	          ? campos
+	          : utils::transformPosition(getRelToAbsTransform().inverted(),
+	                                     Utils::toQt(camera.position));
 
 	double dist(DBL_MAX);
 	unsigned int oldClosestId(closestId);

@@ -61,7 +61,7 @@ void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 	if(starTex() == nullptr)
 	{
 		starTex() = std::make_unique<GLTexture>(
-		    getAbsoluteDataPath("images/star.png").toLatin1().data());
+		    utils::getAbsoluteDataPath("images/star.png").toLatin1().data());
 		starTex()->generateMipmap();
 	}
 	if(galTex() == nullptr && !atlasFile.isEmpty())

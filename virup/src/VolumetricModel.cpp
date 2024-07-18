@@ -94,7 +94,8 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
 	GLBlendSet glBlend({GL_ONE, GL_ONE});
 	GLCullFaceSet glCullFace(GL_FRONT);
 	shader.setUniform("color", color);
-	shader.setUniform("campos", dataModel.inverted() * campos);
+	shader.setUniform("campos",
+	                  utils::transformPosition(dataModel.inverted(), campos));
 
 	std::vector<GLTexture const*> texs({tex.get()});
 

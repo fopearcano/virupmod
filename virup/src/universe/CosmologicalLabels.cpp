@@ -84,13 +84,14 @@ void CosmologicalLabels::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
 
-	Vector3 camPosData(camera.worldToDataPosition(Utils::fromQt(
-	    camera.hmdScaledSpaceToWorldTransform() * QVector3D(0.f, 0.f, 0.f))));
+	Vector3 camPosData(
+	    camera.worldToDataPosition(Utils::fromQt(utils::transformPosition(
+	        camera.hmdScaledSpaceToWorldTransform(), {}))));
 
 	for(auto& cosmoLabel : cosmoLabels)
 	{
-		Vector3 posData = Utils::fromQt(this->getRelToAbsTransform()
-		                                * Utils::toQt(cosmoLabel.first));
+		Vector3 posData = Utils::fromQt(utils::transformPosition(
+		    this->getRelToAbsTransform(), Utils::toQt(cosmoLabel.first)));
 		Vector3 pos(camera.dataToWorldPosition(posData));
 		Vector3 camRelPos(camPosData - posData);
 		Vector3 unitRelPos(camRelPos.getUnitForm());

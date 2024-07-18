@@ -149,15 +149,17 @@ void MovementControls::vrEventCube(
 					{
 						leftGripPressedCube     = true;
 						initControllerPosInCube = cosmoCam.worldToDataPosition(
-						    Utils::fromQt(trackedSpaceToWorldTransform
-						                  * left->getPosition()));
+						    Utils::fromQt(utils::transformPosition(
+						        trackedSpaceToWorldTransform,
+						        left->getPosition())));
 					}
 					else if(e.side == Side::RIGHT && right != nullptr)
 					{
 						rightGripPressedCube    = true;
 						initControllerPosInCube = cosmoCam.worldToDataPosition(
-						    Utils::fromQt(trackedSpaceToWorldTransform
-						                  * right->getPosition()));
+						    Utils::fromQt(utils::transformPosition(
+						        trackedSpaceToWorldTransform,
+						        right->getPosition())));
 					}
 					else
 					{
@@ -174,8 +176,8 @@ void MovementControls::vrEventCube(
 						QVector3D controllersMidPoint(
 						    (left->getPosition() + right->getPosition()) / 2.0);
 
-						controllersMidPoint = trackedSpaceToWorldTransform
-						                      * controllersMidPoint;
+						controllersMidPoint = utils::transformPosition(
+						    trackedSpaceToWorldTransform, controllersMidPoint);
 
 						scaleCenterCube = cosmoCam.worldToDataPosition(
 						    Utils::fromQt(controllersMidPoint));
@@ -201,8 +203,9 @@ void MovementControls::vrEventCube(
 						{
 							initControllerPosInCube
 							    = cosmoCam.worldToDataPosition(
-							        Utils::fromQt(trackedSpaceToWorldTransform
-							                      * right->getPosition()));
+							        Utils::fromQt(utils::transformPosition(
+							            trackedSpaceToWorldTransform,
+							            right->getPosition())));
 						}
 					}
 					else if(e.side == Side::RIGHT)
@@ -212,8 +215,9 @@ void MovementControls::vrEventCube(
 						{
 							initControllerPosInCube
 							    = cosmoCam.worldToDataPosition(
-							        Utils::fromQt(trackedSpaceToWorldTransform
-							                      * left->getPosition()));
+							        Utils::fromQt(utils::transformPosition(
+							            trackedSpaceToWorldTransform,
+							            left->getPosition())));
 						}
 					}
 					break;
@@ -246,8 +250,9 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 					{
 						leftGripPressedOrb = true;
 						initControllerRelPos
-						    = Utils::fromQt(trackedSpaceToWorldTransform
-						                    * left->getPosition())
+						    = Utils::fromQt(utils::transformPosition(
+						          trackedSpaceToWorldTransform,
+						          left->getPosition()))
 						          / CelestialBodyRenderer::overridenScale()
 						      + planetCam.relativePosition;
 					}
@@ -255,8 +260,9 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 					{
 						rightGripPressedOrb = true;
 						initControllerRelPos
-						    = Utils::fromQt(trackedSpaceToWorldTransform
-						                    * right->getPosition())
+						    = Utils::fromQt(utils::transformPosition(
+						          trackedSpaceToWorldTransform,
+						          right->getPosition()))
 						          / CelestialBodyRenderer::overridenScale()
 						      + planetCam.relativePosition;
 					}
@@ -277,8 +283,8 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						    = left->getPosition() + right->getPosition();
 						controllersMidPoint /= 2.f;
 
-						controllersMidPoint = trackedSpaceToWorldTransform
-						                      * controllersMidPoint;
+						controllersMidPoint = utils::transformPosition(
+						    trackedSpaceToWorldTransform, controllersMidPoint);
 						scaleCenterOrb
 						    = Utils::fromQt(controllersMidPoint)
 						          / CelestialBodyRenderer::overridenScale()
@@ -304,8 +310,9 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						if(right != nullptr && rightGripPressedOrb)
 						{
 							initControllerRelPos
-							    = Utils::fromQt(trackedSpaceToWorldTransform
-							                    * right->getPosition())
+							    = Utils::fromQt(utils::transformPosition(
+							          trackedSpaceToWorldTransform,
+							          right->getPosition()))
 							          / CelestialBodyRenderer::overridenScale()
 							      + planetCam.relativePosition;
 						}
@@ -320,8 +327,9 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 						if(left != nullptr && leftGripPressedOrb)
 						{
 							initControllerRelPos
-							    = Utils::fromQt(trackedSpaceToWorldTransform
-							                    * left->getPosition())
+							    = Utils::fromQt(utils::transformPosition(
+							          trackedSpaceToWorldTransform,
+							          left->getPosition()))
 							          / CelestialBodyRenderer::overridenScale()
 							      + planetCam.relativePosition;
 						}
@@ -437,9 +445,9 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 		float scale(0.005);
 		if(leftGripPressedCube && rightGripPressedCube)
 		{
-			midPoint
-			    = cosmoCam.seatedTrackedSpaceToWorldTransform().inverted()
-			      * Utils::toQt(cosmoCam.dataToWorldPosition(scaleCenterCube));
+			midPoint = utils::transformPosition(
+			    cosmoCam.seatedTrackedSpaceToWorldTransform().inverted(),
+			    Utils::toQt(cosmoCam.dataToWorldPosition(scaleCenterCube)));
 
 			scale *= left->getPosition().distanceToPoint(right->getPosition())
 			         / initControllersDistance;
@@ -467,14 +475,16 @@ void MovementControls::updateCube(double frameTiming)
 		if(leftGripPressedCube && left != nullptr)
 		{
 			controllerPosInCube = cosmoCam.worldToDataPosition(
-			    Utils::fromQt(cosmoCam.seatedTrackedSpaceToWorldTransform()
-			                  * left->getPosition()));
+			    Utils::fromQt(utils::transformPosition(
+			        cosmoCam.seatedTrackedSpaceToWorldTransform(),
+			        left->getPosition())));
 		}
 		else if(rightGripPressedCube && right != nullptr)
 		{
 			controllerPosInCube = cosmoCam.worldToDataPosition(
-			    Utils::fromQt(cosmoCam.seatedTrackedSpaceToWorldTransform()
-			                  * right->getPosition()));
+			    Utils::fromQt(utils::transformPosition(
+			        cosmoCam.seatedTrackedSpaceToWorldTransform(),
+			        right->getPosition())));
 		}
 		cosmoCam.position += initControllerPosInCube - controllerPosInCube;
 	}
@@ -491,10 +501,11 @@ void MovementControls::updateCube(double frameTiming)
 	// apply gamepad and keyboard controls
 	// if(!vrHandler.isEnabled())
 	{
-		cosmoCam.position += frameTiming
-		                     * Utils::fromQt(cosmoCam.getView().inverted()
-		                                     * (posVel + negVel + gamepadVel))
-		                     / cosmoCam.scale;
+		cosmoCam.position
+		    += frameTiming
+		       * Utils::fromQt(utils::transformDirection(
+		           cosmoCam.getView().inverted(), posVel + negVel + gamepadVel))
+		       / cosmoCam.scale;
 	}
 }
 
@@ -510,16 +521,18 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 		if(leftGripPressedOrb && left != nullptr)
 		{
 			controllerRelPos
-			    = Utils::fromQt(planetCam.seatedTrackedSpaceToWorldTransform()
-			                    * left->getPosition())
+			    = Utils::fromQt(utils::transformPosition(
+			          planetCam.seatedTrackedSpaceToWorldTransform(),
+			          left->getPosition()))
 			          / CelestialBodyRenderer::overridenScale()
 			      + planetCam.relativePosition;
 		}
 		else if(rightGripPressedOrb && right != nullptr)
 		{
 			controllerRelPos
-			    = Utils::fromQt(planetCam.seatedTrackedSpaceToWorldTransform()
-			                    * right->getPosition())
+			    = Utils::fromQt(utils::transformPosition(
+			          planetCam.seatedTrackedSpaceToWorldTransform(),
+			          right->getPosition()))
 			          / CelestialBodyRenderer::overridenScale()
 			      + planetCam.relativePosition;
 		}
@@ -541,8 +554,8 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 	{
 		planetCam.relativePosition[i]
 		    += frameTiming
-		       * (planetCam.getView().inverted()
-		          * (negVel + posVel + gamepadVel))[i]
+		       * utils::transformDirection(planetCam.getView().inverted(),
+		                                   (negVel + posVel + gamepadVel))[i]
 		       / CelestialBodyRenderer::overridenScale();
 	}
 }

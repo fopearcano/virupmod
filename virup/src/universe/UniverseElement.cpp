@@ -67,15 +67,16 @@ void UniverseElement::setJson(QJsonObject const& json)
 
 Vector3 UniverseElement::getAbsoluteBBoxCenter() const
 {
-	return Utils::fromQt(getRelToAbsTransform() * getBoundingBox().mid);
+	return Utils::fromQt(
+	    utils::transformPosition(getRelToAbsTransform(), getBoundingBox().mid));
 }
 
 QMatrix4x4 UniverseElement::getRelToAbsTransform() const
 {
 	QMatrix4x4 relToAbsTransform;
 	relToAbsTransform.scale(unit);
-	relToAbsTransform.translate(properRotation.inverted()
-	                            * Utils::toQt(-1.0 * solarsystemPosition));
+	relToAbsTransform.translate(utils::transformPosition(
+	    properRotation.inverted(), Utils::toQt(-1.0 * solarsystemPosition)));
 	relToAbsTransform = transform(referenceFrame, ReferenceFrame::ECLIPTIC)
 	                    * properRotation * relToAbsTransform;
 
@@ -283,6 +284,6 @@ void UniverseElement::getModelAndCampos(Camera const& camera, QMatrix4x4& model,
 	auto relToAbsTransform(getRelToAbsTransform());
 	model = camera.dataToWorldTransform() * relToAbsTransform;
 
-	campos
-	    = relToAbsTransform.inverted() * Utils::toQt(camera.getTruePosition());
+	campos = utils::transformPosition(relToAbsTransform.inverted(),
+	                                  Utils::toQt(camera.getTruePosition()));
 }

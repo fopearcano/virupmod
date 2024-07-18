@@ -161,9 +161,17 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 		}
 		return;
 	}
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	float dx = (x() + static_cast<float>(width()) / 2 - e->globalPosition().x())
+	           / width();
+	float dy
+	    = (y() + static_cast<float>(height()) / 2 - e->globalPosition().y())
+	      / height();
+#else
 	float dx = (x() + static_cast<float>(width()) / 2 - e->globalX()) / width();
 	float dy
 	    = (y() + static_cast<float>(height()) / 2 - e->globalY()) / height();
+#endif
 	auto& cam(renderer.getCamera<Camera>("cosmo"));
 	cam.yaw += dx * 3.14f / 3.f;
 	cam.pitch += dy * 3.14f / 3.f;
@@ -276,21 +284,19 @@ void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 		{
 			case GamepadHandler::Button::A:
 				animator->recenter();
-				QSound::play(
-				    getAbsoluteDataPath("sounds/buttons/recenter.wav"));
+				recenterSound.play();
 				break;
 			case GamepadHandler::Button::B:
 				animator->next();
-				QSound::play(getAbsoluteDataPath("sounds/buttons/next.wav"));
+				nextSound.play();
 				break;
 			case GamepadHandler::Button::X:
 				animator->previous();
-				QSound::play(
-				    getAbsoluteDataPath("sounds/buttons/previous.wav"));
+				previousSound.play();
 				break;
 			case GamepadHandler::Button::Y:
 				animator->home();
-				QSound::play(getAbsoluteDataPath("sounds/buttons/home.wav"));
+				homeSound.play();
 				break;
 			default:
 				sceneChanged = false;
@@ -333,6 +339,11 @@ void MainWin::initLibraries()
 
 void MainWin::initScene()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	// allow reading large images
+	QImageReader::setAllocationLimit(0);
+#endif
+
 	toneMappingModel->exposure     = 0.3f;
 	toneMappingModel->dynamicrange = 10000.f;
 	grid                           = std::make_unique<Grid>();
@@ -355,7 +366,9 @@ void MainWin::initScene()
 
 	// UI
 	helperBillboard = std::make_unique<Billboard>(
-	    getAbsoluteDataPath("images/halfcave_helper.png").toLatin1().data());
+	    utils::getAbsoluteDataPath("images/halfcave_helper.png")
+	        .toLatin1()
+	        .data());
 
 	debugText = std::make_unique<Text3D>(textWidth, textHeight);
 	debugText->setFlags(Qt::AlignCenter);
@@ -380,12 +393,12 @@ void MainWin::initScene()
 	movementControls = std::make_unique<MovementControls>(
 	    *vrHandler, universe->getBoundingBox(), *cam, *camPlanet);
 
-	inSound.setSource(
-	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/in.wav")));
-	thrustSound.setSource(
-	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/thrust.wav")));
-	outSound.setSource(
-	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/thruster/out.wav")));
+	inSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/thruster/in.wav")));
+	thrustSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/thruster/thrust.wav")));
+	outSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/thruster/out.wav")));
 	thrustSound.setLoopCount(QSoundEffect::Infinite);
 	connect(&inSound, &QSoundEffect::playingChanged,
 	        [this]()
@@ -408,6 +421,14 @@ void MainWin::initScene()
 			        outSound.play();
 		        }
 	        });
+	recenterSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/buttons/recenter.wav")));
+	nextSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/buttons/next.wav")));
+	previousSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/buttons/previous.wav")));
+	homeSound.setSource(QUrl::fromLocalFile(
+	    utils::getAbsoluteDataPath("sounds/buttons/home.wav")));
 
 	renderer.removeSceneRenderPath("default");
 
@@ -485,7 +506,7 @@ void MainWin::initScene()
 	// AMBIANCE
 
 	ambiance.setSource(
-	    QUrl::fromLocalFile(getAbsoluteDataPath("sounds/music/00.wav")));
+	    QUrl::fromLocalFile(utils::getAbsoluteDataPath("sounds/music/00.wav")));
 	ambiance.setVolume(QSettings().value("sound/ambiancevolume").toDouble());
 	ambiance.setLoopCount(QSoundEffect::Infinite);
 	ambiance.play();
@@ -608,8 +629,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 
 		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
 		{
-			helperBillboard->position
-			    = cam.hmdSpaceToWorldTransform() * billboardPos;
+			helperBillboard->position = utils::transformPosition(
+			    cam.hmdSpaceToWorldTransform(), billboardPos);
 
 			debugText->getModel() = cam.hmdSpaceToWorldTransform();
 			/*debugText->getModel().translate(pos);
@@ -619,8 +640,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		}
 		else
 		{
-			helperBillboard->position
-			    = cam.cameraSpaceToWorldTransform() * billboardPos;
+			helperBillboard->position = utils::transformPosition(
+			    cam.cameraSpaceToWorldTransform(), billboardPos);
 
 			debugText->getModel() = cam.cameraSpaceToWorldTransform();
 		}
@@ -731,7 +752,8 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	lenseScreenCoord = camera.project(pos);
 	lenseScreenCoord /= lenseScreenCoord.w();
 	lenseDist
-	    = ((camera.hmdScaledSpaceToWorldTransform() * QVector3D(0, 0, 0)) - pos)
+	    = (utils::transformPosition(camera.hmdScaledSpaceToWorldTransform(), {})
+	       - pos)
 	          .length();
 }
 
@@ -818,14 +840,15 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	// world space first
 	if(cont != nullptr)
 	{
-		position
-		    = renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform()
-		      * cont->getPosition();
+		position = utils::transformPosition(
+		    renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform(),
+		    cont->getPosition());
 	}
 	else
 	{
-		position = renderer.getCamera("cosmo").hmdScaledSpaceToWorldTransform()
-		           * position;
+		position = utils::transformPosition(
+		    renderer.getCamera("cosmo").hmdScaledSpaceToWorldTransform(),
+		    position);
 	}
 
 	// then data space
@@ -833,7 +856,11 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	    = Utils::toQt(renderer.getCamera<Camera>("cosmo").worldToDataPosition(
 	        Utils::fromQt(position)));
 	QString posstr;
-	&posstr << position;
+	posstr += QString::number(position.x());
+	posstr += "; ";
+	posstr += QString::number(position.y());
+	posstr += "; ";
+	posstr += QString::number(position.z());
 
 	auto msgBox = qt_owned<QMessageBox>();
 	msgBox->setAttribute(Qt::WA_DeleteOnClose);

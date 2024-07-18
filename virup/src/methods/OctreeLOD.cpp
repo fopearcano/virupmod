@@ -449,7 +449,8 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
-	update(camera, globalModel * model, model.inverted() * globalCampos);
+	update(camera, globalModel * model,
+	       utils::transformPosition(model.inverted(), globalCampos));
 }
 
 void OctreeLOD::render(Camera const& camera, QMatrix4x4 const& globalModel,
@@ -477,7 +478,8 @@ void OctreeLOD::render(Camera const& camera, QMatrix4x4 const& globalModel,
 
 	QMatrix4x4 model;
 	model.translate(Utils::toQt(localTranslation));
-	renderNode(camera, globalModel * model, model.inverted() * globalCampos,
+	renderNode(camera, globalModel * model,
+	           utils::transformPosition(model.inverted(), globalCampos),
 	           alpha * totalDataSize / dataSize, globalDustModel * model);
 }
 

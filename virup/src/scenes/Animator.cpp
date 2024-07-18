@@ -332,7 +332,11 @@ void Animator::restart()
 {
 	animationsDisabled = true;
 	stop();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	voiceover.setSource(mainWin.getVoiceoverUrl());
+#else
 	voiceover.setMedia(mainWin.getVoiceoverUrl());
+#endif
 	play();
 	animationsDisabled = false;
 }

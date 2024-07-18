@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QSound>
 #include <QSoundEffect>
 #include <QVBoxLayout>
 
@@ -341,6 +340,11 @@ class MainWin : public AbstractMainWin
 	QSoundEffect inSound;
 	QSoundEffect thrustSound;
 	QSoundEffect outSound;
+
+	QSoundEffect recenterSound;
+	QSoundEffect nextSound;
+	QSoundEffect previousSound;
+	QSoundEffect homeSound;
 	// idle
 	QElapsedTimer idleTimer;
 	void stopIdle()

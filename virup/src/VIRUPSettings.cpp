@@ -160,7 +160,7 @@ void DataListWidget::downloadDefaultData()
 	QUrl url("ftp://obsftp.unige.ch/pub/cabot/VIRUP-DATA.zip");
 
 	PythonQtHandler::init();
-	PythonQtHandler::evalFile(getAbsoluteDataPath("downloaddata.py"));
+	PythonQtHandler::evalFile(utils::getAbsoluteDataPath("downloaddata.py"));
 	PythonQtHandler::evalScript(QString("getfilesize(\"") + url.toString()
 	                            + "\")");
 	auto totsize = PythonQtHandler::getVariable("totsize").toLongLong();

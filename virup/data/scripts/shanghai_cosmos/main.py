@@ -1,5 +1,4 @@
 from PythonQt.QtCore import Qt, QDateTime, QDate, QTime, QTimeZone
-from PythonQt.QtMultimedia import QSound
 from PythonQt.libplanet import Vector3
 from PythonQt.virup import Transition, Scene, SceneSpatialData, SceneTemporalData, SceneUI, SceneCameraData, SceneToneMappingData
 
