@@ -31,10 +31,11 @@ update() {
 	COMMIT_MESSAGE=$(echo -e "$COMMIT_MESSAGE")
 	git commit -m "$COMMIT_MESSAGE" -e
 
-	if [[ $(grep PROJECT build.conf.example | wc -l) -ne $(grep PROJECT build.conf | wc -l) ]]
+	. project_directory.conf
+	if [[ $(grep PROJECT hydrogenvr/example/build.conf | wc -l) -ne $(grep PROJECT $PROJECT_DIRECTORY/build.conf | wc -l) ]]
 	then
 		echo "WARNING:"
-		echo "Your build.conf seems outdated, please compare it with build.conf.example."
+		echo "Your build.conf seems outdated, please compare it with hydrogenvr/example/build.conf."
 	fi
 }
 

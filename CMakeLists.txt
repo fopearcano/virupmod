@@ -21,18 +21,28 @@ cmake_minimum_required(VERSION 3.10.0)
 option(USE_QT6 "Force using Qt6, else Qt5 will be forced" OFF)
 
 if(USE_QT6)
-	set(QT_CMAKE_FILE "cmake/Qt6.cmake")
+	set(QT_CMAKE_FILE "hydrogenvr/cmake/Qt6.cmake")
 	message(STATUS "Using Qt6...")
 else()
-	set(QT_CMAKE_FILE "cmake/Qt5.cmake")
+	set(QT_CMAKE_FILE "hydrogenvr/cmake/Qt5.cmake")
 	message(STATUS "Using Qt5...")
 endif()
 
 # READ CONFIG FILE AND SET VARIABLES
-set(BUILD_CONF "${CMAKE_CURRENT_SOURCE_DIR}/build.conf")
-if(NOT EXISTS "${BUILD_CONF}")
-	set(BUILD_CONF "${CMAKE_CURRENT_SOURCE_DIR}/build.conf.example")
-endif()
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/project_directory.conf" ConfigContents)
+foreach(NameAndValue ${ConfigContents})
+# Strip leading spaces
+  string(REGEX REPLACE "^[ ]+" "" NameAndValue ${NameAndValue})
+# Find variable name
+  string(REGEX MATCH "^[^=]+" Name ${NameAndValue})
+# Find the value
+  string(REPLACE "${Name}=" "" Value ${NameAndValue})
+# Remove quotes
+  string(REPLACE "\"" "" Value ${Value})
+# Set the variable
+  set(${Name} ${Value})
+endforeach()
+set(BUILD_CONF "${PROJECT_DIRECTORY}/build.conf")
 message(STATUS "Build configuration file: ${BUILD_CONF}")
 file(STRINGS "${BUILD_CONF}" ConfigContents)
 foreach(NameAndValue ${ConfigContents})
@@ -144,26 +154,26 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty)
 	endforeach()
 endif()
 
-set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
+set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/hydrogenvr/include)
 set(THIRDPARTY_INCLUDES ${RESULT})
 set(PROJECT_INCLUDES ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/include)
-set(TEST_INCLUDES ${PROJECT_SOURCE_DIR}/test ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/test)
+set(TEST_INCLUDES ${PROJECT_SOURCE_DIR}/hydrogenvr/test ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/test)
 
 file(GLOB_RECURSE ENGINE_HPP_FILES FOLLOW_SYMLINKS ${COMMON_INCLUDES}/*.hpp)
 file(GLOB_RECURSE THIRDPARTY_HPP_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/include/*.hpp)
 file(GLOB_RECURSE PROJECT_HPP_FILES FOLLOW_SYMLINKS ${PROJECT_INCLUDES}/*.hpp)
 file(GLOB_RECURSE HPP_FILES FOLLOW_SYMLINKS ${ENGINE_HPP_FILES} ${THIRDPARTY_HPP_FILES} ${PROJECT_HPP_FILES})
 
-file(GLOB_RECURSE ENGINE_SRC_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE ENGINE_SRC_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/hydrogenvr/src/*.cpp)
 file(GLOB_RECURSE THIRDPARTY_SRC_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/src/*.cpp)
 file(GLOB_RECURSE PROJECT_SRC_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/src/*.cpp)
 file(GLOB_RECURSE SRC_FILES FOLLOW_SYMLINKS ${ENGINE_SRC_FILES} ${THIRDPARTY_SRC_FILES} ${PROJECT_SRC_FILES})
-file(GLOB_RECURSE MAIN_FILE FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/src/main.cpp)
+file(GLOB_RECURSE MAIN_FILE FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/hydrogenvr/src/main.cpp)
 list(REMOVE_ITEM SRC_FILES ${MAIN_FILE})
 
-file(GLOB_RECURSE ENGINE_TEST_HPP_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/test/*.hpp)
+file(GLOB_RECURSE ENGINE_TEST_HPP_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/hydrogenvr/test/*.hpp)
 file(GLOB_RECURSE TEST_HPP_FILES FOLLOW_SYMLINKS ${ENGINE_TEST_HPP_FILES} ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/test/*.hpp)
-file(GLOB_RECURSE ENGINE_TEST_CPP_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/test/*.cpp)
+file(GLOB_RECURSE ENGINE_TEST_CPP_FILES FOLLOW_SYMLINKS ${PROJECT_SOURCE_DIR}/hydrogenvr/test/*.cpp)
 file(GLOB_RECURSE TEST_SRC_FILES FOLLOW_SYMLINKS ${ENGINE_TEST_CPP_FILES} ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/test/*.cpp)
 
 FOREACH(PATH ${THIRDPARTY_DATA_FILES})
@@ -175,14 +185,14 @@ ENDFOREACH(PATH)
 # DEPENDENCIES
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 set(CONAN_CMAKE_SILENT_OUTPUT TRUE)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/modules ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/modules)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/hydrogenvr/cmake/modules ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/cmake/modules)
 
 if(DOC_ONLY)
-	include(cmake/Doc.cmake)
+	include(hydrogenvr/cmake/Doc.cmake)
 	return()
 endif()
 if(CLANG_TOOLS_ONLY)
-	include(cmake/ClangDevTools.cmake)
+	include(hydrogenvr/cmake/ClangDevTools.cmake)
 	return()
 endif()
 
@@ -269,11 +279,6 @@ endmacro()
 # Attempt to locate any packages that are required and report the missing ones in CONAN_REQUIRED_LIBS
 hydrogenvr_find_packages()
 
-FOREACH(PATH ${THIRDPARTY_DATA_FILES})
-	get_filename_component(FOO "${PATH}" DIRECTORY)
-	get_filename_component(LIB_NAME "${FOO}" NAME)
-	set(LIBRARIES_DIRS "${LIBRARIES_DIRS} ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/${LIB_NAME}/include ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/${LIB_NAME}/src")
-ENDFOREACH(PATH)
 
 # Determine OpenVR version
 set(OPENVR_HEADER "${OPENVR_INCLUDE_DIRS}/openvr/openvr.h")
@@ -451,11 +456,12 @@ target_link_libraries(${PROJECT_NAME} ${LD_LIBS})
 #SETUP DATA DIRECTORY
 
 # core
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data ${PROJECT_BINARY_DIR}/data
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/hydrogenvr/data ${PROJECT_BINARY_DIR}/data
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # project
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data ${PROJECT_BINARY_DIR}/data/${PROJECT_DIRECTORY}
+get_filename_component(DATA_PROJECT_DIR ${PROJECT_DIRECTORY} NAME)
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data ${PROJECT_BINARY_DIR}/data/${DATA_PROJECT_DIR}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # thirdparty
@@ -469,7 +475,7 @@ ENDFOREACH(PATH)
 
 # translations
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/translations ${PROJECT_BINARY_DIR}/data/translations
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/hydrogenvr/translations ${PROJECT_BINARY_DIR}/data/translations
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -492,7 +498,7 @@ if(NOT WIN32)
 
 	set(DEB_DEP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_DIRECTORY}/ci/gitlab-ci/${OSRELEASE_ID}/${OSRELEASE_VERSION_ID}/DEPENDENCIES)
 	if(NOT EXISTS ${DEB_DEP_FILE})
-		set(DEB_DEP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ci/gitlab-ci/${OSRELEASE_ID}/${OSRELEASE_VERSION_ID}/DEPENDENCIES)
+		set(DEB_DEP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/hydrogenvr/ci/gitlab-ci/${OSRELEASE_ID}/${OSRELEASE_VERSION_ID}/DEPENDENCIES)
 	endif()
 	message(STATUS "deb DEPENDENCIES file : ${DEB_DEP_FILE}")
 
@@ -543,9 +549,9 @@ if(MSVC)
 endif()
 
 # Including extra cmake rules
-include(cmake/ClangDevTools.cmake)
-include(cmake/Doc.cmake)
-include(cmake/GLSLValidator.cmake)
+include(hydrogenvr/cmake/ClangDevTools.cmake)
+include(hydrogenvr/cmake/Doc.cmake)
+include(hydrogenvr/cmake/GLSLValidator.cmake)
 
 # Translation
 if(PROJECT_TRANSLATE)
@@ -559,12 +565,12 @@ if(PROJECT_TRANSLATE_THIRDPARTY)
 endif()
 
 add_custom_target(translation-update
-	COMMAND lupdate ${TRANSLATION_FILES} -ts ${CMAKE_CURRENT_SOURCE_DIR}/translations/${PROJECT_NAME}_fr.ts
+	COMMAND lupdate ${TRANSLATION_FILES} -ts ${CMAKE_CURRENT_SOURCE_DIR}/hydrogenvr/translations/${PROJECT_NAME}_fr.ts
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating translation (.ts) file."
 	VERBATIM)
 add_custom_target(translation-release
-	COMMAND lrelease ${CMAKE_CURRENT_SOURCE_DIR}/translations/${PROJECT_NAME}_fr.ts
+	COMMAND lrelease ${CMAKE_CURRENT_SOURCE_DIR}/hydrogenvr/translations/${PROJECT_NAME}_fr.ts
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating translation (.qm) file."
 	VERBATIM)

@@ -17,17 +17,17 @@ dockerbuild:focal:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/ubuntu/install_dependencies.sh
-            - ci/gitlab-ci/ubuntu/20.04/Dockerfile
-            - ci/gitlab-ci/ubuntu/20.04/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/20.04/Dockerfile
+            - hydrogenvr/ci/gitlab-ci/ubuntu/20.04/install_dependencies.sh
             - .gitlab-ci.yml
             - '**/ci/gitlab-ci/ubuntu/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
+        - . ./project_directory.conf
         - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
-        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:focal -f ./ci/gitlab-ci/ubuntu/20.04/Dockerfile --no-cache --pull .
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./hydrogenvr/example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:focal -f ./hydrogenvr/ci/gitlab-ci/ubuntu/20.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:focal
 
 dockerbuild:jammy:
@@ -39,17 +39,17 @@ dockerbuild:jammy:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/ubuntu/install_dependencies.sh
-            - ci/gitlab-ci/ubuntu/22.04/Dockerfile
-            - ci/gitlab-ci/ubuntu/22.04/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/22.04/Dockerfile
+            - hydrogenvr/ci/gitlab-ci/ubuntu/22.04/install_dependencies.sh
             - .gitlab-ci.yml
             - '**/ci/gitlab-ci/ubuntu/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
+        - . ./project_directory.conf
         - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
-        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:jammy -f ./ci/gitlab-ci/ubuntu/22.04/Dockerfile --no-cache --pull .
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./hydrogenvr/example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:jammy -f ./hydrogenvr/ci/gitlab-ci/ubuntu/22.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:jammy
 
 dockerbuild:noble:
@@ -61,17 +61,17 @@ dockerbuild:noble:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/ubuntu/install_dependencies.sh
-            - ci/gitlab-ci/ubuntu/24.04/Dockerfile
-            - ci/gitlab-ci/ubuntu/24.04/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/ubuntu/24.04/Dockerfile
+            - hydrogenvr/ci/gitlab-ci/ubuntu/24.04/install_dependencies.sh
             - .gitlab-ci.yml
             - '**/ci/gitlab-ci/ubuntu/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
+        - . ./project_directory.conf
         - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
-        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:noble -f ./ci/gitlab-ci/ubuntu/24.04/Dockerfile --no-cache --pull .
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./hydrogenvr/example/ci/gitlab-ci/ubuntu/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:noble -f ./hydrogenvr/ci/gitlab-ci/ubuntu/24.04/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:noble
 
 dockerbuild:archlinux:
@@ -83,16 +83,16 @@ dockerbuild:archlinux:
         refs:
             - pushes
         changes:
-            - ci/gitlab-ci/archlinux/install_dependencies.sh
-            - ci/gitlab-ci/archlinux/Dockerfile
+            - hydrogenvr/ci/gitlab-ci/archlinux/install_dependencies.sh
+            - hydrogenvr/ci/gitlab-ci/archlinux/Dockerfile
             - .gitlab-ci.yml
             - '**/ci/gitlab-ci/archlinux/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - if [ ! -f "./build.conf" ]; then . ./build.conf.example ; else . ./build.conf ; fi
+        - . ./project_directory.conf
         - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/archlinux/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./example/ci/gitlab-ci/archlinux/install_dependencies.sh; fi
-        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:archlinux -f ./ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./hydrogenvr/example/ci/gitlab-ci/archlinux/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:archlinux -f ./hydrogenvr/ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:archlinux
 
 build:focal:
@@ -101,7 +101,7 @@ build:focal:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/ubuntu/20.04/build.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/20.04/build.sh
     artifacts:
         paths:
             - build/*.deb
@@ -115,7 +115,7 @@ build:appimage:
     script:
         - apt update
         - apt install -y qt5-default libqt5multimedia5-plugins qtdeclarative5-dev-tools
-        - ./ci/gitlab-ci/commons/make-appimage.sh
+        - ./hydrogenvr/ci/gitlab-ci/commons/make-appimage.sh
     artifacts:
         paths:
             - build/*.AppImage
@@ -127,7 +127,7 @@ build:jammy:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/ubuntu/22.04/build.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/22.04/build.sh
     artifacts:
         paths:
             - build/*.deb
@@ -139,7 +139,7 @@ build:noble:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/ubuntu/24.04/build.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/24.04/build.sh
     artifacts:
         paths:
             - build/*.deb
@@ -151,7 +151,7 @@ build:archlinux:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/archlinux/build.sh
+        - ./hydrogenvr/ci/gitlab-ci/archlinux/build.sh
 
 test:focal:
     image: ubuntu:20.04
@@ -159,7 +159,7 @@ test:focal:
     dependencies:
         - build:focal
     script:
-        - ./ci/gitlab-ci/ubuntu/test_deb.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/test_deb.sh
     artifacts:
         paths:
             - build/*.deb
@@ -171,7 +171,7 @@ test:jammy:
     dependencies:
         - build:jammy
     script:
-        - ./ci/gitlab-ci/ubuntu/test_deb.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/test_deb.sh
     artifacts:
         paths:
             - build/*.deb
@@ -183,7 +183,7 @@ test:noble:
     dependencies:
         - build:noble
     script:
-        - ./ci/gitlab-ci/ubuntu/test_deb.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/test_deb.sh
     artifacts:
         paths:
             - build/*.deb
@@ -196,7 +196,7 @@ checkcode:
         refs:
             - pushes
     script:
-        - ./ci/gitlab-ci/ubuntu/checkcode.sh
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/checkcode.sh
 
 deploy:focal:
     image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -280,7 +280,7 @@ pages:
     only:
         - pushes
     script:
-        - ./ci/gitlab-ci/commons/deploy-pages.sh $CI_COMMIT_REF_SLUG $CI_PAGES_URL
+        - ./hydrogenvr/ci/gitlab-ci/commons/deploy-pages.sh $CI_COMMIT_REF_SLUG $CI_PAGES_URL
     artifacts:
         name: "$CI_COMMIT_REF_SLUG"
         paths:

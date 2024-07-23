@@ -1,9 +1,8 @@
 #!/bin/bash -e
-if [ ! -f "./build.conf" ]; then
-	. ./build.conf.example
-else
-	. ./build.conf
-fi
+
+. ./project_directory.conf
+. ./${PROJECT_DIRECTORY}/build.conf
+
 mkdir -p build
 cd build
 if [[ -v CMAKE_BUILD_TYPE ]];
