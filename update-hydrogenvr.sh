@@ -31,7 +31,7 @@ update() {
 	COMMIT_MESSAGE=$(echo -e "$COMMIT_MESSAGE")
 	git commit -m "$COMMIT_MESSAGE" -e
 
-	. project_directory.conf
+	. ./project_directory.conf || PROJECT_DIRECTORY=hydrogenvr/example
 	if [[ $(grep PROJECT hydrogenvr/example/build.conf | wc -l) -ne $(grep PROJECT $PROJECT_DIRECTORY/build.conf | wc -l) ]]
 	then
 		echo "WARNING:"

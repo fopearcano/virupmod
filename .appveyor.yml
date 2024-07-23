@@ -31,7 +31,7 @@ install:
     - set Path=%QTPATH%;%QTPATH%/bin;%INNOSETUPPATH%;%PATH%
 
     - cd %APPVEYOR_BUILD_FOLDER%
-    - for /f "delims=" %%x in (project_directory.conf) do (set "%%x")
+    - IF NOT EXIST project_directory.conf ( set PROJECT_DIRECTORY=hydrogenvr/example ) ELSE (for /f "delims=" %%x in (project_directory.conf) do (set "%%x"))
     - set "PROJECT_DIRECTORY=%PROJECT_DIRECTORY:/=\%"
     - set BUILD_CONF=%PROJECT_DIRECTORY%\build.conf
     - for /f "delims=" %%x in (%BUILD_CONF%) do (set "%%x")

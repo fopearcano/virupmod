@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./project_directory.conf
+. ./project_directory.conf || PROJECT_DIRECTORY=hydrogenvr/example
 . ./${PROJECT_DIRECTORY}/build.conf
 
 mkdir build ; cd build

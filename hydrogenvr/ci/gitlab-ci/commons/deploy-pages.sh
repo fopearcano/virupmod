@@ -14,7 +14,7 @@ mv html public/$SUBDIR
 
 # GENERATE GLOBAL INDEX.HTML
 
-. ./project_directory.conf
+. ./project_directory.conf || PROJECT_DIRECTORY=hydrogenvr/example
 . ./${PROJECT_DIRECTORY}/build.conf
 
 # Create an index.html file in the public directory

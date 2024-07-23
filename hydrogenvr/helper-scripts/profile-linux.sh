@@ -5,7 +5,7 @@
 #to stop profiling :
 #callgrind_control -i off
 
-. ./project_directory.conf
+. ./project_directory.conf || PROJECT_DIRECTORY=hydrogenvr/example
 . ./${PROJECT_DIRECTORY}/build.conf
 
 export CMAKE_BUILD_TYPE=Debug

@@ -29,19 +29,23 @@ else()
 endif()
 
 # READ CONFIG FILE AND SET VARIABLES
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/project_directory.conf" ConfigContents)
-foreach(NameAndValue ${ConfigContents})
-# Strip leading spaces
-  string(REGEX REPLACE "^[ ]+" "" NameAndValue ${NameAndValue})
-# Find variable name
-  string(REGEX MATCH "^[^=]+" Name ${NameAndValue})
-# Find the value
-  string(REPLACE "${Name}=" "" Value ${NameAndValue})
-# Remove quotes
-  string(REPLACE "\"" "" Value ${Value})
-# Set the variable
-  set(${Name} ${Value})
-endforeach()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/project_directory.conf")
+	file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/project_directory.conf" ConfigContents)
+	foreach(NameAndValue ${ConfigContents})
+	# Strip leading spaces
+	  string(REGEX REPLACE "^[ ]+" "" NameAndValue ${NameAndValue})
+	# Find variable name
+	  string(REGEX MATCH "^[^=]+" Name ${NameAndValue})
+	# Find the value
+	  string(REPLACE "${Name}=" "" Value ${NameAndValue})
+	# Remove quotes
+	  string(REPLACE "\"" "" Value ${Value})
+	# Set the variable
+	  set(${Name} ${Value})
+	endforeach()
+else()
+	set(PROJECT_DIRECTORY "hydrogenvr/example")
+endif()
 set(BUILD_CONF "${PROJECT_DIRECTORY}/build.conf")
 message(STATUS "Build configuration file: ${BUILD_CONF}")
 file(STRINGS "${BUILD_CONF}" ConfigContents)
