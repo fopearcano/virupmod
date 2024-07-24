@@ -1,0 +1,35 @@
+# Gitlab CI config for AppImage
+
+build:appimage:
+    image: $CI_REGISTRY_IMAGE:focal
+    stage: build
+    only:
+        - pushes
+    script:
+        - apt update
+        - apt install -y qt5-default libqt5multimedia5-plugins qtdeclarative5-dev-tools
+        - ./hydrogenvr/ci/gitlab-ci/commons/make-appimage.sh
+    artifacts:
+        paths:
+            - build/*.AppImage
+        expire_in: 1h
+
+deploy:appimage:
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    stage: deploy
+    only:
+        - tags
+    dependencies:
+        - build:appimage
+    script:
+        - apk --no-cache add curl
+        - export IN=$(ls build/*.AppImage)
+        - export OUT=$(echo $IN | sed 's/.*\/\(.*\)/\1/g')
+        - export URL=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/releases/${CI_COMMIT_TAG}/${OUT}
+        - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file ${IN} ${URL}'
+        - message="Error while adding link to Release :"
+        - message=$message"PRIVATE_TOKEN hasn't been set.\nPlease read "
+        - message=$message"https://gitlab.com/Dexter9313/hydrogenvr/-/wikis/tutorials/1-general-topics/9-continuous-integration for more details."
+        - if [[ -z $PRIVATE_TOKEN ]] ; then echo -e "$message"; fi
+        - 'curl --request POST --header "PRIVATE-TOKEN: $PRIVATE_TOKEN" --data name="${OUT}" --data url="${URL}" --data link_type="package" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/${CI_COMMIT_TAG}/assets/links"'
+

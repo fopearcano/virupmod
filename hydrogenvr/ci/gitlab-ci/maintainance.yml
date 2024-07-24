@@ -1,0 +1,23 @@
+# Gitlab CI config for Maintainance
+
+checkcode:
+    image: $CI_REGISTRY_IMAGE:jammy
+    stage: test
+    only:
+        refs:
+            - pushes
+    script:
+        - ./hydrogenvr/ci/gitlab-ci/ubuntu/checkcode.sh
+
+pages:
+    image: gcc
+    stage: deploy
+    only:
+        - pushes
+    script:
+        - ./hydrogenvr/ci/gitlab-ci/commons/deploy-pages.sh $CI_COMMIT_REF_SLUG $CI_PAGES_URL
+    artifacts:
+        name: "$CI_COMMIT_REF_SLUG"
+        paths:
+            - public
+
