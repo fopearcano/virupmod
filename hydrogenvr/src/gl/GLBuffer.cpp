@@ -61,13 +61,8 @@ GLBuffer::GLBuffer(GLenum target, size_t size, GLenum usage)
 	GLHandler::glf().glGenBuffers(1, &id);
 	if(size != 0)
 	{
-		resize(size, usage);
+		setData(static_cast<char*>(nullptr), size, usage);
 	}
-}
-
-void GLBuffer::resize(size_t size, GLenum usage)
-{
-	setData(static_cast<char*>(nullptr), size, usage);
 }
 
 void GLBuffer::bind() const
@@ -94,20 +89,25 @@ void GLBuffer::bindBase(unsigned int index) const
 void* GLBuffer::map(GLenum access) const
 {
 	bind();
-	return GLHandler::glf().glMapBuffer(currentTarget, access);
+	auto res = GLHandler::glf().glMapBuffer(currentTarget, access);
+	unbind();
+	return res;
 }
 
 void* GLBuffer::mapRange(size_t offset, size_t subSize, GLenum access) const
 {
 	bind();
-	return GLHandler::glf().glMapBufferRange(currentTarget, offset, subSize,
-	                                         access);
+	auto res = GLHandler::glf().glMapBufferRange(currentTarget, offset, subSize,
+	                                             access);
+	unbind();
+	return res;
 }
 
 void GLBuffer::unmap() const
 {
 	bind();
 	GLHandler::glf().glUnmapBuffer(currentTarget);
+	unbind();
 }
 
 void GLBuffer::cleanUp()
@@ -116,6 +116,7 @@ void GLBuffer::cleanUp()
 	{
 		return;
 	}
+	unbind();
 	--instancesCount();
 	GLHandler::glf().glDeleteBuffers(1, &id);
 	doClean = false;
@@ -124,11 +125,20 @@ void GLBuffer::cleanUp()
 void GLBuffer::glBufferData(GLenum target, size_t size, void const* data,
                             GLenum usage)
 {
+	if(this->size != 0 && this->size != size)
+	{
+		qWarning()
+		    << "Resizing GLBuffer is deprecated and soon won't be possible.";
+	}
+	bind();
 	GLHandler::glf().glBufferData(target, size, data, usage);
+	unbind();
 }
 
 void GLBuffer::glBufferSubData(GLenum target, size_t offset, size_t size,
                                void const* data)
 {
+	bind();
 	GLHandler::glf().glBufferSubData(target, offset, size, data);
+	unbind();
 }

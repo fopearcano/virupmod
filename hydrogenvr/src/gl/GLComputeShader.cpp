@@ -20,26 +20,11 @@
 
 #include "gl/GLComputeShader.hpp"
 
-PFNGLDISPATCHCOMPUTEPROC GLComputeShader::glDispatchCompute = nullptr;
-
 GLComputeShader::GLComputeShader(QString const& fileName,
                                  QMap<QString, QString> const& defines)
     : GLShaderProgram({{fileName, Stage::COMPUTE}}, addDefines(defines))
 {
 	get(GL_COMPUTE_WORK_GROUP_SIZE, &workGroupSize[0]);
-
-	// load glDispatchCompute
-	if(glDispatchCompute == nullptr)
-	{
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		glDispatchCompute = reinterpret_cast<PFNGLDISPATCHCOMPUTEPROC>(
-		    QOpenGLContext::currentContext()->getProcAddress(
-		        "glDispatchCompute"));
-		if(glDispatchCompute == nullptr)
-		{
-			qCritical() << "Can't load ARB_compute_shader : glDispatchCompute";
-		}
-	}
 }
 
 void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
@@ -87,7 +72,8 @@ void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
 		      + (globalGroupSize[i] % workGroupSize[i] == 0 ? 0 : 1);
 	}
 
-	glDispatchCompute(dispatchSize[0], dispatchSize[1], dispatchSize[2]);
+	GLHandler::glf().glDispatchCompute(dispatchSize[0], dispatchSize[1],
+	                                   dispatchSize[2]);
 
 	if(waitForFinish)
 	{

@@ -184,6 +184,10 @@ class GLHandler : public QObject
 	    std::function<void(bool, QMatrix4x4, QMatrix4x4)> const& renderFunction,
 	    QVector3D const& shift = QVector3D(0, 0, 0));
 	/**
+	 * @brief Returns if wireframe is active.
+	 */
+	static bool isWireframeActive();
+	/**
 	 * @brief Begins wireframe rendering.
 	 */
 	static void beginWireframe();

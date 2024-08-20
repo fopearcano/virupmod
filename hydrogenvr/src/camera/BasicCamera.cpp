@@ -159,6 +159,9 @@ void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 
 		return;
 	}
+	projLeft         = {};
+	projRight        = {};
+	hmdScaledToWorld = {};
 
 	update2D(angleShiftMat);
 }

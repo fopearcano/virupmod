@@ -25,6 +25,18 @@ std::unordered_map<QString, Timings::Timer, Timings::QStringHash>&
 	return timers;
 }
 
+std::list<std::pair<QString, int>>& Timings::orderedNames()
+{
+	static std::list<std::pair<QString, int>> orderedNames;
+	return orderedNames;
+}
+
+int& Timings::currentDepth()
+{
+	static int currentDepth = 0;
+	return currentDepth;
+}
+
 void Timings::start(QString const& timerName, bool persistent)
 {
 	if(timers().count(timerName) == 0)
@@ -44,6 +56,10 @@ void Timings::start(QString const& timerName, bool persistent)
 		           << "that was already ended.";
 		return;
 	}
+
+	orderedNames().emplace_back(timerName, currentDepth());
+	++currentDepth();
+
 	timer.startQuery.queryCounter();
 	timer.cpuTimer.restart();
 	timer.started    = true;
@@ -74,36 +90,42 @@ void Timings::end(QString const& timerName)
 	timer.cpuTime = timer.cpuTimer.nsecsElapsed();
 	timer.endQuery.queryCounter();
 	timer.ended = true;
+
+	--currentDepth();
 }
 
-QList<QPair<QString, QPair<uint64_t, uint64_t>>> Timings::getTimingsNanosecond()
+QList<Timings::CPUGPUTiming> Timings::getTimingsNanosecond()
 {
-	QList<QPair<QString, QPair<uint64_t, uint64_t>>> result;
+	QList<CPUGPUTiming> result;
 	std::vector<QString> toRemove;
 
-	for(auto& pair : timers())
+	for(auto& pair : orderedNames())
 	{
-		if((!pair.second.started || !pair.second.ended)
-		   && !pair.second.persistent)
+		auto const& name = pair.first;
+		auto depth       = pair.second;
+		auto& timer      = timers().at(name);
+		if((!timer.started || !timer.ended) && !timer.persistent)
 		{
 			// badly used timer or ignored timer, remove it
-			toRemove.push_back(pair.first);
+			toRemove.push_back(name);
 			continue;
 		}
 
 		result.push_back(
-		    {pair.first,
-		     {pair.second.cpuTime, pair.second.endQuery.getResult()
-		                               - pair.second.startQuery.getResult()}});
+		    {name, timer.cpuTime,
+		     timer.endQuery.getResult() - timer.startQuery.getResult(), depth});
 		// reset checks
-		pair.second.started = false;
-		pair.second.ended   = false;
+		timer.started = false;
+		timer.ended   = false;
 	}
 
 	for(auto const& name : toRemove)
 	{
 		timers().erase(name);
 	}
+
+	orderedNames().clear();
+	currentDepth() = 0;
 
 	return result;
 }

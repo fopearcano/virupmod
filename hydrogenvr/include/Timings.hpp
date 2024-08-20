@@ -39,6 +39,14 @@ class Timings
 		bool persistent = false;
 	};
 
+	struct CPUGPUTiming
+	{
+		QString name;
+		uint64_t cpu;
+		uint64_t gpu;
+		int depth;
+	};
+
 	struct QStringHash
 	{
 		std::size_t operator()(const QString& key) const
@@ -55,12 +63,14 @@ class Timings
   private:
 	friend AbstractMainWin;
 	// pair(name, pair(cpuTiming, gpuTiming))
-	static QList<QPair<QString, QPair<uint64_t, uint64_t>>>
-	    getTimingsNanosecond();
+	static QList<CPUGPUTiming> getTimingsNanosecond();
 	static void cleanUp();
 
 	// true private
 	static std::unordered_map<QString, Timer, QStringHash>& timers();
+
+	static std::list<std::pair<QString, int>>& orderedNames();
+	static int& currentDepth();
 };
 
 #endif // TIMINGS_HPP

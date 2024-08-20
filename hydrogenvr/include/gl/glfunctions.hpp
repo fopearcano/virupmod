@@ -24,7 +24,7 @@
 #endif
 
 #ifndef OPENGL_MINOR_VERSION
-#define OPENGL_MINOR_VERSION 2
+#define OPENGL_MINOR_VERSION 5
 #endif
 
 #ifndef OPENGL_PROFILE

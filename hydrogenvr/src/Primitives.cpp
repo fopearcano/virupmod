@@ -27,6 +27,11 @@ void Primitives::setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
 	    0.5f,  -0.5f, // 2
 	    0.5f,  0.5f,  // 3
 	};
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = PrimitiveType::TRIANGLE_STRIP;
+	}
+	mesh.setPrimitiveType(primitiveType);
 
 	if(primitiveType == PrimitiveType::POINTS)
 	{
@@ -45,8 +50,7 @@ void Primitives::setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
 	{
 		elements = {0, 2, 1, 1, 2, 3};
 	}
-	else if(primitiveType == PrimitiveType::TRIANGLE_STRIP
-	        || primitiveType == PrimitiveType::AUTO)
+	else if(primitiveType == PrimitiveType::TRIANGLE_STRIP)
 	{
 		elements = {0, 2, 1, 3};
 	}
@@ -67,6 +71,12 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 		}
 	}
 
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = PrimitiveType::TRIANGLES;
+	}
+	mesh.setPrimitiveType(primitiveType);
+
 	if(primitiveType == PrimitiveType::POINTS)
 	{
 		mesh.setVertexShaderMapping(shader, {{"position", 2}});
@@ -85,12 +95,12 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 				unsigned int id = j + size * i;
 
 				elements.push_back(id - size - 1);
-				elements.push_back(id - size);
 				elements.push_back(id - 1);
+				elements.push_back(id - size);
 
 				elements.push_back(id - 1);
-				elements.push_back(id - size);
 				elements.push_back(id);
+				elements.push_back(id - size);
 			}
 		}
 	}
@@ -126,6 +136,12 @@ void Primitives::setAsUnitCube(GLMesh& mesh, GLShaderProgram const& shader,
 	    0.5f,  0.5f,  -0.5f, // 6
 	    0.5f,  0.5f,  0.5f,  // 7
 	};
+
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = PrimitiveType::TRIANGLE_STRIP;
+	}
+	mesh.setPrimitiveType(primitiveType);
 
 	if(primitiveType == PrimitiveType::POINTS)
 	{
@@ -168,8 +184,7 @@ void Primitives::setAsUnitCube(GLMesh& mesh, GLShaderProgram const& shader,
 		    7, 5, 3, // up1
 		};
 	}
-	else if(primitiveType == PrimitiveType::TRIANGLE_STRIP
-	        || primitiveType == PrimitiveType::AUTO)
+	else if(primitiveType == PrimitiveType::TRIANGLE_STRIP)
 	{
 		// see : Optimizing Triangle Strips for Fast Rendering, Francine Evans,
 		// Steven Skiena, Amitabh Varshney,
@@ -205,6 +220,12 @@ void Primitives::setAsUnitSphere(GLMesh& mesh, GLShaderProgram const& shader,
 {
 	std::vector<float> vertices;
 	std::vector<unsigned int> elements;
+
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = PrimitiveType::TRIANGLES;
+	}
+	mesh.setPrimitiveType(primitiveType);
 
 	// "north pole"
 	vertices.push_back(0.f);
@@ -338,6 +359,12 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
 {
 	std::vector<float> vertices;
 	std::vector<unsigned int> elements;
+
+	if(primitiveType == PrimitiveType::AUTO)
+	{
+		primitiveType = PrimitiveType::TRIANGLES;
+	}
+	mesh.setPrimitiveType(primitiveType);
 
 	// Generate cap center vertices
 	vertices.push_back(0.0f);

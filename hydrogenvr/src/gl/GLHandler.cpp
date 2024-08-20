@@ -241,6 +241,13 @@ void GLHandler::generateEnvironmentMap(
 	}
 }
 
+bool GLHandler::isWireframeActive()
+{
+	int val;
+	glf().glGetIntegerv(GL_POLYGON_MODE, &val);
+	return val != GL_FILL;
+}
+
 void GLHandler::beginWireframe()
 {
 	GLHandler::glf().glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -277,13 +284,20 @@ void GLHandler::setUpTransforms(
 
 void GLHandler::useTextures(std::vector<GLTexture const*> const& textures)
 {
-	for(unsigned int i(0); i < textures.size(); ++i)
+	std::vector<GLuint> texs;
+	texs.reserve(textures.size());
+	for(auto const& tex : textures)
 	{
-		if(textures[i] != nullptr)
+		if(tex != nullptr)
 		{
-			textures[i]->use(GL_TEXTURE0 + i);
+			texs.push_back(tex->glTexture);
+		}
+		else
+		{
+			texs.push_back(0);
 		}
 	}
+	glf().glBindTextures(0, textures.size(), texs.data());
 }
 
 QColor GLHandler::sRGBToLinear(QColor const& srgb)

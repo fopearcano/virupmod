@@ -51,7 +51,6 @@ class GLBuffer
 	};
 	// in bytes
 	size_t getSize() const { return size; };
-	void resize(size_t size, GLenum usage = GL_STATIC_DRAW);
 	void bind() const;
 	void bind(GLenum target); // resets currentTarget
 	void unbind() const;
@@ -86,10 +85,10 @@ class GLBuffer
 	bool doClean = true;
 	static unsigned int& instancesCount();
 
-	static void glBufferData(GLenum target, size_t size, void const* data,
-	                         GLenum usage);
-	static void glBufferSubData(GLenum target, size_t offset, size_t size,
-	                            void const* data);
+	void glBufferData(GLenum target, size_t size, void const* data,
+	                  GLenum usage);
+	void glBufferSubData(GLenum target, size_t offset, size_t size,
+	                     void const* data);
 };
 
 template <typename T>
@@ -101,7 +100,6 @@ void GLBuffer::setData(T const* data, size_t size, GLenum usage)
 		setSubData(0, data, size);
 		return;
 	}
-	bind();
 	glBufferData(currentTarget, size * sizeof(T), data, usage);
 	this->size = size * sizeof(T);
 }
@@ -131,7 +129,6 @@ void GLBuffer::setSubData(size_t offset, T const* data, size_t subSize)
 		setData(data, offset + subSize);
 		return;
 	}
-	bind();
 	glBufferSubData(currentTarget, offset * sizeof(T), subSize * sizeof(T),
 	                data);
 }

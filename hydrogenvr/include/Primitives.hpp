@@ -35,7 +35,7 @@ class Primitives
 	static void setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 	                      unsigned int size = 1024,
 	                      PrimitiveType primitiveType
-	                      = PrimitiveType::TRIANGLE_STRIP);
+	                      = PrimitiveType::TRIANGLES);
 
 	static void setAsUnitCube(GLMesh& mesh, GLShaderProgram const& shader,
 	                          PrimitiveType primitiveType

@@ -503,7 +503,6 @@ QString GLTexture::getTypeStr() const
 void GLTexture::generateMipmap(unsigned int baseLevel,
                                unsigned int maxLevel) const
 {
-	GLHandler::glf().glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MIN_FILTER,
 	                                 GL_LINEAR_MIPMAP_LINEAR);
@@ -540,21 +539,14 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 	switch(internalFormat) // determine what type GL texture has...
 	{
 		case GL_RGB:
+		case GL_SRGB8:
 		{
 			QImage result(size, QImage::Format::Format_RGB888);
-			GLHandler::glf().glGetTexImage(target, level, GL_RGBA,
+			GLHandler::glf().glGetTexImage(target, level, GL_RGB,
 			                               GL_UNSIGNED_BYTE, result.bits());
 			return result;
 		}
-		break;
 		case GL_RGBA:
-		{
-			QImage result(size, QImage::Format::Format_RGBA8888);
-			GLHandler::glf().glGetTexImage(target, level, GL_RGBA,
-			                               GL_UNSIGNED_BYTE, result.bits());
-			return result;
-		}
-		break;
 		case GL_SRGB8_ALPHA8:
 		{
 			QImage result(size, QImage::Format::Format_RGBA8888);
@@ -563,6 +555,8 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 			return result;
 		}
 		default: // unsupported type for now
+			qWarning() << "Trying to get content as image of unsupported "
+			              "texture internal format.";
 			break;
 	}
 
@@ -728,30 +722,35 @@ void GLTexture::cleanUp()
 
 void GLTexture::initData(Data const& data) const
 {
+	// TODO(florian) allow for storage to contain only one level, or any number
+	// of levels
+	GLsizei levels = log2(fmax(size[0], size[1])) + 1;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	switch(type)
 	{
 		case Type::TEX1D:
-			GLHandler::glf().glTexImage1D(glTarget, 0, internalFormat, size[0],
-			                              0, data.format, data.type, data.ptr);
+			GLHandler::glf().glTexStorage1D(glTarget, levels, internalFormat,
+			                                size[0]);
 			break;
 		case Type::TEX2D:
-			GLHandler::glf().glTexImage2D(glTarget, 0, internalFormat, size[0],
-			                              size[1], 0, data.format, data.type,
-			                              data.ptr);
+			GLHandler::glf().glTexStorage2D(glTarget, levels, internalFormat,
+			                                size[0], size[1]);
 			break;
 		case Type::TEXMULTISAMPLE:
 			qWarning() << "Attempt to set data of a multisampled texture.";
 			break;
 		case Type::TEX3D:
-			GLHandler::glf().glTexImage3D(glTarget, 0, internalFormat, size[0],
-			                              size[1], size[2], 0, data.format,
-			                              data.type, data.ptr);
+			GLHandler::glf().glTexStorage3D(glTarget, levels, internalFormat,
+			                                size[0], size[1], size[2]);
 			break;
 		case Type::TEXCUBEMAP:
 			qWarning()
 			    << "Attempt to set data of cubemap texture for only one face.";
 			break;
+	}
+	if(data.ptr != nullptr)
+	{
+		setData(data);
 	}
 	// glGenerateMipmap(format);
 	GLHandler::glf().glBindTexture(glTarget, 0);

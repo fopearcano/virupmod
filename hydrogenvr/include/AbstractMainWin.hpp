@@ -310,11 +310,22 @@ class AbstractMainWin : public RenderingWindow
 	 */
 	virtual void initLibraries(){};
 	/**
+	 * @brief Override this to clean HydrogenVR libraries you use by
+	 * calling @e cleanLibrary().
+	 */
+	virtual void cleanLibraries(){};
+	/**
 	 * @brief Initialize a library by class. The class must inherit from @e
 	 * AbstractLibrary.
 	 */
 	template <class T>
 	void initLibrary();
+	/**
+	 * @brief Cleanse library by class. The class must inherit from @e
+	 * AbstractLibrary.
+	 */
+	template <class T>
+	void cleanLibrary();
 	/**
 	 * @brief Gets called after the OpenGL context is ready and before the main
 	 * loop.
@@ -451,7 +462,7 @@ class AbstractMainWin : public RenderingWindow
 	float avgFPS                        = 0.f;
 	const unsigned int avgFPSWindowSize = 10;
 	// timings
-	QList<QPair<QString, QPair<uint64_t, uint64_t>>> timingsNs;
+	QList<Timings::CPUGPUTiming> timingsNs;
 
   private:
 	void initializeGL();
@@ -488,7 +499,18 @@ void AbstractMainWin::initLibrary()
 	    std::is_base_of<AbstractLibrary, T>::value,
 	    "Initializing a library that doesn't inherit from AbstractLibrary.");
 	T lib;
+	lib.initResources();
 	lib.setupPythonAPI();
+}
+
+template <class T>
+void AbstractMainWin::cleanLibrary()
+{
+	static_assert(
+	    std::is_base_of<AbstractLibrary, T>::value,
+	    "Initializing a library that doesn't inherit from AbstractLibrary.");
+	T lib;
+	lib.cleanResources();
 }
 
 class ImageWriter : public QRunnable

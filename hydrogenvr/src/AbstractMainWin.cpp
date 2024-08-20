@@ -145,6 +145,8 @@ bool AbstractMainWin::event(QEvent* e)
 		}
 		if(quitOnClose)
 		{
+			// Clean libraries
+			cleanLibraries();
 			QCoreApplication::quit();
 		}
 	}
@@ -325,13 +327,17 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 	painter.drawRect(QRect{10, 10, 256, 256});
 
 	QString timingsStr;
-	for(auto const& pair : timingsNs)
+	for(auto const& timing : timingsNs)
 	{
-		timingsStr += pair.first + ": "
-		              + QString::number(pair.second.first / 1.e6f) + "CPUms "
-		              + QString::number(pair.second.second / 1.e6f) + "GPUms\n";
+		for(int i(0); i < timing.depth; ++i)
+		{
+			timingsStr += "    ";
+		}
+		timingsStr += timing.name + ": " + QString::number(timing.cpu / 1.e6f)
+		              + "CPUms " + QString::number(timing.gpu / 1.e6f)
+		              + "GPUms\n";
 	}
-	timingsStr += "Full frame (full loop): "
+	timingsStr += "\nFull frame (full loop): "
 	              + QString::number(frameTiming * 1.e3f) + "ms\n";
 	painter.drawText(
 	    QRect{10, 276, targetSize.width() - 10, targetSize.height() - 276},
@@ -344,20 +350,20 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 		if(!exists)
 		{
 			profLog.write(QString("Full frame (full loop) (ms),").toLatin1());
-			for(auto const& pair : timingsNs)
+			for(auto const& timing : timingsNs)
 			{
 				profLog.write(
-				    (pair.first + " (CPUms)," + pair.first + " (GPUms),")
+				    (timing.name + " (CPUms)," + timing.name + " (GPUms),")
 				        .toLatin1());
 			}
 			profLog.write(QString('\n').toLatin1());
 		}
 		profLog.write((QString::number(frameTiming * 1.e3f) + ',').toLatin1());
-		for(auto const& pair : timingsNs)
+		for(auto const& timing : timingsNs)
 		{
 			QString timings;
-			timings += QString::number(pair.second.first / 1.e6f) + ',';
-			timings += QString::number(pair.second.second / 1.e6f) + ',';
+			timings += QString::number(timing.cpu / 1.e6f) + ',';
+			timings += QString::number(timing.gpu / 1.e6f) + ',';
 			profLog.write(timings.toLatin1());
 		}
 		if(frameTiming > 0.015f)
@@ -438,11 +444,115 @@ void AbstractMainWin::toggleDiagnostics()
 	setDiagnostics(!getDiagnostics());
 }
 
+// Define platform-specific macros
+#ifdef _WIN32
+// Define CALLING_CONVENTION to __stdcall for Windows
+#define CALLING_CONVENTION __stdcall
+// Define APIENTRY if not already defined (some OpenGL headers define it)
+#ifndef APIENTRY
+#define APIENTRY CALLING_CONVENTION
+#endif
+#else
+// On non-Windows platforms, no special calling convention is needed
+#define CALLING_CONVENTION
+#endif
+
+// Define the debug callback function using the appropriate calling convention
+void CALLING_CONVENTION glMessageCallback(GLenum source, GLenum type, GLuint id,
+                                          GLenum severity, GLsizei /*length*/,
+                                          const GLchar* message,
+                                          const void* /*userParam*/)
+{
+	QString qtMessage("OPENGL ");
+	switch(source)
+	{
+		case GL_DEBUG_SOURCE_API:
+			qtMessage += "API: ";
+			break;
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+			qtMessage += "WINDOW SYSTEM: ";
+			break;
+		case GL_DEBUG_SOURCE_SHADER_COMPILER:
+			qtMessage += "SHADER COMPILER: ";
+			break;
+		case GL_DEBUG_SOURCE_THIRD_PARTY:
+			qtMessage += "THIRD PARTY: ";
+			break;
+		case GL_DEBUG_SOURCE_APPLICATION:
+			qtMessage += "APPLICATION: ";
+			break;
+		case GL_DEBUG_SOURCE_OTHER:
+			qtMessage += "OTHER: ";
+			break;
+		default:
+			qtMessage += "UNIDENTIFIED: ";
+			break;
+	}
+
+	switch(type)
+	{
+		case GL_DEBUG_TYPE_ERROR:
+			qtMessage += "ERROR: ";
+			break;
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			qtMessage += "Deprecated behavior: ";
+			break;
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			qtMessage += "Undefined behavior: ";
+			break;
+		case GL_DEBUG_TYPE_PORTABILITY:
+			qtMessage += "Portability: ";
+			break;
+		case GL_DEBUG_TYPE_PERFORMANCE:
+			qtMessage += "Performance: ";
+			break;
+		case GL_DEBUG_TYPE_MARKER:
+			qtMessage += "Marker: ";
+			break;
+		case GL_DEBUG_TYPE_PUSH_GROUP:
+			qtMessage += "Push group: ";
+			break;
+		case GL_DEBUG_TYPE_POP_GROUP:
+			qtMessage += "Pop group: ";
+			break;
+		case GL_DEBUG_TYPE_OTHER:
+			qtMessage += "Other: ";
+			break;
+		default:
+			qtMessage += "Undefined: ";
+			break;
+	}
+
+	qtMessage += "(id:" + QString::number(id) + ") " + message;
+
+	switch(severity)
+	{
+		case GL_DEBUG_SEVERITY_HIGH:
+			qWarning() << qtMessage;
+			break;
+		case GL_DEBUG_SEVERITY_MEDIUM:
+			qWarning() << qtMessage;
+			break;
+		default:
+			qDebug() << qtMessage;
+			break;
+	}
+}
+
 void AbstractMainWin::initializeGL()
 {
 	m_context.makeCurrent(this);
 	// Init GL
 	GLHandler::init();
+	// Setup Debug Output
+	if(BUILD_TYPE == QString("Debug"))
+	{
+		GLHandler::glf().glEnable(GL_DEBUG_OUTPUT);
+		GLHandler::glf().glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		GLHandler::glf().glDebugMessageCallback(
+		    static_cast<GLDEBUGPROC>(glMessageCallback), nullptr);
+	}
+
 	// Init ToneMappingModel
 	toneMappingModel = std::make_unique<ToneMappingModel>(*vrHandler);
 	// Init Dialog3DWheel

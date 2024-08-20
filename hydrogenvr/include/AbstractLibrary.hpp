@@ -26,7 +26,9 @@ class AbstractLibrary
   public:
 	AbstractLibrary() = default;
 	virtual void setupSettings(SettingsWidget& /*settingsWidget*/){};
+	virtual void initResources(){};
 	virtual void setupPythonAPI(){};
+	virtual void cleanResources(){};
 	virtual ~AbstractLibrary(){};
 };
 

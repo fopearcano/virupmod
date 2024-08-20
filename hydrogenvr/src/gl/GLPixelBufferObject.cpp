@@ -29,6 +29,7 @@ unsigned int& GLPixelBufferObject::instancesCount()
 GLPixelBufferObject::GLPixelBufferObject(GLPixelBufferObject&& other) noexcept
     : buff(std::move(other.buff))
     , size(other.size)
+    , bytesPerPixel(other.bytesPerPixel)
     , mappedData(other.mappedData)
     , doClean(other.doClean)
 {
@@ -45,36 +46,67 @@ GLPixelBufferObject&
 	}
 	cleanUp();
 
-	buff       = std::move(other.buff);
-	size       = other.size;
-	mappedData = other.mappedData;
-	doClean    = other.doClean;
+	buff          = std::move(other.buff);
+	size          = other.size;
+	bytesPerPixel = other.bytesPerPixel;
+	dataFormat    = other.dataFormat;
+	mappedData    = other.mappedData;
+	doClean       = other.doClean;
 
 	other.doClean = false;
 	return *this;
 }
 
-GLPixelBufferObject::GLPixelBufferObject(QSize const& size)
-    : buff(GL_PIXEL_UNPACK_BUFFER, size.width() * size.height() * 4,
+GLPixelBufferObject::GLPixelBufferObject(QSize const& size,
+                                         unsigned int bytesPerPixel,
+                                         GLTexture::Data dataFormat)
+    : buff(GL_PIXEL_UNPACK_BUFFER, size.width() * size.height() * bytesPerPixel,
            GL_STREAM_DRAW)
     , size(size)
+    , bytesPerPixel(bytesPerPixel)
+    , dataFormat(dataFormat)
 {
 	++instancesCount();
+	this->dataFormat.ptr = nullptr;
+}
 
-	mappedData = static_cast<unsigned char*>(buff.map(GL_WRITE_ONLY));
-	buff.unbind();
+unsigned char* GLPixelBufferObject::getMappedData() const
+{
+	if(mappedData == nullptr)
+	{
+		mappedData = static_cast<unsigned char*>(buff.map(GL_WRITE_ONLY));
+	}
+	return mappedData;
 }
 
 std::unique_ptr<GLTexture>
     GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
 {
-	buff.unmap();
+	unmap();
+
+	unsigned int padding = (4 - (size.width() * bytesPerPixel) % 4) % 4;
+	padding              = (padding == 0 ? 4 : (padding == 3 ? 1 : padding));
+	GLHandler::glf().glPixelStorei(GL_UNPACK_ALIGNMENT, padding);
 	buff.bind(); // be sure it is bound before the call to glTexImage2D
 	std::unique_ptr<GLTexture> result = std::make_unique<GLTexture>(
-	    GLTexture::Tex2DProperties(size.width(), size.height(), sRGB));
+	    GLTexture::Tex2DProperties(size.width(), size.height(), sRGB),
+	    GLTexture::Sampler{}, dataFormat);
+	result->setData(dataFormat);
 	buff.unbind();
 
 	return result;
+}
+
+void GLPixelBufferObject::copyContentToTex(GLTexture const& texture) const
+{
+	unmap();
+
+	unsigned int padding = (4 - (size.width() * bytesPerPixel) % 4) % 4;
+	padding              = (padding == 0 ? 4 : (padding == 3 ? 1 : padding));
+	GLHandler::glf().glPixelStorei(GL_UNPACK_ALIGNMENT, padding);
+	buff.bind();
+	texture.setData(dataFormat);
+	buff.unbind();
 }
 
 void GLPixelBufferObject::cleanUp()
@@ -84,6 +116,11 @@ void GLPixelBufferObject::cleanUp()
 		return;
 	}
 	--instancesCount();
-	buff.unbind();
 	doClean = false;
+}
+
+void GLPixelBufferObject::unmap() const
+{
+	buff.unmap();
+	mappedData = nullptr;
 }

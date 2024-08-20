@@ -20,6 +20,12 @@ cmake_minimum_required(VERSION 3.10.0)
 # OPTIONS
 option(USE_QT6 "Force using Qt6, else Qt5 will be forced" OFF)
 
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 if(USE_QT6)
 	set(QT_CMAKE_FILE "hydrogenvr/cmake/Qt6.cmake")
 	message(STATUS "Using Qt6...")
@@ -120,6 +126,7 @@ add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_DIRECTORY="${PROJECT_DIRECTORY}")
 add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 add_definitions(-DBUILD_SRC_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+add_definitions(-DBUILD_TYPE="${CMAKE_BUILD_TYPE}")
 add_definitions(-DQT_MESSAGELOGCONTEXT)
 add_definitions(-DOPENGL_MAJOR_VERSION=${OPENGL_MAJOR_VERSION})
 add_definitions(-DOPENGL_MINOR_VERSION=${OPENGL_MINOR_VERSION})

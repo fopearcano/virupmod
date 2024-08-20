@@ -31,6 +31,12 @@ class FPSCamera : public BasicCamera
 	FPSCamera(VRHandler const& vrHandler);
 	QVector3D getPosition() const { return position; };
 	void setPosition(QVector3D const& position) { this->position = position; };
+	float getPitch() const { return pitch; };
+	void setPitch(float pitch) { this->pitch = pitch; };
+	float getYaw() const { return yaw; };
+	void setYaw(float yaw) { this->yaw = yaw; };
+	float getSpeed() const { return speed; };
+	void setSpeed(float speed) { this->speed = speed; };
 	void actionEvent(BaseInputManager::Action const& a, bool pressed);
 	void mousePressEvent(QMouseEvent* e, QRect const& winGeometry);
 	void mouseReleaseEvent(QMouseEvent* e);
@@ -48,6 +54,8 @@ class FPSCamera : public BasicCamera
 	bool moveView        = false;
 	float yaw            = 0.f;
 	float pitch          = 0.f;
+
+	float speed = 1.f;
 
 	QPoint cursorPosBackup;
 };

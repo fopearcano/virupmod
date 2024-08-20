@@ -26,7 +26,7 @@ GLCullFaceSet::CullFaceState::CullFaceState()
 }
 
 GLCullFaceSet::CullFaceState::CullFaceState(int faceToCull)
-    : CullFaceState(faceToCull, GL_BACK)
+    : CullFaceState(faceToCull, GL_CCW)
 {
 }
 

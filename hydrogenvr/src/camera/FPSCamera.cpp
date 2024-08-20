@@ -154,6 +154,7 @@ void FPSCamera::updateLookAt(float frameTiming,
 	// apply gamepad and keyboard controls
 	auto vec(utils::transformPosition(noTrans(getView()).inverted(),
 	                                  negVel + posVel + gamepadVel));
+	frameTiming *= speed;
 	for(unsigned int i(0); i < 3; ++i)
 	{
 		position[i] += frameTiming * vec[i];

@@ -44,12 +44,19 @@ class GLPixelBufferObject
 	GLPixelBufferObject(GLPixelBufferObject&& other) noexcept;
 	GLPixelBufferObject& operator=(GLPixelBufferObject&& other) noexcept;
 
-	explicit GLPixelBufferObject(QSize const& size);
-	GLPixelBufferObject(unsigned int width, unsigned int height)
-	    : GLPixelBufferObject(QSize(width, height)){};
+	explicit GLPixelBufferObject(QSize const& size,
+	                             unsigned int bytesPerPixel = 4,
+	                             GLTexture::Data dataFormat = {});
+	GLPixelBufferObject(unsigned int width, unsigned int height,
+	                    unsigned int bytesPerPixel = 4,
+	                    GLTexture::Data dataFormat = {})
+	    : GLPixelBufferObject(QSize(width, height), bytesPerPixel,
+	                          dataFormat){};
 	QSize getSize() { return size; };
-	unsigned char* getMappedData() { return mappedData; };
+	size_t getBufferSize() { return buff.getSize(); };
+	unsigned char* getMappedData() const;
 	std::unique_ptr<GLTexture> copyContentToNewTex(bool sRGB = true) const;
+	void copyContentToTex(GLTexture const& texture) const;
 
 	virtual ~GLPixelBufferObject() { cleanUp(); };
 
@@ -60,9 +67,13 @@ class GLPixelBufferObject
 	void cleanUp();
 
   private:
+	void unmap() const;
+
 	GLBuffer buff;
 	QSize size;
-	unsigned char* mappedData;
+	unsigned int bytesPerPixel;
+	mutable GLTexture::Data dataFormat;
+	mutable unsigned char* mappedData = nullptr;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();

@@ -49,8 +49,8 @@ class ObjectPool
 			return createObject();
 		}
 
-		auto obj(std::move(objects.back()));
-		objects.pop_back();
+		auto obj(std::move(objects.front()));
+		objects.pop_front();
 		return obj;
 	}
 
