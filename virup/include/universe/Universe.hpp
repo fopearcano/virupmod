@@ -30,6 +30,10 @@
 #include "universe/PlanetarySystems.hpp"
 #include "universe/TexturedSphere.hpp"
 
+#include "graphics/renderers/CelestialBodyRenderer.hpp"
+#include "graphics/renderers/planet/DebrisRenderer.hpp"
+#include "physics/SimulationTime.hpp"
+
 /** @ingroup pycall
  *
  * Callable in Python as the "Universe" object.

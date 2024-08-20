@@ -18,11 +18,19 @@
 
 #include "VIRUPSettings.hpp"
 
+#include <QStandardPaths>
+#include <QStorageInfo>
+#include <QtConcurrent>
+
 #include "LibPlanet.hpp"
+#include "LibTerrain.hpp"
 
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
 {
+	trn::LibTerrain libterrain;
+	libterrain.setupSettings(*this);
+
 	LibPlanet libplanet;
 	libplanet.setupSettings(*this);
 

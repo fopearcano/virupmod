@@ -2,6 +2,8 @@
 
 #include <QOpenGLPaintDevice>
 
+#include "LibTerrain.hpp"
+
 MainWin::MainWin()
 {
 	srand(time(nullptr));
@@ -335,6 +337,7 @@ void MainWin::setupPythonAPI()
 void MainWin::initLibraries()
 {
 	initLibrary<LibPlanet>();
+	initLibrary<trn::LibTerrain>();
 }
 
 void MainWin::initScene()

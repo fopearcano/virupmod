@@ -13,6 +13,7 @@
 #include "AbstractMainWin.hpp"
 #include "Text3D.hpp"
 
+#include "Billboard.hpp"
 #include "Grid.hpp"
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"

@@ -18,6 +18,8 @@
 
 #include "scenes/SceneTemporalData.hpp"
 
+#include <QTimeZone>
+
 SceneTemporalData::SceneTemporalData(float timeCoeff)
     : timeCoeff(timeCoeff)
 {

@@ -18,6 +18,9 @@
 
 #include "universe/PlanetarySystems.hpp"
 
+#include "graphics/renderers/planet/PlanetRenderer.hpp"
+#include "physics/CSVOrbit.hpp"
+
 PlanetarySystems::PlanetarySystems()
     : shader("default")
 {
