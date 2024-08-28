@@ -40,5 +40,5 @@ update() {
 }
 
 test -n "$(git status --porcelain --untracked-files=no)" && echo "Please cleanup working directory (at least stash your work, make sure no HydrogenVR file is edited, even in stash)." && exit 0
-update
+update $1
 

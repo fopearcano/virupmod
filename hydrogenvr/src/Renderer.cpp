@@ -422,7 +422,10 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			{
 				auto renderSize(mainRenderTarget->sceneTarget.getSize());
 				pair.second.camera->setWindowSize(renderSize);
-				GLHandler::glf().glClear(pair.second.clearMask);
+				if(pair.second.clearMask != 0x0)
+				{
+					GLHandler::glf().glClear(pair.second.clearMask);
+				}
 				QMatrix4x4 viewBack(pair.second.camera->getView()),
 				    projBack(pair.second.camera->getProj());
 				if(overrideCamera)

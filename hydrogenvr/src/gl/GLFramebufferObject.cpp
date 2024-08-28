@@ -251,7 +251,7 @@ void GLFramebufferObject::setName(QString const& name)
 {
 	this->name    = name;
 	auto fullName = "Framebuffer " + QString::number(fbo) + " - " + name;
-	GLHandler::glf().glObjectLabel(GL_TEXTURE, fbo, fullName.size(),
+	GLHandler::glf().glObjectLabel(GL_FRAMEBUFFER, fbo, fullName.size(),
 	                               fullName.toLatin1().data());
 }
 
@@ -306,20 +306,16 @@ void GLFramebufferObject::blitColorBufferTo(GLFramebufferObject const& to,
                                             int srcY1, int dstX0, int dstY0,
                                             int dstX1, int dstY1) const
 {
-	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-	GLHandler::glf().glBindFramebuffer(GL_DRAW_FRAMEBUFFER, to.fbo);
-	GLHandler::glf().glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0,
-	                                   dstX1, dstY1, GL_COLOR_BUFFER_BIT,
-	                                   GL_LINEAR);
+	GLHandler::glf().glBlitNamedFramebuffer(fbo, to.fbo, srcX0, srcY0, srcX1,
+	                                        srcY1, dstX0, dstY0, dstX1, dstY1,
+	                                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
 
 void GLFramebufferObject::blitDepthBufferTo(GLFramebufferObject const& to) const
 {
-	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-	GLHandler::glf().glBindFramebuffer(GL_DRAW_FRAMEBUFFER, to.fbo);
-	GLHandler::glf().glBlitFramebuffer(0, 0, width, height, 0, 0, to.width,
-	                                   to.height, GL_DEPTH_BUFFER_BIT,
-	                                   GL_NEAREST);
+	GLHandler::glf().glBlitNamedFramebuffer(fbo, to.fbo, 0, 0, width, height, 0,
+	                                        0, to.width, to.height,
+	                                        GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 void GLFramebufferObject::showOnWindow(int x0, int y0, int x1, int y1) const

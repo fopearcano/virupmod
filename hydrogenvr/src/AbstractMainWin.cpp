@@ -863,6 +863,10 @@ void AbstractMainWin::paintGL()
 		renderer.renderFrame(w->getAngleShiftMatrix());
 		w->show();
 	}
+	if(!secondaryWindows.empty())
+	{
+		m_context.makeCurrent(this);
+	}
 	// render texture display if available
 	{
 		auto viewer(textureSelector->getViewer());
@@ -875,9 +879,9 @@ void AbstractMainWin::paintGL()
 				viewer->render();
 				m_context.swapBuffers(&win);
 			}
+			m_context.makeCurrent(this);
 		}
 	}
-	m_context.makeCurrent(this);
 
 	// garbage collect some resources
 	AsyncTexture::garbageCollect();

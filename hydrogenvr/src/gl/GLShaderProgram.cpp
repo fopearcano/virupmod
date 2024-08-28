@@ -74,9 +74,11 @@ GLShaderProgram::GLShaderProgram(
 {
 	++instancesCount();
 
+	auto fullName = "Program " + QString::number(glShaderProgram) + " - ";
 	for(auto const& stage : pipeline)
 	{
 		QString name(stage.first);
+		fullName += name + ' ';
 		// (extension, GLenum stage)
 		auto pair(decodeStage(stage.second));
 		if(!name.contains('.'))
@@ -88,6 +90,8 @@ GLShaderProgram::GLShaderProgram(
 		GLHandler::glf().glAttachShader(glShaderProgram, shader);
 		GLHandler::glf().glDeleteShader(shader);
 	}
+	GLHandler::glf().glObjectLabel(GL_PROGRAM, glShaderProgram, fullName.size(),
+	                               fullName.toLatin1().data());
 
 	GLHandler::glf().glBindFragDataLocation(
 	    glShaderProgram, 0,
@@ -108,9 +112,13 @@ GLShaderProgram::GLShaderProgram(
 
 		GLHandler::glf().glGetActiveUniform(glShaderProgram, i, sizeof(name),
 		                                    &length, &size, &type, name.data());
-		uniformLocations.insert(
-		    name.data(), GLHandler::glf().glGetUniformLocation(glShaderProgram,
-		                                                       name.data()));
+		QString nameStr = name.data();
+		if(nameStr.endsWith("[0]"))
+		{
+			nameStr.chop(3);
+		}
+		uniformLocations.insert(nameStr, GLHandler::glf().glGetUniformLocation(
+		                                     glShaderProgram, name.data()));
 	}
 }
 
@@ -186,14 +194,12 @@ void GLShaderProgram::setUnusedAttributesValues(
 void GLShaderProgram::setUniform(const char* uniformName,
                                  unsigned int value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform1ui(
 	    glShaderProgram, getUniformLocation(uniformName), value);
 }
 
 void GLShaderProgram::setUniform(const char* uniformName, int value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform1i(glShaderProgram,
 	                                    getUniformLocation(uniformName), value);
 }
@@ -201,14 +207,12 @@ void GLShaderProgram::setUniform(const char* uniformName, int value) const
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  int const* values) const
 {
-	use();
 	GLHandler::glf().glProgramUniform1iv(
 	    glShaderProgram, getUniformLocation(uniformName), size, values);
 }
 
 void GLShaderProgram::setUniform(const char* uniformName, float value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform1f(glShaderProgram,
 	                                    getUniformLocation(uniformName), value);
 }
@@ -216,7 +220,6 @@ void GLShaderProgram::setUniform(const char* uniformName, float value) const
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  float const* values) const
 {
-	use();
 	GLHandler::glf().glProgramUniform1fv(
 	    glShaderProgram, getUniformLocation(uniformName), size, values);
 }
@@ -224,7 +227,6 @@ void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
 void GLShaderProgram::setUniform(const char* uniformName,
                                  QVector2D const& value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform2f(
 	    glShaderProgram, getUniformLocation(uniformName), value.x(), value.y());
 }
@@ -232,7 +234,6 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName,
                                  QVector3D const& value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform3f(glShaderProgram,
 	                                    getUniformLocation(uniformName),
 	                                    value.x(), value.y(), value.z());
@@ -241,7 +242,6 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  QVector3D const* values) const
 {
-	use();
 	std::unique_ptr<GLfloat[]> data(new GLfloat[3 * size]);
 	for(unsigned int i(0); i < size; ++i)
 	{
@@ -257,7 +257,6 @@ void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
 void GLShaderProgram::setUniform(const char* uniformName,
                                  QVector4D const& value) const
 {
-	use();
 	GLHandler::glf().glProgramUniform4f(
 	    glShaderProgram, getUniformLocation(uniformName), value.x(), value.y(),
 	    value.z(), value.w());
@@ -266,7 +265,6 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  QVector4D const* values) const
 {
-	use();
 	std::unique_ptr<GLfloat[]> data(new GLfloat[4 * size]);
 	for(unsigned int i(0); i < size; ++i)
 	{
@@ -431,6 +429,9 @@ GLuint GLShaderProgram::loadShader(QString const& path, GLenum shaderType,
 	const char* bytes = ba.data();
 
 	GLuint shader = GLHandler::glf().glCreateShader(shaderType);
+	auto fullName = "Shader " + QString::number(shader) + " - " + path;
+	GLHandler::glf().glObjectLabel(GL_SHADER, shader, fullName.size(),
+	                               fullName.toLatin1().data());
 	GLHandler::glf().glShaderSource(shader, 1, &bytes, nullptr);
 	GLHandler::glf().glCompileShader(shader);
 
