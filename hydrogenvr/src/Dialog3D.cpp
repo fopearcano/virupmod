@@ -134,6 +134,8 @@ void Dialog3D::click(VRHandler const& headset)
 
 void Dialog3D::click(Controller const& controller)
 {
+	// this error is thrown by Qt's code
+	// NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
 	if(controller.side != sidePriority || !isVisible())
 	{
 		return;
@@ -146,6 +148,7 @@ void Dialog3D::click(Controller const& controller)
 		return;
 	}
 	mouseClick(localPos2D);
+	// NOLINTEND(clang-analyzer-cplusplus.NewDelete)
 }
 
 void Dialog3D::triggerWheelEvent(VRHandler const& headset, QWheelEvent* e)

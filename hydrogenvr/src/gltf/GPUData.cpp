@@ -97,7 +97,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	unusedAttributes["tangent"]  = QVector3D(100.f, 0.f, 0.f);
 	unusedAttributes["normal"]   = QVector3D();
 	QColor c                     = GLHandler::sRGBToLinear(
-	                        prim.material->pbrMetallicRoughness.baseColorFactor);
+        prim.material->pbrMetallicRoughness.baseColorFactor);
 	unusedAttributes["color_0"]    = QVector3D(c.redF(), c.greenF(), c.blueF());
 	unusedAttributes["texcoord_0"] = QVector3D();
 

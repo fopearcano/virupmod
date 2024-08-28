@@ -27,6 +27,8 @@
 #include "MainRenderTarget.hpp"
 #include "camera/BasicCamera.hpp"
 #include "camera/DebugCamera.hpp"
+#include "paint/AdvancedPainter.hpp"
+#include "paint/OpenGL4PaintDevice.hpp"
 #include "vr/VRHandler.hpp"
 
 class AbstractMainWin;
@@ -233,6 +235,8 @@ class Renderer
 	std::unique_ptr<CalibrationCompass> compass;
 
 	std::unique_ptr<MainRenderTarget> mainRenderTarget = nullptr;
+	std::unique_ptr<OpenGL4PaintDevice> device         = nullptr;
+	std::unique_ptr<AdvancedPainter> painter           = nullptr;
 };
 
 template <class T>

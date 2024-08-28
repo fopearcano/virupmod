@@ -101,11 +101,12 @@ class VRHandler : public QObject
 	bool forceRight = false;
 
   public slots:
-	virtual QMatrix4x4 getEyeViewMatrix(Side eye) const                    = 0;
+	virtual QMatrix4x4 getEyeViewMatrix(Side eye) const = 0;
 	virtual QMatrix4x4 getProjectionMatrix(QMatrix4x4 const& angleShiftMat,
 	                                       Side eye, float nearPlan = 0.1f,
-	                                       float farPlan = 10000.0f) const = 0;
-	virtual void resetPos()                                                = 0;
+	                                       float farPlan = 10000.0f) const
+	    = 0;
+	virtual void resetPos() = 0;
 
   signals:
 	void renderTargetSizeChanged(QSize newSize);

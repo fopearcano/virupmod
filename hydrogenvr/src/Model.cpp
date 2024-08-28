@@ -59,6 +59,7 @@ Model::Model(QString const& modelName, GLShaderProgram&& shader,
 std::vector<std::pair<GLMesh const&, QMatrix4x4>> Model::getMeshes() const
 {
 	std::vector<std::pair<GLMesh const&, QMatrix4x4>> result;
+	result.reserve(meshes.size());
 	for(auto const& mesh : meshes)
 	{
 		result.emplace_back(mesh.mesh, mesh.transform);

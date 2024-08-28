@@ -78,15 +78,9 @@ class GamepadHandler : public QObject
   public:
 	GamepadHandler();
 #ifdef QT_GAMEPAD
-	bool isEnabled() const
-	{
-		return gamepad != nullptr;
-	};
+	bool isEnabled() const { return gamepad != nullptr; };
 #else
-	bool isEnabled() const
-	{
-		return false;
-	};
+	bool isEnabled() const { return false; };
 #endif
 	QVector2D getJoystick(Side side) const;
 	double getTrigger(Side side) const;

@@ -26,6 +26,9 @@ MainRenderTarget::MainRenderTarget(unsigned int width, unsigned int height,
                              GLFramebufferObject(GLTexture::Tex2DProperties(
                                  width, height, GL_RGBA32F))})
 {
+	sceneTarget.setName("Main Scene");
+	postProcessingTargets[0].setName("Post-processing 0");
+	postProcessingTargets[1].setName("Post-processing 1");
 }
 
 GLFramebufferObject MainRenderTarget::constructSceneTarget(

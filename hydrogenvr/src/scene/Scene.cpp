@@ -113,6 +113,7 @@ void Scene::render(BasicCamera const& cam, bool environment)
 	}
 
 	std::vector<Light const*> lightsPtr;
+	lightsPtr.reserve(lights.size());
 	for(auto const& light : lights)
 	{
 		lightsPtr.push_back(light.get());

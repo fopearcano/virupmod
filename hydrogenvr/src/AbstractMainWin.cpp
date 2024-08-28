@@ -612,12 +612,12 @@ void AbstractMainWin::initializeGL()
 	// let user init
 	initScene();
 
-	//#ifdef Q_OS_WIN
+	// #ifdef Q_OS_WIN
 	if(isFullscreen())
 	{
 		fullScreenTimer.start();
 	}
-	//#endif
+	// #endif
 
 	// Init Python engine
 	setupPythonScripts();
@@ -772,10 +772,10 @@ void AbstractMainWin::paintGL()
 	toneMappingModel->autoUpdateExposure(
 	    renderer.getLastFrameAverageLuminance(), frameTiming);
 
-	//#ifdef Q_OS_WIN
-	// fullscreen can be initially wrong on Windows, quick hack is to toggle it
-	// back and forth
-	// update : now also wrong on Linux
+	// #ifdef Q_OS_WIN
+	//  fullscreen can be initially wrong on Windows, quick hack is to toggle it
+	//  back and forth
+	//  update : now also wrong on Linux
 	if(fullScreenTimer.isValid())
 	{
 		if(fullScreenTimer.elapsed() / 1000 > 1 && isFullscreen())
@@ -808,7 +808,7 @@ void AbstractMainWin::paintGL()
 			fullScreenTimer.invalidate();
 		}
 	}
-	//#endif
+	// #endif
 
 	// handle VR events if any
 	if(vrHandler->isEnabled())

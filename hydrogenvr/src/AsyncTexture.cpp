@@ -58,7 +58,8 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
 
 	pbo = std::make_unique<GLPixelBufferObject>(size);
 
-	thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData());
+	thread = std::make_unique<at::WorkerThread>(
+	    path, pbo->getMappedData<std::byte>());
 	thread->start();
 }
 
@@ -91,15 +92,16 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
 	{
 		pbo = std::make_unique<GLPixelBufferObject>(size);
 
-		thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData());
+		thread = std::make_unique<at::WorkerThread>(
+		    path, pbo->getMappedData<std::byte>());
 		thread->start();
 	}
 	else
 	{
 		pbo = std::make_unique<GLPixelBufferObject>(width, height);
 
-		thread = std::make_unique<at::WorkerThread>(path, pbo->getMappedData(),
-		                                            width, height);
+		thread = std::make_unique<at::WorkerThread>(
+		    path, pbo->getMappedData<std::byte>(), width, height);
 		thread->start();
 	}
 }

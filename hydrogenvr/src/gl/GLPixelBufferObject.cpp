@@ -70,15 +70,6 @@ GLPixelBufferObject::GLPixelBufferObject(QSize const& size,
 	this->dataFormat.ptr = nullptr;
 }
 
-unsigned char* GLPixelBufferObject::getMappedData() const
-{
-	if(mappedData == nullptr)
-	{
-		mappedData = static_cast<unsigned char*>(buff.map(GL_WRITE_ONLY));
-	}
-	return mappedData;
-}
-
 std::unique_ptr<GLTexture>
     GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
 {

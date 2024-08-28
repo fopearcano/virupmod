@@ -1,3 +1,5 @@
+set(CMAKE_AUTOMOC ON)
+
 # Qt5 requires that we find individual component
 find_package(Qt5 COMPONENTS Widgets Concurrent Test Network)
 find_package(Qt5 OPTIONAL_COMPONENTS Gamepad)
@@ -15,13 +17,6 @@ else()
 endif()
 
 set(LD_LIBS ${LD_LIBS} Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network ${QT5_OPTIONAL_LIBS})
-
-function(run_moc)
-	qt5_wrap_cpp(MOC_FILES_ ${HPP_FILES})
-	qt5_wrap_cpp(TEST_MOC_FILES_ ${TEST_HPP_FILES})
-	set(MOC_FILES ${MOC_FILES_} PARENT_SCOPE)
-	set(TEST_MOC_FILES ${TEST_MOC_FILES_} PARENT_SCOPE)
-endfunction(run_moc)
 
 function(copy_Qt_deps target_dir)
     include(hydrogenvr/cmake/WindowsCopyFiles.cmake)

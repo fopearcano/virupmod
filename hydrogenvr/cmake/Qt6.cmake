@@ -1,3 +1,5 @@
+set(CMAKE_AUTOMOC ON)
+
 # Qt6 requires that we find individual component
 find_package(Qt6 COMPONENTS Widgets Concurrent Test Network OpenGL)
 if(NOT Qt6_FOUND)
@@ -16,13 +18,6 @@ else()
 endif()
 
 set(LD_LIBS ${LD_LIBS} Qt6::Widgets Qt6::Concurrent Qt6::Test Qt6::Network Qt6::OpenGL ${QT6_OPTIONAL_LIBS})
-
-function(run_moc)
-	qt6_wrap_cpp(MOC_FILES_ ${HPP_FILES})
-	qt6_wrap_cpp(TEST_MOC_FILES_ ${TEST_HPP_FILES})
-	set(MOC_FILES ${MOC_FILES_} PARENT_SCOPE)
-	set(TEST_MOC_FILES ${TEST_MOC_FILES_} PARENT_SCOPE)
-endfunction(run_moc)
 
 function(copy_Qt_deps target_dir)
     include(hydrogenvr/cmake/WindowsCopyFiles.cmake)

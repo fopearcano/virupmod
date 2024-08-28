@@ -214,7 +214,7 @@ float AssetLoader::parseNode(aiNode const& node, aiScene const& scene,
 	QMatrix4x4 nodeTransform(transform * assimpToQt(node.mTransformation));
 	for(unsigned int i(0); i < node.mNumMeshes; ++i)
 	{
-		meshDescriptors.emplace_back(MeshDescriptor());
+		meshDescriptors.emplace_back();
 		MeshDescriptor& descriptor = meshDescriptors.back();
 		aiMesh const& mesh         = *scene.mMeshes[node.mMeshes[i]];
 		float bsr(parseMesh(mesh, scene, directory, nodeTransform, descriptor));
@@ -317,9 +317,7 @@ float AssetLoader::parseMesh(aiMesh const& mesh, aiScene const& scene,
 			{
 				texpath = findFilePath(directory,
 				                       texpath.substr(pos, texpath.size()));
-				texturesPathsTypes.emplace_back(
-				    std::pair<TextureType, std::string>{textureTypes()[j],
-				                                        texpath});
+				texturesPathsTypes.emplace_back(textureTypes()[j], texpath);
 			}
 		}
 	}

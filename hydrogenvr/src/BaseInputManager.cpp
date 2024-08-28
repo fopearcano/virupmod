@@ -33,10 +33,19 @@ BaseInputManager::BaseInputManager()
 	addAction(Qt::Key_F11, {"togglevr", tr("Toggle Virtual Reality")}, true);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	addAction(Qt::ALT | Qt::Key_Return,
-#else
-	addAction(Qt::ALT + Qt::Key_Return,
-#endif
 	          {"togglefullscreen", tr("Toggle Fullscreen")}, true);
+#else
+#if(defined __GNUC__) && __GNUC__ >= 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+#endif
+	// NOLINTNEXTLINE(clang-diagnostic-deprecated-enum-enum-conversion)
+	addAction(Qt::ALT + Qt::Key_Return,
+	          {"togglefullscreen", tr("Toggle Fullscreen")}, true);
+#if(defined __GNUC__) && __GNUC__ >= 11
+#pragma GCC diagnostic pop
+#endif
+#endif
 	addAction(Qt::Key_E, {"autoexposure", tr("Toggle Automatic Exposure")},
 	          true);
 	addAction(Qt::Key_PageUp, {"exposureup", tr("Increase Exposure")}, true);

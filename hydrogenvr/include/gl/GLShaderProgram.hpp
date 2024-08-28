@@ -112,6 +112,9 @@ class GLShaderProgram
 	/** @brief Returns attribute location in shader program.
 	 */
 	int getAttribLocationFromName(const char* attributeName) const;
+	/** @brief Returns uniform location in shader program.
+	 */
+	int getUniformLocation(const char* uniformName) const;
 	// doesn't work in PythonQt
 	/** @brief Sets values for vertex attributes that aren't provided by a
 	 * vertex array.
@@ -150,102 +153,102 @@ class GLShaderProgram
 	    QStringList const& names,
 	    std::vector<std::vector<float>> const& values) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type uint.
 	 */
-	void setUniform(const char* paramName, unsigned int value) const;
+	void setUniform(const char* uniformName, unsigned int value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type int.
 	 */
-	void setUniform(const char* paramName, int value) const;
+	void setUniform(const char* uniformName, int value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * array of values of size @size.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p array of values of size @size.
 	 *
 	 * The uniform must be an array of type int.
 	 */
-	void setUniform(const char* paramName, unsigned int size,
+	void setUniform(const char* uniformName, unsigned int size,
 	                int const* values) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type float.
 	 */
-	void setUniform(const char* paramName, float value) const;
+	void setUniform(const char* uniformName, float value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * array of values of size @size.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p array of values of size @size.
 	 *
 	 * The uniform must be an array of type float.
 	 */
-	void setUniform(const char* paramName, unsigned int size,
+	void setUniform(const char* uniformName, unsigned int size,
 	                float const* value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type vec2.
 	 */
-	void setUniform(const char* paramName, QVector2D const& value) const;
+	void setUniform(const char* uniformName, QVector2D const& value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type vec3.
 	 */
-	void setUniform(const char* paramName, QVector3D const& value) const;
+	void setUniform(const char* uniformName, QVector3D const& value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * array of values of size @size.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p array of values of size @size.
 	 *
 	 * The uniform must be an array of type vec3.
 	 */
-	void setUniform(const char* paramName, unsigned int size,
+	void setUniform(const char* uniformName, unsigned int size,
 	                QVector3D const* values) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type vec4.
 	 */
-	void setUniform(const char* paramName, QVector4D const& value) const;
+	void setUniform(const char* uniformName, QVector4D const& value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * array of values of size @size.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p array of values of size @size.
 	 *
 	 * The uniform must be an array of type vec4.
 	 */
-	void setUniform(const char* paramName, unsigned int size,
+	void setUniform(const char* uniformName, unsigned int size,
 	                QVector4D const* values) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type mat4.
 	 */
-	void setUniform(const char* paramName, QMatrix4x4 const& value) const;
+	void setUniform(const char* uniformName, QMatrix4x4 const& value) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * array of values of size @size.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p array of values of size @size.
 	 *
 	 * The uniform must be an array of type mat4.
 	 */
-	void setUniform(const char* paramName, unsigned int size,
+	void setUniform(const char* uniformName, unsigned int size,
 	                QMatrix4x4 const* values) const;
 	/**
-	 * @brief Sets the @p shader program's uniform @p paramName to a certain @p
-	 * value.
+	 * @brief Sets the @p shader program's uniform @p uniformName to a certain
+	 * @p value.
 	 *
 	 * The uniform must be of type vec3. If the color is from @p sRGB space, it
 	 * will be converted to linear space before being set.
 	 */
-	void setUniform(const char* paramName, QColor const& value,
+	void setUniform(const char* uniformName, QColor const& value,
 	                bool sRGB = true) const;
 	/**
 	 * @brief Tells OpenGL to use this @p shader program for rendering.
@@ -279,6 +282,7 @@ class GLShaderProgram
 
   private:
 	GLuint glShaderProgram;
+	QHash<QString, int> uniformLocations;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();

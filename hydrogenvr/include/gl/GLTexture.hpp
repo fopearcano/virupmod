@@ -264,7 +264,7 @@ class GLTexture
 	GLuint getGLTexture() const { return glTexture; };
 	GLenum getGLTarget() const { return glTarget; };
 	QString getName() const { return name; };
-	void setName(QString const& name) { this->name = name; };
+	void setName(QString const& name);
 	// level = level of mipmapping
 	std::array<int, 3> getSize(unsigned int level = 0) const;
 	Type getType() const { return type; };
@@ -287,7 +287,9 @@ class GLTexture
 	             const unsigned char* blue,
 	             const unsigned char* alpha = nullptr);
 
-	void use(GLenum textureUnit = GL_TEXTURE0) const;
+	void use(GLint textureUnit = 0) const;
+	void useAsImage(GLint textureUnit = 0, int level = 0,
+	                GLenum accessMode = GL_READ_WRITE) const;
 
 	virtual ~GLTexture() { cleanUp(); };
 

@@ -122,6 +122,7 @@ void GLHandler::setUpRender(GLShaderProgram const& shader,
 		default:
 			break;
 	};
+	shader.use();
 }
 
 void GLHandler::postProcess(

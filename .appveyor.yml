@@ -2,19 +2,20 @@ branches:
   except:
     - /draft/
 image:
-- Visual Studio 2017
+- Visual Studio 2019
 build:
     verbosity: detailed
 environment:
   matrix:
     - BUILD_TYPE: 64bit
-      QTPATH: 'C:\Qt\5.13.2\msvc2017_64'
-      PYTHON_PATH: 'C:\Python37-x64'
-      PYTHON_LIB: 'C:\Python37-x64\libs'
-      GENERATOR: '"Visual Studio 15 2017 Win64"'
+      GENERATOR: '"Ninja"'
       VCREDIST13: vcredist_x64.exe
       VCREDIST15: vc_redist.x64.exe
-      PYTHON_URL: "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip"
+      QTPATH: 'C:\Qt\5.15.2\msvc2019_64'
+      PYTHON_PATH: 'C:\Python312-x64'
+      PYTHON_LIB: 'C:\Python312-x64\libs'
+      PYTHON_VERSION: '3.12'
+      PYTHON_URL: "https://www.python.org/ftp/python/3.12.3/python-3.12.3-embed-amd64.zip"
    #- BUILD_TYPE: 32bit
    #  QTPATH: 'C:\Qt\5.13.2\msvc2017'
    #  PYTHON_PATH: 'C:\Python37'
@@ -25,9 +26,9 @@ environment:
    #  PYTHON_URL: "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-win32.zip"
 
 install:
-    - set INNOSETUPPATH=C:\Program Files (x86)\Inno Setup 5
-    - set BINDIR=%APPVEYOR_BUILD_FOLDER%\build\Release\
-    - set CLPATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\bin\Hostx64\x64"
+    - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+    - set INNOSETUPPATH=C:\Program Files (x86)\Inno Setup 6
+    - set BINDIR=%APPVEYOR_BUILD_FOLDER%\build\
     - set Path=%QTPATH%;%QTPATH%/bin;%INNOSETUPPATH%;%PATH%
 
     - cd %APPVEYOR_BUILD_FOLDER%
@@ -65,7 +66,7 @@ build_script:
     - cd %APPVEYOR_BUILD_FOLDER%
     - mkdir build
     - cd build
-    - cmake .. -G %GENERATOR%
+    - cmake .. -G %GENERATOR% -DCMAKE_BUILD_TYPE=Release
     - set /p VERSION=<PROJECT_VERSION
     - cmake --build . --config Release
     - cd %BINDIR%
@@ -110,16 +111,14 @@ after_build:
     - copy %ASSIMP_SHARED% %RELEASE_DIR%
     - copy %LIBKTX_SHARED% %RELEASE_DIR%
     # - copy %LEAPMOTION_SHARED% %RELEASE_DIR%
-    - copy %PYTHON_PATH%\python37.dll %RELEASE_DIR%
+    - copy %PYTHON_PATH%\python312.dll %RELEASE_DIR%
     - copy %PYTHONQT_SHARED% %RELEASE_DIR%
     - copy %PYTHONQT_QTALL_SHARED% %RELEASE_DIR%
-    - cd ..
     - appveyor DownloadFile %PYTHON_URL% -FileName python.zip
     - 7z x python.zip -o.\python > nul
-    - 7z x python\python37.zip -o%RELEASE_DIR%\python > nul
+    - 7z x python\python312.zip -o%RELEASE_DIR%\python > nul
     - move python\*.pyd %RELEASE_DIR%\python
     - move data %RELEASE_DIR%
-    - cd Release
     - set USER_BEFORE_ARCHIVING=..\..\%PROJECT_DIRECTORY%\ci\appveyor\before_archiving.bat
     - IF EXIST %USER_BEFORE_ARCHIVING% (%USER_BEFORE_ARCHIVING%)
     - 7z a -tzip %RELEASE_DIR_NAME%.zip %RELEASE_DIR%
@@ -135,7 +134,7 @@ after_build:
     - IF %APPVEYOR_REPO_TAG% == true ( %APPVEYOR_BUILD_FOLDER%\hydrogenvr\ci\appveyor\deploy.bat )
 
 artifacts:
-  - path: build\Release\*.zip
+  - path: build\*.zip
     name: zipfile
   - path: hydrogenvr\innosetup\Output\*.exe
     name: installer

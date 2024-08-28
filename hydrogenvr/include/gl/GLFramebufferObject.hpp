@@ -80,6 +80,8 @@ class GLFramebufferObject
 	    GLTexture::TexCubemapProperties const& properties,
 	    GLTexture::Sampler const& sampler = {GL_LINEAR, GL_MIRRORED_REPEAT});
 
+	QString getName() const { return name; };
+	void setName(QString const& name);
 	QSize getSize() const { return QSize(width, height); };
 	unsigned int getDepth() const { return depth; };
 	GLTexture const& getColorAttachmentTexture() const
@@ -166,6 +168,7 @@ class GLFramebufferObject
 
   private:
 	GLuint fbo = 0;
+	QString name;
 	// if depth map, will be the depth buffer instead
 	std::unique_ptr<GLTexture> texColorBuffer = nullptr;
 	GLuint renderBuffer                       = 0;

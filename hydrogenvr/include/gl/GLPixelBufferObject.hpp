@@ -20,6 +20,7 @@
 #define GLPIXELBUFFEROBJECT_HPP
 
 #include <QSize>
+#include <span>
 
 #include "GLBuffer.hpp"
 #include "GLTexture.hpp"
@@ -53,8 +54,9 @@ class GLPixelBufferObject
 	    : GLPixelBufferObject(QSize(width, height), bytesPerPixel,
 	                          dataFormat){};
 	QSize getSize() { return size; };
-	size_t getBufferSize() { return buff.getSize(); };
-	unsigned char* getMappedData() const;
+	size_t getBufferSize() const { return buff.getSize(); };
+	template <typename T>
+	std::span<T> getMappedData() const;
 	std::unique_ptr<GLTexture> copyContentToNewTex(bool sRGB = true) const;
 	void copyContentToTex(GLTexture const& texture) const;
 
@@ -73,10 +75,20 @@ class GLPixelBufferObject
 	QSize size;
 	unsigned int bytesPerPixel;
 	mutable GLTexture::Data dataFormat;
-	mutable unsigned char* mappedData = nullptr;
+	mutable void* mappedData = nullptr;
 
 	bool doClean = true;
 	static unsigned int& instancesCount();
 };
+
+template <typename T>
+std::span<T> GLPixelBufferObject::getMappedData() const
+{
+	if(mappedData == nullptr)
+	{
+		mappedData = buff.map(GL_WRITE_ONLY);
+	}
+	return {static_cast<T*>(mappedData), getBufferSize() / sizeof(T)};
+}
 
 #endif // GLPIXELBUFFEROBJECT_HPP

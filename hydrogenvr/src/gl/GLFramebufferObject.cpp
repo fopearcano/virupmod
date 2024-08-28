@@ -247,6 +247,14 @@ GLFramebufferObject::GLFramebufferObject(
 	                                           GL_RENDERBUFFER, renderBuffer);
 }
 
+void GLFramebufferObject::setName(QString const& name)
+{
+	this->name    = name;
+	auto fullName = "Framebuffer " + QString::number(fbo) + " - " + name;
+	GLHandler::glf().glObjectLabel(GL_TEXTURE, fbo, fullName.size(),
+	                               fullName.toLatin1().data());
+}
+
 void GLFramebufferObject::bind(GLTexture::CubemapFace face, GLint layer) const
 {
 	GLHandler::glf().glBindFramebuffer(GL_FRAMEBUFFER, fbo);

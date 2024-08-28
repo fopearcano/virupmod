@@ -21,7 +21,7 @@ sed -i "${line_number}cMAKEFLAGS=\"-j\$\(nproc\)\"" /etc/makepkg.conf
 # KTX
 git clone --branch v4.3.2 https://github.com/KhronosGroup/KTX-Software.git
 mkdir KTX-Software/build ; cd KTX-Software/build
-cmake .. -DKTX_FEATURE_STATIC_LIBRARY=ON
+cmake .. -DKTX_FEATURE_STATIC_LIBRARY=ON -DKTX_FEATURE_TESTS=OFF -DKTX_FEATURE_TOOLS=OFF
 make install -j $(nproc)
 cd ../..
 

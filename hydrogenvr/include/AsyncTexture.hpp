@@ -32,14 +32,14 @@ class WorkerThread : public QThread
 {
 	Q_OBJECT
   public:
-	WorkerThread(QString const& path, unsigned char* data)
+	WorkerThread(QString const& path, std::span<std::byte> data)
 	    : path(path)
 	    , data(data)
 	{
 	}
 
-	WorkerThread(QString const& path, unsigned char* data, unsigned int width,
-	             unsigned int height)
+	WorkerThread(QString const& path, std::span<std::byte> data,
+	             unsigned int width, unsigned int height)
 	    : path(path)
 	    , data(data)
 	    , resize(true)
@@ -50,7 +50,7 @@ class WorkerThread : public QThread
 
   private:
 	QString path;
-	unsigned char* data;
+	std::span<std::byte> data;
 	bool resize         = false;
 	unsigned int width  = 0;
 	unsigned int height = 0;
@@ -70,9 +70,9 @@ class WorkerThread : public QThread
 		}
 		img = img.convertToFormat(QImage::Format_RGBA8888);
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-		std::memcpy(data, img.bits(), std::size_t(img.byteCount()));
+		std::memcpy(data.data(), img.bits(), std::size_t(img.byteCount()));
 #else
-		std::memcpy(data, img.bits(), std::size_t(img.sizeInBytes()));
+		std::memcpy(data.data(), img.bits(), std::size_t(img.sizeInBytes()));
 #endif
 	}
 };

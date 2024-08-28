@@ -71,16 +71,28 @@ endforeach()
 project(${PROJECT_NAME} CXX)
 set(CMAKE_PROJECT_DESCRIPTION ${PROJECT_DESCRIPTION})
 
-# C++ 17
+# C++ 20
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=gnu++17" COMPILER_SUPPORTS_CXX17)
-CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
-if(COMPILER_SUPPORTS_CXX17)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
-elseif(COMPILER_SUPPORTS_CXX1Y)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+if (MSVC)
+    # For MSVC, use the /std:c++20 flag
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+	set(CMAKE_CXX_FLAGS_RELEASE "/O2")
 else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
+    # For other compilers, check for the appropriate flags
+    CHECK_CXX_COMPILER_FLAG("-std=gnu++20" COMPILER_SUPPORTS_GNU_CXX20)
+    CHECK_CXX_COMPILER_FLAG("-std=c++20" COMPILER_SUPPORTS_CXX20)
+    CHECK_CXX_COMPILER_FLAG("-std=c++2a" COMPILER_SUPPORTS_CXX2A)
+
+    if(COMPILER_SUPPORTS_GNU_CXX20)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
+    elseif(COMPILER_SUPPORTS_CXX20)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+    elseif(COMPILER_SUPPORTS_CXX2A)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+    else()
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++20 support. Please use a different C++ compiler.")
+    endif()
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
 # For clang - tidy to use(clang - tidy - p)
@@ -445,18 +457,15 @@ IF((DEFINED WIN32) AND ($ENV{HIDE_CONSOLE}))
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
 ENDIF()
 
-# RUN MOC (defined in Qt specific cmake file)
-run_moc()
-
 # COMMON OBJECTS
-add_library(objects OBJECT ${SRC_FILES} ${MOC_FILES})
+add_library(objects OBJECT ${HPP_FILES} ${SRC_FILES})
 target_link_libraries(objects ${LD_LIBS})
 foreach(EXT_PROJ IN LISTS PROJECT_EXT_PROJECTS)
 	add_dependencies(objects ${EXT_PROJ})
 endforeach()
 
 # TESTS
-add_executable(tests ${TEST_SRC_FILES} ${TEST_MOC_FILES} $<TARGET_OBJECTS:objects>)
+add_executable(tests ${TEST_HPP_FILES} ${TEST_SRC_FILES} $<TARGET_OBJECTS:objects>)
 target_link_libraries(tests ${LD_LIBS})
 
 # EXECUTABLE : PROJECT_NAME
@@ -514,18 +523,13 @@ if(NOT WIN32)
 	message(STATUS "deb DEPENDENCIES file : ${DEB_DEP_FILE}")
 
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} DESTINATION bin)
-	# Ubuntu 20.04 has a package
-	if((NOT "${OSRELEASE_ID}" STREQUAL "ubuntu") OR (NOT "${OSRELEASE_VERSION_ID}" STREQUAL "20.04"))
-		INSTALL(FILES ${OPENVR_LIBRARIES} DESTINATION lib/${PROJECT_NAME})
-	endif()
 	if(LeapMotion_FOUND)
 		INSTALL(FILES ${LEAPMOTION_LIBRARIES} DESTINATION lib/${PROJECT_NAME})
 	endif()
-	# Ubuntu 18.04 has a package
-	if(PythonQt_FOUND AND ((NOT ${OSRELEASE_ID} STREQUAL "ubuntu") OR (NOT ${OSRELEASE_VERSION_ID} STREQUAL "18.04")))
+	if(PythonQt_FOUND)
 		INSTALL(FILES ${PYTHONQT_LIBRARIES} DESTINATION lib/${PROJECT_NAME})
 	endif()
-	if(PythonQt_QtAll_FOUND AND ((NOT ${OSRELEASE_ID} STREQUAL "ubuntu") OR (NOT ${OSRELEASE_VERSION_ID} STREQUAL "18.04")))
+	if(PythonQt_QtAll_FOUND)
 		INSTALL(FILES ${PYTHONQT_QTALL_LIBRARIES} DESTINATION lib/${PROJECT_NAME})
 	endif()
 	INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data DESTINATION share/${PROJECT_NAME})

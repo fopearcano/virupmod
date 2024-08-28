@@ -19,8 +19,6 @@
 #include "Renderer.hpp"
 
 #include "AbstractMainWin.hpp"
-#include "paint/AdvancedPainter.hpp"
-#include "paint/OpenGL4PaintDevice.hpp"
 
 Renderer::Renderer(AbstractMainWin& window, VRHandler& vrHandler)
     : window(window)
@@ -137,9 +135,8 @@ void Renderer::appendSceneRenderPath(QString const& id, RenderPath path)
 void Renderer::insertSceneRenderPath(QString const& id, RenderPath path,
                                      unsigned int pos)
 {
-	sceneRenderPipeline_.emplace(
-	    std::next(sceneRenderPipeline_.begin(), pos),
-	    std::pair<QString, RenderPath>(id, std::move(path)));
+	sceneRenderPipeline_.emplace(std::next(sceneRenderPipeline_.begin(), pos),
+	                             id, std::move(path));
 }
 
 void Renderer::removeSceneRenderPath(QString const& id)
@@ -159,8 +156,8 @@ void Renderer::appendPostProcessingShader(QString const& id,
                                           QString const& computeName,
                                           QMap<QString, QString> const& defines)
 {
-	postProcessingPipeline_.emplace_back(
-	    std::make_pair(id, GLComputeShader(computeName, defines)));
+	postProcessingPipeline_.emplace_back(id,
+	                                     GLComputeShader(computeName, defines));
 }
 
 void Renderer::insertPostProcessingShader(QString const& id,
@@ -168,8 +165,8 @@ void Renderer::insertPostProcessingShader(QString const& id,
                                           unsigned int pos)
 {
 	postProcessingPipeline_.emplace(
-	    std::next(postProcessingPipeline_.begin(), pos),
-	    std::make_pair(id, GLComputeShader(computeName)));
+	    std::next(postProcessingPipeline_.begin(), pos), id,
+	    GLComputeShader(computeName));
 }
 
 void Renderer::removePostProcessingShader(QString const& id)
@@ -194,6 +191,10 @@ void Renderer::reloadPostProcessingTargets()
 
 	mainRenderTarget = std::make_unique<MainRenderTarget>(
 	    newSize.width(), newSize.height(), samples, projection);
+
+	painter.reset();
+	device  = std::make_unique<OpenGL4PaintDevice>(newSize);
+	painter = std::make_unique<AdvancedPainter>(device.get());
 }
 
 void Renderer::updateFOV()
@@ -413,8 +414,9 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 	// if no VR or debug not in headset, render 2D
 	if((!vrHandler.isEnabled() || thirdRender) || (debug && !debugInHeadset))
 	{
-		auto renderFunc =
-		    [=](bool overrideCamera, QMatrix4x4 overrView, QMatrix4x4 overrProj)
+		auto renderFunc = [this, renderingCamIsDebug,
+		                   debug](bool overrideCamera, QMatrix4x4 overrView,
+		                          QMatrix4x4 overrProj)
 		{
 			for(auto const& pair : sceneRenderPipeline_)
 			{
@@ -428,8 +430,8 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 					pair.second.camera->setProj(overrProj);
 					pair.second.camera->setView(overrView * viewBack);
 				}
-				pair.second.camera->update2D(angleShiftMat);
-				dbgCamera->update(angleShiftMat);
+				pair.second.camera->update2D(this->angleShiftMat);
+				dbgCamera->update(this->angleShiftMat);
 				if(renderingCamIsDebug)
 				{
 					dbgCamera->uploadMatrices();
@@ -453,7 +455,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 				}
 				if(renderCompass)
 				{
-					compass->render(angleShiftMat);
+					compass->render(this->angleShiftMat);
 				}
 				if(wireframe)
 				{
@@ -585,20 +587,19 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 
 			// will get disabled by QOpenGLPaintDevice anyway
 			GLStateSet glState({{GL_DEPTH_TEST, false}});
-			OpenGL4PaintDevice d(targetSize);
-			AdvancedPainter painter(&d);
-			painter.setRenderHint(QPainter::Antialiasing);
-			painter.setRenderHint(QPainter::TextAntialiasing);
+			painter->setRenderHint(QPainter::Antialiasing);
+			painter->setRenderHint(QPainter::TextAntialiasing);
 
 			int screenHeight(window.screen()->geometry().height()
 			                 * window.screen()->devicePixelRatio());
-			QFont font = painter.font();
+			QFont font = painter->font();
+			font.setPointSize(8);
 			font.setPointSize(font.pointSize() * screenHeight / 1080);
-			painter.setFont(font);
-			painter.beginNativePainting();
-			window.renderGui(targetSize, painter);
+			painter->setFont(font);
+			painter->beginNativePainting();
+			window.renderGui(targetSize, *painter);
 
-			painter.endNativePainting();
+			painter->endNativePainting();
 		}
 
 		// blit result on screen

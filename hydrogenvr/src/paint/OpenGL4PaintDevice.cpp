@@ -77,12 +77,12 @@ void OpenGL4PaintEngine::drawPolygon(QPointF const* points, int pointCount,
 		vertices.push_back(-2 * points[0].y() / height + 1);
 	}
 
-	GLShaderProgram shader("defaultline");
-	shader.setUniform("color", pen.color());
+	defaultLineShader.setUniform("color", pen.color());
 	GLMesh mesh;
-	mesh.setVertexShaderMapping(shader, {{"position", 2}});
+	mesh.setVertexShaderMapping(defaultLineShader, {{"position", 2}});
 	mesh.setVertices(vertices);
-	GLHandler::setUpRender(shader, {}, GLHandler::GeometricSpace::CLIP);
+	GLHandler::setUpRender(defaultLineShader, {},
+	                       GLHandler::GeometricSpace::CLIP);
 	mesh.render(PrimitiveType::LINE_STRIP);
 }
 

@@ -390,6 +390,7 @@ GLTexture::GLTexture(QString const& texturePath, bool sRGB)
 		initData({img_data.bits()});
 		setSampler(Sampler(GL_LINEAR, GL_REPEAT));
 	}
+	setName(texturePath);
 }
 
 GLTexture::GLTexture(std::array<QImage, 6> const& images, bool sRGB)
@@ -461,23 +462,23 @@ GLTexture::GLTexture(std::array<QString, 6> const& texturesPaths, bool sRGB)
 {
 }
 
+void GLTexture::setName(QString const& name)
+{
+	this->name    = name;
+	auto fullName = "Texture " + QString::number(glTexture) + " - " + name;
+	GLHandler::glf().glObjectLabel(GL_TEXTURE, glTexture, fullName.size(),
+	                               fullName.toLatin1().data());
+}
+
 std::array<int, 3> GLTexture::getSize(unsigned int level) const
 {
-	GLenum target = glTarget;
-	if(type == Type::TEXCUBEMAP)
-	{
-		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-	}
 	GLint width, height, depth;
-	GLHandler::glf().glBindTexture(glTarget, glTexture);
-	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH,
-	                                          &width);
-	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT,
-	                                          &height);
-	GLHandler::glf().glGetTexLevelParameteriv(target, level, GL_TEXTURE_DEPTH,
-	                                          &depth);
-	GLHandler::glf().glBindTexture(glTarget, 0);
-
+	GLHandler::glf().glGetTextureLevelParameteriv(glTexture, level,
+	                                              GL_TEXTURE_WIDTH, &width);
+	GLHandler::glf().glGetTextureLevelParameteriv(glTexture, level,
+	                                              GL_TEXTURE_HEIGHT, &height);
+	GLHandler::glf().glGetTextureLevelParameteriv(glTexture, level,
+	                                              GL_TEXTURE_DEPTH, &depth);
 	return {width, height, depth};
 }
 
@@ -503,14 +504,13 @@ QString GLTexture::getTypeStr() const
 void GLTexture::generateMipmap(unsigned int baseLevel,
                                unsigned int maxLevel) const
 {
-	GLHandler::glf().glBindTexture(glTarget, glTexture);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MIN_FILTER,
-	                                 GL_LINEAR_MIPMAP_LINEAR);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_BASE_LEVEL,
-	                                 baseLevel);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MAX_LEVEL, maxLevel);
-	GLHandler::glf().glGenerateMipmap(glTarget);
-	GLHandler::glf().glBindTexture(glTarget, 0);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_MIN_FILTER,
+	                                     GL_LINEAR_MIPMAP_LINEAR);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_BASE_LEVEL,
+	                                     baseLevel);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_MAX_LEVEL,
+	                                     maxLevel);
+	GLHandler::glf().glGenerateTextureMipmap(glTexture);
 }
 
 unsigned int GLTexture::getHighestMipmapLevel() const
@@ -539,6 +539,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 	switch(internalFormat) // determine what type GL texture has...
 	{
 		case GL_RGB:
+		case GL_RGB8:
 		case GL_SRGB8:
 		{
 			QImage result(size, QImage::Format::Format_RGB888);
@@ -547,6 +548,7 @@ QImage GLTexture::getContentAsImage(unsigned int level) const
 			return result;
 		}
 		case GL_RGBA:
+		case GL_RGBA8:
 		case GL_SRGB8_ALPHA8:
 		{
 			QImage result(size, QImage::Format::Format_RGBA8888);
@@ -622,20 +624,19 @@ float GLTexture::getAverageLuminance() const
 
 void GLTexture::setSampler(Sampler const& sampler) const
 {
-	GLHandler::glf().glBindTexture(glTarget, glTexture);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MIN_FILTER,
-	                                 sampler.magfilter);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_MAG_FILTER,
-	                                 sampler.minfilter);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_S,
-	                                 sampler.wraps);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_T,
-	                                 sampler.wrapt);
-	GLHandler::glf().glTexParameteri(glTarget, GL_TEXTURE_WRAP_R,
-	                                 sampler.wrapr);
-	GLHandler::glf().glTexParameterf(glTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-	                                 sampler.anisotropicFilterSamples);
-	GLHandler::glf().glBindTexture(glTarget, 0);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_MIN_FILTER,
+	                                     sampler.magfilter);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_MAG_FILTER,
+	                                     sampler.minfilter);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_WRAP_S,
+	                                     sampler.wraps);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_WRAP_T,
+	                                     sampler.wrapt);
+	GLHandler::glf().glTextureParameteri(glTexture, GL_TEXTURE_WRAP_R,
+	                                     sampler.wrapr);
+	GLHandler::glf().glTextureParameterf(glTexture,
+	                                     GL_TEXTURE_MAX_ANISOTROPY_EXT,
+	                                     sampler.anisotropicFilterSamples);
 }
 
 void GLTexture::setData(Data const& data) const
@@ -702,10 +703,17 @@ void GLTexture::setData(const unsigned char* red, const unsigned char* green,
 	setData({image.data()});
 }
 
-void GLTexture::use(GLenum textureUnit) const
+void GLTexture::use(GLint textureUnit) const
 {
-	GLHandler::glf().glActiveTexture(textureUnit);
-	GLHandler::glf().glBindTexture(glTarget, glTexture);
+	GLHandler::glf().glBindTextureUnit(textureUnit, glTexture);
+}
+
+void GLTexture::useAsImage(GLint textureUnit, int level,
+                           GLenum accessMode) const
+{
+	auto layered = static_cast<GLboolean>(type == GLTexture::Type::TEXCUBEMAP);
+	GLHandler::glf().glBindImageTexture(textureUnit, glTexture, level, layered,
+	                                    0, accessMode, internalFormat);
 }
 
 void GLTexture::cleanUp()

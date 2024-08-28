@@ -10,7 +10,6 @@ stages:
 
 include:
     - hydrogenvr/ci/gitlab-ci/archlinux/gitlab-ci.yml
-    - hydrogenvr/ci/gitlab-ci/ubuntu/20.04/gitlab-ci.yml
     - hydrogenvr/ci/gitlab-ci/ubuntu/22.04/gitlab-ci.yml
     - hydrogenvr/ci/gitlab-ci/ubuntu/24.04/gitlab-ci.yml
     - hydrogenvr/ci/gitlab-ci/appimage.yml

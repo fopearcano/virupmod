@@ -486,10 +486,10 @@ class AbstractMainWin : public RenderingWindow
 	// SECONDARY WINDOWS
 	std::vector<std::unique_ptr<RenderingWindow>> secondaryWindows;
 
-	//#ifdef Q_OS_WIN
-	// FULLSCREEN HACK
+	// #ifdef Q_OS_WIN
+	//  FULLSCREEN HACK
 	QElapsedTimer fullScreenTimer;
-	//#endif
+	// #endif
 };
 
 template <class T>

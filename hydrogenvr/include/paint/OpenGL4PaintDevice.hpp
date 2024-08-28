@@ -27,11 +27,14 @@
 #endif
 #include <QPaintEngine>
 
+#include "gl/GLShaderProgram.hpp"
+
 class OpenGL4PaintEngine : public QPaintEngine
 {
   public:
 	OpenGL4PaintEngine()
-	    : QPaintEngine(){};
+	    : QPaintEngine()
+	    , defaultLineShader("defaultline"){};
 	virtual bool begin(QPaintDevice* pdev) override;
 	virtual void drawImage(QRectF const& rectangle, QImage const& image,
 	                       QRectF const& sr, Qt::ImageConversionFlags flags
@@ -48,6 +51,8 @@ class OpenGL4PaintEngine : public QPaintEngine
 
   private:
 	QPen pen;
+
+	GLShaderProgram defaultLineShader;
 };
 
 class OpenGL4PaintDevice : public QOpenGLPaintDevice

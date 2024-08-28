@@ -1,6 +1,8 @@
 #include "Logger.hpp"
 #include "MainWin.hpp"
 
+#include <algorithm>
+
 void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(!pressed)
@@ -314,8 +316,8 @@ void MainWin::initScene()
 
 void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 {
-	text->setText(tr("Hello World !\n")
-	              + QString::number(round(1.0 / frameTiming)) + " FPS");
+	auto fps = std::clamp(1.f / frameTiming, 0.f, 120.f);
+	text->setText(tr("Hello World !\n") + QString::number(round(fps)) + " FPS");
 	if(gamepadHandler.isEnabled())
 	{
 		auto leftJoystick(gamepadHandler.getJoystick(Side::LEFT));

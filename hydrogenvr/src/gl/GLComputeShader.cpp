@@ -36,30 +36,12 @@ void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
 	for(unsigned int i(0); i < textureBindings.size(); ++i)
 	{
 		auto const& binding(textureBindings[i]);
-		binding.texture.use(GL_TEXTURE0 + i);
-
-		if(binding.accessMode != DataAccessMode::SAMPLER)
+		if(binding.accessMode == DataAccessMode::SAMPLER)
 		{
-			GLint format;
-			GLboolean layered;
-			if(binding.texture.getType() == GLTexture::Type::TEXCUBEMAP)
-			{
-				GLHandler::glf().glGetTexLevelParameteriv(
-				    GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0,
-				    GL_TEXTURE_INTERNAL_FORMAT, &format);
-				layered = GL_TRUE;
-			}
-			else
-			{
-				GLHandler::glf().glGetTexLevelParameteriv(
-				    binding.texture.getGLTarget(), 0,
-				    GL_TEXTURE_INTERNAL_FORMAT, &format);
-				layered = GL_FALSE;
-			}
-			GLHandler::glf().glBindImageTexture(
-			    i, binding.texture.getGLTexture(), binding.level, layered, 0,
-			    binding.accessMode, format);
+			binding.texture.use(i);
+			continue;
 		}
+		binding.texture.useAsImage(i, binding.level, binding.accessMode);
 	}
 	std::array<unsigned int, 3> dispatchSize{};
 	for(unsigned int i(0); i < 3; ++i)
