@@ -117,6 +117,8 @@ void TreeMethodLOD::init(QStringList const& gasFiles,
 BBox TreeMethodLOD::getDataBoundingBox() const
 {
 	std::vector<BBox> bboxes;
+	bboxes.reserve(gasTrees.size() + starsTrees.size()
+	               + darkMatterTrees.size());
 	for(auto const& gasTree : gasTrees)
 	{
 		bboxes.push_back(gasTree.getBoundingBox());

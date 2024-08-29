@@ -4,11 +4,6 @@
 
 #include "LibTerrain.hpp"
 
-MainWin::MainWin()
-{
-	srand(time(nullptr));
-}
-
 void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 {
 	if(loaded)
@@ -872,23 +867,4 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	msgBox->setText(posstr);
 	msgBox->setModal(false);
 	msgBox->show();
-}
-
-std::vector<float> MainWin::generateVertices(unsigned int number,
-                                             unsigned int seed)
-{
-	std::vector<float> vertices;
-	vertices.reserve(3 * number);
-
-	srand(seed);
-
-	for(unsigned int i(0); i < 3 * number; ++i)
-	{
-		vertices.push_back(
-		    // NOLINT(cert-msc30-c)
-		    2 * (static_cast<float>(rand()) / static_cast<float>(RAND_MAX))
-		    - 1);
-	}
-
-	return vertices;
 }

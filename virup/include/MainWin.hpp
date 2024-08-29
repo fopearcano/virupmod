@@ -113,7 +113,7 @@ class MainWin : public AbstractMainWin
 		Universe::State universeState;
 	};
 
-	MainWin();
+	MainWin() = default;
 
 	// CUBE
 
@@ -291,8 +291,6 @@ class MainWin : public AbstractMainWin
 
   private:
 	void printPositionInDataSpace(Side controller = Side::NONE) const;
-	static std::vector<float> generateVertices(unsigned int number,
-	                                           unsigned int seed);
 
 	bool loaded = false;
 	std::unique_ptr<Universe> universe;

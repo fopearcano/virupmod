@@ -90,10 +90,8 @@ void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 		}
 
 		line = file.readLine().data();
-		unsigned int i(0);
 		while(line != "")
 		{
-			++i;
 			objects.push_back(parseLine(line, columnsNumbers));
 			for(auto const& starName : objects[objects.size() - 1].names)
 			{
