@@ -141,7 +141,11 @@ int GLShaderProgram::getAttribLocationFromName(const char* attributeName) const
 
 int GLShaderProgram::getUniformLocation(const char* uniformName) const
 {
-	return uniformLocations[uniformName];
+	if(uniformLocations.contains(uniformName))
+	{
+		return uniformLocations[uniformName];
+	}
+	return -1;
 }
 
 void GLShaderProgram::setUnusedAttributesValues(

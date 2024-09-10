@@ -94,6 +94,7 @@ void Light::generateShadowMap(std::vector<GLMesh const*> const& meshes,
 	for(unsigned int i(0); i < meshes.size(); ++i)
 	{
 		shadowShader.setUniform("camera", lightSpace * models[i]);
+		shadowShader.use();
 		meshes[i]->render();
 	}
 }
