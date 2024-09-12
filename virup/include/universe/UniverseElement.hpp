@@ -103,7 +103,7 @@ class UniverseElement : public QObject
 	 *
 	 * @param camera The current @ref Camera used for rendering.
 	 */
-	virtual void update(Camera const& /*camera*/){};
+	virtual void update(Camera const& /*camera*/) {};
 	/*! @brief Implement this method to render this element.
 	 *
 	 * @param camera The current @ref Camera used for rendering.

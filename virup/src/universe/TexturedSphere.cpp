@@ -88,8 +88,7 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Texture Path:"), pathSelector});
 
 	auto cbox = make_qt_unique<QCheckBox>(parent);
-	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [&jsonObj](int state)
+	QObject::connect(cbox, &QCheckBox::stateChanged, [&jsonObj](int state)
 	                 { jsonObj["cullfrontfaces"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["cullfrontfaces"].toBool() ? Qt::Checked
 	                                                       : Qt::Unchecked);

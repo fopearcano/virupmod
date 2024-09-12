@@ -54,8 +54,7 @@ PlanetarySystemSelector::PlanetarySystemSelector(Universe const& universe,
 
 	auto b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
-	connect(b, &QPushButton::pressed,
-	        [this]()
+	connect(b, &QPushButton::pressed, [this]()
 	        { selectOrbitableSolSys(solarSystemTree.currentItem(), 0); });
 
 	layout->addWidget(b);

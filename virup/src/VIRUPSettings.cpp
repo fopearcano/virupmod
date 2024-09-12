@@ -100,12 +100,8 @@ DataListWidget::DataListWidget(QWidget* parent)
 	entries << tr("Cosmological Labels") << tr("CSV Stars")
 	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
 	        << tr("Textured Sphere") << tr("Credits");
-	entriesIds << "cosmolabels"
-	           << "csvstars"
-	           << "csvgalaxies"
-	           << "cosmosim"
-	           << "texsphere"
-	           << "credits";
+	entriesIds << "cosmolabels" << "csvstars" << "csvgalaxies" << "cosmosim"
+	           << "texsphere" << "credits";
 
 	loadMainLayout();
 }
@@ -337,8 +333,7 @@ void DataListWidget::loadMainLayout()
 	pathSelector = make_qt_unique<PathSelector>(
 	    *this, tr("Data root directory"), PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
-	connect(pathSelector, &PathSelector::pathChanged, this,
-	        [](QString const& t)
+	connect(pathSelector, &PathSelector::pathChanged, this, [](QString const& t)
 	        { QSettings().setValue("data/rootdir", t + '/'); });
 	l->addWidget(label);
 	l->addWidget(pathSelector);

@@ -47,8 +47,7 @@ Visibilities::Visibilities(Universe& universe)
 		connect(universe.getElement(name), &UniverseElement::visibilityChanged,
 		        [slider](float visibility)
 		        { slider->setValue(static_cast<int>(visibility * 100)); });
-		connect(slider, &QSlider::valueChanged,
-		        [&universe, name](int val)
+		connect(slider, &QSlider::valueChanged, [&universe, name](int val)
 		        { universe.setVisibility(name, val / 100.f); });
 	}
 
@@ -73,8 +72,7 @@ Visibilities::Visibilities(Universe& universe)
 				        slider->setValue(static_cast<int>(visibility * 100));
 			        }
 		        });
-		connect(slider, &QSlider::valueChanged,
-		        [&universe, name](int val)
+		connect(slider, &QSlider::valueChanged, [&universe, name](int val)
 		        { universe.setVisibility(name, val / 100.f); });
 	}
 

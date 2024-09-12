@@ -126,8 +126,7 @@ class UniverseElementEditor : public QDialog
 		auto b = make_qt_unique<QPushButton>(*this);
 		b->setText(tr("Apply"));
 		form->addRow(b);
-		connect(b, &QPushButton::pressed, this,
-		        [this, universeElement]()
+		connect(b, &QPushButton::pressed, this, [this, universeElement]()
 		        { universeElement->setJson(this->json); });
 	};
 

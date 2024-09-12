@@ -111,8 +111,7 @@ TimeController::TimeController(Universe& universe)
 	button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("Now"));
 	connect(
-	    button, &QPushButton::pressed,
-	    [this]()
+	    button, &QPushButton::pressed, [this]()
 	    { this->universe.setSimulationTime(QDateTime::currentDateTimeUtc()); });
 	buttonsLayout->addWidget(button);
 }

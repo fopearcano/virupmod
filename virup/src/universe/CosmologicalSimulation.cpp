@@ -290,8 +290,7 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Dark Matter Path:"), pathSelector});
 
 	auto cbox = make_qt_unique<QCheckBox>(parent);
-	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [&jsonObj](int state)
+	QObject::connect(cbox, &QCheckBox::stateChanged, [&jsonObj](int state)
 	                 { jsonObj["loaddarkmatter"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["loaddarkmatter"].toBool() ? Qt::Checked
 	                                                       : Qt::Unchecked);
@@ -299,8 +298,7 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Load Dark Matter:"), cbox});
 
 	cbox = make_qt_unique<QCheckBox>(parent);
-	QObject::connect(cbox, &QCheckBox::stateChanged,
-	                 [&jsonObj](int state)
+	QObject::connect(cbox, &QCheckBox::stateChanged, [&jsonObj](int state)
 	                 { jsonObj["temporalseries"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["temporalseries"].toBool(true) ? Qt::Checked
 	                                                           : Qt::Unchecked);
