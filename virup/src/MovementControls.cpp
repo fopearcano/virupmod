@@ -59,8 +59,8 @@ void MovementControls::actionEvent(BaseInputManager::Action const& a,
 		if(a.id == "centercam")
 		{
 			Vector3 unitRelPos(planetCam.relativePosition.getUnitForm());
-			float yaw(atan2(unitRelPos[1], unitRelPos[0]));
-			float pitch(planetCam.pitch = -1.0 * asin(unitRelPos[2]));
+			const float yaw(atan2(unitRelPos[1], unitRelPos[0]));
+			const float pitch(planetCam.pitch = -1.0 * asin(unitRelPos[2]));
 
 			cosmoCam.yaw    = yaw;
 			cosmoCam.pitch  = pitch;
@@ -233,7 +233,7 @@ void MovementControls::vrEventCube(
 
 void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 {
-	QMatrix4x4 trackedSpaceToWorldTransform(
+	const QMatrix4x4 trackedSpaceToWorldTransform(
 	    planetCam.seatedTrackedSpaceToWorldTransform());
 	switch(e.type)
 	{
@@ -397,8 +397,8 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 		                   - static_cast<int>(oldGamepadVel.y() < 0));
 		oldGamepadVel.setZ(static_cast<int>(oldGamepadVel.z() > 0)
 		                   - static_cast<int>(oldGamepadVel.z() < 0));
-		float yVal = gamepadHandler.getTrigger(Side::RIGHT)
-		             - gamepadHandler.getTrigger(Side::LEFT);
+		const float yVal = gamepadHandler.getTrigger(Side::RIGHT)
+		                   - gamepadHandler.getTrigger(Side::LEFT);
 		gamepadVel = {gamepadHandler.getJoystick(Side::LEFT).x(), yVal,
 		              gamepadHandler.getJoystick(Side::LEFT).y()};
 		if(gamepadVel.isNull() != oldGamepadVel.isNull())
@@ -417,8 +417,8 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 			emit gamepadVelocityChanged(gamepadVel);
 		}
 
-		float fI((scaleIncreaseFactor - 1.f) * frameTiming + 1.f);
-		float fD((scaleDecreaseFactor - 1.f) * frameTiming + 1.f);
+		const float fI((scaleIncreaseFactor - 1.f) * frameTiming + 1.f);
+		const float fD((scaleDecreaseFactor - 1.f) * frameTiming + 1.f);
 		cosmoCam.scale *= fI / fD;
 		CelestialBodyRenderer::overridenScale() *= fI / fD;
 	}
@@ -426,7 +426,8 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 	{
 		gamepadVel = {};
 	}
-	auto multiplier = QSettings().value("controls/translationspeed").toDouble();
+	const auto multiplier
+	    = QSettings().value("controls/translationspeed").toDouble();
 	gamepadVel *= multiplier;
 
 	updateCube(frameTiming);
@@ -573,7 +574,7 @@ void MovementControls::renderGuides()
 {
 	if(displayGuide)
 	{
-		GLBlendSet glBlend(GLBlendSet::BlendState{});
+		const GLBlendSet glBlend(GLBlendSet::BlendState{});
 		GLHandler::setUpRender(guideShader, guideModel,
 		                       GLHandler::GeometricSpace::SEATEDTRACKED);
 		guideMesh.render();

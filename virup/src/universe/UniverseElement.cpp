@@ -44,9 +44,9 @@ QJsonObject UniverseElement::getJson() const
 
 void UniverseElement::setJson(QJsonObject const& json)
 {
-	name                   = json["name"].toString();
-	unit                   = json["unit"].toDouble(1.0);
-	QString referenceFrame = json["referenceframe"].toString();
+	name                         = json["name"].toString();
+	unit                         = json["unit"].toDouble(1.0);
+	const QString referenceFrame = json["referenceframe"].toString();
 	if(referenceFrame == "equatorial")
 	{
 		this->referenceFrame = ReferenceFrame::EQUATORIAL;
@@ -115,7 +115,7 @@ void UniverseElement::setProperRotationFromCustomZAxis(
 
 QMatrix4x4 const& UniverseElement::equatorialToEcliptic()
 {
-	static QMatrix4x4 equatorialToEcliptic
+	static const QMatrix4x4 equatorialToEcliptic
 	    = QMatrix4x4(1.0, 6.19344636e-05, 2.6982713e-05, 0.0,      //
 	                 -6.74978101e-05, 0.91747101, 0.39780267, 0.0, //
 	                 -1.01181804e-07, -0.39780266, 0.917471, 0.0,  //
@@ -126,7 +126,7 @@ QMatrix4x4 const& UniverseElement::equatorialToEcliptic()
 
 QMatrix4x4 const& UniverseElement::galacticToEcliptic()
 {
-	static QMatrix4x4 galacticToEcliptic
+	static const QMatrix4x4 galacticToEcliptic
 	    = QMatrix4x4(-0.05494273, 0.49410207, -0.86766607, 0.0,  //
 	                 -0.99382033, -0.11100021, -0.00027913, 0.0, //
 	                 -0.09644906, 0.86228889, 0.49714731, 0.0,   //
@@ -162,7 +162,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto sbox = make_qt_unique<SciDoubleSpinBox>(parent);
+	auto* sbox = make_qt_unique<SciDoubleSpinBox>(parent);
 	QObject::connect(sbox,
 	                 static_cast<void (QDoubleSpinBox::*)(double)>(
 	                     &QDoubleSpinBox::valueChanged),
@@ -171,7 +171,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Data unit (in kpc):"), sbox});
 
-	auto cbox = make_qt_unique<QComboBox>(parent);
+	auto* cbox = make_qt_unique<QComboBox>(parent);
 	QStringList entries({QObject::tr("Equatorial"), QObject::tr("Galactic"),
 	                     QObject::tr("Ecliptic")});
 	QStringList entriesIds({"equatorial", "galactic", "ecliptic"});
@@ -197,8 +197,8 @@ QList<QPair<QString, QWidget*>>
 	result.append({QObject::tr("Reference frame:"), cbox});
 
 	Vector3 stored(jsonObj["solarsyslocalpos"].toObject());
-	auto w                                  = make_qt_unique<QWidget>(parent);
-	auto layout                             = make_qt_unique<QHBoxLayout>(*w);
+	auto* w                                 = make_qt_unique<QWidget>(parent);
+	auto* layout                            = make_qt_unique<QHBoxLayout>(*w);
 	std::array<SciDoubleSpinBox*, 3> sboxes = {{nullptr, nullptr, nullptr}};
 	std::array<QString, 3> componentLabels
 	    = {{QObject::tr("x"), QObject::tr("y"), QObject::tr("z")}};

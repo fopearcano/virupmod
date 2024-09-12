@@ -46,21 +46,21 @@ void Grid::setColor(QColor const& color)
 void Grid::render(double scale, double height)
 {
 	// round scale to nearest power of 10
-	double roundscale((pow(10, round(log10(scale)))));
-	double gridScale(1.0 * scale / roundscale);
+	const double roundscale((pow(10, round(log10(scale)))));
+	const double gridScale(1.0 * scale / roundscale);
 
 	QMatrix4x4 t;
 	t.translate(QVector3D(0.f, height, 0.f));
 	t.scale(gridScale);
 
 	{
-		GLBlendSet glBlend(GLBlendSet::BlendState{});
+		const GLBlendSet glBlend(GLBlendSet::BlendState{});
 		GLHandler::setUpRender(shader, t,
 		                       GLHandler::GeometricSpace::STANDINGTRACKED);
 		mesh.render(PrimitiveType::LINES);
 	}
 
-	QString newScaleText(generateScaleText(10.0 * roundscale));
+	const QString newScaleText(generateScaleText(10.0 * roundscale));
 	if(newScaleText != scaleText)
 	{
 		scaleText = newScaleText;
@@ -174,7 +174,7 @@ void Grid::generateGridVertices(std::vector<float>& vertices,
 		}
 	}
 
-	unsigned int elemShift(2 * (subdivisions + 1) * (subdivisions + 1));
+	const unsigned int elemShift(2 * (subdivisions + 1) * (subdivisions + 1));
 	for(unsigned int i(0); i <= subdivisions; ++i)
 	{
 		for(unsigned int j(0); j <= subdivisions; ++j)

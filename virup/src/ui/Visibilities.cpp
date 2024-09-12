@@ -25,22 +25,22 @@ Visibilities::Visibilities(Universe& universe)
 	setFixedSize(200, 600);
 	setWindowTitle(tr("Visibilities List"));
 
-	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
-	auto scrollArea = make_qt_unique<QScrollArea>(*this);
+	auto* mainLayout = make_qt_unique<QVBoxLayout>(*this);
+	auto* scrollArea = make_qt_unique<QScrollArea>(*this);
 
-	auto w      = make_qt_unique<QWidget>(*this);
-	auto layout = make_qt_unique<QVBoxLayout>(*w);
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*w);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
 	scrollArea->setWidget(w);
 	mainLayout->addWidget(scrollArea);
 
 	for(auto const& name : universe.getUniverseElementsNames())
 	{
-		auto label = make_qt_unique<QLabel>(*this);
+		auto* label = make_qt_unique<QLabel>(*this);
 		label->setText(name);
 		layout->addWidget(label);
 
-		auto slider = make_qt_unique<QSlider>(*this, Qt::Horizontal);
+		auto* slider = make_qt_unique<QSlider>(*this, Qt::Horizontal);
 		slider->setMinimum(0);
 		slider->setMaximum(100);
 		layout->addWidget(slider);
@@ -56,11 +56,11 @@ Visibilities::Visibilities(Universe& universe)
 
 	for(auto const& name : nonElementsVisibilities)
 	{
-		auto label = make_qt_unique<QLabel>(*this);
+		auto* label = make_qt_unique<QLabel>(*this);
 		label->setText(name);
 		layout->addWidget(label);
 
-		auto slider = make_qt_unique<QSlider>(*this, Qt::Horizontal);
+		auto* slider = make_qt_unique<QSlider>(*this, Qt::Horizontal);
 		slider->setMinimum(0);
 		slider->setMaximum(100);
 		layout->addWidget(slider);

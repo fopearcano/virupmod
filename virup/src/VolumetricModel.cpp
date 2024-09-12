@@ -22,8 +22,9 @@ VolumetricModel::VolumetricModel(QString const& datFile)
     : shader("volume")
 {
 	std::ifstream file(datFile.toStdString(), std::ios::binary);
-	int64_t Nx, Ny, Nz;
-	double minx, maxx, miny, maxy, minz, maxz;
+	int64_t Nx = 0, Ny = 0, Nz = 0;
+	double minx = NAN, maxx = NAN, miny = NAN, maxy = NAN, minz = NAN,
+	       maxz = NAN;
 
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	file.read(reinterpret_cast<char*>(&Nx), sizeof(int64_t));
@@ -57,7 +58,8 @@ VolumetricModel::VolumetricModel(QString const& datFile)
 
 	std::vector<float> data(Nx * Ny * Nz);
 	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-	file.read(reinterpret_cast<char*>(&data[0]), Nx * Ny * Nz * sizeof(float));
+	file.read(reinterpret_cast<char*>(data.data()),
+	          Nx * Ny * Nz * sizeof(float));
 
 	float max(0.0);
 	for(auto v : data)
@@ -71,7 +73,7 @@ VolumetricModel::VolumetricModel(QString const& datFile)
 	tex = std::make_unique<GLTexture>(
 	    GLTexture::Tex3DProperties(Nz, Ny, Nx, GL_R32F),
 	    GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER},
-	    GLTexture::Data{&data[0], GL_FLOAT, GL_RED});
+	    GLTexture::Data{data.data(), GL_FLOAT, GL_RED});
 	tex->generateMipmap();
 }
 
@@ -91,8 +93,8 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
                              QVector3D const& campos,
                              VolumetricModel const* occlusionModel)
 {
-	GLBlendSet glBlend({GL_ONE, GL_ONE});
-	GLCullFaceSet glCullFace(GL_FRONT);
+	const GLBlendSet glBlend({GL_ONE, GL_ONE});
+	const GLCullFaceSet glCullFace(GL_FRONT);
 	shader.setUniform("color", color);
 	shader.setUniform("campos",
 	                  utils::transformPosition(dataModel.inverted(), campos));

@@ -391,7 +391,7 @@ class Universe : public QObject
 	void setVisibility(QString const& name, double visibility);
 	Vector3 getSolarSystemPosition(QString const& name) const;
 	void setSolarSystemPosition(QString const& name, Vector3 const& pos);
-	void setLabelsOrbitsOnly(QStringList const& nameList);
+	static void setLabelsOrbitsOnly(QStringList const& nameList);
 	int getCosmoSimForcedQuality(QString const& name) const;
 	void setCosmoSimForcedQuality(QString const& name, int forcedQuality);
 	float getCosmoLocalAnimationTime(QString const& name) const;

@@ -65,9 +65,9 @@ void TexturedSphere::render(Camera const& camera,
 	}
 	shader.setUniform("exposure", vis);
 
-	GLStateSet glState({{GL_CULL_FACE, cullFrontFaces}});
-	GLBlendSet glBlend({GL_ONE, GL_ONE});
-	GLCullFaceSet glCullFace(GL_FRONT);
+	const GLStateSet glState({{GL_CULL_FACE, cullFrontFaces}});
+	const GLBlendSet glBlend({GL_ONE, GL_ONE});
+	const GLCullFaceSet glCullFace(GL_FRONT);
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
@@ -78,7 +78,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Texture path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)
@@ -87,7 +87,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Texture Path:"), pathSelector});
 
-	auto cbox = make_qt_unique<QCheckBox>(parent);
+	auto* cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged, [&jsonObj](int state)
 	                 { jsonObj["cullfrontfaces"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["cullfrontfaces"].toBool() ? Qt::Checked

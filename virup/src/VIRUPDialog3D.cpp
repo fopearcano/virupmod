@@ -35,7 +35,7 @@ void VIRUPDialog3D::showEvent(QShowEvent* /*event*/)
 	}
 
 	QRect screenGeometry(window()->windowHandle()->screen()->geometry());
-	for(auto s : QGuiApplication::screens())
+	for(auto const* s : QGuiApplication::screens())
 	{
 		if(s->name() == screenName)
 		{

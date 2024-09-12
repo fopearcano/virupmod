@@ -59,7 +59,7 @@ void Credits::render(Camera const& camera, ToneMappingModel const& tmm)
 	model.rotate(camera.pitch * 45.f / M_PI, {0.f, 1.f, 0.f});
 	model.translate({0.5f, 0.f, 0.f});
 
-	GLStateSet glState({{GL_CULL_FACE, false}});
+	const GLStateSet glState({{GL_CULL_FACE, false}});
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render(PrimitiveType::TRIANGLE_STRIP);
@@ -70,7 +70,7 @@ QList<QPair<QString, QWidget*>> Credits::getLauncherFields(QWidget& parent,
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Textures path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)

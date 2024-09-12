@@ -77,8 +77,8 @@ void Thread::run()
 				continue;
 			}
 
-			allEmpty = false;
-			auto oct = queue.front();
+			allEmpty  = false;
+			auto* oct = queue.front();
 			queue.pop();
 			updateOctree(oct);
 			break;

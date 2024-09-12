@@ -24,7 +24,7 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
     : camCosmo(camCosmo)
     , camPlanet(camPlanet)
 {
-	QJsonDocument jsondoc(QJsonDocument::fromJson(
+	const QJsonDocument jsondoc(QJsonDocument::fromJson(
 	    QSettings().value("data/json").toString().toLatin1()));
 	QJsonObject dataJsonRepresentation = jsondoc.object();
 	if(dataJsonRepresentation.keys().indexOf("entries") == -1)
@@ -87,10 +87,10 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 	loadClosestSystem();
 
 	// preload octrees data to fill VRAM giving priority to top levels
-	uint64_t max(OctreeLOD::getMemLimit());
+	const uint64_t max(OctreeLOD::getMemLimit());
 
 	uint64_t wholeData(0);
-	for(auto cosmoSim : cosmoSims)
+	for(auto const* cosmoSim : cosmoSims)
 	{
 		wholeData += cosmoSim->getOctreesTotalDataSize();
 	}
@@ -133,7 +133,7 @@ Vector3 Universe::getCosmoPosition() const
 
 void Universe::setCosmoPosition(Vector3 cosmoPosition)
 {
-	Vector3 diff(cosmoPosition - camCosmo.position);
+	const Vector3 diff(cosmoPosition - camCosmo.position);
 	camCosmo.position = cosmoPosition;
 	camPlanet.relativePosition += diff / mtokpc;
 }
@@ -146,7 +146,7 @@ QString Universe::getPlanetTarget() const
 void Universe::setPlanetTarget(QString const& name)
 {
 	auto ptrs = orbitalSystem->getAllOrbitablesPointers();
-	for(auto ptr : ptrs)
+	for(auto const* ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == name)
 		{
@@ -162,7 +162,7 @@ Vector3 Universe::getPlanetPosition() const
 
 void Universe::setPlanetPosition(Vector3 planetPosition)
 {
-	Vector3 diff(planetPosition - camPlanet.relativePosition);
+	const Vector3 diff(planetPosition - camPlanet.relativePosition);
 	camPlanet.relativePosition = planetPosition;
 	camCosmo.position += diff * mtokpc;
 }
@@ -201,7 +201,7 @@ QString Universe::getClosestCommonAncestorName(
 	Orbitable const* orb1(nullptr);
 
 	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
+	for(auto const* ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == celestialBodyName0)
 		{
@@ -228,7 +228,7 @@ Vector3 Universe::getCelestialBodyPosition(QString const& bodyName,
 	Orbitable const* orbRef(nullptr);
 
 	auto ptrs = orbitalSystem->getAllOrbitablesPointers();
-	for(auto ptr : ptrs)
+	for(auto const* ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == bodyName)
 		{
@@ -260,7 +260,7 @@ Vector3 Universe::interpolateCoordinates(QString const& celestialBodyName0,
 	Orbitable const* orb1(nullptr);
 
 	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
+	for(auto const* ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == celestialBodyName0)
 		{
@@ -290,7 +290,7 @@ Vector3 Universe::getCameraCurrentRelPosToBody(QString const& bodyName) const
 	Orbitable const* orb(nullptr);
 
 	auto ptrs = orbitalSystem->getAllCelestialBodiesPointers();
-	for(auto ptr : ptrs)
+	for(auto const* ptr : ptrs)
 	{
 		if(QString(ptr->getName().c_str()) == bodyName)
 		{
@@ -308,7 +308,7 @@ double Universe::getVisibility(QString const& name) const
 {
 	if(name == "Constellations")
 	{
-		for(auto csv : csvObjs)
+		for(auto const* csv : csvObjs)
 		{
 			return csv->constellationsAlpha;
 		}
@@ -331,7 +331,7 @@ double Universe::getVisibility(QString const& name) const
 		return DebrisRenderer::asteroids;
 	}
 
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return 0.0;
@@ -345,7 +345,7 @@ void Universe::setVisibility(QString const& name, double visibility)
 	if(name == "Constellations")
 	{
 		bool sendSig(false);
-		for(auto csv : csvObjs)
+		for(auto* csv : csvObjs)
 		{
 			if(visibility != csv->constellationsAlpha
 			   || visibility != csv->constellationsLabels)
@@ -398,7 +398,7 @@ void Universe::setVisibility(QString const& name, double visibility)
 		return;
 	}
 
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
@@ -409,7 +409,7 @@ void Universe::setVisibility(QString const& name, double visibility)
 
 Vector3 Universe::getSolarSystemPosition(QString const& name) const
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return {};
@@ -420,7 +420,7 @@ Vector3 Universe::getSolarSystemPosition(QString const& name) const
 
 void Universe::setSolarSystemPosition(QString const& name, Vector3 const& pos)
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
@@ -436,12 +436,12 @@ void Universe::setLabelsOrbitsOnly(QStringList const& nameList)
 
 int Universe::getCosmoSimForcedQuality(QString const& name) const
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return -1;
 	}
-	auto cosmoSim
+	auto* cosmoSim
 	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
@@ -453,12 +453,12 @@ int Universe::getCosmoSimForcedQuality(QString const& name) const
 
 void Universe::setCosmoSimForcedQuality(QString const& name, int forcedQuality)
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
 	}
-	auto cosmoSim
+	auto* cosmoSim
 	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
@@ -470,12 +470,12 @@ void Universe::setCosmoSimForcedQuality(QString const& name, int forcedQuality)
 
 float Universe::getCosmoLocalAnimationTime(QString const& name) const
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return -1;
 	}
-	auto cosmoSim
+	auto* cosmoSim
 	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
@@ -487,12 +487,12 @@ float Universe::getCosmoLocalAnimationTime(QString const& name) const
 
 void Universe::setCosmoLocalAnimationTime(QString const& name, float animTime)
 {
-	if(elements.count(name) == 0)
+	if(!elements.contains(name))
 	{
 		qWarning() << name + " is not a valid UniverseElement";
 		return;
 	}
-	auto cosmoSim
+	auto* cosmoSim
 	    = dynamic_cast<CosmologicalSimulation*>(elements.at(name).get());
 	if(!cosmoSims.contains(cosmoSim))
 	{
@@ -504,7 +504,7 @@ void Universe::setCosmoLocalAnimationTime(QString const& name, float animTime)
 
 void Universe::dumpOctreesStates()
 {
-	for(auto cosmoSim : cosmoSims)
+	for(auto* cosmoSim : cosmoSims)
 	{
 		auto name(elementsRev.at(cosmoSim));
 		cosmoSim->dumpOctreesStates(
@@ -583,7 +583,8 @@ void Universe::updatePlanetarySystem()
 void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 {
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
-	GLStateSet glState({{GL_DEPTH_CLAMP, true}, {GL_CLIP_DISTANCE0, true}});
+	const GLStateSet glState(
+	    {{GL_DEPTH_CLAMP, true}, {GL_CLIP_DISTANCE0, true}});
 	for(auto const& pair : elements)
 	{
 		// only used by CosmologicalLabels for now

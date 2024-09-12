@@ -58,7 +58,7 @@ void BaseLineMethod::init(std::string const& gazPath,
 		tree.init(file);
 		tree.readData(file);
 		bboxes.push_back(tree.getBoundingBox());
-		std::vector<float> data(tree.getData());
+		const std::vector<float> data(tree.getData());
 		gazMesh.setVertexShaderMapping(shaderProgram,
 		                               {{"position", 3}, {"radius", 1}});
 		gazMesh.setVertices(data);
@@ -74,7 +74,7 @@ void BaseLineMethod::init(std::string const& gazPath,
 		tree.init(file);
 		tree.readData(file);
 		bboxes.push_back(tree.getBoundingBox());
-		std::vector<float> data(tree.getData());
+		const std::vector<float> data(tree.getData());
 		starsMesh.setVertexShaderMapping(shaderProgram, {{"position", 3}});
 		starsMesh.setVertices(data);
 		totalSize += data.size();
@@ -89,7 +89,7 @@ void BaseLineMethod::init(std::string const& gazPath,
 		tree.init(file);
 		tree.readData(file);
 		bboxes.push_back(tree.getBoundingBox());
-		std::vector<float> data(tree.getData());
+		const std::vector<float> data(tree.getData());
 		darkMatterMesh.setVertexShaderMapping(shaderProgram, {{"position", 3}});
 		darkMatterMesh.setVertices(data);
 		totalSize += data.size();
@@ -102,13 +102,13 @@ void BaseLineMethod::init(std::string const& gazPath,
 
 void BaseLineMethod::render(Camera const& camera)
 {
-	QMatrix4x4 model(camera.dataToWorldTransform());
+	const QMatrix4x4 model(camera.dataToWorldTransform());
 
 	shaderProgram.setUniform(
 	    "alpha", static_cast<float>(camera.scale * camera.scale * getAlpha()));
 	shaderProgram.setUniform(
 	    "view", camera.hmdScaledSpaceToWorldTransform().inverted() * model);
-	GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE});
+	const GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE});
 	GLHandler::setUpRender(shaderProgram, model);
 	shaderProgram.setUniform("color", gasColor);
 	shaderProgram.setUnusedAttributesValues({{"luminosity", {1.f}}});

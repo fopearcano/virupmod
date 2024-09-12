@@ -27,13 +27,13 @@ SceneSelector::SceneSelector(Animator& animator)
 	setWindowTitle(tr("VIRUP Scenes"));
 	setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-	auto layout = make_qt_unique<QVBoxLayout>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = make_qt_unique<QWidget>(*this);
+	auto* w = make_qt_unique<QWidget>(*this);
 	layout->addWidget(w);
-	auto hl = make_qt_unique<QHBoxLayout>(*w);
+	auto* hl = make_qt_unique<QHBoxLayout>(*w);
 
-	auto b = make_qt_unique<QPushButton>(*w);
+	auto* b = make_qt_unique<QPushButton>(*w);
 	b->setText(tr("RESTART"));
 	connect(b, &QPushButton::clicked, this,
 	        [&animator]() { animator.restart(); });
@@ -63,7 +63,7 @@ SceneSelector::SceneSelector(Animator& animator)
 
 	hl->addWidget(make_qt_unique<QLabel>(*this, tr("EN (on) / JP (off) : ")));
 
-	auto cb = make_qt_unique<QCheckBox>(*this);
+	auto* cb = make_qt_unique<QCheckBox>(*this);
 	cb->setCheckState(Qt::Checked);
 	connect(cb, &QCheckBox::stateChanged,
 	        [this](int state) { english = state != Qt::Unchecked; });
@@ -76,7 +76,7 @@ SceneSelector::SceneSelector(Animator& animator)
 	hl->addWidget(b);
 
 	hl->addWidget(make_qt_unique<QLabel>(*this, tr("User height : ")));
-	auto sb = make_qt_unique<QDoubleSpinBox>(*this);
+	auto* sb = make_qt_unique<QDoubleSpinBox>(*this);
 	sb->setValue(animator.getPersonHeight());
 	connect(sb,
 	        static_cast<void (QDoubleSpinBox::*)(double)>(
@@ -102,7 +102,7 @@ SceneSelector::SceneSelector(Animator& animator)
 
 	layout->addWidget(make_qt_unique<QLabel>(*this, "Scenes :"));
 
-	auto buttonsWidget = make_qt_unique<QWidget>(*this);
+	auto* buttonsWidget = make_qt_unique<QWidget>(*this);
 	layout->addWidget(buttonsWidget);
 	buttonsWidget->setLayout(&buttonsLayout);
 	connect(&animator, &Animator::transitionsModified, this,
@@ -126,8 +126,8 @@ void SceneSelector::update()
 	animationTimeSlider.updateTime(
 	    static_cast<int>(10 * animator.getWholeAnimationPercentage()));
 
-	int id(animator.getCurrentTransitionId());
-	QString currentScene
+	const int id(animator.getCurrentTransitionId());
+	const QString currentScene
 	    = (id < 0
 	       || static_cast<unsigned int>(id) >= animator.getTransitions().size())
 	          ? ""
@@ -148,7 +148,7 @@ void SceneSelector::update()
 		button->update();
 	}
 	QPalette pal = transitionsButton->palette();
-	bool animationDisabled(
+	const bool animationDisabled(
 	    PythonQtHandler::getVariable("disableanimations").toBool());
 	if(animationDisabled)
 	{

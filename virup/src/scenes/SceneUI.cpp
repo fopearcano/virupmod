@@ -30,7 +30,7 @@ SceneUI::SceneUI(QVariantMap const& visibilities)
 
 float SceneUI::getVisibility(QString const& name) const
 {
-	if(visibilities.count(name) == 0)
+	if(!visibilities.contains(name))
 	{
 		return 0.f;
 	}

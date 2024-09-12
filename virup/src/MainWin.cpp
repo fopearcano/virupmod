@@ -50,7 +50,7 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 			}
 			else if(a.id == "timecoeffdown")
 			{
-				float tc(universe->getTimeCoeff());
+				const float tc(universe->getTimeCoeff());
 				if(tc > 1.f && !universe->getLockedRealTime())
 				{
 					universe->setTimeCoeff(tc / 10.f);
@@ -63,7 +63,7 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 			}
 			else if(a.id == "timecoeffup")
 			{
-				float tc(universe->getTimeCoeff());
+				const float tc(universe->getTimeCoeff());
 				if(tc < 1000000.f && !universe->getLockedRealTime())
 				{
 					universe->setTimeCoeff(tc * 10.f);
@@ -159,14 +159,16 @@ void MainWin::mouseMoveEvent(QMouseEvent* e)
 		return;
 	}
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	float dx = (x() + static_cast<float>(width()) / 2 - e->globalPosition().x())
-	           / width();
-	float dy
+	const float dx
+	    = (x() + static_cast<float>(width()) / 2 - e->globalPosition().x())
+	      / width();
+	const float dy
 	    = (y() + static_cast<float>(height()) / 2 - e->globalPosition().y())
 	      / height();
 #else
-	float dx = (x() + static_cast<float>(width()) / 2 - e->globalX()) / width();
-	float dy
+	const float dx
+	    = (x() + static_cast<float>(width()) / 2 - e->globalX()) / width();
+	const float dy
 	    = (y() + static_cast<float>(height()) / 2 - e->globalY()) / height();
 #endif
 	auto& cam(renderer.getCamera<Camera>("cosmo"));
@@ -217,7 +219,7 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 							}
 							else // UP OR DOWN
 							{
-								float tc(universe->getTimeCoeff());
+								const float tc(universe->getTimeCoeff());
 								if(padCoords[1] < 0.0f) // DOWN
 								{
 									if(tc > 1.f
@@ -374,7 +376,7 @@ void MainWin::initScene()
 	    QSettings().value("misc/uilabelscolor").value<QColor>());
 	debugText->setText("");
 
-	QString fontPath(QSettings().value("misc/uilabelsfont").toString());
+	const QString fontPath(QSettings().value("misc/uilabelsfont").toString());
 	if(!fontPath.isEmpty())
 	{
 		auto id         = QFontDatabase::addApplicationFont(fontPath);
@@ -472,7 +474,7 @@ void MainWin::initScene()
 		*tmController); dialog3dWheel->addDialog3D(tr("Visibilities List"),
 		*visibilities);*/
 
-		auto tools(menuBar->addMenu(tr("Tools")));
+		auto* tools(menuBar->addMenu(tr("Tools")));
 		tools->addAction(tr("Scenes"), this,
 		                 [this]() { this->scenes->show(); });
 		tools->addAction(tr("Universe Elements"), this,
@@ -667,8 +669,8 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		{
 			return;
 		}
-		std::string targetName(cam.target->getName());
 		/*
+		const std::string targetName(cam.target->getName());
 		if(targetName != lastTargetName)
 		{
 		    debugText->setText(QString("Locked to ") + targetName.c_str());
@@ -722,7 +724,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 		if(vrHandler->isEnabled())
 		{
 			QMatrix4x4 model;
-			QSizeF playAreaSize(vrHandler->getPlayAreaSize());
+			const QSizeF playAreaSize(vrHandler->getPlayAreaSize());
 			if(playAreaSize.width() > playAreaSize.height())
 			{
 				model.translate(-0.5f * playAreaSize.width() + 0.45, 0.f, 0.f);
@@ -740,12 +742,12 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	{
 		renderer.renderVRControls();
 	}
-	auto& cam(dynamic_cast<Camera const&>(camera));
+	auto const& cam(dynamic_cast<Camera const&>(camera));
 
 	universe->renderCosmo(*toneMappingModel);
 
 	// update here because depends on eye
-	QVector3D pos(
+	const QVector3D pos(
 	    Utils::toQt(cam.dataToWorldPosition(-1 * Vector3(0.43, 8.24, 0.81))));
 	lenseScreenCoord = camera.project(pos);
 	lenseScreenCoord /= lenseScreenCoord.w();
@@ -758,7 +760,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 {
 	// will get disabled by QOpenGLPaintDevice anyway
-	GLStateSet glState({{GL_DEPTH_TEST, false}});
+	const GLStateSet glState({{GL_DEPTH_TEST, false}});
 	if(!showInfoText)
 	{
 		return;
@@ -780,7 +782,7 @@ void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 	str += tr("Scale (real meter / sim meter) : ")
 	       + QString::number(universe->getScale(), 'g', 5) + '\n';
 
-	QPen pen(Qt::red);
+	const QPen pen(Qt::red);
 	painter.setPen(pen);
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
 	                 Qt::AlignLeft | Qt::AlignTop, str);
@@ -796,7 +798,7 @@ void MainWin::applyPostProcShaderParams(
 		float aspectRatio(renderer.getAspectRatioFromFOV());
 		if(vrHandler->isEnabled() && vrHandler->getDriverName() == "OpenVR")
 		{
-			QSize rtSize(vrHandler->getEyeRenderTargetSize());
+			const QSize rtSize(vrHandler->getEyeRenderTargetSize());
 			aspectRatio = rtSize.width();
 			aspectRatio /= rtSize.height();
 		}
@@ -860,7 +862,7 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	posstr += "; ";
 	posstr += QString::number(position.z());
 
-	auto msgBox = qt_owned<QMessageBox>();
+	auto* msgBox = qt_owned<QMessageBox>();
 	msgBox->setAttribute(Qt::WA_DeleteOnClose);
 	msgBox->setStandardButtons(QMessageBox::Ok);
 	msgBox->setWindowTitle(tr("Position selected"));
