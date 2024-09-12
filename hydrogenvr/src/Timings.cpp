@@ -39,7 +39,7 @@ int& Timings::currentDepth()
 
 void Timings::start(QString const& timerName, bool persistent)
 {
-	if(timers().count(timerName) == 0)
+	if(!timers().contains(timerName))
 	{
 		timers()[timerName] = {};
 	}
@@ -68,7 +68,7 @@ void Timings::start(QString const& timerName, bool persistent)
 
 void Timings::end(QString const& timerName)
 {
-	if(timers().count(timerName) == 0)
+	if(!timers().contains(timerName))
 	{
 		qWarning() << "Attempt to end GPU timer" << timerName
 		           << "that never was started.";

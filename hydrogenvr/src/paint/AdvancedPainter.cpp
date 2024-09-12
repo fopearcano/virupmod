@@ -30,14 +30,14 @@ QRectF
 {
 	std::vector<QPointF> dataPoints;
 	float miny = FLT_MAX, maxy = FLT_MIN;
-	unsigned int N(target.width());
+	const unsigned int N(target.width());
 	// construct polygon in data space
 	for(unsigned int i(0); i < N; ++i)
 	{
-		float x = xBegin + i * (xEnd - xBegin) / (N - 1);
-		float y = function(x);
-		miny    = miny < y ? miny : y;
-		maxy    = maxy > y ? maxy : y;
+		const float x = xBegin + i * (xEnd - xBegin) / (N - 1);
+		const float y = function(x);
+		miny          = miny < y ? miny : y;
+		maxy          = maxy > y ? maxy : y;
 		dataPoints.emplace_back(x, y);
 	}
 
@@ -69,14 +69,14 @@ QRectF
 {
 	std::vector<QPointF> dataPoints;
 	float maxy = FLT_MIN;
-	unsigned int N(target.width());
+	const unsigned int N(target.width());
 	// construct polygon in data space
 	for(unsigned int i(0); i < N; ++i)
 	{
-		float x = xBegin + i * (xEnd - xBegin) / (N - 1);
-		float y = function(x);
-		y       = y < yBegin ? yBegin : y;
-		maxy    = maxy > y ? maxy : y;
+		const float x = xBegin + i * (xEnd - xBegin) / (N - 1);
+		float y       = function(x);
+		y             = y < yBegin ? yBegin : y;
+		maxy          = maxy > y ? maxy : y;
 		dataPoints.emplace_back(x, y);
 	}
 
@@ -107,11 +107,11 @@ QRectF
                                   std::function<float(float)> const& function)
 {
 	QPolygonF polygon;
-	unsigned int N(target.width());
+	const unsigned int N(target.width());
 	// construct polygon in data space
 	for(unsigned int i(0); i < N; ++i)
 	{
-		float x(xBegin + i * (xEnd - xBegin) / (N - 1));
+		const float x(xBegin + i * (xEnd - xBegin) / (N - 1));
 		float y = function(x);
 		y       = y < yBegin ? yBegin : y;
 		y       = y > yEnd ? yEnd : y;
@@ -148,9 +148,9 @@ QRectF AdvancedPainter::drawBarPlot(QRectF const& target, float yBegin,
 	QVector<QRectF> rects;
 	for(unsigned int i(0); i < values.size(); ++i)
 	{
-		QPointF tl{static_cast<float>(i) / values.size(),
-		           (values.at(i) - yBegin) / (yEnd - yBegin)};
-		QPointF br{static_cast<float>(i + 1) / values.size(), 0.f};
+		const QPointF tl{static_cast<float>(i) / values.size(),
+		                 (values.at(i) - yBegin) / (yEnd - yBegin)};
+		const QPointF br{static_cast<float>(i + 1) / values.size(), 0.f};
 		rects.push_back({transform(target, tl), transform(target, br)});
 	}
 	QPainter::drawRects(rects);
@@ -161,13 +161,13 @@ QRectF AdvancedPainter::drawBarPlot(QRectF const& target, float yBegin,
 void AdvancedPainter::drawHistogram(QRectF const& target,
                                     GLBuffer const& histData)
 {
-	QSize fboSize(device()->width(), device()->height());
-	GLShaderProgram histShader("histogram");
+	const QSize fboSize(device()->width(), device()->height());
+	const GLShaderProgram histShader("histogram");
 	GLMesh quad;
 	quad.setVertexShaderMapping(histShader, {{"position", 2}});
 	quad.setVertices({-1.f, -1.f, 1.f, -1.f, -1.f, 1.f, 1.f, 1.f});
 
-	float relX(target.x() / fboSize.width()),
+	const float relX(target.x() / fboSize.width()),
 	    relY(1.0 - (target.y() + target.height()) / fboSize.height()),
 	    relWidth(target.width() / fboSize.width()),
 	    relHeight(target.height() / fboSize.height());
@@ -181,14 +181,14 @@ void AdvancedPainter::drawHistogram(QRectF const& target,
 	histShader.setUniform("bufferSize",
 	                      static_cast<int>(histData.getSize() / sizeof(int)));
 
-	GLBlendSet glBlend(GLBlendSet::BlendState{});
+	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	GLHandler::setUpRender(histShader, model, GLHandler::GeometricSpace::CLIP);
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
 void AdvancedPainter::fillRect(QRectF const& target)
 {
-	GLStateSet glState({{GL_SCISSOR_TEST, true}});
+	const GLStateSet glState({{GL_SCISSOR_TEST, true}});
 	GLHandler::glf().glScissor(
 	    target.x(), device()->height() - target.height() - target.y(),
 	    target.width(), target.height());
@@ -210,7 +210,7 @@ QPointF AdvancedPainter::invTransform(QRectF const& absoluteRef,
                                       QPointF const& absoluteCoord,
                                       bool flipped)
 {
-	float x((absoluteCoord.x() - absoluteRef.x()) / absoluteRef.width());
+	const float x((absoluteCoord.x() - absoluteRef.x()) / absoluteRef.width());
 	float y((absoluteCoord.y() - absoluteRef.y()) / absoluteRef.height());
 	if(flipped)
 	{

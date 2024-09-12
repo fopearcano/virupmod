@@ -34,21 +34,21 @@ TextureSelector::TextureSelector(QWidget* parent)
 	setFixedSize(450, 600);
 	setWindowTitle(tr("Texture Selector"));
 
-	auto layout = make_qt_unique<QVBoxLayout>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w            = make_qt_unique<QWidget>(*this);
-	auto layoutSearch = make_qt_unique<QHBoxLayout>(*w);
+	auto* w            = make_qt_unique<QWidget>(*this);
+	auto* layoutSearch = make_qt_unique<QHBoxLayout>(*w);
 
-	auto searchLabel = make_qt_unique<QLabel>(*w);
+	auto* searchLabel = make_qt_unique<QLabel>(*w);
 	searchLabel->setText(tr("Search :"));
-	auto searchBar = make_qt_unique<QLineEdit>(*w);
+	auto* searchBar = make_qt_unique<QLineEdit>(*w);
 	connect(searchBar, &QLineEdit::textChanged, this,
 	        &TextureSelector::setVisibleItems);
 	layoutSearch->addWidget(searchLabel);
 	layoutSearch->addWidget(searchBar);
 	layout->addWidget(w);
 
-	auto b = make_qt_unique<QPushButton>(*this);
+	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Refresh"));
 	connect(b, &QPushButton::pressed, [this]() { setVisible(true); });
 	layout->addWidget(b);
@@ -69,10 +69,10 @@ void TextureSelector::setVisible(bool visible)
 	if(visible)
 	{
 		listWidget.clear();
-		for(auto texture : GLTexture::getAllTextures())
+		for(auto* texture : GLTexture::getAllTextures())
 		{
 			QString label;
-			QString glID(QString::number(texture->getGLTexture()));
+			const QString glID(QString::number(texture->getGLTexture()));
 			label = glID;
 			if(!texture->getName().isEmpty())
 			{
@@ -91,7 +91,7 @@ void TextureSelector::selectElement(QListWidgetItem* item)
 {
 	auto glID    = item->data(Qt::UserRole);
 	GLTexture* t = nullptr;
-	for(auto texture : GLTexture::getAllTextures())
+	for(auto* texture : GLTexture::getAllTextures())
 	{
 		if(QString::number(texture->getGLTexture()) == glID)
 		{
@@ -132,7 +132,7 @@ void TextureSelector::selectElement(QListWidgetItem* item)
 
 void TextureSelector::setVisibleItems(QString const& match)
 {
-	for(auto item : listWidget.findItems("", Qt::MatchContains))
+	for(auto* item : listWidget.findItems("", Qt::MatchContains))
 	{
 		if(match == ""
 		   || item->text().contains(QString(match), Qt::CaseInsensitive))

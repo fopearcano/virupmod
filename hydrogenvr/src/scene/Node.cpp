@@ -31,7 +31,7 @@ Node::Node(std::map<QString, Node*>& nodesDict, QString name)
 {
 	if(!this->name.isEmpty())
 	{
-		if(nodesDict.count(this->name) > 0)
+		if(nodesDict.contains(this->name))
 		{
 			qCritical() << this->name << "is duplicated as Node name.";
 		}
@@ -146,7 +146,7 @@ float Node::computeVisibility(BasicCamera const& camera)
 void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
                          hvr::Scene& scene)
 {
-	GLStateSet glState({{GL_TEXTURE_CUBE_MAP_SEAMLESS, true}});
+	const GLStateSet glState({{GL_TEXTURE_CUBE_MAP_SEAMLESS, true}});
 	computedEnvOnce = true;
 
 	envIsRendering = true;
@@ -155,7 +155,7 @@ void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 	    = [&camera, &envmap, &scene](bool /*overrideCamera*/,
 	                                 QMatrix4x4 overrView, QMatrix4x4 overrProj)
 	{
-		QMatrix4x4 viewBack(camera.getView()), projBack(camera.getProj());
+		const QMatrix4x4 viewBack(camera.getView()), projBack(camera.getProj());
 		auto windowSizeBack(camera.getWindowSize());
 
 		auto renderSize(envmap.getSize());
@@ -195,9 +195,9 @@ void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 	// SH
 	auto size = envmap.getColorAttachmentTexture().getSize();
 	Timings::start("SH");
-	GLComputeShader sh("gi/sphericalharmonics");
+	const GLComputeShader sh("gi/sphericalharmonics");
 	GLBuffer shCoeffs(GL_SHADER_STORAGE_BUFFER);
-	std::vector<float> d(9 * 4);
+	const std::vector<float> d(9 * 4);
 	shCoeffs.setData(d, GL_DYNAMIC_DRAW);
 	shCoeffs.bindBase(1);
 	// with some luck using a lower resolution envmap won't affect the result
@@ -207,7 +207,7 @@ void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 	         static_cast<unsigned int>(size[1]) / 2, 6});
 	Timings::end("SH");
 
-	GLComputeShader irrfromSH("gi/irradiancefromSH");
+	const GLComputeShader irrfromSH("gi/irradiancefromSH");
 	Timings::start("irradiancefromSH");
 	size = irradiancemap.getSize();
 	irrfromSH.exec({{irradiancemap, GLComputeShader::W}},
@@ -217,12 +217,12 @@ void Node::computeEnvMap(BasicCamera& camera, GLFramebufferObject const& envmap,
 	Timings::end("irradiancefromSH");
 	// END SH*/
 
-	GLComputeShader prefilter("gi/prefilter");
+	const GLComputeShader prefilter("gi/prefilter");
 	Timings::start("prefilter");
 	size = prefilteredmap.getSize();
 	for(int i(0); i < 5; ++i)
 	{
-		unsigned int divisor(1u << static_cast<unsigned int>(i));
+		const unsigned int divisor(1u << static_cast<unsigned int>(i));
 		prefilter.setUniform("roughness", i / 4.f);
 		prefilter.exec(
 		    {{envmap.getColorAttachmentTexture(), GLComputeShader::SAMPLER},

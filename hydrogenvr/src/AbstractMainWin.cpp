@@ -47,7 +47,7 @@ void AbstractMainWin::setVerticalFOV(double fov)
 	renderer.updateFOV();
 }
 
-QVector3D AbstractMainWin::getVirtualCamShift() const
+QVector3D AbstractMainWin::getVirtualCamShift()
 {
 	return QSettings().value("vr/virtualcamshift").value<QVector3D>();
 }
@@ -108,7 +108,7 @@ void AbstractMainWin::toggleVR()
 
 void AbstractMainWin::takeScreenshot(QString path) const
 {
-	QImage screenshot(renderer.getLastFrame());
+	const QImage screenshot(renderer.getLastFrame());
 	if(path == "")
 	{
 		path = QFileDialog::getSaveFileName(
@@ -172,7 +172,7 @@ void AbstractMainWin::actionEvent(BaseInputManager::Action const& a,
 
 	if(a.id == "toggledbgcam")
 	{
-		renderer.getDebugCamera().toggle();
+		DebugCamera::toggle();
 	}
 	else if(a.id == "togglewireframe")
 	{
@@ -345,7 +345,7 @@ void AbstractMainWin::renderGui(QSize const& targetSize,
 	if(logProfAction->isChecked())
 	{
 		QFile profLog("profiling.txt");
-		bool exists(profLog.exists());
+		const bool exists(profLog.exists());
 		profLog.open(QIODevice::WriteOnly | QIODevice::Append);
 		if(!exists)
 		{
@@ -393,9 +393,9 @@ void AbstractMainWin::applyPostProcShaderParams(
 	}
 	else
 	{
-		QString pyCmd("if \"applyPostProcShaderParams\" in "
-		              "dir():\n\tapplyPostProcShaderParams(\""
-		              + id + "\"," + shader.toStr() + ")");
+		const QString pyCmd("if \"applyPostProcShaderParams\" in "
+		                    "dir():\n\tapplyPostProcShaderParams(\""
+		                    + id + "\"," + shader.toStr() + ")");
 		PythonQtHandler::evalScript(pyCmd);
 	}
 }
@@ -410,11 +410,11 @@ std::vector<GLComputeShader::TextureBinding>
 		if(bloom)
 		{
 			// high luminosity pass
-			GLComputeShader hlshader("highlumpass");
+			const GLComputeShader hlshader("highlumpass");
 			GLHandler::postProcess(hlshader, currentTarget, *bloomTargets[0]);
 
 			// blurring
-			GLComputeShader blurshader("blur");
+			const GLComputeShader blurshader("blur");
 			for(unsigned int i = 0; i < 6;
 			    i++) // always execute even number of times
 			{
@@ -584,10 +584,10 @@ void AbstractMainWin::initializeGL()
 	                        | Qt::MSWindowsFixedSizeDialogHint
 	                        | Qt::FramelessWindowHint);
 
-	auto file(menuBar->addMenu(tr("File")));
+	auto* file(menuBar->addMenu(tr("File")));
 	file->addAction(tr("Close"), this, [this]() { this->close(); });
 
-	auto engine(menuBar->addMenu(tr("HydrogenVR")));
+	auto* engine(menuBar->addMenu(tr("HydrogenVR")));
 	engine->addAction(tr("Explore Shaders..."), this,
 	                  [this]() {
 		                  this->shaderSelector->setVisible(
@@ -680,7 +680,7 @@ void AbstractMainWin::setupPythonScripts()
 		mainScriptRootDir = QSettings().value("scripting/customdir").toString();
 	}
 
-	QString mainScriptPath(mainScriptRootDir + "/main.py");
+	const QString mainScriptPath(mainScriptRootDir + "/main.py");
 	if(QFile(mainScriptPath).exists())
 	{
 		PythonQtHandler::evalFile(mainScriptPath);
@@ -710,7 +710,7 @@ void AbstractMainWin::paintGL()
 	frameTimer.restart();
 
 	// update fps history
-	float curVal = 1.f / frameTiming;
+	const float curVal = 1.f / frameTiming;
 	avgFPS
 	    -= fpsHistory.at((currentFrame - avgFPSWindowSize) % fpsHistory.size())
 	       / avgFPSWindowSize;
@@ -745,7 +745,7 @@ void AbstractMainWin::paintGL()
 	}
 	if(vrHandler->isEnabled())
 	{
-		float vrFT(vrHandler->getFrameTiming());
+		const float vrFT(vrHandler->getFrameTiming());
 		if(vrFT >= 0.f)
 		{
 			frameTiming_ = vrFT / 1000.f;
@@ -869,7 +869,7 @@ void AbstractMainWin::paintGL()
 	}
 	// render texture display if available
 	{
-		auto viewer(textureSelector->getViewer());
+		auto* viewer(textureSelector->getViewer());
 		if(viewer != nullptr)
 		{
 			auto& win = viewer->getTextureDisplayWindow();
@@ -892,8 +892,8 @@ void AbstractMainWin::paintGL()
 		{
 			videoRenderingTimer.start();
 		}
-		QImage frame(renderer.getLastFrame());
-		QString number
+		const QImage frame(renderer.getLastFrame());
+		const QString number
 		    = QString("%1").arg(currentVideoFrame, 5, 10, QChar('0'));
 
 		QString subdir;
@@ -919,22 +919,22 @@ void AbstractMainWin::paintGL()
 				break;
 		}
 
-		QString res
+		const QString res
 		    = QString::number(renderer.getSize().width()) + "x"
 		      + QString::number(renderer.getSize().height()) + "_"
 		      + QString::number(QSettings().value("window/videofps").toInt())
 		      + "fps";
 		if(currentVideoFrame == 0)
 		{
-			QDir viddir(QSettings().value("window/viddir").toString());
+			const QDir viddir(QSettings().value("window/viddir").toString());
 			viddir.mkpath(".");
 			QFile::copy(
 			    "./" + utils::getAbsoluteDataPath("scripts/generate_vids.sh"),
 			    QSettings().value("window/viddir").toString()
 			        + "/generate_vids.sh");
 			viddir.mkdir(subdir);
-			QDir projdir(QSettings().value("window/viddir").toString() + "/"
-			             + subdir);
+			const QDir projdir(QSettings().value("window/viddir").toString()
+			                   + "/" + subdir);
 			projdir.mkdir(res);
 			QDir framesdir = QSettings().value("window/viddir").toString() + "/"
 			                 + subdir + "/" + res;
@@ -945,7 +945,8 @@ void AbstractMainWin::paintGL()
 				framesdir.remove(f);
 			}
 		}
-		unsigned int maxframe(QSettings().value("window/maxframe").toUInt());
+		const unsigned int maxframe(
+		    QSettings().value("window/maxframe").toUInt());
 		if(maxframe > 0)
 		{
 			if(currentVideoFrame > maxframe)
@@ -964,9 +965,9 @@ void AbstractMainWin::paintGL()
 				progressStr += QString::number(currentVideoFrame) + "/"
 				               + QString::number(maxframe)
 				               + " | Time remaining: ";
-				int elapsed(videoRenderingTimer.elapsed() / 1000);
-				int remaining(elapsed * (maxframe - currentVideoFrame)
-				              / currentVideoFrame);
+				const int elapsed(videoRenderingTimer.elapsed() / 1000);
+				const int remaining(elapsed * (maxframe - currentVideoFrame)
+				                    / currentVideoFrame);
 				if(remaining > 3600 * 24)
 				{
 					progressStr += QString::number(
@@ -981,8 +982,9 @@ void AbstractMainWin::paintGL()
 			}
 		}
 
-		QString framePath(QSettings().value("window/viddir").toString() + "/"
-		                  + subdir + "/" + res + "/frame" + number + ".png");
+		const QString framePath(QSettings().value("window/viddir").toString()
+		                        + "/" + subdir + "/" + res + "/frame" + number
+		                        + ".png");
 		qDebug() << "Writing " + framePath + "...";
 		QThreadPool::globalInstance()->start(qt_owned<ImageWriter>(
 		    framePath, frame.convertToFormat(QImage::Format_RGB888)));

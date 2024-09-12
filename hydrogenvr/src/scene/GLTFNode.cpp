@@ -69,7 +69,7 @@ QJsonObject GLTFNode::unpack(QString const& src,
 		}
 
 		// Reading the header
-		quint32 magic, version, length;
+		quint32 magic = 0, version = 0, length = 0;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		file.read(reinterpret_cast<char*>(&magic), sizeof(magic));
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -90,7 +90,7 @@ QJsonObject GLTFNode::unpack(QString const& src,
 		}
 
 		// Reading the JSON chunk header
-		quint32 chunkLength, chunkType;
+		quint32 chunkLength = 0, chunkType = 0;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		file.read(reinterpret_cast<char*>(&chunkLength), sizeof(chunkLength));
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -103,8 +103,8 @@ QJsonObject GLTFNode::unpack(QString const& src,
 		}
 
 		// Reading the JSON chunk data
-		QByteArray jsonData   = file.read(chunkLength);
-		QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+		const QByteArray jsonData   = file.read(chunkLength);
+		const QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
 
 		if(!jsonDoc.isObject())
 		{
@@ -143,8 +143,8 @@ void GLTFNode::loadCPU()
 	gltfModel.setColumn(2, QVector4D(1.f, 0.f, 0.f, 0.f));
 
 	// FIRST PARSE ALL FILE AND STORE ITS CONTENT IN RAM
-	QString srcDir(QFileInfo(src).absoluteDir().absolutePath());
-	QString currentDir(QDir::current().absolutePath());
+	const QString srcDir(QFileInfo(src).absoluteDir().absolutePath());
+	const QString currentDir(QDir::current().absolutePath());
 
 	std::vector<char> binBuffer;
 	auto json(unpack(src, binBuffer));
@@ -186,7 +186,7 @@ std::vector<std::pair<GLMesh const&, QMatrix4x4>>
 bool GLTFNode::setTransform(QString const& subNodeName,
                             QMatrix4x4 const& transform)
 {
-	if(gpuData->nodesDict.count(subNodeName) > 0)
+	if(gpuData->nodesDict.contains(subNodeName))
 	{
 		gpuData->nodesDict[subNodeName]->transform = transform;
 		return true;

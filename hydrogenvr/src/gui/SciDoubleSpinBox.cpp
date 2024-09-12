@@ -30,7 +30,7 @@ SciDoubleSpinBox::SciDoubleSpinBox(QWidget* parent)
 	            &QDoubleSpinBox::valueChanged),
 	        [this](double val)
 	        {
-		        int tenPow(floor(log10(abs(val))));
+		        const int tenPow(floor(log10(abs(val))));
 		        setSingleStep(pow(10, tenPow - 1));
 	        });
 }
@@ -48,7 +48,7 @@ QString SciDoubleSpinBox::textFromValue(double value) const
 QValidator::State SciDoubleSpinBox::validate(QString& text, int& /*pos*/) const
 {
 	// Try to convert the string to double
-	bool ok;
+	bool ok = false;
 	text.toDouble(&ok);
 	// See if it's a valid Double
 	return ok ? QValidator::Acceptable : QValidator::Invalid;

@@ -77,7 +77,7 @@ uint64_t GLQuery::getResult() const
 		                                    &stopTimerAvailable);
 	}
 
-	GLuint64 time;
+	GLuint64 time = 0;
 	GLHandler::glf().glGetQueryObjectui64v(glQuery, GL_QUERY_RESULT, &time);
 	return time;
 }

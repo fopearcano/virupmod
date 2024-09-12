@@ -63,8 +63,8 @@ struct BufferView
 	int byteStride = 0;
 	Target target;
 	QString name;
-	Buffer const& loadBuffer(QJsonObject const& json,
-	                         std::vector<Buffer> const& globalBuffers);
+	static Buffer const& loadBuffer(QJsonObject const& json,
+	                                std::vector<Buffer> const& globalBuffers);
 };
 struct Accessor
 {
@@ -88,7 +88,7 @@ struct Accessor
 	QString name;
 	void load(QJsonObject const& json,
 	          std::vector<BufferView> const& globalBufferViews);
-	int sizeInBytes(ComponentType type);
+	static int sizeInBytes(ComponentType type);
 	int typeDimensions() const;
 };
 struct Sampler
@@ -157,7 +157,7 @@ struct Mesh
 		void load(QJsonObject const& json,
 		          std::vector<Accessor> const& globalAccessors,
 		          std::vector<Material> const& globalMaterials);
-		PrimitiveType modeFromInt(int mode);
+		static PrimitiveType modeFromInt(int mode);
 	};
 
 	QString name;

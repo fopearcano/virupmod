@@ -86,7 +86,7 @@ class Node
 	    = 0;
 	virtual void doRenderTransparent(
 	    BasicCamera const& /*cam*/, std::vector<Light const*> const& /*lights*/,
-	    GLTexture const& /*brdfLUT*/, bool /*environment*/){};
+	    GLTexture const& /*brdfLUT*/, bool /*environment*/) {};
 
 	BoundingSphere boundingSphere;
 	Node* getChild(unsigned int id);

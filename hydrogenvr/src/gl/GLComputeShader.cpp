@@ -24,7 +24,7 @@ GLComputeShader::GLComputeShader(QString const& fileName,
                                  QMap<QString, QString> const& defines)
     : GLShaderProgram({{fileName, Stage::COMPUTE}}, addDefines(defines))
 {
-	get(GL_COMPUTE_WORK_GROUP_SIZE, &workGroupSize[0]);
+	get(GL_COMPUTE_WORK_GROUP_SIZE, workGroupSize.data());
 }
 
 void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
@@ -69,7 +69,7 @@ QMap<QString, QString>
 {
 	QMap<QString, QString> result(userDefines);
 
-	GLint maxInvocations;
+	GLint maxInvocations = 0;
 	GLHandler::glf().glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS,
 	                               &maxInvocations);
 

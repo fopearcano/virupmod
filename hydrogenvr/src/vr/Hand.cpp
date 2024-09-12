@@ -26,7 +26,7 @@ Hand::Hand(Side side)
     , _isClosed(false)
 {
 	shaderProgram.setUniform("alpha", 1.f);
-	std::vector<unsigned int> ebo = {
+	const std::vector<unsigned int> ebo = {
 	    2,  3,  3,  4,                                        // thumb
 	    5,  6,  6,  7,  7,  8,                                // index
 	    9,  10, 10, 11, 11, 12,                               // middle
@@ -35,7 +35,7 @@ Hand::Hand(Side side)
 	    2,  5,  5,  9,  9,  13, 13, 17, 17, 21, 21, 22, 22, 2 // palm
 	};
 
-	std::vector<float> vertices(22 * 3); // 21 random positions
+	const std::vector<float> vertices(22 * 3); // 21 random positions
 	mesh.setVertexShaderMapping(shaderProgram, {{"position", 3}});
 	mesh.setVertices(vertices, ebo);
 

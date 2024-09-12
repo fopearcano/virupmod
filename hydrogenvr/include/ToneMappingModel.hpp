@@ -165,33 +165,33 @@ class ToneMappingModel : public QObject
 	// duration for Hermit interpolator between cones and rods being used
 	double mixDuration = 2.0 * 60.0; // s
 
-	double coneThreshold(double t);
-	double dConeThreshold(double t); // derivative
+	double coneThreshold(double t) const;
+	double dConeThreshold(double t) const; // derivative
 	// double invConeThreshold(double lum); // inverse
-	double rodThreshold(double t);
-	double dRodThreshold(double t); // derivative
+	double rodThreshold(double t) const;
+	double dRodThreshold(double t) const; // derivative
 	// double invRodThreshold(double lum); // inverse
-	double mixThreshold(double t);
-	double dMixThreshold(double t); // derivative
+	double mixThreshold(double t) const;
+	double dMixThreshold(double t) const; // derivative
 	// double invMixThreshold(double lum); // inverse
 
 	static double getConeRodIntersectionTime(double startLogLuminance);
 
-	double threshold(double t);
-	double dThreshold(double t); // derivative
+	double threshold(double t) const;
+	double dThreshold(double t) const; // derivative
 	// double invThreshold(double lum); // inverse
 
 	// LA=light adaptation
-	double LAthreshold(double t);
-	double dLAthreshold(double t);
-	double invLAthreshold(double lum);
+	static double LAthreshold(double t);
+	static double dLAthreshold(double t);
+	static double invLAthreshold(double lum);
 
 	// temporal variation of minimum visible luminance given the current minimum
 	// visible luminance (cd/m^2) computed using :
 	// https://www.researchgate.net/figure/Dark-adaptation-curves-for-a-normal-subject-40-years-of-age-obtained-after-a-96_fig2_5677883
 	// double dLumOverdTAtGivenLum(double minVisibleLum);
 
-	double dLALumOverdTAtGivenLum(double minVisibleLum);
+	static double dLALumOverdTAtGivenLum(double minVisibleLum);
 	/*
 	 * END AUTOEXPOSURE MODEL
 	 */

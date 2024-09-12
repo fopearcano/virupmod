@@ -47,6 +47,11 @@ BoundingSphere::BoundingSphere(BoundingSphere&& moved) noexcept
 
 BoundingSphere& BoundingSphere::operator=(BoundingSphere const& other)
 {
+	if(this == &other)
+	{
+		return *this;
+	}
+
 	position_ = other.position_;
 	radius_   = other.radius_;
 
@@ -82,7 +87,7 @@ BoundingSphere BoundingSphere::transformed(QMatrix4x4 const& transform) const
 // https://stackoverflow.com/a/33535438
 BoundingSphere BoundingSphere::merged(BoundingSphere const& other) const
 {
-	QVector3D relPos(other.position - position);
+	const QVector3D relPos(other.position - position);
 	auto relDist(relPos.length());
 	// if enclosed, return largest sphere
 	if(relDist + radius <= other.radius)
@@ -94,8 +99,8 @@ BoundingSphere BoundingSphere::merged(BoundingSphere const& other) const
 		return *this;
 	}
 	// else
-	float R     = 0.5f * (radius + other.radius + relDist);
-	QVector3D C = position + (R - radius) * relPos / relDist;
+	const float R     = 0.5f * (radius + other.radius + relDist);
+	const QVector3D C = position + (R - radius) * relPos / relDist;
 	return {C, R};
 }
 
@@ -117,6 +122,11 @@ AABB::AABB(AABB&& moved) noexcept
 
 AABB& AABB::operator=(AABB const& other)
 {
+	if(this == &other)
+	{
+		return *this;
+	}
+
 	min_ = other.min_;
 	max_ = other.max_;
 
@@ -177,12 +187,12 @@ AABB AABB::transformed(QMatrix4x4 const& transform) const
 
 AABB AABB::merged(AABB const& other) const
 {
-	QVector3D newMin(min.x() < other.min.x() ? min.x() : other.min.x(),
-	                 min.y() < other.min.y() ? min.y() : other.min.y(),
-	                 min.z() < other.min.z() ? min.z() : other.min.z());
-	QVector3D newMax(max.x() > other.max.x() ? max.x() : other.max.x(),
-	                 max.y() > other.max.y() ? max.y() : other.max.y(),
-	                 max.z() > other.max.z() ? max.z() : other.max.z());
+	const QVector3D newMin(min.x() < other.min.x() ? min.x() : other.min.x(),
+	                       min.y() < other.min.y() ? min.y() : other.min.y(),
+	                       min.z() < other.min.z() ? min.z() : other.min.z());
+	const QVector3D newMax(max.x() > other.max.x() ? max.x() : other.max.x(),
+	                       max.y() > other.max.y() ? max.y() : other.max.y(),
+	                       max.z() > other.max.z() ? max.z() : other.max.z());
 
 	return {newMin, newMax};
 }

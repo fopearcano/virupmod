@@ -127,7 +127,7 @@ void GLStateSet::printDifferences(
     std::unordered_map<int, bool> const& globalState1)
 {
 	qDebug() << "OpenGL global state differences :";
-	Logger::NoFormatGuard f;
+	const Logger::NoFormatGuard f;
 	for(auto const& pair : globalState())
 	{
 		if(globalState0.at(pair.first) != globalState1.at(pair.first))

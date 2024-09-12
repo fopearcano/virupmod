@@ -37,14 +37,14 @@ QString ScreenSelector::selectScreen(QWidget* parent)
 ScreenSelector::ScreenSelector(QWidget* parent)
     : QDialog(parent)
 {
-	float aspectRatio(static_cast<float>(desktopGeometry.width())
-	                  / desktopGeometry.height());
+	const float aspectRatio(static_cast<float>(desktopGeometry.width())
+	                        / desktopGeometry.height());
 	h = static_cast<int>(w / aspectRatio);
 
 	this->setFixedSize(QSize(w, h));
 	for(auto const& s : getScreens())
 	{
-		auto button = make_qt_unique<QPushButton>(*this);
+		auto* button = make_qt_unique<QPushButton>(*this);
 		button->setGeometry(s.second);
 		button->setText(s.first);
 
@@ -60,8 +60,8 @@ ScreenSelector::ScreenSelector(QWidget* parent)
 QList<QPair<QString, QRect>> ScreenSelector::getScreens() const
 {
 	QList<QPair<QString, QRect>> result;
-	QList<QScreen*> screens(QGuiApplication::screens());
-	for(auto s : screens)
+	const QList<QScreen*> screens(QGuiApplication::screens());
+	for(auto* s : screens)
 	{
 		QRect geom(s->geometry());
 		geom.setX((s->geometry().x() - desktopGeometry.x()) * w

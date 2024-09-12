@@ -30,7 +30,7 @@ Scene::Scene()
     , generator(static_cast<unsigned int>(std::time(nullptr)))
     , distribution(0.0, 1.0)
 {
-	GLComputeShader brdf_lut("gi/brdf_lut");
+	const GLComputeShader brdf_lut("gi/brdf_lut");
 	brdf_lut.exec({{brdfLUT, GLComputeShader::W}}, {512, 512, 1});
 
 	envmap.setColorAttachmentName("envmap");
@@ -54,7 +54,7 @@ void Scene::update(BasicCamera& camera)
 	std::vector<QMatrix4x4> shadowCastModels;
 	for(auto const& pair : nodesDict)
 	{
-		auto node = pair.second;
+		auto* node = pair.second;
 		for(auto const& pair : node->getShadowCastingMeshes())
 		{
 			shadowCastMeshes.push_back(&pair.first);
@@ -71,8 +71,8 @@ void Scene::update(BasicCamera& camera)
 	std::vector<std::pair<Node*, float>> visibilities;
 	for(auto const& pair : nodesDict)
 	{
-		auto node = pair.second;
-		auto v    = node->computeVisibility(camera);
+		auto* node = pair.second;
+		auto v     = node->computeVisibility(camera);
 		if(v <= 0.f || !node->usesGlobalIllumination())
 		{
 			continue;

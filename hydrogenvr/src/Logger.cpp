@@ -72,16 +72,16 @@ void Logger::log(QtMsgType type, const QMessageLogContext& context,
 		return;
 	}
 
-	QByteArray localMsg   = msg.toLocal8Bit();
-	const char* file      = context.file != nullptr ? context.file : "";
-	const char* shortFile = file;
+	const QByteArray localMsg = msg.toLocal8Bit();
+	const char* file          = context.file != nullptr ? context.file : "";
+	const char* shortFile     = file;
 	if(strlen(shortFile) > strlen(BUILD_SRC_DIR) + 1)
 	{
 		shortFile += strlen(BUILD_SRC_DIR) + 1;
 	}
 	const char* function = context.function != nullptr ? context.function : "";
 
-	QDateTime time(QDateTime::currentDateTimeUtc());
+	const QDateTime time(QDateTime::currentDateTimeUtc());
 	const char* timeStr(time.toString(Qt::ISODateWithMs).toLatin1().data());
 
 	std::string messageTypeStr, messageTypeStrColor;
@@ -119,10 +119,10 @@ void Logger::log(QtMsgType type, const QMessageLogContext& context,
 
 	if(type == QtCriticalMsg || type == QtFatalMsg)
 	{
-		std::string messageBoxStr("<em>" + std::string(shortFile) + ':'
-		                          + QString::number(context.line).toStdString()
-		                          + "<br/>" + function + "</em><br/><br/>"
-		                          + localMsg.constData());
+		const std::string messageBoxStr(
+		    "<em>" + std::string(shortFile) + ':'
+		    + QString::number(context.line).toStdString() + "<br/>" + function
+		    + "</em><br/><br/>" + localMsg.constData());
 
 		QMessageBox::critical(nullptr, messageTypeStr.c_str(),
 		                      messageBoxStr.c_str());

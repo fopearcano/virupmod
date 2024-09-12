@@ -51,10 +51,10 @@ Volume::Volume(GLTexture&& tex3D, GLShaderProgram&& shader)
 
 	texture.setSampler({GL_LINEAR_MIPMAP_LINEAR, GL_CLAMP_TO_BORDER});
 
-	QVector3D minbbox(metad["minx"].toFloat(), metad["miny"].toFloat(),
-	                  metad["minz"].toFloat());
-	QVector3D maxbbox(metad["maxx"].toFloat(), metad["maxy"].toFloat(),
-	                  metad["maxz"].toFloat());
+	const QVector3D minbbox(metad["minx"].toFloat(), metad["miny"].toFloat(),
+	                        metad["minz"].toFloat());
+	const QVector3D maxbbox(metad["maxx"].toFloat(), metad["maxy"].toFloat(),
+	                        metad["maxz"].toFloat());
 
 	volumeShader.setUniform("minbbox", minbbox);
 	volumeShader.setUniform("maxbbox", maxbbox);
@@ -83,8 +83,8 @@ void Volume::render(BasicCamera const& camera) const
 
 	// GLHandler::glf().glDisable(GL_DEPTH_TEST);
 	GLHandler::useTextures({&texture});
-	GLBlendSet glBlend({GL_ONE, GL_ONE});
-	GLCullFaceSet glCullFace(GL_FRONT);
+	const GLBlendSet glBlend({GL_ONE, GL_ONE});
+	const GLCullFaceSet glCullFace(GL_FRONT);
 	GLHandler::setUpRender(volumeShader);
 	volumeCube.render(PrimitiveType::TRIANGLE_STRIP);
 	// GLHandler::glf().glEnable(GL_DEPTH_TEST);

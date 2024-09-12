@@ -39,9 +39,8 @@ GLCullFaceSet::CullFaceState& GLCullFaceSet::globalState()
 }
 
 GLCullFaceSet::GLCullFaceSet(CullFaceState const& stateSet)
+    : revertSet(globalState())
 {
-	revertSet = globalState();
-
 	GLHandler::glf().glCullFace(stateSet.faceToCull);
 	GLHandler::glf().glFrontFace(stateSet.frontFaceWindingOrder);
 
@@ -76,7 +75,7 @@ void GLCullFaceSet::printDifferences(CullFaceState const& globalState0,
                                      CullFaceState const& globalState1)
 {
 	qDebug() << "OpenGL global blend state differences :";
-	Logger::NoFormatGuard f;
+	const Logger::NoFormatGuard f;
 	if(globalState0.faceToCull != globalState1.faceToCull)
 	{
 		qDebug() << "faceToCull" << globalState0.faceToCull << "vs"

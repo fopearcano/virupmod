@@ -36,11 +36,11 @@ void OpenGL4PaintEngine::drawImage(QRectF const& rectangle, QImage const& image,
 
 	GLTexture tex(image);
 	// currentGLFBO() = std::make_unique<GLFramebufferObject>(std::move(tex));
-	GLFramebufferObject fbo(std::move(tex));
+	const GLFramebufferObject fbo(std::move(tex));
 
 	GLFramebufferObject::applyCurrentFromBindStack();
 
-	int curHeight(GLFramebufferObject::getCurrentSize()[1]);
+	const int curHeight(GLFramebufferObject::getCurrentSize()[1]);
 	fbo.blitColorBufferToCurrent(
 	    sr.x(), sr.y(), sr.x() + sr.width(), sr.y() + sr.height(),
 	    rectangle.x(), curHeight - rectangle.y() - rectangle.width(),
@@ -64,7 +64,7 @@ void OpenGL4PaintEngine::drawPolygon(QPointF const* points, int pointCount,
 		return;
 	}
 
-	int width(paintDevice()->width()), height(paintDevice()->height());
+	const int width(paintDevice()->width()), height(paintDevice()->height());
 	std::vector<float> vertices;
 	for(int i(0); i < pointCount; ++i)
 	{
@@ -115,7 +115,7 @@ QPaintEngine::Type OpenGL4PaintEngine::type() const
 
 void OpenGL4PaintEngine::updateState(QPaintEngineState const& state)
 {
-	QPaintEngine::DirtyFlags dirty(state.state());
+	const QPaintEngine::DirtyFlags dirty(state.state());
 	if((dirty & QPaintEngine::DirtyPen) != 0u)
 	{
 		pen = state.pen();

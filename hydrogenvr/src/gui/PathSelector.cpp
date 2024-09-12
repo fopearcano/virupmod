@@ -32,24 +32,24 @@ PathSelector::PathSelector(QString const& caption, Type type, QWidget* parent)
 	QObject::connect(fileEdit, &QLineEdit::textChanged,
 	                 [this](QString const& text) { setPath(text); });
 
-	auto browsePb = make_qt_unique<QPushButton>(*parent);
+	auto* browsePb = make_qt_unique<QPushButton>(*parent);
 	browsePb->setText("...");
-	QObject::connect(
-	    browsePb, &QPushButton::clicked,
-	    [this, caption, type](bool)
-	    {
-		    QString result(type == Type::FILE
-		                       ? QFileDialog::getOpenFileName(this, caption,
-		                                                      fileEdit->text())
-		                       : QFileDialog::getExistingDirectory(
-		                           this, caption, fileEdit->text()));
-		    if(result != "")
-		    {
-			    setPath(result);
-		    }
-	    });
+	QObject::connect(browsePb, &QPushButton::clicked,
+	                 [this, caption, type](bool)
+	                 {
+		                 const QString result(
+		                     type == Type::FILE
+		                         ? QFileDialog::getOpenFileName(
+		                               this, caption, fileEdit->text())
+		                         : QFileDialog::getExistingDirectory(
+		                               this, caption, fileEdit->text()));
+		                 if(result != "")
+		                 {
+			                 setPath(result);
+		                 }
+	                 });
 
-	auto layout = make_qt_unique<QHBoxLayout>(*this);
+	auto* layout = make_qt_unique<QHBoxLayout>(*this);
 	layout->addWidget(fileEdit);
 	layout->addWidget(browsePb);
 }
@@ -57,9 +57,9 @@ PathSelector::PathSelector(QString const& caption, Type type, QWidget* parent)
 void PathSelector::setPath(QString const& path)
 {
 	fileEdit->setText(path);
-	auto dirModel = make_qt_unique<QFileSystemModel>(*fileEdit);
+	auto* dirModel = make_qt_unique<QFileSystemModel>(*fileEdit);
 	dirModel->setRootPath(QFileInfo(path).absoluteDir().absolutePath());
-	auto completer = make_qt_unique<QCompleter>(*fileEdit, dirModel);
+	auto* completer = make_qt_unique<QCompleter>(*fileEdit, dirModel);
 	completer->setCaseSensitivity(Qt::CaseInsensitive);
 	completer->setCompletionMode(QCompleter::PopupCompletion);
 	fileEdit->setCompleter(completer);

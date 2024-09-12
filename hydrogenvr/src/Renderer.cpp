@@ -81,9 +81,9 @@ QSize Renderer::getSize(bool ignoreVR) const
 
 float Renderer::getRenderTargetAspectRatio() const
 {
-	QSize renderSize(getSize());
-	float aspectRatio(static_cast<float>(renderSize.width())
-	                  / static_cast<float>(renderSize.height()));
+	const QSize renderSize(getSize());
+	const float aspectRatio(static_cast<float>(renderSize.width())
+	                        / static_cast<float>(renderSize.height()));
 	return aspectRatio;
 }
 
@@ -184,8 +184,8 @@ void Renderer::removePostProcessingShader(QString const& id)
 
 void Renderer::reloadPostProcessingTargets()
 {
-	QSize newSize(getSize());
-	unsigned int samples(
+	const QSize newSize(getSize());
+	const unsigned int samples(
 	    static_cast<unsigned int>(1)
 	    << QSettings().value("graphics/antialiasing").toUInt());
 
@@ -209,13 +209,13 @@ void Renderer::updateFOV()
 		}
 		else
 		{
-			float a(getRenderTargetAspectRatio());
+			const float a(getRenderTargetAspectRatio());
 			vFOV = 360.f * atan(tan(hFOV * M_PI / 360.f) / a) / M_PI;
 		}
 	}
 	if(hFOV == 0.0)
 	{
-		float a(getRenderTargetAspectRatio());
+		const float a(getRenderTargetAspectRatio());
 		hFOV = 360.f * atan(tan(vFOV * M_PI / 360.f) * a) / M_PI;
 	}
 
@@ -304,7 +304,7 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 	vrHandler.prepareRendering(side);
 	GLHandler::beginRendering(mainRenderTarget->sceneTarget);
 
-	GLStateSet glState({{GL_STENCIL_TEST, true}});
+	const GLStateSet glState({{GL_STENCIL_TEST, true}});
 	GLHandler::glf().glClearStencil(0x0);
 	GLHandler::glf().glStencilMask(0xFF);
 	GLHandler::glf().glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -382,12 +382,12 @@ void Renderer::vrRender(Side side, bool debug, bool debugInHeadset,
 void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 {
 	this->angleShiftMat = angleShiftMat;
-	bool debug(dbgCamera->isEnabled());
-	bool debugInHeadset(dbgCamera->debugInHeadset());
+	const bool debug(dbgCamera->isEnabled());
+	const bool debugInHeadset(dbgCamera->debugInHeadset());
 	bool renderingCamIsDebug(debug
 	                         && ((debugInHeadset && vrHandler.isEnabled())
 	                             || !vrHandler.isEnabled()));
-	bool thirdRender(QSettings().value("vr/thirdrender").toBool());
+	const bool thirdRender(QSettings().value("vr/thirdrender").toBool());
 
 	// main render logic
 	if(vrHandler.isEnabled())
@@ -426,7 +426,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 				{
 					GLHandler::glf().glClear(pair.second.clearMask);
 				}
-				QMatrix4x4 viewBack(pair.second.camera->getView()),
+				const QMatrix4x4 viewBack(pair.second.camera->getView()),
 				    projBack(pair.second.camera->getProj());
 				if(overrideCamera)
 				{
@@ -486,40 +486,40 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
 			    .generateMipmap();
 
-			GLShaderProgram shader("postprocess", "panorama360");
+			const GLShaderProgram shader("postprocess", "panorama360");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 		}
 		else if(projection == MainRenderTarget::Projection::VR180L
 		        || projection == MainRenderTarget::Projection::VR180R)
 		{
-			QVector3D shift(projection == MainRenderTarget::Projection::VR180L
-			                    ? -0.065
-			                    : 0.065,
-			                0.0, 0.0);
+			const QVector3D shift(
+			    projection == MainRenderTarget::Projection::VR180L ? -0.065
+			                                                       : 0.065,
+			    0.0, 0.0);
 
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
 			                                  renderFunc, shift);
 			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
 			    .generateMipmap();
-			GLShaderProgram shader("postprocess", "panorama180");
+			const GLShaderProgram shader("postprocess", "panorama180");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 		}
 		else if(projection == MainRenderTarget::Projection::VR180)
 		{
-			int tgtWidth(
+			const int tgtWidth(
 			    mainRenderTarget->postProcessingTargets[0].getSize().width()),
 			    tgtHeight(mainRenderTarget->postProcessingTargets[0]
 			                  .getSize()
 			                  .height());
-			QVector3D shift(0.065, 0.0, 0.0);
+			const QVector3D shift(0.065, 0.0, 0.0);
 
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
 			                                  renderFunc, -shift);
 			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
 			    .generateMipmap();
-			GLShaderProgram shader("postprocess", "panorama180");
+			const GLShaderProgram shader("postprocess", "panorama180");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 			mainRenderTarget->postProcessingTargets[0].blitColorBufferTo(
@@ -545,7 +545,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			mainRenderTarget->sceneTarget.getColorAttachmentTexture()
 			    .generateMipmap();
 
-			GLShaderProgram shader("postprocess", "domemaster180");
+			const GLShaderProgram shader("postprocess", "domemaster180");
 			GLHandler::postProcess(shader, mainRenderTarget->sceneTarget,
 			                       mainRenderTarget->postProcessingTargets[0]);
 		}
@@ -589,12 +589,12 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			    mainRenderTarget->postProcessingTargets.at(0).getSize());
 
 			// will get disabled by QOpenGLPaintDevice anyway
-			GLStateSet glState({{GL_DEPTH_TEST, false}});
+			const GLStateSet glState({{GL_DEPTH_TEST, false}});
 			painter->setRenderHint(QPainter::Antialiasing);
 			painter->setRenderHint(QPainter::TextAntialiasing);
 
-			int screenHeight(window.screen()->geometry().height()
-			                 * window.screen()->devicePixelRatio());
+			const int screenHeight(window.screen()->geometry().height()
+			                       * window.screen()->devicePixelRatio());
 			QFont font = painter->font();
 			font.setPointSize(8);
 			font.setPointSize(font.pointSize() * screenHeight / 1080);

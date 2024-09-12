@@ -236,26 +236,24 @@ void ShaderProgram::reload()
 						{
 							case QMetaType::QVector3D:
 							{
-								std::unique_ptr<QVector3D[]> arr(
-								    new QVector3D[l.size()]);
+								std::vector<QVector3D> arr(l.size());
 								for(int i(0); i < l.size(); ++i)
 								{
 									arr[i] = l.at(i).value<QVector3D>();
 								}
 								glShader->setUniform(pair.first, l.size(),
-								                     arr.get());
+								                     arr.data());
 							}
 							break;
 							case QMetaType::QVector4D:
 							{
-								std::unique_ptr<QVector4D[]> arr(
-								    new QVector4D[l.size()]);
+								std::vector<QVector4D> arr(l.size());
 								for(int i(0); i < l.size(); ++i)
 								{
 									arr[i] = l.at(i).value<QVector4D>();
 								}
 								glShader->setUniform(pair.first, l.size(),
-								                     arr.get());
+								                     arr.data());
 							}
 							break;
 							default:
@@ -273,7 +271,7 @@ void ShaderProgram::reload()
 
 void ShaderProgram::reloadAllShaderPrograms()
 {
-	for(auto shaderProgram : allShaderPrograms())
+	for(auto* shaderProgram : allShaderPrograms())
 	{
 		shaderProgram->reload();
 	}

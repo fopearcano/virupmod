@@ -63,7 +63,8 @@ GLShaderProgram::GLShaderProgram(QString const& vertexName,
                                  QString const& fragmentName,
                                  QMap<QString, QString> const& defines)
     : GLShaderProgram(
-        {{vertexName, Stage::VERTEX}, {fragmentName, Stage::FRAGMENT}}, defines)
+          {{vertexName, Stage::VERTEX}, {fragmentName, Stage::FRAGMENT}},
+          defines)
 {
 }
 
@@ -86,7 +87,7 @@ GLShaderProgram::GLShaderProgram(
 			name = "shaders/" + name + pair.first;
 		}
 		// vertex shader
-		GLuint shader(loadShader(name, pair.second, defines));
+		const GLuint shader(loadShader(name, pair.second, defines));
 		GLHandler::glf().glAttachShader(glShaderProgram, shader);
 		GLHandler::glf().glDeleteShader(shader);
 	}
@@ -106,9 +107,9 @@ GLShaderProgram::GLShaderProgram(
 	for(GLint i = 0; i < numUniforms; ++i)
 	{
 		std::array<char, 256> name{};
-		GLsizei length;
-		GLint size;
-		GLenum type;
+		GLsizei length = 0;
+		GLint size     = 0;
+		GLenum type    = 0;
 
 		GLHandler::glf().glGetActiveUniform(glShaderProgram, i, sizeof(name),
 		                                    &length, &size, &type, name.data());
@@ -153,7 +154,7 @@ void GLShaderProgram::setUnusedAttributesValues(
 {
 	for(auto attribute : defaultValues)
 	{
-		GLint posAttrib = GLHandler::glf().glGetAttribLocation(
+		const GLint posAttrib = GLHandler::glf().glGetAttribLocation(
 		    glShaderProgram, attribute.first.toLatin1().data());
 		if(posAttrib != -1)
 		{
@@ -165,16 +166,20 @@ void GLShaderProgram::setUnusedAttributesValues(
 			switch(attribute.second.size())
 			{
 				case 1:
-					glf_base.glVertexAttrib1fv(posAttrib, &attribute.second[0]);
+					glf_base.glVertexAttrib1fv(posAttrib,
+					                           attribute.second.data());
 					break;
 				case 2:
-					glf_base.glVertexAttrib2fv(posAttrib, &attribute.second[0]);
+					glf_base.glVertexAttrib2fv(posAttrib,
+					                           attribute.second.data());
 					break;
 				case 3:
-					glf_base.glVertexAttrib3fv(posAttrib, &attribute.second[0]);
+					glf_base.glVertexAttrib3fv(posAttrib,
+					                           attribute.second.data());
 					break;
 				case 4:
-					glf_base.glVertexAttrib4fv(posAttrib, &attribute.second[0]);
+					glf_base.glVertexAttrib4fv(posAttrib,
+					                           attribute.second.data());
 					break;
 				default:
 					break;
@@ -246,7 +251,7 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  QVector3D const* values) const
 {
-	std::unique_ptr<GLfloat[]> data(new GLfloat[3 * size]);
+	std::vector<GLfloat> data(3 * size);
 	for(unsigned int i(0); i < size; ++i)
 	{
 		for(unsigned int j(0); j < 3; ++j)
@@ -255,7 +260,7 @@ void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
 		}
 	}
 	GLHandler::glf().glProgramUniform3fv(
-	    glShaderProgram, getUniformLocation(uniformName), size, data.get());
+	    glShaderProgram, getUniformLocation(uniformName), size, data.data());
 }
 
 void GLShaderProgram::setUniform(const char* uniformName,
@@ -269,7 +274,7 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  QVector4D const* values) const
 {
-	std::unique_ptr<GLfloat[]> data(new GLfloat[4 * size]);
+	std::vector<GLfloat> data(4 * size);
 	for(unsigned int i(0); i < size; ++i)
 	{
 		for(unsigned int j(0); j < 4; ++j)
@@ -278,7 +283,7 @@ void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
 		}
 	}
 	GLHandler::glf().glProgramUniform4fv(
-	    glShaderProgram, getUniformLocation(uniformName), size, data.get());
+	    glShaderProgram, getUniformLocation(uniformName), size, data.data());
 }
 
 void GLShaderProgram::setUniform(const char* uniformName,
@@ -292,7 +297,7 @@ void GLShaderProgram::setUniform(const char* uniformName,
 void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
                                  QMatrix4x4 const* values) const
 {
-	std::unique_ptr<GLfloat[]> data(new GLfloat[16 * size]);
+	std::vector<GLfloat> data(16 * size);
 	for(unsigned int i(0); i < size; ++i)
 	{
 		for(unsigned int j(0); j < 16; ++j)
@@ -302,13 +307,13 @@ void GLShaderProgram::setUniform(const char* uniformName, unsigned int size,
 	}
 	GLHandler::glf().glProgramUniformMatrix4fv(glShaderProgram,
 	                                           getUniformLocation(uniformName),
-	                                           size, GL_FALSE, data.get());
+	                                           size, GL_FALSE, data.data());
 }
 
 void GLShaderProgram::setUniform(const char* uniformName, QColor const& value,
                                  bool sRGB) const
 {
-	QColor linVal(sRGB ? GLHandler::sRGBToLinear(value) : value);
+	const QColor linVal(sRGB ? GLHandler::sRGBToLinear(value) : value);
 	setUniform(uniformName,
 	           QVector3D(linVal.redF(), linVal.greenF(), linVal.blueF()));
 }
@@ -348,7 +353,7 @@ QString GLShaderProgram::getFullPreprocessedSource(
     QString const& path, QMap<QString, QString> const& defines,
     std::vector<QString>& debugFiles)
 {
-	unsigned int id(debugFiles.size());
+	const unsigned int id(debugFiles.size());
 	debugFiles.push_back(path);
 	// Read source
 	QFile f(utils::getAbsoluteDataPath(path));
@@ -373,16 +378,17 @@ QString GLShaderProgram::getFullPreprocessedSource(
 	int includePos(source.lastIndexOf("#include"));
 	while(includePos != -1)
 	{
-		int beginPath(source.indexOf('<', includePos));
-		int endPath(source.indexOf('>', includePos));
-		int endOfLine(source.indexOf('\n', includePos) + 1);
+		const int beginPath(source.indexOf('<', includePos));
+		const int endPath(source.indexOf('>', includePos));
+		const int endOfLine(source.indexOf('\n', includePos) + 1);
 
-		QString includePath(source.mid(beginPath + 1, endPath - beginPath - 1));
+		const QString includePath(
+		    source.mid(beginPath + 1, endPath - beginPath - 1));
 
 		QString includedSrc(
 		    getFullPreprocessedSource(includePath, {}, debugFiles));
 
-		unsigned int line(source.left(includePos).count('\n'));
+		const unsigned int line(source.left(includePos).count('\n'));
 
 		if(includedSrc == "///!ERROR")
 		{
@@ -411,7 +417,7 @@ QString GLShaderProgram::getFullPreprocessedSource(
 		definesInsertPoint = source.indexOf('\n', definesInsertPoint) + 1;
 	}
 
-	unsigned int line(source.left(definesInsertPoint).count('\n') - 1);
+	const unsigned int line(source.left(definesInsertPoint).count('\n') - 1);
 	source.insert(definesInsertPoint, "#line " + QString::number(line) + ' '
 	                                      + QString::number(id) + '\n');
 	for(auto const& key : defines.keys())
@@ -427,37 +433,37 @@ GLuint GLShaderProgram::loadShader(QString const& path, GLenum shaderType,
                                    QMap<QString, QString> const& defines)
 {
 	std::vector<QString> debugFiles;
-	QString source(getFullPreprocessedSource(path, defines, debugFiles));
+	const QString source(getFullPreprocessedSource(path, defines, debugFiles));
 
 	QByteArray ba     = source.toLatin1();
 	const char* bytes = ba.data();
 
-	GLuint shader = GLHandler::glf().glCreateShader(shaderType);
-	auto fullName = "Shader " + QString::number(shader) + " - " + path;
+	const GLuint shader = GLHandler::glf().glCreateShader(shaderType);
+	auto fullName       = "Shader " + QString::number(shader) + " - " + path;
 	GLHandler::glf().glObjectLabel(GL_SHADER, shader, fullName.size(),
 	                               fullName.toLatin1().data());
 	GLHandler::glf().glShaderSource(shader, 1, &bytes, nullptr);
 	GLHandler::glf().glCompileShader(shader);
 
 	// checks
-	GLint status;
+	GLint status = 0;
 	GLHandler::glf().glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	std::array<char, 512> buffer = {};
-	GLHandler::glf().glGetShaderInfoLog(shader, 512, nullptr, &buffer[0]);
+	GLHandler::glf().glGetShaderInfoLog(shader, 512, nullptr, buffer.data());
 	if(status != GL_TRUE)
 	{
-		QString bufStrs(&buffer[0]);
+		const QString bufStrs(buffer.data());
 		for(auto const& bufStr : bufStrs.split('\n'))
 		{
 			if(bufStr.isEmpty())
 			{
 				continue;
 			}
-			int lineBeg       = bufStr.indexOf('(') + 1;
-			int lineSize      = bufStr.indexOf(')') - lineBeg;
-			int msgBeg        = bufStr.indexOf(':') + 2;
-			unsigned int file = bufStr.left(lineBeg - 1).toInt();
-			unsigned int line = bufStr.mid(lineBeg, lineSize).toInt();
+			const int lineBeg       = bufStr.indexOf('(') + 1;
+			const int lineSize      = bufStr.indexOf(')') - lineBeg;
+			const int msgBeg        = bufStr.indexOf(':') + 2;
+			const unsigned int file = bufStr.left(lineBeg - 1).toInt();
+			const unsigned int line = bufStr.mid(lineBeg, lineSize).toInt();
 			QString warning("SHADER ERROR (");
 			warning += QString::number(shader) + " - ";
 			warning += debugFiles[file] + ":" + QString::number(line) + ") : ";

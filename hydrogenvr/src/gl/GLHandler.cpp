@@ -139,12 +139,12 @@ void GLHandler::postProcess(
 	std::vector<GLTexture const*> texs;
 	texs.push_back(&from.getColorAttachmentTexture());
 	// TODO(florian) performance
-	for(auto tex : uniformTextures)
+	for(const auto* tex : uniformTextures)
 	{
 		texs.push_back(tex);
 	}
 	useTextures(texs);
-	GLStateSet glState({{GL_CULL_FACE, false}});
+	const GLStateSet glState({{GL_CULL_FACE, false}});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
@@ -196,7 +196,7 @@ void GLHandler::renderFromScratch(GLShaderProgram const& shader,
 	{
 		beginRendering(to);
 		shader.use();
-		GLStateSet glState({{GL_CULL_FACE, false}});
+		const GLStateSet glState({{GL_CULL_FACE, false}});
 		quad.render(PrimitiveType::TRIANGLE_STRIP);
 	}
 	else
@@ -205,7 +205,7 @@ void GLHandler::renderFromScratch(GLShaderProgram const& shader,
 		{
 			GLHandler::beginRendering(to, GLTexture::CubemapFace::FRONT, i);
 			shader.setUniform("z", i / static_cast<float>(to.getDepth()));
-			GLStateSet glState({{GL_CULL_FACE, false}});
+			const GLStateSet glState({{GL_CULL_FACE, false}});
 			quad.render(PrimitiveType::TRIANGLE_STRIP);
 		}
 	}
@@ -244,7 +244,7 @@ void GLHandler::generateEnvironmentMap(
 
 bool GLHandler::isWireframeActive()
 {
-	int val;
+	int val = 0;
 	glf().glGetIntegerv(GL_POLYGON_MODE, &val);
 	return val != GL_FILL;
 }

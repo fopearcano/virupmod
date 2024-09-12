@@ -173,11 +173,11 @@ class AbstractMainWin : public RenderingWindow
 	/**
 	 * @getter{virtualCamShift}
 	 */
-	QVector3D getVirtualCamShift() const;
+	static QVector3D getVirtualCamShift();
 	/**
 	 * @setter{virtualcamShift}
 	 */
-	void setVirtualCamShift(QVector3D const& virtualCamShift);
+	static void setVirtualCamShift(QVector3D const& virtualCamShift);
 	/**
 	 * @getter{compasstilt}
 	 */
@@ -308,12 +308,12 @@ class AbstractMainWin : public RenderingWindow
 	 * @brief Override this to initialize HydrogenVR libraries you use by
 	 * calling @e initLibrary().
 	 */
-	virtual void initLibraries(){};
+	virtual void initLibraries() {};
 	/**
 	 * @brief Override this to clean HydrogenVR libraries you use by
 	 * calling @e cleanLibrary().
 	 */
-	virtual void cleanLibraries(){};
+	virtual void cleanLibraries() {};
 	/**
 	 * @brief Initialize a library by class. The class must inherit from @e
 	 * AbstractLibrary.
@@ -350,7 +350,7 @@ class AbstractMainWin : public RenderingWindow
 	{
 		return nullptr;
 	};
-	virtual void readState(AbstractState const& /*s*/){};
+	virtual void readState(AbstractState const& /*s*/) {};
 	virtual void writeState(AbstractState& /*s*/) const {};
 
   public:

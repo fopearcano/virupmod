@@ -75,21 +75,21 @@ int main(int argc, char* argv[])
 
 	qDebug() << versionOss.str().c_str();
 
-	QApplication a(argc, argv);
+	const QApplication a(argc, argv);
 
 	// Set arguments
 	QCommandLineParser parser;
 	parser.addHelpOption();
-	QCommandLineOption noLauncher(
+	const QCommandLineOption noLauncher(
 	    "no-launcher", QCoreApplication::translate(
 	                       "main", "By-pass launcher and launch application."));
 	parser.addOption(noLauncher);
-	QCommandLineOption config(
+	const QCommandLineOption config(
 	    "config",
 	    QCoreApplication::translate("main", "Read .ini config from <file>."),
 	    "file");
 	parser.addOption(config);
-	QCommandLineOption version(
+	const QCommandLineOption version(
 	    "version",
 	    QCoreApplication::translate("main", "Display version information."));
 	parser.addOption(version);
@@ -99,8 +99,8 @@ int main(int argc, char* argv[])
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 	if(parser.isSet(config))
 	{
-		QString configPath(parser.value(config));
-		QFileInfo file(configPath);
+		const QString configPath(parser.value(config));
+		const QFileInfo file(configPath);
 		QDir dir(file.absoluteDir());
 		QCoreApplication::setOrganizationName(dir.dirName());
 		dir.cdUp();
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 	}
 
 	// set translation
-	QString localeName(
+	const QString localeName(
 	    QSettings()
 	        .value("window/language", QLocale::system().name().left(2))
 	        .toString());
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 
 #ifdef PYTHONQT
 	// set PYTHONPATH
-	QDir pathDir(QDir::currentPath() + "/python");
+	const QDir pathDir(QDir::currentPath() + "/python");
 	if(pathDir.exists())
 	{
 		if(QString::fromLocal8Bit(qgetenv("PYTHONPATH")) == "")

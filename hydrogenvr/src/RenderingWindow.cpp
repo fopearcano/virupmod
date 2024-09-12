@@ -61,7 +61,7 @@ void RenderingWindow::setFullscreen(bool fullscreen)
 		QRect screenGeometry(screen()->geometry());
 		if(params.screenname != "")
 		{
-			for(auto s : QGuiApplication::screens())
+			for(auto* s : QGuiApplication::screens())
 			{
 				if(s->name() == params.screenname)
 				{
@@ -135,7 +135,7 @@ void RenderingWindow::keyPressEvent(QKeyEvent* e)
 
 	key = QKeySequence(e->key()).toString();
 
-	QKeySequence ks(modifier + key);
+	const QKeySequence ks(modifier + key);
 	actionEvent(inputManager[ks], true);
 
 	if(!PythonQtHandler::isInitialized())
@@ -189,7 +189,7 @@ void RenderingWindow::keyReleaseEvent(QKeyEvent* e)
 
 	key = QKeySequence(e->key()).toString();
 
-	QKeySequence ks(modifier + key);
+	const QKeySequence ks(modifier + key);
 	actionEvent(inputManager[ks], false);
 
 	if(!PythonQtHandler::isInitialized())

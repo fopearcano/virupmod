@@ -21,7 +21,7 @@
 void Primitives::setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
                            PrimitiveType primitiveType)
 {
-	std::vector<float> vertices = {
+	const std::vector<float> vertices = {
 	    -0.5f, -0.5f, // 0
 	    -0.5f, 0.5f,  // 1
 	    0.5f,  -0.5f, // 2
@@ -92,7 +92,7 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 		{
 			for(unsigned int j(1); j < size; ++j)
 			{
-				unsigned int id = j + size * i;
+				const unsigned int id = j + size * i;
 
 				elements.push_back(id - size - 1);
 				elements.push_back(id - 1);
@@ -110,7 +110,7 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 		{
 			for(unsigned int j(1); j < size; ++j)
 			{
-				unsigned int id = j + size * i;
+				const unsigned int id = j + size * i;
 
 				elements.push_back(id - size - 1);
 				elements.push_back(id - size);
@@ -126,7 +126,7 @@ void Primitives::setAsGrid(GLMesh& mesh, GLShaderProgram const& shader,
 void Primitives::setAsUnitCube(GLMesh& mesh, GLShaderProgram const& shader,
                                PrimitiveType primitiveType)
 {
-	std::vector<float> vertices = {
+	const std::vector<float> vertices = {
 	    -0.5f, -0.5f, -0.5f, // 0
 	    -0.5f, -0.5f, 0.5f,  // 1
 	    -0.5f, 0.5f,  -0.5f, // 2
@@ -257,13 +257,14 @@ void Primitives::setAsUnitSphere(GLMesh& mesh, GLShaderProgram const& shader,
 
 	for(unsigned int i(0); i < latDivisions; ++i)
 	{
-		float lat = (static_cast<float>(i + 1) / (latDivisions + 1)) * M_PI;
+		const float lat
+		    = (static_cast<float>(i + 1) / (latDivisions + 1)) * M_PI;
 
-		float cosLat(std::cos(lat)), sinLat(std::sin(lat));
+		const float cosLat(std::cos(lat)), sinLat(std::sin(lat));
 
 		for(unsigned int j(0); j < lonDivisions; ++j)
 		{
-			float lon = 2 * M_PI * static_cast<float>(j) / lonDivisions;
+			const float lon = 2 * M_PI * static_cast<float>(j) / lonDivisions;
 			vertices.push_back(sinLat * std::cos(lon));
 			vertices.push_back(sinLat * std::sin(lon));
 			vertices.push_back(cosLat);
@@ -322,7 +323,7 @@ void Primitives::setAsUnitSphere(GLMesh& mesh, GLShaderProgram const& shader,
 	}
 
 	// link last latitude to south pole
-	unsigned int southPole(latDivisions * lonDivisions + 1);
+	const unsigned int southPole(latDivisions * lonDivisions + 1);
 	if(primitiveType == PrimitiveType::TRIANGLES)
 	{
 		for(unsigned int i(0); i < lonDivisions - 1; ++i)
@@ -380,10 +381,11 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
 	{
 		for(unsigned int r = 0; r < radialDivisions; ++r)
 		{
-			float angle = 2.0f * M_PI * static_cast<float>(r) / radialDivisions;
-			float x     = std::cos(angle);
-			float y     = std::sin(angle);
-			auto z      = static_cast<float>(h);
+			const float angle
+			    = 2.0f * M_PI * static_cast<float>(r) / radialDivisions;
+			const float x = std::cos(angle);
+			const float y = std::sin(angle);
+			const auto z  = static_cast<float>(h);
 
 			vertices.push_back(x);
 			vertices.push_back(y);
@@ -395,10 +397,10 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
 	for(unsigned int r = 0; r <= radialDivisions; ++r)
 	{
 		// NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
-		unsigned int idx           = r % radialDivisions;
-		unsigned int sideIndex     = 2 + idx;
-		unsigned int next_r        = (r + 1) % radialDivisions;
-		unsigned int nextSideIndex = 2 + next_r;
+		const unsigned int idx           = r % radialDivisions;
+		const unsigned int sideIndex     = 2 + idx;
+		const unsigned int next_r        = (r + 1) % radialDivisions;
+		const unsigned int nextSideIndex = 2 + next_r;
 
 		if(primitiveType == PrimitiveType::TRIANGLES)
 		{

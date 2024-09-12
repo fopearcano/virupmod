@@ -29,62 +29,63 @@ NetworkManager::NetworkManager(std::unique_ptr<AbstractState> networkedState)
 	{
 		udpUpSocket.bind(QHostAddress::Any,
 		                 QSettings().value("network/port").toUInt());
-		connect(
-		    &udpUpSocket, &QUdpSocket::readyRead,
-		    [this]()
-		    {
-			    while(udpUpSocket.hasPendingDatagrams())
-			    {
-				    QNetworkDatagram datagram(udpUpSocket.receiveDatagram());
+		connect(&udpUpSocket, &QUdpSocket::readyRead,
+		        [this]()
+		        {
+			        while(udpUpSocket.hasPendingDatagrams())
+			        {
+				        const QNetworkDatagram datagram(
+				            udpUpSocket.receiveDatagram());
 
-				    QString str;
-				    quint16 p;
-				    qreal ft;
-				    quint16 cid;
-				    QByteArray buf(datagram.data());
-				    QDataStream stream(&buf, QIODevice::ReadOnly);
-				    stream >> str;
-				    stream >> p;
-				    stream >> ft;
-				    stream >> cid;
-				    if(str != PROJECT_NAME)
-				    {
-					    qDebug() << "Received bad header :";
-					    qDebug() << str;
-					    continue;
-				    }
+				        QString str;
+				        quint16 p   = 0;
+				        qreal ft    = NAN;
+				        quint16 cid = 0;
+				        QByteArray buf(datagram.data());
+				        QDataStream stream(&buf, QIODevice::ReadOnly);
+				        stream >> str;
+				        stream >> p;
+				        stream >> ft;
+				        stream >> cid;
+				        if(str != PROJECT_NAME)
+				        {
+					        qDebug() << "Received bad header :";
+					        qDebug() << str;
+					        continue;
+				        }
 
-				    bool exists(false);
-				    for(auto& c : clients)
-				    {
-					    if(c.clientId == cid)
-					    {
-						    c.frameTiming      = ft;
-						    c.clientId         = cid;
-						    c.lastReceivedTime = networkTimer.elapsed();
-						    /*qDebug() << "Update client :";
-						    qDebug() << c.addr;
-						    qDebug() << c.port;
-						    qDebug() << c.lastReceivedTime;
-						    qDebug() << c.clientId;*/
-						    exists = true;
-						    break;
-					    }
-				    }
-				    if(!exists)
-				    {
-					    clients.emplace_back(datagram.senderAddress(), p, ft,
-					                         cid, networkTimer.elapsed());
-					    clients.back().tcpSocket.connectToHost(
-					        datagram.senderAddress(),
-					        QSettings().value("network/tcpport").toUInt());
-					    qDebug() << "New client :";
-					    qDebug() << datagram.senderAddress();
-					    qDebug() << p;
-					    qDebug() << cid;
-				    }
-			    }
-		    });
+				        bool exists(false);
+				        for(auto& c : clients)
+				        {
+					        if(c.clientId == cid)
+					        {
+						        c.frameTiming      = ft;
+						        c.clientId         = cid;
+						        c.lastReceivedTime = networkTimer.elapsed();
+						        /*qDebug() << "Update client :";
+						        qDebug() << c.addr;
+						        qDebug() << c.port;
+						        qDebug() << c.lastReceivedTime;
+						        qDebug() << c.clientId;*/
+						        exists = true;
+						        break;
+					        }
+				        }
+				        if(!exists)
+				        {
+					        clients.emplace_back(datagram.senderAddress(), p,
+					                             ft, cid,
+					                             networkTimer.elapsed());
+					        clients.back().tcpSocket.connectToHost(
+					            datagram.senderAddress(),
+					            QSettings().value("network/tcpport").toUInt());
+					        qDebug() << "New client :";
+					        qDebug() << datagram.senderAddress();
+					        qDebug() << p;
+					        qDebug() << cid;
+				        }
+			        }
+		        });
 	}
 	// UDP client
 	else
@@ -93,7 +94,8 @@ NetworkManager::NetworkManager(std::unique_ptr<AbstractState> networkedState)
 		connect(&udpDownSocket, &QAbstractSocket::readyRead,
 		        [this]()
 		        {
-			        QNetworkDatagram datagram(udpDownSocket.receiveDatagram());
+			        const QNetworkDatagram datagram(
+			            udpDownSocket.receiveDatagram());
 
 			        QByteArray buf(datagram.data());
 			        QDataStream stream(&buf, QIODevice::ReadOnly);
@@ -106,7 +108,7 @@ NetworkManager::NetworkManager(std::unique_ptr<AbstractState> networkedState)
 		connect(tcpServer.get(), &QTcpServer::newConnection,
 		        [this]()
 		        {
-			        auto pendingConn = tcpServer->nextPendingConnection();
+			        auto* pendingConn = tcpServer->nextPendingConnection();
 			        if(!pendingConn->peerAddress().isEqual(QHostAddress(
 			               QSettings().value("network/ip").toString())))
 			        {

@@ -25,7 +25,7 @@ ColorSelector::ColorSelector(QString const& caption, QWidget* parent)
 	connect(this, &QPushButton::clicked, this,
 	        [this, caption](bool)
 	        {
-		        QColor result(
+		        const QColor result(
 		            QColorDialog::getColor(currentColor, this, caption));
 		        if(!result.isValid())
 		        {

@@ -83,27 +83,27 @@ class DebugCamera : public BasicCamera
 	/**
 	 * @getter{enabled}
 	 */
-	bool isEnabled() const;
+	static bool isEnabled();
 	/**
 	 * @setter{enabled, enabled}
 	 */
-	void setEnabled(bool enabled);
+	static void setEnabled(bool enabled);
 	/**
 	 * @getter{debuginheadset}
 	 */
-	bool debugInHeadset() const;
+	static bool debugInHeadset();
 	/**
 	 * @setter{debuginheadset, debuginheadset}
 	 */
-	void setDebugInHeadset(bool debuginheadset);
+	static void setDebugInHeadset(bool debuginheadset);
 	/**
 	 * @getter{followhmd}
 	 */
-	bool followHMD() const;
+	static bool followHMD();
 	/**
 	 * @setter{followhmd, followhmd}
 	 */
-	void setFollowHMD(bool followhmd);
+	static void setFollowHMD(bool followhmd);
 	/**
 	 * @brief Updates all the camera transformation matrices.
 	 *
@@ -119,15 +119,15 @@ class DebugCamera : public BasicCamera
 	/**
 	 * @toggle{enabled}
 	 */
-	void toggle();
+	static void toggle();
 	/**
 	 * @toggle{debuginheadset}
 	 */
-	void toggleDebugInHeadset();
+	static void toggleDebugInHeadset();
 	/**
 	 * @toggle{followhmd}
 	 */
-	void toggleFollowHMD();
+	static void toggleFollowHMD();
 
   private:
 	GLMesh camMesh;

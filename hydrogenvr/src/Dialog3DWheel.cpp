@@ -29,7 +29,7 @@ Dialog3DWheel::Dialog3DWheel(VRHandler const& vrHandler,
 void Dialog3DWheel::addDialog3D(QString const& name, Dialog3D& dialog3D)
 {
 	auto index(dialog3Ds.size());
-	auto b = make_qt_unique<QPushButton>(*this);
+	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(name);
 	b->setAutoDefault(false);
 	connect(b, &QPushButton::pressed,
@@ -58,7 +58,7 @@ void Dialog3DWheel::vrEvent(VRHandler::Event const& e)
 			switch(e.button)
 			{
 				case VRHandler::Button::TRIGGER:
-					for(auto d3d : dialog3Ds)
+					for(auto* d3d : dialog3Ds)
 					{
 						d3d->triggerPressed(*vrHandler.getController(e.side));
 					}
@@ -71,7 +71,7 @@ void Dialog3DWheel::vrEvent(VRHandler::Event const& e)
 			switch(e.button)
 			{
 				case VRHandler::Button::TRIGGER:
-					for(auto d3d : dialog3Ds)
+					for(auto* d3d : dialog3Ds)
 					{
 						d3d->triggerReleased(*vrHandler.getController(e.side));
 					}
@@ -88,7 +88,7 @@ void Dialog3DWheel::vrEvent(VRHandler::Event const& e)
 void Dialog3DWheel::renderWheel()
 {
 	render(vrHandler, tmm);
-	for(auto d3d : dialog3Ds)
+	for(auto* d3d : dialog3Ds)
 	{
 		d3d->render(vrHandler, tmm);
 	}

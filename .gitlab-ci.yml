@@ -4,6 +4,7 @@ workflow:
 
 stages:
     - dockerbuild
+    - check
     - build
     - test
     - deploy

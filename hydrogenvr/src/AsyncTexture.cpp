@@ -40,12 +40,12 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
     , sRGB(sRGB)
     , averageColor(defaultColor)
 {
-	unsigned char color[4];
+	std::array<unsigned char, 4> color{};
 	color[0] = defaultColor.red();
 	color[1] = defaultColor.green();
 	color[2] = defaultColor.blue();
 	color[3] = defaultColor.alpha();
-	defaultTex.setData({&(color[0])});
+	defaultTex.setData({color.data()});
 
 	if(path.isEmpty())
 	{
@@ -53,8 +53,8 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
 		return;
 	}
 
-	QImageReader imReader(path);
-	QSize size(imReader.size());
+	const QImageReader imReader(path);
+	const QSize size(imReader.size());
 
 	pbo = std::make_unique<GLPixelBufferObject>(size);
 
@@ -70,12 +70,12 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
     , sRGB(sRGB)
     , averageColor(defaultColor)
 {
-	unsigned char color[4];
+	std::array<unsigned char, 4> color{};
 	color[0] = defaultColor.red();
 	color[1] = defaultColor.green();
 	color[2] = defaultColor.blue();
 	color[3] = defaultColor.alpha();
-	defaultTex.setData({&(color[0])});
+	defaultTex.setData(color.data());
 
 	if(path.isEmpty())
 	{
@@ -83,8 +83,8 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
 		return;
 	}
 
-	QImageReader imReader(path);
-	QSize size(imReader.size());
+	const QImageReader imReader(path);
+	const QSize size(imReader.size());
 
 	if(forbidUpSample
 	   && (width > static_cast<unsigned int>(size.width())
@@ -133,7 +133,7 @@ GLTexture const& AsyncTexture::getTexture()
 	tex = pbo->copyContentToNewTex(sRGB);
 	pbo.reset();
 	tex->generateMipmap();
-	unsigned int lastMipmap(tex->getHighestMipmapLevel());
+	const unsigned int lastMipmap(tex->getHighestMipmapLevel());
 	averageColor = tex->getContentAsImage(lastMipmap).pixelColor(0, 0);
 	thread.reset();
 	loaded = true;

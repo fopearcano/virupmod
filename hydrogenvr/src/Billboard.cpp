@@ -50,8 +50,8 @@ Billboard::Billboard(GLTexture&& texture, GLShaderProgram&& shader)
 {
 	Primitives::setAsQuad(quad, this->shader, PrimitiveType::TRIANGLE_STRIP);
 
-	auto s(tex.getSize());
-	QSize size(s[0], s[1]);
+	const auto s(tex.getSize());
+	const QSize size(s[0], s[1]);
 
 	if(size.width() > size.height())
 	{
@@ -67,12 +67,12 @@ Billboard::Billboard(GLTexture&& texture, GLShaderProgram&& shader)
 
 void Billboard::render(BasicCamera const& camera)
 {
-	QVector3D hmdPos = utils::transformPosition(
+	const QVector3D hmdPos = utils::transformPosition(
 	    camera.hmdSpaceToWorldTransform().inverted(), position);
 	QMatrix4x4 model;
 	model.translate(hmdPos);
 	model.scale(width / camera.getEyeDistanceFactor());
-	GLBlendSet glBlend(GLBlendSet::BlendState{});
+	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	GLHandler::useTextures({&tex});
 	GLHandler::setUpRender(shader, model * aspectratio,
 	                       GLHandler::GeometricSpace::HMD);

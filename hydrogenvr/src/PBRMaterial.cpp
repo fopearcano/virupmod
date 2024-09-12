@@ -86,7 +86,7 @@ PBRMaterial::PBRMaterial(QString const& directory)
                                            {"TEXTURED_NORMAL", "1"}})
     , textured(true)
 {
-	QString path("images/" + directory + "/");
+	const QString path("images/" + directory + "/");
 	albedoTex = std::make_unique<GLTexture>(
 	    utils::getAbsoluteDataPath(path + "albedo.png"));
 	albedoTex->generateMipmap();
@@ -143,7 +143,7 @@ void PBRMaterial::setUpTextures(GLTexture const& irradiancemap,
 	                                          emissiveTex.get(),
 	                                          metallicRoughnessTex.get(),
 	                                          normalTex.get()};
-	for(auto shadowmap : shadowmaps)
+	for(const auto* shadowmap : shadowmaps)
 	{
 		textures.push_back(shadowmap);
 	}

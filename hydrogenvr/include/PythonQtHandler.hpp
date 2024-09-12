@@ -72,10 +72,10 @@ class PythonQtWrapper : public QObject
 {
 	Q_OBJECT
   private:
-	void overloadStaticBinary(const char* op);
-	void overloadMember(const char* op);
-	void overloadMemberUnary(const char* op);
-	void overloadMemberBinary(const char* op);
+	void overloadStaticBinary(const char* op) const;
+	void overloadMember(const char* op) const;
+	void overloadMemberUnary(const char* op) const;
+	void overloadMemberBinary(const char* op) const;
 
   public:
 	virtual const char* wrappedClassName() const    = 0;

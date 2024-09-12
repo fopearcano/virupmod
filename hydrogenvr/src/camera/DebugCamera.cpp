@@ -24,7 +24,7 @@ DebugCamera::DebugCamera(VRHandler const& vrHandler)
 {
 	camMeshShader.setUniform("color", QColor::fromRgbF(1.0f, 0.0f, 0.0f));
 
-	std::vector<float> vertices = {
+	const std::vector<float> vertices = {
 	    -1.0f, -1.0f, -1.0f, // 0
 	    -1.0f, -1.0f, 1.0f,  // 1
 	    -1.0f, 1.0f,  -1.0f, // 2
@@ -35,7 +35,7 @@ DebugCamera::DebugCamera(VRHandler const& vrHandler)
 	    1.0f,  1.0f,  1.0f,  // 7
 	};
 
-	std::vector<unsigned int> elements = {
+	const std::vector<unsigned int> elements = {
 	    0, 1, 0, 2, 0, 4,
 
 	    7, 6, 7, 5, 7, 3,
@@ -85,7 +85,7 @@ void DebugCamera::renderCamera(BasicCamera const& cam)
 	}
 }
 
-bool DebugCamera::isEnabled() const
+bool DebugCamera::isEnabled()
 {
 	return QSettings().value("debugcamera/enabled").toBool();
 }
@@ -100,7 +100,7 @@ void DebugCamera::toggle()
 	setEnabled(!isEnabled());
 }
 
-bool DebugCamera::debugInHeadset() const
+bool DebugCamera::debugInHeadset()
 {
 	return QSettings().value("debugcamera/debuginheadset").toBool();
 }
@@ -115,7 +115,7 @@ void DebugCamera::toggleDebugInHeadset()
 	setDebugInHeadset(!debugInHeadset());
 }
 
-bool DebugCamera::followHMD() const
+bool DebugCamera::followHMD()
 {
 	return QSettings().value("debugcamera/followhmd").toBool();
 }

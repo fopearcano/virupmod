@@ -41,7 +41,7 @@ class Scene
 
   protected:
 	virtual std::vector<Node*> sortedNodes() const;
-	virtual void updateNodes(BasicCamera& /*camera*/){};
+	virtual void updateNodes(BasicCamera& /*camera*/) {};
 	std::map<QString, Node*> nodesDict;
 	std::vector<std::unique_ptr<Light>> lights;
 

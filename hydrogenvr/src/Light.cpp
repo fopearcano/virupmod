@@ -88,9 +88,9 @@ void Light::generateShadowMap(std::vector<GLMesh const*> const& meshes,
 {
 	// see third comment :
 	// https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
-	GLStateSet glState({{GL_CULL_FACE, false}});
+	const GLStateSet glState({{GL_CULL_FACE, false}});
 	GLHandler::beginRendering(GL_DEPTH_BUFFER_BIT, shadowMap);
-	QMatrix4x4 lightSpace(getTransformation());
+	const QMatrix4x4 lightSpace(getTransformation());
 	for(unsigned int i(0); i < meshes.size(); ++i)
 	{
 		shadowShader.setUniform("camera", lightSpace * models[i]);
@@ -107,7 +107,7 @@ void Light::render(float angularSizeRad)
 	model.translate(-direction.normalized());
 	model.scale(tan(0.5 * angularSizeRad));
 
-	GLStateSet glState({{GL_DEPTH_TEST, false}});
+	const GLStateSet glState({{GL_DEPTH_TEST, false}});
 	GLHandler::setUpRender(def, model, GLHandler::GeometricSpace::SKYBOX);
 	mesh.render();
 }
@@ -121,7 +121,7 @@ void Light::setUpShader(GLShaderProgram const& shader,
 	std::vector<QMatrix4x4> lightspaces;
 	std::vector<float> boundingSphereRadii;
 
-	for(auto light : lights)
+	for(const auto* light : lights)
 	{
 		lightDirections.emplace_back(light->direction.normalized());
 		lightColors.emplace_back(light->color);

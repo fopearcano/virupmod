@@ -65,14 +65,9 @@ QVector4D BasicCamera::project(QVector4D const& vertex) const
 
 bool BasicCamera::shouldBeCulled(BoundingSphere const& boundingSphere) const
 {
-	for(auto const& angleShift : clippingPlanes.keys())
-	{
-		if(!shouldBeCulled(angleShift, boundingSphere))
-		{
-			return false;
-		}
-	}
-	return true;
+	return std::ranges::all_of(clippingPlanes.keys(),
+	                           [this, &boundingSphere](auto const& p)
+	                           { return shouldBeCulled(p, boundingSphere); });
 }
 
 bool BasicCamera::shouldBeCulled(QString const& angleShift,
@@ -103,7 +98,7 @@ void BasicCamera::update(QMatrix4x4 const& angleShiftMat)
 		                                          0.1f * eyeDistanceFactor,
 		                                          10000.f * eyeDistanceFactor);
 
-		Side currentRenderingEye(vrHandler.getCurrentRenderingEye());
+		const Side currentRenderingEye(vrHandler.getCurrentRenderingEye());
 
 		// fullEyeSpaceTransform
 		fullEyeSpaceTransform
@@ -292,7 +287,7 @@ float BasicCamera::pixelVertFOV() const
 
 float BasicCamera::pixelSolidAngle() const
 {
-	float radPerPix(pixelVertFOV());
+	const float radPerPix(pixelVertFOV());
 	// https://en.wikipedia.org/wiki/Solid_angle#Pyramid
 	return 4.0 * asin(sin(radPerPix / 2.0) * sin(radPerPix / 2.0));
 }

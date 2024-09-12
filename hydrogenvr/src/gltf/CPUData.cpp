@@ -35,8 +35,8 @@ Buffer::Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk)
 			           << json[key];
 		}
 	}
-	QString uri    = json["uri"].toString();
-	int byteLength = json["byteLength"].toInt();
+	const QString uri    = json["uri"].toString();
+	const int byteLength = json["byteLength"].toInt();
 	data.resize(byteLength);
 	name = json["name"].toString();
 
@@ -48,7 +48,7 @@ Buffer::Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk)
 
 	QFile file(uri); // TODO(florian): solve when this is over network
 	file.open(QIODevice::ReadOnly);
-	file.read(&data[0], byteLength);
+	file.read(data.data(), byteLength);
 }
 
 BufferView::BufferView(QJsonObject const& json,
@@ -75,7 +75,7 @@ BufferView::BufferView(QJsonObject const& json,
 Buffer const& BufferView::loadBuffer(QJsonObject const& json,
                                      std::vector<Buffer> const& globalBuffers)
 {
-	int idx = json["buffer"].toInt(-1);
+	const int idx = json["buffer"].toInt(-1);
 	if(idx >= 0)
 	{
 		return globalBuffers[idx];
@@ -126,7 +126,7 @@ void Accessor::load(QJsonObject const& json,
 			           << json[key];
 		}
 	}
-	int idx = json["bufferView"].toInt(-1);
+	const int idx = json["bufferView"].toInt(-1);
 	if(idx >= 0)
 	{
 		bufferView = &globalBufferViews[idx];
@@ -207,13 +207,13 @@ Sampler::Sampler(QJsonObject const& json)
 			           << json[key];
 		}
 	}
-	GLint magFilter     = convertFilter(json["magFilter"].toInt(9728));
-	GLint minFilter     = convertFilter(json["minFilter"].toInt(9728));
-	GLint wrapS         = convertWrap(json["wrapS"].toInt(10497));
-	GLint wrapT         = convertWrap(json["wrapT"].toInt(10497));
-	glSampler           = GLTexture::Sampler(magFilter, wrapS, wrapT);
-	glSampler.minfilter = minFilter;
-	name                = json["name"].toString();
+	const GLint magFilter = convertFilter(json["magFilter"].toInt(9728));
+	const GLint minFilter = convertFilter(json["minFilter"].toInt(9728));
+	const GLint wrapS     = convertWrap(json["wrapS"].toInt(10497));
+	const GLint wrapT     = convertWrap(json["wrapT"].toInt(10497));
+	glSampler             = GLTexture::Sampler(magFilter, wrapS, wrapT);
+	glSampler.minfilter   = minFilter;
+	name                  = json["name"].toString();
 }
 
 GLint Sampler::convertFilter(int filter)
@@ -271,8 +271,8 @@ Image::Image(QJsonObject const& json,
 	}
 	if(json.contains("uri"))
 	{
-		QString uri      = json["uri"].toString();
-		QString mimeType = json["mimeType"].toString();
+		const QString uri      = json["uri"].toString();
+		const QString mimeType = json["mimeType"].toString();
 		data.load(
 		    uri,
 		    mimeType
@@ -280,11 +280,11 @@ Image::Image(QJsonObject const& json,
 	}
 	else
 	{
-		int idx = json["bufferView"].toInt(-1);
+		const int idx = json["bufferView"].toInt(-1);
 		if(idx >= 0)
 		{
 			auto const& bufferView = globalBufferViews[idx];
-			QString mimeType       = json["mimeType"].toString();
+			const QString mimeType = json["mimeType"].toString();
 			auto const* dataPtr
 			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			    = reinterpret_cast<uchar const*>(bufferView.buffer.data.data());
@@ -433,9 +433,9 @@ void Material::load(QJsonObject const& json,
 			emissiveFactor[i] = json["emissiveFactor"].toArray()[i].toDouble();
 		}
 	}
-	QString alphaModeStr = json["alphaMode"].toString("OPAQUE");
-	alphaMode            = AlphaMode::OPAQUE;
-	alphaCutoff          = -1.f;
+	const QString alphaModeStr = json["alphaMode"].toString("OPAQUE");
+	alphaMode                  = AlphaMode::OPAQUE;
+	alphaCutoff                = -1.f;
 	if(alphaModeStr == "MASK")
 	{
 		alphaMode   = AlphaMode::MASK;
@@ -489,7 +489,7 @@ void Mesh::Primitive::load(QJsonObject const& json,
 			           << json[key];
 		}
 
-		int idx = json["attributes"].toObject()[key].toInt(-1);
+		const int idx = json["attributes"].toObject()[key].toInt(-1);
 		if(idx >= 0)
 		{
 			attributes[key] = &globalAccessors[idx];
@@ -565,8 +565,8 @@ void Node::load(QJsonObject const& json, std::vector<Mesh> const& globalMeshes)
 			childrenIds.push_back(nodeIdx);
 		}
 	}
-	name        = json["name"].toString();
-	int meshIdx = json["mesh"].toInt(-1);
+	name              = json["name"].toString();
+	const int meshIdx = json["mesh"].toInt(-1);
 	if(meshIdx >= 0)
 	{
 		mesh = &globalMeshes[meshIdx];
@@ -748,7 +748,7 @@ bool CPUData::load(QJsonObject const& json,
 
 	if(!scenes.empty())
 	{
-		int sceneIdx = json["scene"].toInt(-1);
+		const int sceneIdx = json["scene"].toInt(-1);
 		if(sceneIdx >= 0)
 		{
 			scene = &scenes[sceneIdx];

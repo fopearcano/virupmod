@@ -86,9 +86,9 @@ class GLBuffer
 	static unsigned int& instancesCount();
 
 	void glBufferData(GLenum target, size_t size, void const* data,
-	                  GLenum usage);
+	                  GLenum usage) const;
 	void glBufferSubData(GLenum target, size_t offset, size_t size,
-	                     void const* data);
+	                     void const* data) const;
 };
 
 template <typename T>

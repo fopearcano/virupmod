@@ -27,8 +27,8 @@ FontSelector::FontSelector(QString const& caption, QWidget* parent)
 	connect(this, &QPushButton::clicked, this,
 	        [this, caption](bool)
 	        {
-		        bool ok;
-		        QFont result(
+		        bool ok = false;
+		        const QFont result(
 		            QFontDialog::getFont(&ok, currentFont, this, caption));
 		        if(!ok)
 		        {

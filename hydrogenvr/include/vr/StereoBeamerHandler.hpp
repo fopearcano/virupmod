@@ -53,6 +53,8 @@ class StereoBeamerHandler : public VRHandler
 
   private:
 	bool enabled = false;
+
+	const float eyeShiftDist = 0.03215f;
 };
 
 #endif // STEREOBEAMERHANDLER_H

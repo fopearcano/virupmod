@@ -26,21 +26,21 @@ ShaderSelector::ShaderSelector(QWidget* parent)
 	setFixedSize(450, 600);
 	setWindowTitle(tr("Shader Selector"));
 
-	auto layout = make_qt_unique<QVBoxLayout>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w            = make_qt_unique<QWidget>(*this);
-	auto layoutSearch = make_qt_unique<QHBoxLayout>(*w);
+	auto* w            = make_qt_unique<QWidget>(*this);
+	auto* layoutSearch = make_qt_unique<QHBoxLayout>(*w);
 
-	auto searchLabel = make_qt_unique<QLabel>(*w);
+	auto* searchLabel = make_qt_unique<QLabel>(*w);
 	searchLabel->setText(tr("Search :"));
-	auto searchBar = make_qt_unique<QLineEdit>(*w);
+	auto* searchBar = make_qt_unique<QLineEdit>(*w);
 	connect(searchBar, &QLineEdit::textChanged, this,
 	        &ShaderSelector::setVisibleItems);
 	layoutSearch->addWidget(searchLabel);
 	layoutSearch->addWidget(searchBar);
 	layout->addWidget(w);
 
-	auto b = make_qt_unique<QPushButton>(*this);
+	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Refresh"));
 	connect(b, &QPushButton::pressed, [this]() { setVisible(true); });
 	layout->addWidget(b);
@@ -61,9 +61,9 @@ void ShaderSelector::setVisible(bool visible)
 	if(visible)
 	{
 		listWidget.clear();
-		for(auto shader : ShaderProgram::getAllShaderPrograms())
+		for(auto* shader : ShaderProgram::getAllShaderPrograms())
 		{
-			QString glID(shader->toStr());
+			const QString glID(shader->toStr());
 			QString pipelineStr;
 			for(auto const& p : shader->getPipeline())
 			{
@@ -88,7 +88,7 @@ void ShaderSelector::selectElement(QListWidgetItem* item)
 {
 	auto glID         = item->data(Qt::UserRole);
 	ShaderProgram* sp = nullptr;
-	for(auto shader : ShaderProgram::getAllShaderPrograms())
+	for(auto* shader : ShaderProgram::getAllShaderPrograms())
 	{
 		if(shader->toStr() == glID)
 		{
@@ -101,13 +101,13 @@ void ShaderSelector::selectElement(QListWidgetItem* item)
 		return;
 	}
 
-	auto editor = make_qt_unique<ShaderEditor>(*this, *sp);
+	auto* editor = make_qt_unique<ShaderEditor>(*this, *sp);
 	editor->show();
 }
 
 void ShaderSelector::setVisibleItems(QString const& match)
 {
-	for(auto item : listWidget.findItems("", Qt::MatchContains))
+	for(auto* item : listWidget.findItems("", Qt::MatchContains))
 	{
 		if(match == ""
 		   || item->text().contains(QString(match), Qt::CaseInsensitive))

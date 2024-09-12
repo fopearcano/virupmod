@@ -26,8 +26,8 @@ class TEXCUBEMAPViewer : public TextureViewer
   public:
 	explicit TEXCUBEMAPViewer(GLTexture const& tex, QWidget* parent = nullptr)
 	    : TextureViewer(
-	        tex, GLShaderProgram{"postprocess", "texdisplay/textureCubemap"},
-	        parent)
+	          tex, GLShaderProgram{"postprocess", "texdisplay/textureCubemap"},
+	          parent)
 	{
 	}
 };

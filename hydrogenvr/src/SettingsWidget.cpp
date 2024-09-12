@@ -91,7 +91,7 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addDoubleSetting("hfov", 0.0, tr("Horizontal field of view (0=auto)"), 0.0,
 	                 360.0);
 
-	InputManager inputManager;
+	const InputManager inputManager;
 	addGroup("controls", tr("Controls"));
 	currentForm->addRow(tr("ENGINE"), make_qt_unique<QWidget>(*this));
 
@@ -104,10 +104,10 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 		labels << pair.second;
 		defaultIndex = 1;
 	}
-	auto comboBox = addStringAmongListSetting("gamepad", vals, labels,
-	                                          tr("Gamepad"), defaultIndex);
+	auto* comboBox = addStringAmongListSetting("gamepad", vals, labels,
+	                                           tr("Gamepad"), defaultIndex);
 
-	auto refresh = make_qt_unique<QPushButton>(*this, tr("Refresh"));
+	auto* refresh = make_qt_unique<QPushButton>(*this, tr("Refresh"));
 	connect(refresh, &QPushButton::pressed,
 	        [this, comboBox]()
 	        {
@@ -120,9 +120,9 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 			        labels << pair.second;
 		        }
 
-		        QString currentVal(
+		        const QString currentVal(
 		            settings.value("controls/gamepad", "-1").toString());
-		        int currentIndex(vals.indexOf(currentVal));
+		        const int currentIndex(vals.indexOf(currentVal));
 
 		        comboBox->clear();
 		        for(int i(0); i < labels.size(); ++i)
@@ -173,7 +173,8 @@ SettingsWidget::SettingsWidget(QWidget* parent)
 	addUIntSetting("port", 5000, tr("UDP port"), 1025, 49999);
 	addUIntSetting("tcpport", 5001, tr("TCP port"), 1025, 49999);
 
-	QString scriptsDir("./data/" + QString(PROJECT_DIRECTORY) + "/scripts/");
+	const QString scriptsDir("./data/" + QString(PROJECT_DIRECTORY)
+	                         + "/scripts/");
 	QDirIterator it(scriptsDir, QStringList() << "main.py", QDir::Files,
 	                QDirIterator::Subdirectories);
 	QStringList dirList;
@@ -201,9 +202,9 @@ void SettingsWidget::addGroup(QString const& name, QString const& label)
 {
 	currentGroup = name;
 
-	auto newScrollArea = make_qt_unique<QScrollArea>(*this);
-	auto newTab        = make_qt_unique<QWidget>(*this);
-	currentForm        = make_qt_unique<QFormLayout>(*newTab);
+	auto* newScrollArea = make_qt_unique<QScrollArea>(*this);
+	auto* newTab        = make_qt_unique<QWidget>(*this);
+	currentForm         = make_qt_unique<QFormLayout>(*newTab);
 	currentForm->setSizeConstraint(QLayout::SetMinimumSize);
 
 	newScrollArea->setWidget(newTab);
@@ -218,9 +219,9 @@ void SettingsWidget::insertGroup(QString const& name, QString const& label,
 {
 	currentGroup = name;
 
-	auto newScrollArea = make_qt_unique<QScrollArea>(*this);
-	auto newTab        = make_qt_unique<QWidget>(*this);
-	currentForm        = make_qt_unique<QFormLayout>(*newTab);
+	auto* newScrollArea = make_qt_unique<QScrollArea>(*this);
+	auto* newTab        = make_qt_unique<QWidget>(*this);
+	currentForm         = make_qt_unique<QFormLayout>(*newTab);
 	currentForm->setSizeConstraint(QLayout::SetMinimumSize);
 
 	newScrollArea->setWidget(newTab);
@@ -234,7 +235,7 @@ void SettingsWidget::editGroup(QString const& name, bool ignoreEngineSeparation)
 {
 	currentGroup = name;
 
-	unsigned int index(orderedGroups.indexOf(name));
+	const unsigned int index(orderedGroups.indexOf(name));
 
 	currentForm = dynamic_cast<QFormLayout*>(
 	    dynamic_cast<QScrollArea*>(QTabWidget::widget(index))
@@ -275,18 +276,17 @@ void SettingsWidget::insertCustomGroup(QString const& name,
 void SettingsWidget::addBoolSetting(QString const& name, bool defaultVal,
                                     QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto checkBox = make_qt_unique<QCheckBox>(*this);
+	auto* checkBox = make_qt_unique<QCheckBox>(*this);
 	checkBox->setCheckState(settings.value(fullName).toBool() ? Qt::Checked
 	                                                          : Qt::Unchecked);
-	connect(checkBox, &QCheckBox::stateChanged, this,
-	        [this, fullName](int s)
+	connect(checkBox, &QCheckBox::stateChanged, this, [this, fullName](int s)
 	        { updateValue(fullName, s != Qt::Unchecked); });
 
 	currentForm->addRow(label + " :", checkBox);
@@ -297,14 +297,14 @@ void SettingsWidget::addUIntSetting(QString const& name,
                                     QString const& label, unsigned int minVal,
                                     unsigned int maxVal)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto sbox = make_qt_unique<QSpinBox>(*this);
+	auto* sbox = make_qt_unique<QSpinBox>(*this);
 	sbox->setRange(minVal, maxVal);
 	sbox->setValue(settings.value(fullName).toUInt());
 
@@ -318,14 +318,14 @@ void SettingsWidget::addUIntSetting(QString const& name,
 void SettingsWidget::addIntSetting(QString const& name, int defaultVal,
                                    QString const& label, int minVal, int maxVal)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto sbox = make_qt_unique<QSpinBox>(*this);
+	auto* sbox = make_qt_unique<QSpinBox>(*this);
 	sbox->setRange(minVal, maxVal);
 	sbox->setValue(settings.value(fullName).toInt());
 
@@ -339,14 +339,14 @@ void SettingsWidget::addDoubleSetting(QString const& name, double defaultVal,
                                       QString const& label, double minVal,
                                       double maxVal, unsigned int decimals)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto sbox = make_qt_unique<QDoubleSpinBox>(*this);
+	auto* sbox = make_qt_unique<QDoubleSpinBox>(*this);
 	sbox->setRange(minVal, maxVal);
 	sbox->setDecimals(decimals);
 	sbox->setValue(settings.value(fullName).toDouble());
@@ -363,14 +363,14 @@ void SettingsWidget::addStringSetting(QString const& name,
                                       QString const& defaultVal,
                                       QString const& label, bool password)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto lineEdit = make_qt_unique<QLineEdit>(*this);
+	auto* lineEdit = make_qt_unique<QLineEdit>(*this);
 	lineEdit->setText(settings.value(fullName).toString());
 	lineEdit->setMinimumWidth(400);
 	if(password)
@@ -389,9 +389,9 @@ QComboBox* SettingsWidget::addStringAmongListSetting(
     QStringList const& strLabels, QString const& label,
     unsigned int defaultIndex)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
-	QString currentVal(settings.value(fullName).toString());
+	const QString currentVal(settings.value(fullName).toString());
 	int currentIndex(values.indexOf(currentVal));
 
 	if(!settings.contains(fullName) || currentIndex < 0)
@@ -400,7 +400,7 @@ QComboBox* SettingsWidget::addStringAmongListSetting(
 		currentIndex = defaultIndex;
 	}
 
-	auto comboBox = make_qt_unique<QComboBox>(*this);
+	auto* comboBox = make_qt_unique<QComboBox>(*this);
 	for(int i(0); i < strLabels.size(); ++i)
 	{
 		auto const& label(strLabels[i]);
@@ -429,30 +429,30 @@ void SettingsWidget::addFilePathSetting(QString const& name,
                                         QString const& label,
                                         QString const& filter)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto lineEdit = make_qt_unique<QLineEdit>(*this);
+	auto* lineEdit = make_qt_unique<QLineEdit>(*this);
 	lineEdit->setText(settings.value(fullName).toString());
 	lineEdit->setMinimumWidth(400);
 
-	auto dirModel = make_qt_unique<QFileSystemModel>(*this);
+	auto* dirModel = make_qt_unique<QFileSystemModel>(*this);
 	dirModel->setRootPath(QDir::currentPath());
-	auto completer = make_qt_unique<QCompleter>(*this, dirModel);
+	auto* completer = make_qt_unique<QCompleter>(*this, dirModel);
 	completer->setCaseSensitivity(Qt::CaseInsensitive);
 	completer->setCompletionMode(QCompleter::PopupCompletion);
 	lineEdit->setCompleter(completer);
 
-	auto browsePb = make_qt_unique<QPushButton>(*this);
+	auto* browsePb = make_qt_unique<QPushButton>(*this);
 	browsePb->setText("...");
 	connect(browsePb, &QPushButton::clicked, this,
 	        [this, label, lineEdit, filter](bool)
 	        {
-		        QString result(QFileDialog::getOpenFileName(
+		        const QString result(QFileDialog::getOpenFileName(
 		            this, label, lineEdit->text(), filter));
 		        if(result != "")
 		        {
@@ -460,8 +460,8 @@ void SettingsWidget::addFilePathSetting(QString const& name,
 		        }
 	        });
 
-	auto w      = make_qt_unique<QWidget>(*this);
-	auto layout = make_qt_unique<QHBoxLayout>(*w);
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* layout = make_qt_unique<QHBoxLayout>(*w);
 	layout->addWidget(lineEdit);
 	layout->addWidget(browsePb);
 
@@ -475,30 +475,30 @@ void SettingsWidget::addDirPathSetting(QString const& name,
                                        QString const& defaultVal,
                                        QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	auto lineEdit = make_qt_unique<QLineEdit>(*this);
+	auto* lineEdit = make_qt_unique<QLineEdit>(*this);
 	lineEdit->setText(settings.value(fullName).toString());
 	lineEdit->setFixedWidth(350);
 
-	auto dirModel = make_qt_unique<QFileSystemModel>(*this);
+	auto* dirModel = make_qt_unique<QFileSystemModel>(*this);
 	dirModel->setRootPath(QDir::currentPath());
-	auto completer = make_qt_unique<QCompleter>(*this, dirModel);
+	auto* completer = make_qt_unique<QCompleter>(*this, dirModel);
 	completer->setCaseSensitivity(Qt::CaseInsensitive);
 	completer->setCompletionMode(QCompleter::PopupCompletion);
 	lineEdit->setCompleter(completer);
 
-	auto browsePb = make_qt_unique<QPushButton>(*this);
+	auto* browsePb = make_qt_unique<QPushButton>(*this);
 	browsePb->setText("...");
 	connect(browsePb, &QPushButton::clicked, this,
 	        [this, label, lineEdit](bool)
 	        {
-		        QString result(QFileDialog::getExistingDirectory(
+		        const QString result(QFileDialog::getExistingDirectory(
 		            this, label, lineEdit->text()));
 		        if(result != "")
 		        {
@@ -506,8 +506,8 @@ void SettingsWidget::addDirPathSetting(QString const& name,
 		        }
 	        });
 
-	auto w      = make_qt_unique<QWidget>(*this);
-	auto layout = make_qt_unique<QHBoxLayout>(*w);
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* layout = make_qt_unique<QHBoxLayout>(*w);
 	layout->addWidget(lineEdit);
 	layout->addWidget(browsePb);
 
@@ -523,7 +523,7 @@ void SettingsWidget::addVector3DSetting(QString const& name,
                                         std::array<QString, 3> componentLabels,
                                         float minVal, float maxVal)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
@@ -532,8 +532,8 @@ void SettingsWidget::addVector3DSetting(QString const& name,
 
 	auto stored(settings.value(fullName).value<QVector3D>());
 
-	auto w                                = make_qt_unique<QWidget>(*this);
-	auto layout                           = make_qt_unique<QHBoxLayout>(*w);
+	auto* w                               = make_qt_unique<QWidget>(*this);
+	auto* layout                          = make_qt_unique<QHBoxLayout>(*w);
 	std::array<QDoubleSpinBox*, 3> sboxes = {{nullptr, nullptr, nullptr}};
 	unsigned int i(0);
 	for(auto& sbox : sboxes)
@@ -547,7 +547,7 @@ void SettingsWidget::addVector3DSetting(QString const& name,
 		layout->addWidget(sbox);
 		++i;
 	}
-	for(auto sbox : sboxes)
+	for(auto* sbox : sboxes)
 	{
 		connect(sbox,
 		        static_cast<void (QDoubleSpinBox::*)(double)>(
@@ -568,7 +568,7 @@ void SettingsWidget::addColorSetting(QString const& name,
                                      QColor const& defaultVal,
                                      QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
@@ -577,7 +577,7 @@ void SettingsWidget::addColorSetting(QString const& name,
 
 	auto stored(settings.value(fullName).value<QColor>());
 
-	auto colorSelector = make_qt_unique<ColorSelector>(*this, label);
+	auto* colorSelector = make_qt_unique<ColorSelector>(*this, label);
 
 	colorSelector->setStyleSheet("QPushButton{ \
     background-color: " + stored.name()
@@ -596,20 +596,21 @@ void SettingsWidget::addDateTimeSetting(QString const& name,
                                         QDateTime const& defaultVal,
                                         QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	QDateTime stored(settings.value(fullName).value<QDateTime>().toTimeSpec(
-	    Qt::OffsetFromUTC));
+	const QDateTime stored(
+	    settings.value(fullName).value<QDateTime>().toTimeSpec(
+	        Qt::OffsetFromUTC));
 
-	auto w      = make_qt_unique<QWidget>(*this);
-	auto layout = make_qt_unique<QHBoxLayout>(*w);
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* layout = make_qt_unique<QHBoxLayout>(*w);
 
-	auto dtEdit = make_qt_unique<QDateTimeEdit>(*this, stored);
+	auto* dtEdit = make_qt_unique<QDateTimeEdit>(*this, stored);
 	dtEdit->setCalendarPopup(true);
 	dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
 
@@ -617,9 +618,8 @@ void SettingsWidget::addDateTimeSetting(QString const& name,
 	        [this, fullName](QDateTime dt)
 	        { updateValue(fullName, std::move(dt)); });
 
-	auto now = make_qt_unique<QPushButton>(*this, tr("Now"));
-	connect(now, &QPushButton::clicked, this,
-	        [dtEdit]()
+	auto* now = make_qt_unique<QPushButton>(*this, tr("Now"));
+	connect(now, &QPushButton::clicked, this, [dtEdit]()
 	        { dtEdit->setDateTime(QDateTime::currentDateTimeUtc()); });
 
 	layout->addWidget(dtEdit);
@@ -631,22 +631,22 @@ void SettingsWidget::addScreenSetting(QString const& name,
                                       QString const& defaultVal,
                                       QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
 	}
 
-	QString stored(settings.value(fullName).toString());
+	const QString stored(settings.value(fullName).toString());
 
-	auto w      = make_qt_unique<QWidget>(*this);
-	auto layout = make_qt_unique<QHBoxLayout>(*w);
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* layout = make_qt_unique<QHBoxLayout>(*w);
 
-	auto l = make_qt_unique<QLabel>(*this);
+	auto* l = make_qt_unique<QLabel>(*this);
 	l->setText(stored == "" ? "AUTO" : stored);
 
-	auto button = make_qt_unique<QPushButton>(*this);
+	auto* button = make_qt_unique<QPushButton>(*this);
 	button->setText("...");
 
 	connect(button, &QPushButton::clicked, this,
@@ -689,7 +689,7 @@ void SettingsWidget::addWindowsDefinitionSettings(
 	};
 	// end of lambdas
 
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
@@ -702,12 +702,12 @@ void SettingsWidget::addWindowsDefinitionSettings(
 		windowsParams << RenderingWindow::Parameters{};
 	}
 
-	auto tab = make_qt_unique<QTabWidget>(*this);
+	auto* tab = make_qt_unique<QTabWidget>(*this);
 	tab->setMaximumWidth(400);
 	tab->setTabsClosable(windowsParams.size() > 1);
 	for(int i(0); i < windowsParams.size(); ++i)
 	{
-		auto windowParamsSelector = make_qt_unique<WindowParametersSelector>(
+		auto* windowParamsSelector = make_qt_unique<WindowParametersSelector>(
 		    *this, windowsParams.at(i));
 		RenderingWindow::Parameters* p = &windowsParams[i];
 
@@ -762,12 +762,12 @@ void SettingsWidget::addWindowsDefinitionSettings(
 		        }
 	        });
 
-	auto button = make_qt_unique<QPushButton>(*this);
+	auto* button = make_qt_unique<QPushButton>(*this);
 	button->setText("+");
 	connect(button, &QPushButton::pressed,
 	        [this, fullName, &valToVariant, tab]()
 	        {
-		        auto windowParamsSelector
+		        auto* windowParamsSelector
 		            = make_qt_unique<WindowParametersSelector>(*this);
 		        windowsParams.append(RenderingWindow::Parameters{});
 		        tab->setTabsClosable(windowsParams.size() > 1);
@@ -796,7 +796,7 @@ void SettingsWidget::addKeySequenceSetting(QString const& name,
                                            QKeySequence const& defaultVal,
                                            QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 
 	if(!settings.contains(fullName))
 	{
@@ -804,7 +804,7 @@ void SettingsWidget::addKeySequenceSetting(QString const& name,
 		                  defaultVal.toString(QKeySequence::PortableText));
 	}
 
-	auto keyseqEdit = make_qt_unique<QKeySequenceEdit>(
+	auto* keyseqEdit = make_qt_unique<QKeySequenceEdit>(
 	    *this, QKeySequence(settings.value(fullName).toString(),
 	                        QKeySequence::PortableText));
 	keyseqEdit->setMinimumWidth(100);
@@ -820,7 +820,7 @@ void SettingsWidget::addLanguageSetting(QString const& name,
                                         QString const& defaultVal,
                                         QString const& label)
 {
-	QString fullName(currentGroup + '/' + name);
+	const QString fullName(currentGroup + '/' + name);
 	if(!settings.contains(fullName))
 	{
 		settings.setValue(fullName, defaultVal);
@@ -833,14 +833,14 @@ void SettingsWidget::addLanguageSetting(QString const& name,
 	for(auto const& file :
 	    QDir("data/translations").entryList({"HydrogenVR_*.qm"}, QDir::Files))
 	{
-		QString name(file.split('_')[1].split(".")[0]);
+		const QString name(file.split('_')[1].split(".")[0]);
 		QPair<QString, QString> elem(
 		    {name, QLocale(name).nativeLanguageName()});
 		elem.second[0] = elem.second[0].toUpper();
 		available.push_back(elem);
 	}
 
-	auto comboBox = make_qt_unique<QComboBox>(*this);
+	auto* comboBox = make_qt_unique<QComboBox>(*this);
 	for(auto const& pair : available)
 	{
 		comboBox->addItem(pair.second, pair.first);
@@ -851,11 +851,11 @@ void SettingsWidget::addLanguageSetting(QString const& name,
 		}
 	}
 
-	void (QComboBox::*indexChangedSignal)(int)
-	    = &QComboBox::currentIndexChanged;
-	connect(comboBox, indexChangedSignal, this,
-	        [this, fullName, available](int index)
-	        { updateValue(fullName, available[index].first); });
+	connect(
+	    comboBox,
+	    static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+	    this, [this, fullName, available](int index)
+	    { updateValue(fullName, available[index].first); });
 
 	currentForm->addRow(label + " :", comboBox);
 }
@@ -867,7 +867,7 @@ void SettingsWidget::showEvent(QShowEvent* /*event*/)
 	for(int i(0); i < orderedGroups.size(); ++i)
 	{
 		setCurrentIndex(i);
-		auto w = dynamic_cast<QScrollArea*>(QTabWidget::widget(i))->widget();
+		auto* w = dynamic_cast<QScrollArea*>(QTabWidget::widget(i))->widget();
 		maxWidgetSize.setWidth(fmaxf(maxWidgetSize.width(), w->size().width()));
 		maxWidgetSize.setHeight(
 		    fmaxf(maxWidgetSize.height(), w->size().height()));

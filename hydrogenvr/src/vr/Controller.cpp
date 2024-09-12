@@ -11,18 +11,17 @@ std::string GetTrackedDeviceString(vr::IVRSystem* pHmd,
                                    vr::TrackedDeviceProperty prop,
                                    vr::TrackedPropertyError* peError = nullptr)
 {
-	uint32_t requiredBufferLen = pHmd->GetStringTrackedDeviceProperty(
+	const uint32_t requiredBufferLen = pHmd->GetStringTrackedDeviceProperty(
 	    unDevice, prop, nullptr, 0, peError);
 	if(requiredBufferLen == 0)
 	{
 		return "";
 	}
 
-	auto pchBuffer = std::unique_ptr<char[]>(new char[requiredBufferLen]);
-	pHmd->GetStringTrackedDeviceProperty(unDevice, prop, pchBuffer.get(),
+	std::string pchBuffer(requiredBufferLen, '\0');
+	pHmd->GetStringTrackedDeviceProperty(unDevice, prop, pchBuffer.data(),
 	                                     requiredBufferLen, peError);
-	std::string sResult = pchBuffer.get();
-	return sResult;
+	return pchBuffer;
 }
 
 int getAxisId(vr::IVRSystem* vr_pointer, unsigned int deviceId, int axis)
@@ -31,7 +30,7 @@ int getAxisId(vr::IVRSystem* vr_pointer, unsigned int deviceId, int axis)
 	// reading of the trigger
 	for(int i = 0; i < static_cast<int>(vr::k_unControllerStateAxisCount); i++)
 	{
-		int prop = vr_pointer->GetInt32TrackedDeviceProperty(
+		const int prop = vr_pointer->GetInt32TrackedDeviceProperty(
 		    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
 		    deviceId, static_cast<vr::ETrackedDeviceProperty>(
 		                  vr::Prop_Axis0Type_Int32 + i));
@@ -53,11 +52,11 @@ Controller::Controller(vr::IVRSystem* vr_pointer, unsigned int nDevice,
     , padid(getAxisId(vr_pointer, nDevice, vr::k_eControllerAxis_TrackPad))
     , shaderProgram("controllers")
 {
-	std::string render_model_name = GetTrackedDeviceString(
+	const std::string render_model_name = GetTrackedDeviceString(
 	    vr_pointer, nDevice, vr::Prop_RenderModelName_String);
 
-	vr::RenderModel_t* model;
-	vr::EVRRenderModelError error;
+	vr::RenderModel_t* model = nullptr;
+	vr::EVRRenderModelError error{};
 	while(true)
 	{
 		qDebug() << QString("Starting loading render model's model (")
@@ -83,7 +82,7 @@ Controller::Controller(vr::IVRSystem* vr_pointer, unsigned int nDevice,
 		return;
 	}
 
-	vr::RenderModel_TextureMap_t* rm_texture;
+	vr::RenderModel_TextureMap_t* rm_texture = nullptr;
 	while(true)
 	{
 		qDebug() << QString("Starting loading render model's texture (")

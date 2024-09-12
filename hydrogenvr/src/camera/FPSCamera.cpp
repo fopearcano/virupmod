@@ -101,20 +101,22 @@ void FPSCamera::mouseMoveEvent(QMouseEvent* e, QRect const& winGeometry)
 		return;
 	}
 
-	float dx = (winGeometry.x() + static_cast<float>(winGeometry.width()) / 2
+	const float dx
+	    = (winGeometry.x() + static_cast<float>(winGeometry.width()) / 2
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	            - e->globalPosition().x())
+	       - e->globalPosition().x())
 #else
-	            - e->globalX())
+	       - e->globalX())
 #endif
-	           / winGeometry.width();
-	float dy = (winGeometry.y() + static_cast<float>(winGeometry.height()) / 2
+	      / winGeometry.width();
+	const float dy
+	    = (winGeometry.y() + static_cast<float>(winGeometry.height()) / 2
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-	            - e->globalPosition().y())
+	       - e->globalPosition().y())
 #else
-	            - e->globalY())
+	       - e->globalY())
 #endif
-	           / winGeometry.height();
+	      / winGeometry.height();
 	yaw += dx * 3.14f / 3.f;
 	pitch += dy * 3.14f / 3.f;
 	QCursor::setPos(winGeometry.x() + winGeometry.width() / 2,
@@ -134,8 +136,8 @@ void FPSCamera::updateLookAt(float frameTiming,
 		                   - static_cast<int>(oldGamepadVel.y() < 0));
 		oldGamepadVel.setZ(static_cast<int>(oldGamepadVel.z() > 0)
 		                   - static_cast<int>(oldGamepadVel.z() < 0));
-		float yVal = gamepadHandler.getTrigger(Side::RIGHT)
-		             - gamepadHandler.getTrigger(Side::LEFT);
+		const float yVal = gamepadHandler.getTrigger(Side::RIGHT)
+		                   - gamepadHandler.getTrigger(Side::LEFT);
 		gamepadVel = {gamepadHandler.getJoystick(Side::LEFT).x(), yVal,
 		              gamepadHandler.getJoystick(Side::LEFT).y()};
 		auto signOfGamepadVel = gamepadVel;

@@ -26,9 +26,9 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 {
 	setWindowTitle(tr("Shader Editor") + " - " + shader.toStr());
 
-	auto layout = make_qt_unique<QVBoxLayout>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto label = make_qt_unique<QLabel>(*this);
+	auto* label = make_qt_unique<QLabel>(*this);
 	QString header;
 	for(auto const& p : shader.getPipeline())
 	{
@@ -57,24 +57,24 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 	}
 	files.removeDuplicates();
 
-	auto t = make_qt_unique<QTabWidget>(*this);
+	auto* t = make_qt_unique<QTabWidget>(*this);
 	layout->addWidget(t);
 
 	for(auto const& f : files)
 	{
-		auto w         = make_qt_unique<QWidget>(*this);
-		auto tabLayout = make_qt_unique<QVBoxLayout>(*w);
+		auto* w         = make_qt_unique<QWidget>(*this);
+		auto* tabLayout = make_qt_unique<QVBoxLayout>(*w);
 
 		QFile file(f);
 		file.open(QIODevice::ReadOnly | QFile::Text);
 		QTextStream in(&file);
-		auto text = make_qt_unique<QTextEdit>(*this);
+		auto* text = make_qt_unique<QTextEdit>(*this);
 		text->setText(in.readAll().toLocal8Bit());
 		file.close();
 		tabLayout->addWidget(text);
 		(void) make_qt_unique<GlslSyntaxHighlighter>(*text->document());
 
-		auto b = make_qt_unique<QPushButton>(*this, tr("Save"));
+		auto* b = make_qt_unique<QPushButton>(*this, tr("Save"));
 		connect(b, &QPushButton::pressed,
 		        [text, f]()
 		        {
@@ -87,7 +87,7 @@ ShaderEditor::ShaderEditor(ShaderProgram& shader, QWidget* parent)
 
 		t->addTab(w, f);
 	}
-	auto b = make_qt_unique<QPushButton>(*this, tr("Reload"));
+	auto* b = make_qt_unique<QPushButton>(*this, tr("Reload"));
 	connect(b, &QPushButton::pressed, [&shader]() { shader.reload(); });
 	layout->addWidget(b);
 }

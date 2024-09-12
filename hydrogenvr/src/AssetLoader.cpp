@@ -20,7 +20,7 @@
 
 std::vector<AssetLoader::TextureType> const& AssetLoader::textureTypes()
 {
-	static std::vector<TextureType> textureTypes
+	static const std::vector<TextureType> textureTypes
 	    = {TextureType::DIFFUSE,  TextureType::SPECULAR, TextureType::AMBIENT,
 	       TextureType::EMISSIVE, TextureType::NORMALS,  TextureType::SHININESS,
 	       TextureType::OPACITY,  TextureType::LIGHTMAP};
@@ -29,7 +29,7 @@ std::vector<AssetLoader::TextureType> const& AssetLoader::textureTypes()
 
 std::vector<aiTextureType> const& AssetLoader::assimpTextureTypes()
 {
-	static std::vector<aiTextureType> assimpTextureTypes = {
+	static const std::vector<aiTextureType> assimpTextureTypes = {
 	    aiTextureType_DIFFUSE,  aiTextureType_SPECULAR, aiTextureType_AMBIENT,
 	    aiTextureType_EMISSIVE, aiTextureType_NORMALS,  aiTextureType_SHININESS,
 	    aiTextureType_OPACITY,  aiTextureType_LIGHTMAP};
@@ -47,8 +47,8 @@ std::pair<float, std::vector<AssetLoader::MeshDescriptor>>
 
 	modelName = utils::getAbsoluteDataPath(modelName);
 
-	std::string path(modelName.toStdString());
-	std::string directory = path.substr(0, path.find_last_of('/'));
+	const std::string path(modelName.toStdString());
+	const std::string directory = path.substr(0, path.find_last_of('/'));
 
 	Assimp::Importer importer;
 	aiScene const* scene = importer.ReadFile(
@@ -93,7 +93,7 @@ std::vector<AssetLoader::TexturedMesh>
 		for(auto const& tex : descriptor.texturesPathsTypes)
 		{
 			// discard additional textures, keep only one per type
-			if(tMesh.textures.count(tex.first) == 0 && !tex.second.empty())
+			if(!tMesh.textures.contains(tex.first) && !tex.second.empty())
 			{
 				GLTexture gpuTex{tex.second.c_str(),
 				                 tex.first == TextureType::DIFFUSE};
@@ -104,19 +104,19 @@ std::vector<AssetLoader::TexturedMesh>
 		// complete with default textures
 		for(auto const& ttype : textureTypes())
 		{
-			if(tMesh.textures.count(ttype) == 0)
+			if(!tMesh.textures.contains(ttype))
 			{
-				QColor color(getDefaultColor(ttype, defaultDiffuseColor));
-				char data[4];
+				const QColor color(getDefaultColor(ttype, defaultDiffuseColor));
+				std::array<char, 4> data{};
 				data[0] = color.red();
 				data[1] = color.green();
 				data[2] = color.blue();
 				data[3] = color.alpha();
 				tMesh.textures.emplace(
-				    ttype,
-				    GLTexture{GLTexture::Tex2DProperties(
-				                  1, 1, ttype == TextureType::DIFFUSE),
-				              GLTexture::Sampler{}, GLTexture::Data{&data[0]}});
+				    ttype, GLTexture{GLTexture::Tex2DProperties(
+				                         1, 1, ttype == TextureType::DIFFUSE),
+				                     GLTexture::Sampler{},
+				                     GLTexture::Data{data.data()}});
 			}
 		}
 		tMesh.transform = descriptor.transform;
@@ -129,9 +129,10 @@ std::pair<float, std::vector<AssetLoader::TexturedMesh>>
                            GLShaderProgram const& shader,
                            QColor const& defaultDiffuseColor)
 {
-	std::pair<float, std::vector<MeshDescriptor>> pair(loadFile(modelName));
+	const std::pair<float, std::vector<MeshDescriptor>> pair(
+	    loadFile(modelName));
 
-	float bsRad(pair.first);
+	const float bsRad(pair.first);
 	if(bsRad == 0.f)
 	{
 		return std::make_pair(0.f, std::vector<TexturedMesh>{});
@@ -146,8 +147,8 @@ std::pair<float, std::vector<AssetLoader::TexturedMesh>>
 std::string AssetLoader::findFilePath(std::string const& directory,
                                       std::string const& fileName)
 {
-	QDir dir(directory.c_str());
-	QFileInfoList results = dir.entryInfoList();
+	const QDir dir(directory.c_str());
+	const QFileInfoList results = dir.entryInfoList();
 	for(auto const& entry : results)
 	{
 		if(entry.fileName() == "." || entry.fileName() == "..")
@@ -179,18 +180,14 @@ QColor AssetLoader::getDefaultColor(TextureType ttype,
 	{
 		case TextureType::DIFFUSE:
 			return diffuseColor;
-		case TextureType::SPECULAR:
-			return {0, 0, 0};
-		case TextureType::AMBIENT:
-			return {255, 255, 255};
-		case TextureType::EMISSIVE:
-			return {0, 0, 0};
 		case TextureType::NORMALS:
 			return {128, 128, 255};
 		case TextureType::SHININESS:
+		case TextureType::EMISSIVE:
+		case TextureType::SPECULAR:
 			return {0, 0, 0};
+		case TextureType::AMBIENT:
 		case TextureType::OPACITY:
-			return {255, 255, 255};
 		case TextureType::LIGHTMAP:
 			return {255, 255, 255};
 		default:
@@ -211,13 +208,15 @@ float AssetLoader::parseNode(aiNode const& node, aiScene const& scene,
                              std::vector<MeshDescriptor>& meshDescriptors)
 {
 	float boundingSphereRadius(0.f);
-	QMatrix4x4 nodeTransform(transform * assimpToQt(node.mTransformation));
+	const QMatrix4x4 nodeTransform(transform
+	                               * assimpToQt(node.mTransformation));
 	for(unsigned int i(0); i < node.mNumMeshes; ++i)
 	{
 		meshDescriptors.emplace_back();
 		MeshDescriptor& descriptor = meshDescriptors.back();
 		aiMesh const& mesh         = *scene.mMeshes[node.mMeshes[i]];
-		float bsr(parseMesh(mesh, scene, directory, nodeTransform, descriptor));
+		const float bsr(
+		    parseMesh(mesh, scene, directory, nodeTransform, descriptor));
 		if(bsr > boundingSphereRadius)
 		{
 			boundingSphereRadius = bsr;
@@ -226,8 +225,8 @@ float AssetLoader::parseNode(aiNode const& node, aiScene const& scene,
 	// recurse
 	for(unsigned int i(0); i < node.mNumChildren; ++i)
 	{
-		float bsr(parseNode(*node.mChildren[i], scene, directory, nodeTransform,
-		                    meshDescriptors));
+		const float bsr(parseNode(*node.mChildren[i], scene, directory,
+		                          nodeTransform, meshDescriptors));
 		if(bsr > boundingSphereRadius)
 		{
 			boundingSphereRadius = bsr;
@@ -246,16 +245,16 @@ float AssetLoader::parseMesh(aiMesh const& mesh, aiScene const& scene,
 	std::vector<unsigned int>& ind = result.indices;
 	for(unsigned int j(0); j < mesh.mNumVertices; j++)
 	{
-		QVector3D vertice(mesh.mVertices[j].x, mesh.mVertices[j].y,
-		                  mesh.mVertices[j].z);
-		auto l = utils::transformPosition(transform, vertice).length();
+		const QVector3D vertex(mesh.mVertices[j].x, mesh.mVertices[j].y,
+		                       mesh.mVertices[j].z);
+		auto l = utils::transformPosition(transform, vertex).length();
 		if(boundingSphereRadius < l)
 		{
 			boundingSphereRadius = l;
 		}
-		v.push_back(vertice.x());
-		v.push_back(vertice.y());
-		v.push_back(vertice.z());
+		v.push_back(vertex.x());
+		v.push_back(vertex.y());
+		v.push_back(vertex.z());
 		if(mesh.HasTangentsAndBitangents())
 		{
 			v.push_back(mesh.mTangents[j].x);

@@ -30,12 +30,12 @@ void BaseLauncher::init()
 	connect(settingsWidget.get(), &SettingsWidget::maxWidgetSizeChanged,
 	        [this](QSize const& maxWidgetSize)
 	        {
-		        QSize borders(30, 150);
+		        const QSize borders(30, 150);
 
 		        auto newSize = maxWidgetSize;
 		        newSize += borders;
 
-		        auto screen     = this->window()->windowHandle()->screen();
+		        auto* screen    = this->window()->windowHandle()->screen();
 		        auto screenSize = screen->size();
 		        newSize.setWidth(
 		            fminf(newSize.width(), screenSize.width() * 0.5f));
@@ -45,21 +45,21 @@ void BaseLauncher::init()
 	        });
 
 	// LAUNCH AND QUIT BUTTONS
-	auto w = make_qt_unique<QWidget>(*this);
+	auto* w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto l   = make_qt_unique<QHBoxLayout>(*w);
-	auto pbl = make_qt_unique<QPushButton>(*this);
+	auto* l   = make_qt_unique<QHBoxLayout>(*w);
+	auto* pbl = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbl);
 	pbl->setText(tr("LAUNCH"));
 	pbl->setDefault(true);
 	connect(pbl, SIGNAL(pressed()), this, SLOT(accept()));
 
-	auto pbr = make_qt_unique<QPushButton>(*this);
+	auto* pbr = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbr);
 	pbr->setText(tr("RESET TO DEFAULT"));
 	connect(pbr, SIGNAL(pressed()), this, SLOT(resetSettings()));
 
-	auto pbq = make_qt_unique<QPushButton>(*this);
+	auto* pbq = make_qt_unique<QPushButton>(*this);
 	l->addWidget(pbq);
 	pbq->setText(tr("QUIT"));
 	connect(pbq, SIGNAL(pressed()), this, SLOT(reject()));

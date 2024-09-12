@@ -46,7 +46,7 @@ void TimeProgressSlider::updateTime(int time)
 
 void TimeProgressSlider::mouseMoveEvent(QMouseEvent* e)
 {
-	int value(
+	const int value(
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->position().x(),
 	                                    width()));
@@ -64,7 +64,7 @@ void TimeProgressSlider::mousePressEvent(QMouseEvent* e)
 	{
 		return;
 	}
-	int value(
+	const int value(
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	    QStyle::sliderValueFromPosition(minimum(), maximum(), e->position().x(),
 	                                    width()));

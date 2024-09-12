@@ -40,9 +40,8 @@ GLBlendSet::BlendState& GLBlendSet::globalState()
 
 GLBlendSet::GLBlendSet(BlendState const& stateSet)
     : enableBlendStateSet({{GL_BLEND, true}})
+    , revertSet(globalState())
 {
-	revertSet = globalState();
-
 	GLHandler::glf().glDepthMask(stateSet.depthMask ? GL_TRUE : GL_FALSE);
 	GLHandler::glf().glBlendFunc(stateSet.blendfuncSfactor,
 	                             stateSet.blendfuncDfactor);
@@ -68,7 +67,7 @@ GLBlendSet::BlendState GLBlendSet::getTrueGlobalState()
 	BlendState result;
 	GLHandler::glf().glGetIntegerv(GL_BLEND_SRC, &result.blendfuncSfactor);
 	GLHandler::glf().glGetIntegerv(GL_BLEND_DST, &result.blendfuncDfactor);
-	GLboolean b;
+	GLboolean b = 0;
 	GLHandler::glf().glGetBooleanv(GL_DEPTH_WRITEMASK, &b);
 	result.depthMask = (b != 0u);
 	return result;
@@ -80,7 +79,7 @@ void GLBlendSet::printDifferences(BlendState const& globalState0,
                                   BlendState const& globalState1)
 {
 	qDebug() << "OpenGL global blend state differences :";
-	Logger::NoFormatGuard f;
+	const Logger::NoFormatGuard f;
 	if(globalState0.blendfuncSfactor != globalState1.blendfuncSfactor)
 	{
 		qDebug() << "blendfuncSfactor" << globalState0.blendfuncSfactor << "vs"

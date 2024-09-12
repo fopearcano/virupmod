@@ -105,7 +105,7 @@ QList<QPair<int, QString>>
     GamepadHandler::getConnectedGamepads(bool noEmptyName)
 {
 #ifdef QT_GAMEPAD
-	auto gamepadManager = QGamepadManager::instance();
+	auto* gamepadManager = QGamepadManager::instance();
 
 #ifdef Q_OS_WIN
 	// dirty Windows workaround to delay fetching of controllers :
@@ -138,8 +138,9 @@ QList<QPair<int, QString>>
 void GamepadHandler::updateGamepad()
 {
 #ifdef QT_GAMEPAD
-	bool previouslyEnabled = isEnabled();
+	const bool previouslyEnabled = isEnabled();
 	gamepad.reset();
+	// NOLINTNEXTLINE(misc-const-correctness)
 	bool noEmptyName = false;
 #ifdef Q_OS_WIN
 	// usually names never get recovered on Windows

@@ -13,13 +13,13 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 	// check if vrcompositor is running, and if not, attempt to run it
 	QProcess pgrep;
 	QString cmd("pgrep");
-	QStringList args = QStringList() << "vrcompositor";
+	const QStringList args = QStringList() << "vrcompositor";
 	pgrep.start(cmd, args);
 	pgrep.waitForReadyRead();
 	if(pgrep.readAllStandardOutput().isEmpty())
 	{
 		std::array<char, 1024> rtPath{};
-		uint32_t unRequiredSize;
+		uint32_t unRequiredSize = 0;
 		if(vr::VR_GetRuntimePath(rtPath.data(), rtPath.size(), &unRequiredSize)
 		   && unRequiredSize < sizeof(rtPath))
 		{
@@ -50,7 +50,8 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 		return false;
 	}
 	qDebug() << "VR runtime initialized...";
-	if((vr_compositor = vr::VRCompositor()) == nullptr)
+	vr_compositor = vr::VRCompositor();
+	if(vr_compositor == nullptr)
 	{
 		qCritical()
 		    << "Compositor initialization failed. See log file for details";
@@ -98,7 +99,7 @@ bool OpenVRHandler::init(Renderer const& renderer, ToneMappingModel const& tmm)
 
 QSize OpenVRHandler::getEyeRenderTargetSize() const
 {
-	unsigned int w, h;
+	unsigned int w = 0, h = 0;
 	vr_pointer->GetRecommendedRenderTargetSize(&w, &h);
 	return {static_cast<int>(w), static_cast<int>(h)};
 }
@@ -225,8 +226,8 @@ void OpenVRHandler::prepareRendering(Side eye)
 		return;
 	}
 
-	vr::EVRCompositorError error = vr::VRCompositor()->WaitGetPoses(
-	    &tracked_device_pose[0], vr::k_unMaxTrackedDeviceCount, nullptr, 0);
+	const vr::EVRCompositorError error = vr::VRCompositor()->WaitGetPoses(
+	    tracked_device_pose.data(), vr::k_unMaxTrackedDeviceCount, nullptr, 0);
 
 	// reload render targets if resolution per eye changed (supersampling)
 	if(currentTargetSize != getEyeRenderTargetSize())
@@ -245,7 +246,7 @@ void OpenVRHandler::prepareRendering(Side eye)
 	for(unsigned int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount;
 	    nDevice++)
 	{
-		vr::ETrackedDeviceClass tracked_device_class
+		const vr::ETrackedDeviceClass tracked_device_class
 		    = vr_pointer->GetTrackedDeviceClass(nDevice);
 		if(tracked_device_class == vr::TrackedDeviceClass_Invalid)
 		{
@@ -256,7 +257,7 @@ void OpenVRHandler::prepareRendering(Side eye)
 			tracked_device_pose_matrix.at(nDevice) = toQt(
 			    tracked_device_pose.at(nDevice).mDeviceToAbsoluteTracking);
 		}
-		vr::ETrackedControllerRole role
+		const vr::ETrackedControllerRole role
 		    = vr_pointer->GetControllerRoleForTrackedDeviceIndex(nDevice);
 		if(role == vr::TrackedControllerRole_LeftHand)
 		{
@@ -286,7 +287,7 @@ void OpenVRHandler::prepareRendering(Side eye)
 
 void OpenVRHandler::renderHiddenAreaMesh(Side eye)
 {
-	GLShaderProgram s("hiddenarea");
+	const GLShaderProgram s("hiddenarea");
 	GLMesh hiddenAreaMesh;
 	hiddenAreaMesh.setVertexShaderMapping(s, {{"position", 2}});
 	hiddenAreaMesh.setVertices(
@@ -294,7 +295,7 @@ void OpenVRHandler::renderHiddenAreaMesh(Side eye)
 	    2 * 3 * vr_pointer->GetHiddenAreaMesh(getEye(eye)).unTriangleCount);
 
 	s.use();
-	GLStateSet glState({{GL_CULL_FACE, false}});
+	const GLStateSet glState({{GL_CULL_FACE, false}});
 	hiddenAreaMesh.render(PrimitiveType::TRIANGLES);
 }
 
@@ -325,12 +326,12 @@ void OpenVRHandler::renderHands() const
 void OpenVRHandler::submitRendering(GLFramebufferObject const& fbo)
 {
 	fbo.blitColorBufferTo(*submitFBO);
-	vr::Texture_t texture
+	const vr::Texture_t texture
 	    = {// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	       reinterpret_cast<void*>(static_cast<uintptr_t>(
 	           submitFBO->getColorAttachmentTexture().getGLTexture())),
 	       vr::TextureType_OpenGL, vr::ColorSpace_Gamma};
-	vr::EVRCompositorError error
+	const vr::EVRCompositorError error
 	    = vr_compositor->Submit(getEye(currentRenderingEye), &texture);
 	if(error != vr::VRCompositorError_None)
 	{

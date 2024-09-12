@@ -45,14 +45,14 @@ class WindowParametersSelector : public QWidget
   private:
 	RenderingWindow::Parameters value;
 
-	QSpinBox* widthSpinBox;
-	QSpinBox* heightSpinBox;
-	QCheckBox* fullscreenCBox;
-	QLabel* screenLabel;
-	QDoubleSpinBox* hAngleShiftSpinBox;
-	QDoubleSpinBox* vAngleShiftSpinBox;
-	QCheckBox* forceLeftCBox;
-	QCheckBox* forceRightCBox;
+	QSpinBox widthSpinBox;
+	QSpinBox heightSpinBox;
+	QCheckBox fullscreenCBox;
+	QLabel screenLabel;
+	QDoubleSpinBox hAngleShiftSpinBox;
+	QDoubleSpinBox vAngleShiftSpinBox;
+	QCheckBox forceLeftCBox;
+	QCheckBox forceRightCBox;
 };
 
 #endif // WINDOWPARAMETERSSELECTOR_HPP

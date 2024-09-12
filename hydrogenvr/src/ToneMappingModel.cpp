@@ -21,7 +21,7 @@
 ToneMappingModel::ToneMappingModel(VRHandler const& vrHandler)
     : vrHandler(vrHandler)
 {
-	double inter(getConeRodIntersectionTime(0.0));
+	const double inter(getConeRodIntersectionTime(0.0));
 	coneDominationEnd  = inter - 0.5 * mixDuration;
 	rodDominationBegin = inter + 0.5 * mixDuration;
 }
@@ -110,7 +110,8 @@ void ToneMappingModel::autoUpdateExposure(float averageLuminance,
 				time              = 0.0;
 				startLogLuminance = log10(1.0 / exposure);
 				autoExposureState = AutoExposureState::DECREASING;
-				double tInter(getConeRodIntersectionTime(startLogLuminance));
+				const double tInter(
+				    getConeRodIntersectionTime(startLogLuminance));
 				mixDuration        = tInter / 6.0;
 				coneDominationEnd  = tInter - 0.5 * mixDuration;
 				rodDominationBegin = tInter + 0.5 * mixDuration;
@@ -136,14 +137,14 @@ void ToneMappingModel::autoUpdateExposure(float averageLuminance,
 	}
 }
 
-double ToneMappingModel::coneThreshold(double t)
+double ToneMappingModel::coneThreshold(double t) const
 {
 	const double a = startLogLuminance;
 	const double b = minConeVisibleLogLuminance;
 	return pow(10, (a - b) * exp(-t / 60.0) + b);
 }
 
-double ToneMappingModel::dConeThreshold(double t)
+double ToneMappingModel::dConeThreshold(double t) const
 {
 	const double a = startLogLuminance;
 	const double b = minConeVisibleLogLuminance;
@@ -156,7 +157,7 @@ double ToneMappingModel::dConeThreshold(double t)
     return -60.0 * log((log10(lum) + 2.5) / 2.5);
 }*/
 
-double ToneMappingModel::rodThreshold(double t)
+double ToneMappingModel::rodThreshold(double t) const
 {
 	const double tInterMinutes(getConeRodIntersectionTime(startLogLuminance)
 	                           / 60.0);
@@ -167,7 +168,7 @@ double ToneMappingModel::rodThreshold(double t)
 	return pow(10, (a - b) * exp(d * (t / 60.0 - c)) + b);
 }
 
-double ToneMappingModel::dRodThreshold(double t)
+double ToneMappingModel::dRodThreshold(double t) const
 {
 	const double tInterMinutes(getConeRodIntersectionTime(startLogLuminance)
 	                           / 60.0);
@@ -188,7 +189,7 @@ double ToneMappingModel::dRodThreshold(double t)
               + 12);
 }*/
 
-double ToneMappingModel::mixThreshold(double t)
+double ToneMappingModel::mixThreshold(double t) const
 {
 	// Hermit polynomial
 	const double tHerm((t - coneDominationEnd)
@@ -206,7 +207,7 @@ double ToneMappingModel::mixThreshold(double t)
 	       + h01 * p1 + h11 * (rodDominationBegin - coneDominationEnd) * m1;
 }
 
-double ToneMappingModel::dMixThreshold(double t)
+double ToneMappingModel::dMixThreshold(double t) const
 {
 	// Hermit polynomial
 	const double tHerm((t - coneDominationEnd)
@@ -241,7 +242,7 @@ double ToneMappingModel::getConeRodIntersectionTime(double startLogLuminance)
 	return 60.0 * 5 * (2.4 + startLogLuminance);
 }
 
-double ToneMappingModel::threshold(double t)
+double ToneMappingModel::threshold(double t) const
 {
 	// if cones dominant
 	if(t < coneDominationEnd)
@@ -257,7 +258,7 @@ double ToneMappingModel::threshold(double t)
 	return rodThreshold(t);
 }
 
-double ToneMappingModel::dThreshold(double t)
+double ToneMappingModel::dThreshold(double t) const
 {
 	// if cones dominant
 	if(t < coneDominationEnd)

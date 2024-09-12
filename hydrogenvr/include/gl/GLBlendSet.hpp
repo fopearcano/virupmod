@@ -94,10 +94,10 @@ class GLBlendSet
 	                             BlendState const& globalState1);
 
   private:
-	BlendState revertSet;
 	static BlendState& globalState();
 
 	GLStateSet enableBlendStateSet;
+	BlendState revertSet;
 };
 
 #endif // GLBLENDSET_HPP

@@ -1,8 +1,8 @@
 # Gitlab CI config for Maintainance
 
 checkcode:
-    image: $CI_REGISTRY_IMAGE:jammy
-    stage: test
+    image: $CI_REGISTRY_IMAGE:noble
+    stage: check
     only:
         refs:
             - pushes

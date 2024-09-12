@@ -77,7 +77,7 @@ void Model::generateShadowMap(QMatrix4x4 const& model,
 		glMeshes.emplace_back(&mesh.mesh);
 		models.push_back(model * mesh.transform);
 	}
-	for(auto light : lights)
+	for(const auto* light : lights)
 	{
 		light->generateShadowMap(glMeshes, models);
 	}
@@ -89,7 +89,7 @@ void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
 {
 	shader.setUniform("campos", camera.getWorldSpacePosition());
 
-	for(auto& mesh : meshes)
+	for(auto const& mesh : meshes)
 	{
 		std::vector<GLTexture const*> texs(
 		    {&mesh.textures.at(AssetLoader::TextureType::DIFFUSE),
@@ -100,7 +100,7 @@ void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
 		     &mesh.textures.at(AssetLoader::TextureType::SHININESS),
 		     &mesh.textures.at(AssetLoader::TextureType::OPACITY),
 		     &mesh.textures.at(AssetLoader::TextureType::LIGHTMAP)});
-		for(auto sMap : shadowMaps)
+		for(const auto* sMap : shadowMaps)
 		{
 			texs.push_back(sMap);
 		}
@@ -118,7 +118,7 @@ void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
 	Light::setUpShader(shader, lights);
 	std::vector<GLTexture const*> shadowMaps;
 	shadowMaps.reserve(lights.size());
-	for(auto light : lights)
+	for(const auto* light : lights)
 	{
 		shadowMaps.push_back(&light->getShadowMap());
 	}
@@ -128,7 +128,7 @@ void Model::render(BasicCamera const& camera, QMatrix4x4 const& model,
 QMap<QString, QString> Model::setUpShaderDefines()
 {
 	QMap<QString, QString> defines;
-	unsigned int smoothshadows(
+	const unsigned int smoothshadows(
 	    QSettings().value("graphics/smoothshadows").toUInt());
 	if(smoothshadows > 0)
 	{

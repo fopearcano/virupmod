@@ -101,7 +101,7 @@ void Text3D::render(GLHandler::GeometricSpace geometricSpace)
 		return;
 	}
 
-	GLBlendSet glBlend(GLBlendSet::BlendState{});
+	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
 	GLHandler::useTextures({&fbo->getColorAttachmentTexture()});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
@@ -133,10 +133,11 @@ void Text3D::updateTex()
 		font.setPointSize(static_cast<int>(superSampling * fontSize));
 	}
 
-	QRect adjustedRect(static_cast<int>(superSampling * rectangle.x()),
-	                   static_cast<int>(superSampling * rectangle.y()),
-	                   static_cast<int>(superSampling * rectangle.width()),
-	                   static_cast<int>(superSampling * rectangle.height()));
+	const QRect adjustedRect(
+	    static_cast<int>(superSampling * rectangle.x()),
+	    static_cast<int>(superSampling * rectangle.y()),
+	    static_cast<int>(superSampling * rectangle.width()),
+	    static_cast<int>(superSampling * rectangle.height()));
 
 	paintText(*fbo, text, color, font, backgroundColor, adjustedRect, flags);
 
@@ -161,7 +162,7 @@ QRect Text3D::paintText(GLFramebufferObject& fbo, QString const& text,
 	GLHandler::setClearColor(Qt::black);
 
 	// will get disabled by QOpenGLPaintDevice anyway
-	GLStateSet glState({{GL_DEPTH_TEST, false}});
+	const GLStateSet glState({{GL_DEPTH_TEST, false}});
 	QOpenGLPaintDevice d(fbo.getSize());
 	QPainter painter(&d);
 

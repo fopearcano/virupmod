@@ -34,7 +34,7 @@ void Widget3D::update()
 		widget.setVisible(true);
 		widget.setVisible(false);
 	}
-	unsigned int width(widget.width()), height(widget.height());
+	const unsigned int width(widget.width()), height(widget.height());
 	originalSize = widget.size();
 	aspectratio  = QMatrix4x4();
 	if(width > height)

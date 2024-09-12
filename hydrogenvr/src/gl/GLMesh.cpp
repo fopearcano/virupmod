@@ -83,7 +83,7 @@ void GLMesh::setVertexShaderMapping(GLShaderProgram const& shaderProgram,
 	for(auto const& map : mapping)
 	{
 		// map position
-		GLint posAttrib = shaderProgram.getAttribLocationFromName(
+		const GLint posAttrib = shaderProgram.getAttribLocationFromName(
 		    map.name.toStdString().c_str());
 		if(posAttrib != -1)
 		{
@@ -149,13 +149,13 @@ void GLMesh::setVertices(float const* vertices, size_t vertSize,
 
 void GLMesh::setVertices(std::vector<float> const& vertices)
 {
-	setVertices(&(vertices[0]), vertices.size());
+	setVertices(vertices.data(), vertices.size());
 }
 
 void GLMesh::setVertices(std::vector<float> const& vertices,
                          std::vector<unsigned int> const& elements)
 {
-	setVertices(&(vertices[0]), vertices.size(), &(elements[0]),
+	setVertices(vertices.data(), vertices.size(), elements.data(),
 	            elements.size());
 }
 

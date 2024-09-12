@@ -336,7 +336,7 @@ void GLFramebufferObject::showOnWindow(QWindow const& window, float xf0,
 QImage GLFramebufferObject::copyColorBufferToQImage() const
 {
 	// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-	auto data(new uchar[width * height * 4]);
+	auto* data(new uchar[width * height * 4]);
 
 	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	GLHandler::glf().glReadPixels(0, 0, width, height, GL_RGBA,
@@ -363,13 +363,13 @@ void GLFramebufferObject::cleanUp()
 std::array<int, 3> GLFramebufferObject::getCurrentSize()
 {
 	// Get the object name bound to the color attachment
-	GLint attachmentObjectName;
+	GLint attachmentObjectName = 0;
 	GLHandler::glf().glGetFramebufferAttachmentParameteriv(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 	    GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &attachmentObjectName);
 
 	// Check if the attachment is a texture or renderbuffer
-	GLint attachmentObjectType;
+	GLint attachmentObjectType = 0;
 	GLHandler::glf().glGetFramebufferAttachmentParameteriv(
 	    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 	    GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &attachmentObjectType);
@@ -404,7 +404,7 @@ std::array<int, 3> GLFramebufferObject::getCurrentSize()
 
 void GLFramebufferObject::pushCurrentOnBindStack()
 {
-	GLint curFboR, curFboW;
+	GLint curFboR = 0, curFboW = 0;
 	GLHandler::glf().glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &curFboR);
 	GLHandler::glf().glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &curFboW);
 	bindStack().push_back({curFboR, curFboW});

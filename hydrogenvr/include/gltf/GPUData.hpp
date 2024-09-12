@@ -45,7 +45,7 @@ struct GPUMesh
 
 	  private:
 		// returns vertex attrib for appended normals
-		GLMesh::VertexAttrib
+		static GLMesh::VertexAttrib
 		    computeNormals(gltf::Accessor const& positionAccessor,
 		                   gltf::Accessor const* indicesAccessor,
 		                   std::vector<float>& newBuffer);

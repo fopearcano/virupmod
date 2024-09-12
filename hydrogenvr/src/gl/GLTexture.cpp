@@ -28,7 +28,7 @@
 
 float GLTexture::getMaxAnisotropicFilterSamples()
 {
-	GLfloat result;
+	GLfloat result = NAN;
 	GLHandler::glf().glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &result);
 	return result;
 }
@@ -88,13 +88,13 @@ GLTexture& GLTexture::operator=(GLTexture&& other) noexcept
 
 GLTexture::GLTexture(Tex1DProperties const& properties, Sampler const& sampler,
                      Data const& data)
+    : type(Type::TEX1D)
+    , glTarget(properties.target)
+    , internalFormat(properties.internalFormat)
 {
 	++instancesCount();
 	allTextures().append(this);
-	type           = Type::TEX1D;
-	glTarget       = properties.target;
-	internalFormat = properties.internalFormat;
-	size[0]        = properties.width;
+	size[0] = properties.width;
 
 	GLHandler::glf().glGenTextures(1, &glTexture);
 	initData(data);
@@ -103,14 +103,14 @@ GLTexture::GLTexture(Tex1DProperties const& properties, Sampler const& sampler,
 
 GLTexture::GLTexture(Tex2DProperties const& properties, Sampler const& sampler,
                      Data const& data)
+    : type(Type::TEX2D)
+    , glTarget(properties.target)
+    , internalFormat(properties.internalFormat)
 {
 	++instancesCount();
 	allTextures().append(this);
-	type           = Type::TEX2D;
-	glTarget       = properties.target;
-	internalFormat = properties.internalFormat;
-	size[0]        = properties.width;
-	size[1]        = properties.height;
+	size[0] = properties.width;
+	size[1] = properties.height;
 
 	GLHandler::glf().glGenTextures(1, &glTexture);
 	initData(data);
@@ -119,15 +119,15 @@ GLTexture::GLTexture(Tex2DProperties const& properties, Sampler const& sampler,
 
 GLTexture::GLTexture(TexMultisampleProperties const& properties,
                      Sampler const& sampler)
+    : type(Type::TEXMULTISAMPLE)
+    , glTarget(GL_TEXTURE_2D_MULTISAMPLE)
+    , internalFormat(properties.internalFormat)
+    , samples(properties.samples)
 {
 	++instancesCount();
 	allTextures().append(this);
-	type           = Type::TEXMULTISAMPLE;
-	glTarget       = GL_TEXTURE_2D_MULTISAMPLE;
-	internalFormat = properties.internalFormat;
-	size[0]        = properties.width;
-	size[1]        = properties.height;
-	samples        = properties.samples;
+	size[0] = properties.width;
+	size[1] = properties.height;
 
 	GLHandler::glf().glGenTextures(1, &glTexture);
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
@@ -141,15 +141,15 @@ GLTexture::GLTexture(TexMultisampleProperties const& properties,
 
 GLTexture::GLTexture(Tex3DProperties const& properties, Sampler const& sampler,
                      Data const& data)
+    : type(Type::TEX3D)
+    , glTarget(properties.target)
+    , internalFormat(properties.internalFormat)
 {
 	++instancesCount();
 	allTextures().append(this);
-	type           = Type::TEX3D;
-	glTarget       = properties.target;
-	internalFormat = properties.internalFormat;
-	size[0]        = properties.width;
-	size[1]        = properties.height;
-	size[2]        = properties.depth;
+	size[0] = properties.width;
+	size[1] = properties.height;
+	size[2] = properties.depth;
 
 	GLHandler::glf().glGenTextures(1, &glTexture);
 	initData(data);
@@ -158,14 +158,14 @@ GLTexture::GLTexture(Tex3DProperties const& properties, Sampler const& sampler,
 
 GLTexture::GLTexture(TexCubemapProperties const& properties,
                      Sampler const& sampler, DataArray<6> const& data)
+    : type(Type::TEXCUBEMAP)
+    , glTarget(properties.target)
+    , internalFormat(properties.internalFormat)
 {
 	++instancesCount();
 	allTextures().append(this);
-	type           = Type::TEXCUBEMAP;
-	glTarget       = properties.target;
-	internalFormat = properties.internalFormat;
-	size[0]        = properties.side;
-	size[1]        = properties.side;
+	size[0] = properties.side;
+	size[1] = properties.side;
 
 	GLHandler::glf().glGenTextures(1, &glTexture);
 	initData(data);
@@ -193,9 +193,9 @@ GLTexture::GLTexture(QString const& texturePath, bool sRGB)
 	{
 		// LOAD KTX
 #ifdef LIBKTX
-		ktxTexture* kTexture;
-		KTX_error_code result;
-		GLenum glerror;
+		ktxTexture* kTexture  = nullptr;
+		KTX_error_code result = {};
+		GLenum glerror        = 0;
 
 		result = ktxTexture_CreateFromNamedFile(texturePath.toLatin1().data(),
 		                                        KTX_TEXTURE_CREATE_NO_FLAGS,
@@ -216,18 +216,18 @@ GLTexture::GLTexture(QString const& texturePath, bool sRGB)
 
 		GLHandler::glf().glGenTextures(1, &glTexture);
 		// Fill metadata
-		for(auto entry = kTexture->kvDataHead; entry != nullptr;
-		    entry      = ktxHashList_Next(entry))
+		for(auto* entry = kTexture->kvDataHead; entry != nullptr;
+		    entry       = ktxHashList_Next(entry))
 		{
-			unsigned int len;
-			char *bKey, *bVal;
+			unsigned int len = 0;
+			char *bKey = nullptr, *bVal = nullptr;
 			ktxHashListEntry_GetKey(entry, &len, &bKey);
 			ktxHashListEntry_GetValue(
 			    entry, &len,
 			    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			    reinterpret_cast<void**>(&bVal));
-			QString key(bKey);
-			QString prefix(key.left(4)), suffix(key.mid(4));
+			const QString key(bKey);
+			const QString prefix(key.left(4)), suffix(key.mid(4));
 			if(prefix == "i32_")
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -378,7 +378,7 @@ GLTexture::GLTexture(QString const& texturePath, bool sRGB)
 	{
 		// LOAD QIMAGE
 		auto image(getImage(texturePath));
-		Tex2DProperties properties(image.width(), image.height(), sRGB);
+		const Tex2DProperties properties(image.width(), image.height(), sRGB);
 		type           = Type::TEX2D;
 		glTarget       = properties.target;
 		internalFormat = properties.internalFormat;
@@ -472,7 +472,7 @@ void GLTexture::setName(QString const& name)
 
 std::array<int, 3> GLTexture::getSize(unsigned int level) const
 {
-	GLint width, height, depth;
+	GLint width = 0, height = 0, depth = 0;
 	GLHandler::glf().glGetTextureLevelParameteriv(glTexture, level,
 	                                              GL_TEXTURE_WIDTH, &width);
 	GLHandler::glf().glGetTextureLevelParameteriv(glTexture, level,
@@ -516,7 +516,7 @@ void GLTexture::generateMipmap(unsigned int baseLevel,
 unsigned int GLTexture::getHighestMipmapLevel() const
 {
 	auto s(getSize());
-	QSize size(s[0], s[1]);
+	const QSize size(s[0], s[1]);
 	return static_cast<unsigned int>(
 	    log2(size.width() > size.height() ? size.width() : size.height()));
 }
@@ -524,9 +524,9 @@ unsigned int GLTexture::getHighestMipmapLevel() const
 QImage GLTexture::getContentAsImage(unsigned int level) const
 {
 	auto s(getSize(level));
-	QSize size(s[0], s[1]);
+	const QSize size(s[0], s[1]);
 
-	GLint internalFormat;
+	GLint internalFormat = 0;
 	GLenum target(glTarget);
 	if(target == GL_TEXTURE_CUBE_MAP)
 	{
@@ -569,7 +569,7 @@ std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 {
 	auto s(getSize(level));
 
-	GLint internalFormat;
+	GLint internalFormat = 0;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	GLHandler::glf().glGetTexLevelParameteriv(
 	    glTarget, level, GL_TEXTURE_INTERNAL_FORMAT,
@@ -593,23 +593,24 @@ std::vector<GLfloat> GLTexture::getContentAsData(unsigned int level) const
 float GLTexture::getAverageLuminance() const
 {
 	generateMipmap();
-	unsigned int lvl = getHighestMipmapLevel() - 3;
-	auto s(getSize(lvl));
-	QSize size(s[0], s[1]);
+	const unsigned int lvl = getHighestMipmapLevel() - 3;
+	const auto s(getSize(lvl));
+	const QSize size(s[0], s[1]);
 	auto buff(getContentAsData(lvl));
 	float lastFrameAverageLuminance = 0.f;
 	if(!buff.empty())
 	{
 		float coeffSum = 0.f;
-		float halfWidth((size.width() - 1) / 2.f);
-		float halfHeight((size.height() - 1) / 2.f);
+		const float halfWidth((size.width() - 1) / 2.f);
+		const float halfHeight((size.height() - 1) / 2.f);
 		for(int i(0); i < size.width(); ++i)
 		{
 			for(int j(0); j < size.height(); ++j)
 			{
-				unsigned int id(j * size.width() + i);
-				float lum(0.2126 * buff[4 * id] + 0.7152 * buff[4 * id + 1]
-				          + 0.0722 * buff[4 * id + 2]);
+				const unsigned int id(j * size.width() + i);
+				const float lum(0.2126 * buff[4 * id]
+				                + 0.7152 * buff[4 * id + 1]
+				                + 0.0722 * buff[4 * id + 2]);
 				float coeff
 				    = exp(-1 * pow((i - halfWidth) * 4.5 / halfWidth, 2));
 				coeff *= exp(-1 * pow((j - halfHeight) * 4.5 / halfHeight, 2));
@@ -732,7 +733,7 @@ void GLTexture::initData(Data const& data) const
 {
 	// TODO(florian) allow for storage to contain only one level, or any number
 	// of levels
-	GLsizei levels = log2(fmax(size[0], size[1])) + 1;
+	const GLsizei levels = log2(fmax(size[0], size[1])) + 1;
 	GLHandler::glf().glBindTexture(glTarget, glTexture);
 	switch(type)
 	{

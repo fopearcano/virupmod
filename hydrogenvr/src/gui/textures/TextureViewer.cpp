@@ -31,13 +31,13 @@ TextureViewer::TextureViewer(GLTexture const& tex, GLShaderProgram&& shader,
 	}
 	setWindowTitle(title);
 
-	auto textLabel = make_qt_unique<QLabel>(*this, "Your Image:");
-	layout         = make_qt_unique<QVBoxLayout>(*this);
+	auto* textLabel = make_qt_unique<QLabel>(*this, "Your Image:");
+	layout          = make_qt_unique<QVBoxLayout>(*this);
 
 	textLabel->setAlignment(Qt::AlignCenter);
 	layout->addWidget(textLabel);
 
-	auto w = QWidget::createWindowContainer(&texDispWindow, this);
+	auto* w = QWidget::createWindowContainer(&texDispWindow, this);
 	w->setMinimumSize(100, 100);
 	w->setMaximumSize(2000, 2000);
 	w->setFocusPolicy(Qt::TabFocus);
@@ -53,7 +53,7 @@ void TextureViewer::render()
 	                            texDispWindow.geometry().height());
 	GLHandler::useTextures({&tex});
 	shader.use();
-	GLStateSet glState({{GL_CULL_FACE, false}});
+	const GLStateSet glState({{GL_CULL_FACE, false}});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 
 	// crappy way to force update

@@ -89,7 +89,7 @@ void GLBuffer::bindBase(unsigned int index) const
 void* GLBuffer::map(GLenum access) const
 {
 	bind();
-	auto res = GLHandler::glf().glMapBuffer(currentTarget, access);
+	auto* res = GLHandler::glf().glMapBuffer(currentTarget, access);
 	unbind();
 	return res;
 }
@@ -97,8 +97,8 @@ void* GLBuffer::map(GLenum access) const
 void* GLBuffer::mapRange(size_t offset, size_t subSize, GLenum access) const
 {
 	bind();
-	auto res = GLHandler::glf().glMapBufferRange(currentTarget, offset, subSize,
-	                                             access);
+	auto* res = GLHandler::glf().glMapBufferRange(currentTarget, offset,
+	                                              subSize, access);
 	unbind();
 	return res;
 }
@@ -123,7 +123,7 @@ void GLBuffer::cleanUp()
 }
 
 void GLBuffer::glBufferData(GLenum target, size_t size, void const* data,
-                            GLenum usage)
+                            GLenum usage) const
 {
 	if(this->size != 0 && this->size != size)
 	{
@@ -136,7 +136,7 @@ void GLBuffer::glBufferData(GLenum target, size_t size, void const* data,
 }
 
 void GLBuffer::glBufferSubData(GLenum target, size_t offset, size_t size,
-                               void const* data)
+                               void const* data) const
 {
 	bind();
 	GLHandler::glf().glBufferSubData(target, offset, size, data);

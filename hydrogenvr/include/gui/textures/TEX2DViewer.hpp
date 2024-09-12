@@ -25,8 +25,9 @@ class TEX2DViewer : public TextureViewer
 {
   public:
 	explicit TEX2DViewer(GLTexture const& tex, QWidget* parent = nullptr)
-	    : TextureViewer(
-	        tex, GLShaderProgram{"postprocess", "texdisplay/texture2D"}, parent)
+	    : TextureViewer(tex,
+	                    GLShaderProgram{"postprocess", "texdisplay/texture2D"},
+	                    parent)
 	{
 	}
 };

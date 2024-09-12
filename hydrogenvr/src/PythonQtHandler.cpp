@@ -156,7 +156,7 @@ void PythonQtHandler::clean()
 #endif
 }
 
-void PythonQtWrapper::overloadStaticBinary(const char* op)
+void PythonQtWrapper::overloadStaticBinary(const char* op) const
 {
 	PythonQtHandler::evalScript(
 	    QString() + "def __" + op
@@ -169,7 +169,7 @@ void PythonQtWrapper::overloadStaticBinary(const char* op)
 	    + "__', __" + op + "__)");
 }
 
-void PythonQtWrapper::overloadMember(const char* op)
+void PythonQtWrapper::overloadMember(const char* op) const
 {
 	PythonQtHandler::evalScript(
 	    QString() + "def __" + op + "__(x):\n\treturn x." + op
@@ -179,7 +179,7 @@ void PythonQtWrapper::overloadMember(const char* op)
 	    + "__', __" + op + "__)");
 }
 
-void PythonQtWrapper::overloadMemberUnary(const char* op)
+void PythonQtWrapper::overloadMemberUnary(const char* op) const
 {
 	PythonQtHandler::evalScript(
 	    QString() + "def __" + op + "__(x,y):\n\treturn x." + op
@@ -189,7 +189,7 @@ void PythonQtWrapper::overloadMemberUnary(const char* op)
 	    + "__', __" + op + "__)");
 }
 
-void PythonQtWrapper::overloadMemberBinary(const char* op)
+void PythonQtWrapper::overloadMemberBinary(const char* op) const
 {
 	PythonQtHandler::evalScript(
 	    QString() + "def __" + op + "__(x,y,z):\n\treturn x." + op

@@ -28,7 +28,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 {
 	auto albedoSpec(std::make_unique<PBRMaterial::AlbedoSpec>(
 	    prim.material->pbrMetallicRoughness.baseColorFactor));
-	auto tex = prim.material->pbrMetallicRoughness.baseColorTexture;
+	const auto* tex = prim.material->pbrMetallicRoughness.baseColorTexture;
 	if(tex != nullptr)
 	{
 		albedoSpec = std::make_unique<PBRMaterial::AlbedoSpec>(
@@ -84,7 +84,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	// set bounding sphere
 	auto const &minVec(prim.attributes.at("POSITION")->min),
 	    &maxVec(prim.attributes.at("POSITION")->max);
-	QVector3D min(minVec[0], minVec[1], minVec[2]),
+	const QVector3D min(minVec[0], minVec[1], minVec[2]),
 	    max(maxVec[0], maxVec[1], maxVec[2]);
 	boundingSphere = {0.5f * (min + max), 0.5f * (max - min).length()};
 
@@ -96,7 +96,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	unusedAttributes["position"] = QVector3D();
 	unusedAttributes["tangent"]  = QVector3D(100.f, 0.f, 0.f);
 	unusedAttributes["normal"]   = QVector3D();
-	QColor c                     = GLHandler::sRGBToLinear(
+	const QColor c               = GLHandler::sRGBToLinear(
         prim.material->pbrMetallicRoughness.baseColorFactor);
 	unusedAttributes["color_0"]    = QVector3D(c.redF(), c.greenF(), c.blueF());
 	unusedAttributes["texcoord_0"] = QVector3D();
@@ -111,7 +111,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 			globalOffset = pair.second->bufferView->byteOffset;
 		}
 		bool seen = false;
-		for(auto bv : alreadySeen)
+		for(const auto* bv : alreadySeen)
 		{
 			if(bv == pair.second->bufferView)
 			{
@@ -129,15 +129,16 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	std::vector<GLMesh::VertexAttrib> mapping;
 	for(auto const& pair : prim.attributes)
 	{
-		QString name(pair.first.toLower());
+		const QString name(pair.first.toLower());
 		unusedAttributes.remove(name);
-		int size(pair.second->typeDimensions());
+		const int size(pair.second->typeDimensions());
 		if(name == "color_0" && size > 3)
 		{
 			qWarning() << "Attribute color_0 is of dimension" << size
 			           << "but only size 3 is supported for now.";
 		}
-		size_t stride(pair.second->bufferView->byteStride / sizeof(float));
+		const size_t stride(pair.second->bufferView->byteStride
+		                    / sizeof(float));
 		size_t offset((pair.second->bufferView->byteOffset - globalOffset)
 		              + pair.second->byteOffset);
 		offset /= sizeof(float);
@@ -146,7 +147,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 
 	auto const& view = *prim.attributes.at("POSITION")->bufferView;
 	// hardcoded float; GLushort and * 1
-	auto vertexDataBuff
+	const auto* vertexDataBuff
 	    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	    = reinterpret_cast<float const*>(&view.buffer.data[globalOffset]);
 	auto vertexDataSize = globalSize / sizeof(float);
@@ -157,7 +158,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 	{
 		auto va = computeNormals(*prim.attributes.at("POSITION"), prim.indices,
 		                         res);
-		vertexDataBuff = &res[0];
+		vertexDataBuff = res.data();
 		vertexDataSize = res.size();
 		mapping.push_back(va);
 		unusedAttributes.remove("normal");
@@ -200,7 +201,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 			case gltf::Accessor::ComponentType::UNSIGNED_SHORT:
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				auto indBuff = reinterpret_cast<GLushort const*>(
+				const auto* indBuff = reinterpret_cast<GLushort const*>(
 				    &buffInd.data[viewInd.byteOffset + accessInd.byteOffset]);
 				for(int i(0); i < accessInd.count * 1; ++i)
 				{
@@ -211,7 +212,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 			case gltf::Accessor::ComponentType::UNSIGNED_INT:
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				auto indBuff = reinterpret_cast<GLuint const*>(
+				const auto* indBuff = reinterpret_cast<GLuint const*>(
 				    &buffInd.data[viewInd.byteOffset + accessInd.byteOffset]);
 				for(int i(0); i < accessInd.count * 1; ++i)
 				{
@@ -224,7 +225,7 @@ GPUMesh::Primitive::Primitive(gltf::Mesh::Primitive const& prim,
 				           << accessInd.componentType;
 		}
 
-		mesh.setVertices(vertexDataBuff, vertexDataSize, &elements[0],
+		mesh.setVertices(vertexDataBuff, vertexDataSize, elements.data(),
 		                 accessInd.count * 1);
 	}
 }
@@ -242,14 +243,14 @@ void GPUMesh::Primitive::render(BasicCamera const& cam,
 	{
 		stateSet[GL_CULL_FACE] = false;
 	}
-	GLStateSet glState(stateSet);
+	const GLStateSet glState(stateSet);
 	// could be overwritten between different materials
 	material->getShader().setUnusedAttributesValues(unusedAttrVec);
 	material->getShader().setUniform("debug", 1);
 	material->update(nodeModel, cam.getWorldSpacePosition(), lights);
 	std::vector<GLTexture const*> shadowmaps;
 	shadowmaps.reserve(lights.size());
-	for(auto light : lights)
+	for(const auto* light : lights)
 	{
 		shadowmaps.push_back(&light->getShadowMap());
 	}
@@ -257,7 +258,7 @@ void GPUMesh::Primitive::render(BasicCamera const& cam,
 	GLHandler::setUpRender(material->getShader(), nodeModel);
 	if(material->getAlphaMode() != PBRMaterial::AlphaMode::OPAQUE)
 	{
-		GLBlendSet glBlend(GLBlendSet::BlendState{});
+		const GLBlendSet glBlend(GLBlendSet::BlendState{});
 		mesh.render();
 	}
 	else
@@ -285,7 +286,7 @@ GLMesh::VertexAttrib
 			case gltf::Accessor::ComponentType::UNSIGNED_SHORT:
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				auto indBuff = reinterpret_cast<GLushort const*>(
+				const auto* indBuff = reinterpret_cast<GLushort const*>(
 				    &buffInd.data[viewInd.byteOffset
 				                  + indicesAccessor->byteOffset]);
 				for(int i(0); i < indicesAccessor->count * 1; ++i)
@@ -297,7 +298,7 @@ GLMesh::VertexAttrib
 			case gltf::Accessor::ComponentType::UNSIGNED_INT:
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				auto indBuff = reinterpret_cast<GLuint const*>(
+				const auto* indBuff = reinterpret_cast<GLuint const*>(
 				    &buffInd.data[viewInd.byteOffset
 				                  + indicesAccessor->byteOffset]);
 				for(int i(0); i < indicesAccessor->count * 1; ++i)
@@ -334,32 +335,32 @@ GLMesh::VertexAttrib
 
 	// works only for TRIANGLES
 	// iterate through triangles
-	unsigned int oldSize(newBuffer.size());
+	const unsigned int oldSize(newBuffer.size());
 	newBuffer.resize(oldSize + positionAccessor.count * 3);
 
-	int offset = positionAccessor.byteOffset / sizeof(float);
-	int stride = bufferView.byteStride / sizeof(float);
+	const int offset = positionAccessor.byteOffset / sizeof(float);
+	int stride       = bufferView.byteStride / sizeof(float);
 	if(stride == 0)
 	{
 		stride = 3;
 	}
 	for(unsigned int i(0); i < indices.size(); i += 3)
 	{
-		int idx0 = offset + indices[i] * stride;
-		int idx1 = offset + indices[i + 1] * stride;
-		int idx2 = offset + indices[i + 2] * stride;
-		QVector3D pos0(newBuffer[idx0], newBuffer[idx0 + 1],
-		               newBuffer[idx0 + 2]);
-		QVector3D pos1(newBuffer[idx1], newBuffer[idx1 + 1],
-		               newBuffer[idx1 + 2]);
-		QVector3D pos2(newBuffer[idx2], newBuffer[idx2 + 1],
-		               newBuffer[idx2 + 2]);
+		const int idx0 = offset + indices[i] * stride;
+		const int idx1 = offset + indices[i + 1] * stride;
+		const int idx2 = offset + indices[i + 2] * stride;
+		const QVector3D pos0(newBuffer[idx0], newBuffer[idx0 + 1],
+		                     newBuffer[idx0 + 2]);
+		const QVector3D pos1(newBuffer[idx1], newBuffer[idx1 + 1],
+		                     newBuffer[idx1 + 2]);
+		const QVector3D pos2(newBuffer[idx2], newBuffer[idx2 + 1],
+		                     newBuffer[idx2 + 2]);
 
 		QVector3D normal = QVector3D::crossProduct(pos1 - pos0, pos2 - pos0);
 		// assign normal three times ; face normal
-		int idxn0            = oldSize + indices[i] * stride;
-		int idxn1            = oldSize + indices[i + 1] * stride;
-		int idxn2            = oldSize + indices[i + 2] * stride;
+		const int idxn0      = oldSize + indices[i] * stride;
+		const int idxn1      = oldSize + indices[i + 1] * stride;
+		const int idxn2      = oldSize + indices[i + 2] * stride;
 		newBuffer[idxn0]     = normal[0];
 		newBuffer[idxn1]     = normal[0];
 		newBuffer[idxn2]     = normal[0];
@@ -412,7 +413,7 @@ GPUNode::GPUNode(gltf::Node const& node, std::map<QString, GPUNode*>& nodesDict)
 	{
 		nodesDict[name] = this;
 	}
-	for(auto child : node.children)
+	for(const auto* child : node.children)
 	{
 		children.emplace_back(*child, nodesDict);
 	}
