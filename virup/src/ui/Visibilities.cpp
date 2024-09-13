@@ -51,7 +51,7 @@ Visibilities::Visibilities(Universe& universe)
 		        { universe.setVisibility(name, val / 100.f); });
 	}
 
-	QStringList nonElementsVisibilities = {
+	const QStringList nonElementsVisibilities = {
 	    {"Constellations", "Orbits", "PlanetsLabels", "Debris", "Asteroids"}};
 
 	for(auto const& name : nonElementsVisibilities)

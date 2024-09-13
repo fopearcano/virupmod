@@ -152,10 +152,10 @@ void Animator::update(float frameTiming, bool videomode)
 	{
 		return;
 	}
-	float t_secs = pausedAt + timer.elapsed();
+	const float t_secs = pausedAt + timer.elapsed();
 
 	OrbitalSystemRenderer::autoCameraTarget = false;
-	universe.setLabelsOrbitsOnly({});
+	Universe::setLabelsOrbitsOnly({});
 
 	universe.setCamYaw(shiftHorizontalAngle);
 	universe.setCamPitch(-shiftVerticalAngle);
@@ -182,7 +182,7 @@ void Animator::update(float frameTiming, bool videomode)
 	}
 	else if(!transitions.empty())
 	{
-		Transition const* currentTransition = &transitions[0];
+		Transition const* currentTransition = transitions.data();
 		unsigned int i(1);
 		float durationSum(0.f);
 		while(i < transitions.size()
@@ -197,9 +197,9 @@ void Animator::update(float frameTiming, bool videomode)
 		{
 			tmm.exposure = 0.3;
 			fadeFactor   = 1.0;
-			float t_harsh((t_secs - durationSum)
-			              / currentTransition->getDuration());
-			if(currentTransition == &transitions[0])
+			const float t_harsh((t_secs - durationSum)
+			                    / currentTransition->getDuration());
+			if(currentTransition == transitions.data())
 			{
 				currentTransition->updateUniverse(
 				    universe, tmm, t_harsh, currentTransition->getDestination(),
@@ -228,7 +228,7 @@ void Animator::update(float frameTiming, bool videomode)
 				{
 					planetdPos += universe.getPlanetPosition();
 					cosmodPos += universe.getCosmoPosition();
-					float dt = t_secs - t_secsBAK;
+					const float dt = t_secs - t_secsBAK;
 					qDebug()
 					    << getCurrentTransitionId()
 					    << currentTransition->getName()
@@ -295,7 +295,7 @@ float Animator::getWholeAnimationPercentage() const
 
 void Animator::setWholeAnimationPercentage(float percentage)
 {
-	float time(getTotalDuration() * percentage / 100.f);
+	const float time(getTotalDuration() * percentage / 100.f);
 	stop();
 	pausedAt = time;
 	play();

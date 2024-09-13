@@ -40,7 +40,7 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 	file  = json["file"].toString();
 	color = json["color"].toString();
 
-	QString path(QSettings().value("data/rootdir").toString() + file);
+	const QString path(QSettings().value("data/rootdir").toString() + file);
 	QFile f(path);
 	if(!f.open(QFile::ReadOnly | QFile::Text))
 	{
@@ -55,8 +55,8 @@ void CosmologicalLabels::setJson(QJsonObject const& json)
 		QTextStream in(&f);
 		while(!in.atEnd())
 		{
-			QString line       = in.readLine();
-			QStringList fields = line.split(",");
+			const QString line       = in.readLine();
+			const QStringList fields = line.split(",");
 			QString label(fields[0]);
 			label.replace(QString{"\\n"}, QString{'\n'});
 			Vector3 dataPos(fields[1].toDouble(), fields[2].toDouble(),
@@ -84,21 +84,22 @@ void CosmologicalLabels::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
 
-	Vector3 camPosData(
+	const Vector3 camPosData(
 	    camera.worldToDataPosition(Utils::fromQt(utils::transformPosition(
 	        camera.hmdScaledSpaceToWorldTransform(), {}))));
 
 	for(auto& cosmoLabel : cosmoLabels)
 	{
-		Vector3 posData = Utils::fromQt(utils::transformPosition(
+		const Vector3 posData = Utils::fromQt(utils::transformPosition(
 		    this->getRelToAbsTransform(), Utils::toQt(cosmoLabel.first)));
-		Vector3 pos(camera.dataToWorldPosition(posData));
-		Vector3 camRelPos(camPosData - posData);
-		Vector3 unitRelPos(camRelPos.getUnitForm());
+		const Vector3 pos(camera.dataToWorldPosition(posData));
+		const Vector3 camRelPos(camPosData - posData);
+		const Vector3 unitRelPos(camRelPos.getUnitForm());
 
-		float yaw(atan2(unitRelPos[1], unitRelPos[0]));
-		float pitch(-1.0 * asin(unitRelPos[2]));
-		double rescale(pos.length() <= 8000.0 ? 1.0 : 8000.0 / pos.length());
+		const float yaw(atan2(unitRelPos[1], unitRelPos[0]));
+		const float pitch(-1.0 * asin(unitRelPos[2]));
+		const double rescale(pos.length() <= 8000.0 ? 1.0
+		                                            : 8000.0 / pos.length());
 		QMatrix4x4 model;
 		model.translate(Utils::toQt(pos * rescale));
 		model.scale(rescale * camRelPos.length() * camera.scale / 3.0);
@@ -126,7 +127,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("File path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)
@@ -135,7 +136,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("File Path:"), pathSelector});
 
-	auto colorSelector
+	auto* colorSelector
 	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
 	                 [&jsonObj](QColor const& color)

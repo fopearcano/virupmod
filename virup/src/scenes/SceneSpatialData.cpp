@@ -126,10 +126,11 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 			    = sd1.universe->getCelestialBodyPosition(
 			          sd1.bodyName, ancestor, sd0.universe->getSimulationTime())
 			      + sd1.position;
-			SceneSpatialData sd0ancestor(*sd0.universe, sd0.systemName,
-			                             ancestor, 1.0 / sd0.scale, start);
-			SceneSpatialData sd1ancestor(*sd1.universe, sd1.systemName,
-			                             ancestor, 1.0 / sd1.scale, end);
+			const SceneSpatialData sd0ancestor(*sd0.universe, sd0.systemName,
+			                                   ancestor, 1.0 / sd0.scale,
+			                                   start);
+			const SceneSpatialData sd1ancestor(*sd1.universe, sd1.systemName,
+			                                   ancestor, 1.0 / sd1.scale, end);
 			auto result
 			    = noFrameChangeInterpolate(sd0ancestor, sd1ancestor, t, 1.f);
 			// if we are still focused on a body, keep it as frame of reference
@@ -153,7 +154,7 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 	// if diving into a system
 	if(sd0.systemName == "")
 	{
-		SceneSpatialData sd1Cosmo(
+		const SceneSpatialData sd1Cosmo(
 		    *sd1.universe, 1.0 / sd1.scale,
 		    sd1.universe->planetSystems->getAbsolutePosition(sd1.systemName));
 
@@ -168,7 +169,7 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 	// or zooming out of a system
 	if(sd1.systemName == "")
 	{
-		SceneSpatialData sd0Cosmo(
+		const SceneSpatialData sd0Cosmo(
 		    *sd0.universe, 1.0 / sd0.scale,
 		    sd0.universe->planetSystems->getAbsolutePosition(sd0.systemName));
 
@@ -181,10 +182,10 @@ SceneSpatialData SceneSpatialData::interpolate(SceneSpatialData const& sd0,
 		return result;
 	}
 	// or switching planetary system
-	SceneSpatialData sd0Cosmo(
+	const SceneSpatialData sd0Cosmo(
 	    *sd0.universe, 1.0 / sd0.scale,
 	    sd0.universe->planetSystems->getAbsolutePosition(sd0.systemName));
-	SceneSpatialData sd1Cosmo(
+	const SceneSpatialData sd1Cosmo(
 	    *sd1.universe, 1.0 / sd1.scale,
 	    sd1.universe->planetSystems->getAbsolutePosition(sd1.systemName));
 
@@ -275,10 +276,10 @@ SceneSpatialData
 
 	if(sd0.scale > 1.0 / dist && sd1.scale > 1.0 / dist)
 	{
-		SceneSpatialData inter0(*sd1.universe, sd0.systemName, sd0.bodyName,
-		                        dist, sd0.position);
-		SceneSpatialData inter1(*sd1.universe, sd0.systemName, sd0.bodyName,
-		                        dist, sd1.position);
+		const SceneSpatialData inter0(*sd1.universe, sd0.systemName,
+		                              sd0.bodyName, dist, sd0.position);
+		const SceneSpatialData inter1(*sd1.universe, sd0.systemName,
+		                              sd0.bodyName, dist, sd1.position);
 		if(t <= 0.25)
 		{
 			return noFrameChangeInterpolate(sd0, inter0, t * 4);
@@ -292,16 +293,17 @@ SceneSpatialData
 
 	if(sd0.scale < 1.0 / dist && sd0.scale < sd1.scale)
 	{
-		SceneSpatialData inter(*sd1.universe, sd0.systemName, sd0.bodyName,
-		                       1.0 / sd0.scale, sd1.position);
+		const SceneSpatialData inter(*sd1.universe, sd0.systemName,
+		                             sd0.bodyName, 1.0 / sd0.scale,
+		                             sd1.position);
 		if(t <= 0.5)
 		{
 			return noFrameChangeInterpolate(sd0, inter, t * 2);
 		}
 		return noFrameChangeInterpolate(inter, sd1, t * 2 - 1);
 	}
-	SceneSpatialData inter(*sd1.universe, sd0.systemName, sd0.bodyName,
-	                       1.0 / sd1.scale, sd0.position);
+	const SceneSpatialData inter(*sd1.universe, sd0.systemName, sd0.bodyName,
+	                             1.0 / sd1.scale, sd0.position);
 	if(t <= 0.5)
 	{
 		return noFrameChangeInterpolate(sd0, inter, t * 2);

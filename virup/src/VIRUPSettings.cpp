@@ -42,7 +42,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addDirPathSetting("planetsystemdir", "exoplanets/systems",
 	                  tr("Exoplanetary Systems Root Directory"));
 
-	auto dlw = make_qt_unique<DataListWidget>(*this);
+	auto* dlw = make_qt_unique<DataListWidget>(*this);
 	insertCustomGroup("data", tr("Data"), 0, dlw);
 
 	insertGroup("misc", tr("Miscellaneous"), 3);
@@ -136,6 +136,7 @@ void DataListWidget::downloadDefaultData()
 
 	bool ok(false);
 	QString downloadDir;
+	// NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
 	do
 	{
 		downloadDir = QFileDialog::getExistingDirectory(
@@ -145,10 +146,10 @@ void DataListWidget::downloadDefaultData()
 		{
 			return;
 		}
-		QStorageInfo info(downloadDir);
+		const QStorageInfo info(downloadDir);
 		if(info.bytesAvailable() / 1024.0 <= 27.1 * 1024 * 1024) // 27.1GiB
 		{
-			QString avail
+			const QString avail
 			    = QString::number(info.bytesAvailable() / 1024.0 / 1024 / 1024);
 			QMessageBox::warning(this, tr("Not enough storage space"),
 			                     avail + tr(" GiB available, 27.1GiB needed."));
@@ -192,15 +193,15 @@ void DataListWidget::downloadDefaultData()
 
 	while(!future.isFinished() && keepDownloading)
 	{
-		QFile downloadedFile(downloadedFilePath);
-		auto fileSize(downloadedFile.size());
+		const QFile downloadedFile(downloadedFilePath);
+		const auto fileSize(downloadedFile.size());
 
 		progress.setMaximum(totsize / 1024 / 1024);
 		progress.setValue(fileSize / 1024 / 1024);
 		auto dt               = timer.restart() / 1000.0;
 		auto speedInMiBPerSec = (fileSize - sizeBack) / dt / (1024 * 1024);
 		sizeBack              = fileSize;
-		int remaining         = static_cast<int>(
+		const int remaining   = static_cast<int>(
             round((totsize - fileSize) / (speedInMiBPerSec * 1024 * 1024)));
 		progress.setLabelText(
 		    QString::number(fileSize / 1024.0 / 1024 / 1024, 'g', 2) + "GiB/"
@@ -218,6 +219,7 @@ void DataListWidget::downloadDefaultData()
 		downloadedFile.remove();
 		// forces QtConcurrent to stop, else we need to wait for the end of the
 		// download...
+		// NOLINTNEXTLINE(concurrency-mt-unsafe)
 		exit(0);
 	}
 
@@ -279,8 +281,8 @@ void DataListWidget::downloadDefaultData()
 
 		while(!future.isFinished() && keepExtracting)
 		{
-			QFile extractedFile(downloadDir + "/" + currentpath);
-			auto extractedSize(extractedFile.size());
+			const QFile extractedFile(downloadDir + "/" + currentpath);
+			const auto extractedSize(extractedFile.size());
 
 			progress.setValue((alreadyExtracted + extractedSize) / 1024 / 1024);
 			progress.setLabelText(
@@ -309,6 +311,7 @@ void DataListWidget::downloadDefaultData()
 	if(!keepExtracting)
 	{
 		qDebug() << "Cancelled";
+		// NOLINTNEXTLINE(concurrency-mt-unsafe)
 		exit(0);
 	}
 
@@ -321,15 +324,15 @@ void DataListWidget::loadMainLayout()
 	layout = make_qt_unique<QVBoxLayout>(*this);
 	layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-	auto downloadButton
+	auto* downloadButton
 	    = make_qt_unique<QPushButton>(*this, tr("Download default data..."));
 	connect(downloadButton, &QPushButton::pressed,
 	        [this]() { downloadDefaultData(); });
 	layout->addWidget(downloadButton);
 
-	auto w       = make_qt_unique<QWidget>(*this);
-	auto l       = make_qt_unique<QHBoxLayout>(*w);
-	auto label   = make_qt_unique<QLabel>(*w, tr("Root directory :"));
+	auto* w      = make_qt_unique<QWidget>(*this);
+	auto* l      = make_qt_unique<QHBoxLayout>(*w);
+	auto* label  = make_qt_unique<QLabel>(*w, tr("Root directory :"));
 	pathSelector = make_qt_unique<PathSelector>(
 	    *this, tr("Data root directory"), PathSelector::Type::DIRECTORY);
 	pathSelector->setPath(QSettings().value("data/rootdir").toString());
@@ -346,15 +349,15 @@ void DataListWidget::loadMainLayout()
 	w->setLayout(layout);
 	setWidget(w);
 
-	auto addButton = make_qt_unique<QPushButton>(*this);
+	auto* addButton = make_qt_unique<QPushButton>(*this);
 	addButton->setText(tr("Add..."));
 	connect(addButton, &QPushButton::clicked, this, &DataListWidget::addData);
 	layout->addWidget(addButton);
 
-	w                 = make_qt_unique<QWidget>(*this);
-	auto hl           = make_qt_unique<QHBoxLayout>(*w);
-	auto importButton = make_qt_unique<QPushButton>(*this);
-	auto exportButton = make_qt_unique<QPushButton>(*this);
+	w                  = make_qt_unique<QWidget>(*this);
+	auto* hl           = make_qt_unique<QHBoxLayout>(*w);
+	auto* importButton = make_qt_unique<QPushButton>(*this);
+	auto* exportButton = make_qt_unique<QPushButton>(*this);
 	importButton->setText(tr("Import.."));
 	exportButton->setText(tr("Export.."));
 	connect(importButton, &QPushButton::clicked, this,
@@ -374,7 +377,7 @@ void DataListWidget::loadMainLayout()
 
 void DataListWidget::loadJsonRepresentation()
 {
-	QJsonDocument jsondoc(QJsonDocument::fromJson(
+	const QJsonDocument jsondoc(QJsonDocument::fromJson(
 	    QSettings().value("data/json").toString().toLatin1()));
 	dataJsonRepresentation = jsondoc.object();
 	if(dataJsonRepresentation.keys().indexOf("entries") == -1)
@@ -385,14 +388,14 @@ void DataListWidget::loadJsonRepresentation()
 
 void DataListWidget::saveJsonRepresentation()
 {
-	QJsonDocument jsondoc(dataJsonRepresentation);
+	const QJsonDocument jsondoc(dataJsonRepresentation);
 	QSettings().setValue("data/json", QString(jsondoc.toJson()));
 }
 
 void DataListWidget::addData()
 {
 	DataDialog dd(entries, entriesIds);
-	QJsonObject jsonEntry = dd.getDataDefinition();
+	const QJsonObject jsonEntry = dd.getDataDefinition();
 	if(jsonEntry.keys().empty())
 	{
 		return;
@@ -408,18 +411,18 @@ void DataListWidget::addData()
 
 void DataListWidget::addPushButtons(QJsonObject const& entry)
 {
-	auto w  = make_qt_unique<QWidget>(*this);
-	auto hl = make_qt_unique<QHBoxLayout>(*w);
+	auto* w  = make_qt_unique<QWidget>(*this);
+	auto* hl = make_qt_unique<QHBoxLayout>(*w);
 	w->setLayout(hl);
 
-	auto b0 = make_qt_unique<QPushButton>(*w);
-	QString name(entry["name"].toString());
+	auto* b0 = make_qt_unique<QPushButton>(*w);
+	const QString name(entry["name"].toString());
 	QString type(entry["type"].toString());
 	type = entries[entriesIds.indexOf(type)];
 	b0->setText(name + "|" + type);
 	hl->addWidget(b0);
 
-	auto b1 = make_qt_unique<QPushButton>(*w);
+	auto* b1 = make_qt_unique<QPushButton>(*w);
 	b1->setText(tr("Remove"));
 	b1->setMaximumWidth(150);
 	hl->QLayout::addWidget(b1);
@@ -434,7 +437,7 @@ void DataListWidget::addPushButtons(QJsonObject const& entry)
 	connect(b0, &QPushButton::clicked,
 	        [this, b0]()
 	        {
-		        QString name(b0->text().section('|', 0, 0));
+		        const QString name(b0->text().section('|', 0, 0));
 		        DataDialog dd(entries, entriesIds,
 		                      dataJsonRepresentation["entries"]
 		                          .toArray()[getIndexInArray(name)]
@@ -444,7 +447,7 @@ void DataListWidget::addPushButtons(QJsonObject const& entry)
 		        {
 			        return;
 		        }
-		        QString newName(jsonEntry["name"].toString());
+		        const QString newName(jsonEntry["name"].toString());
 		        QString newType(jsonEntry["type"].toString());
 		        newType = entries[entriesIds.indexOf(newType)];
 		        b0->setText(newName + "|" + newType);
@@ -454,7 +457,7 @@ void DataListWidget::addPushButtons(QJsonObject const& entry)
 	connect(b1, &QPushButton::clicked,
 	        [this, b0, w]()
 	        {
-		        QString name(b0->text().section('|', 0, 0));
+		        const QString name(b0->text().section('|', 0, 0));
 		        if(QMessageBox::question(
 		               this, tr("Removing data"),
 		               tr("Do you really want to remove %1 ?").arg(name))
@@ -529,11 +532,11 @@ DataDialog::DataDialog(QStringList const& entries,
                        // NOLINTNEXTLINE(modernize-pass-by-value)
                        QJsonObject const& editFrom)
     : result(editFrom)
+    , layout(make_qt_unique<QFormLayout>(*this))
 {
-	layout = make_qt_unique<QFormLayout>(*this);
 	setLayout(layout);
 
-	auto nameEdit = make_qt_unique<QLineEdit>(*this);
+	auto* nameEdit = make_qt_unique<QLineEdit>(*this);
 	connect(nameEdit, &QLineEdit::textChanged,
 	        [this](QString const& text) { this->result["name"] = text; });
 	nameEdit->setText(result["name"].toString());
@@ -544,7 +547,7 @@ DataDialog::DataDialog(QStringList const& entries,
 		layout->addRow(pair.first, pair.second);
 	}
 
-	auto typeEdit = make_qt_unique<QComboBox>(*this);
+	auto* typeEdit = make_qt_unique<QComboBox>(*this);
 	for(auto const& entry : entries)
 	{
 		typeEdit->addItem(entry);
@@ -563,13 +566,13 @@ DataDialog::DataDialog(QStringList const& entries,
 	}
 	layout->addRow(tr("Type :"), typeEdit);
 
-	auto w  = make_qt_unique<QWidget>(*this);
-	auto hl = make_qt_unique<QHBoxLayout>(*w);
+	auto* w  = make_qt_unique<QWidget>(*this);
+	auto* hl = make_qt_unique<QHBoxLayout>(*w);
 	w->setLayout(hl);
-	auto accept = make_qt_unique<QPushButton>(*this);
+	auto* accept = make_qt_unique<QPushButton>(*this);
 	accept->setText(tr("Accept"));
 	connect(accept, &QPushButton::clicked, this, &QDialog::accept);
-	auto cancel = make_qt_unique<QPushButton>(*this);
+	auto* cancel = make_qt_unique<QPushButton>(*this);
 	cancel->setText(tr("Cancel"));
 	connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
 	hl->addWidget(accept);
@@ -598,8 +601,8 @@ void DataDialog::setType(QString const& type)
 	{
 		layout->removeRow(layout->rowCount() - 2);
 	}
-	specialized     = make_qt_unique<QWidget>(*this);
-	auto speclayout = make_qt_unique<QFormLayout>(*specialized);
+	specialized      = make_qt_unique<QWidget>(*this);
+	auto* speclayout = make_qt_unique<QFormLayout>(*specialized);
 	specialized->setLayout(speclayout);
 
 	QList<QPair<QString, QWidget*>> fields;

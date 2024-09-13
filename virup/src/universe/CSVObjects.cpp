@@ -75,14 +75,14 @@ void CSVObjects::init(QString const& csvFile, QString const& atlasFile)
 		QString line(file.readLine().data());
 
 		// parse first line for columns numbers
-		QList<QString> columns
+		const QList<QString> columns
 		    = {"names",   "x",       "y",       "z",  "absmag",
 		       "rabsmag", "gabsmag", "babsmag", "ci", "teff"};
 		std::map<QString, int> columnsNumbers;
 
 		for(int i(0); i < line.split(",").size(); ++i)
 		{
-			QString str(line.split(",")[i]);
+			const QString str(line.split(",")[i]);
 			if(columns.contains(str.simplified()))
 			{
 				columnsNumbers[str.simplified()] = i;
@@ -175,7 +175,7 @@ void CSVObjects::initWithConstellations(QString const& csvFile,
 			for(auto const& starName : starsNames)
 			{
 				int index(-1);
-				if(indexByName.count(starName) > 0)
+				if(indexByName.contains(starName))
 				{
 					index = indexByName[starName];
 				}
@@ -227,9 +227,9 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 	getModelAndCampos(camera, model, campos);
 
 	{
-		GLStateSet glState(
+		const GLStateSet glState(
 		    {{GL_CLIP_DISTANCE0, true}, {GL_PROGRAM_POINT_SIZE, true}});
-		GLBlendSet glBlend({GL_ONE, GL_ONE});
+		const GLBlendSet glBlend({GL_ONE, GL_ONE});
 		shader.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
 		auto vis = getVisibility();
 		if(useBrightnessMultiplier())
@@ -256,11 +256,11 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 	if(containsConstellations
 	   && (constellationsAlpha > 0.f || constellationsLabels > 0.f))
 	{
-		GLStateSet glState({{GL_MULTISAMPLE, true}});
+		const GLStateSet glState({{GL_MULTISAMPLE, true}});
 		{
-			GLStateSet glState(
+			const GLStateSet glState(
 			    {{GL_LINE_SMOOTH, true}, {GL_PRIMITIVE_RESTART, true}});
-			GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
+			const GLBlendSet glBlend({GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA});
 			GLHandler::glf().glLineWidth(2.f);
 			GLHandler::glf().glPrimitiveRestartIndex(0xFFFF);
 
@@ -286,16 +286,16 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 			coeff = pow(coeff, 0.5f);
 			for(auto& conLabel : conLabels)
 			{
-				Vector3 pos(conLabel.first);
-				Vector3 camRelPos(Utils::fromQt(campos) - pos);
-				Vector3 unitRelPos(camRelPos.getUnitForm());
+				const Vector3 pos(conLabel.first);
+				const Vector3 camRelPos(Utils::fromQt(campos) - pos);
+				const Vector3 unitRelPos(camRelPos.getUnitForm());
 
 				// orient label towards camera and place before 8000
-				float yaw(atan2(unitRelPos[1], unitRelPos[0]));
-				float pitch(-1.0 * asin(unitRelPos[2]));
-				double rescale(camRelPos.length() <= 8000.0
-				                   ? 1.0
-				                   : 8000.0 / camRelPos.length());
+				const float yaw(atan2(unitRelPos[1], unitRelPos[0]));
+				const float pitch(-1.0 * asin(unitRelPos[2]));
+				const double rescale(camRelPos.length() <= 8000.0
+				                         ? 1.0
+				                         : 8000.0 / camRelPos.length());
 
 				QMatrix4x4 model2;
 				model2.translate(rescale * Utils::toQt(pos));
@@ -314,7 +314,7 @@ void CSVObjects::render(Camera const& camera, ToneMappingModel const& tmm)
 QColor CSVObjects::colorFromColorIndex(float ci)
 {
 	// https://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color
-	float temperature
+	const float temperature
 	    = 4600
 	      * ((1.f / ((0.92f * ci) + 1.7f)) + (1.f / ((0.92f * ci) + 0.62f)));
 
@@ -327,22 +327,22 @@ CSVObjects::Object
                           std::map<QString, int> const& columnsNumbers)
 {
 	Object result;
-	QStringList splitted(line.split(","));
+	const QStringList splitted(line.split(","));
 
 	if(columnsNumbers.find("names") != columnsNumbers.cend())
 	{
-		QString names = splitted[columnsNumbers.at("names")].simplified();
+		const QString names = splitted[columnsNumbers.at("names")].simplified();
 		if(names != "")
 		{
-			QStringList namesList = names.split('|');
+			const QStringList namesList = names.split('|');
 			for(auto const& richName : namesList)
 			{
-				QStringList splittedName = richName.split(':');
-				QString name(splittedName[0]);
+				const QStringList splittedName = richName.split(':');
+				QString const& name(splittedName[0]);
 				Designation desig = Designation::UNKNOWN;
 				if(splittedName.size() > 1)
 				{
-					QString desigStr(splittedName[1]);
+					QString const& desigStr(splittedName[1]);
 					if(desigStr == "proper")
 					{
 						desig = Designation::PROPER;
@@ -406,14 +406,14 @@ CSVObjects::Object
 			babsmag *= -1.0;
 		}
 
-		double r      = Color::illuminanceFromMag(rabsmag);
-		double g      = Color::illuminanceFromMag(gabsmag);
-		double b      = Color::illuminanceFromMag(babsmag);
-		result.absmag = Color::magFromIlluminance(r + g + b);
+		const double r = Color::illuminanceFromMag(rabsmag);
+		const double g = Color::illuminanceFromMag(gabsmag);
+		const double b = Color::illuminanceFromMag(babsmag);
+		result.absmag  = Color::magFromIlluminance(r + g + b);
 
-		auto xyY     = Color::rgbtoxyY(r, g, b);
-		auto rgb     = Color::xyYtorgb(xyY[0], xyY[1], 1.0);
-		result.color = QColor::fromRgbF(rgb[0], rgb[1], rgb[2], 1.0);
+		const auto xyY = Color::rgbtoxyY(r, g, b);
+		const auto rgb = Color::xyYtorgb(xyY[0], xyY[1], 1.0);
+		result.color   = QColor::fromRgbF(rgb[0], rgb[1], rgb[2], 1.0);
 	}
 
 	return result;
@@ -437,7 +437,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("CSV path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)
@@ -463,7 +463,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("CSV path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)

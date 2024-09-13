@@ -23,15 +23,16 @@
 TimeController::TimeController(Universe& universe)
     : VIRUPDialog3D({0.0f, 0.5f})
     , universe(universe)
+    , dtEdit(make_qt_unique<QDateTimeEdit>(*this))
+    , timeLabel(make_qt_unique<QLabel>(*this))
 {
 	setWindowTitle(tr("Time Controller"));
 
-	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
+	auto* mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = make_qt_unique<QWidget>(*this);
+	auto* w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto dateTimeLayout = make_qt_unique<QHBoxLayout>(*w);
-	dtEdit              = make_qt_unique<QDateTimeEdit>(*this);
+	auto* dateTimeLayout = make_qt_unique<QHBoxLayout>(*w);
 	dtEdit->setCalendarPopup(true);
 	dtEdit->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
 	dtEdit->setDateTime(universe.getSimulationTime());
@@ -45,14 +46,13 @@ TimeController::TimeController(Universe& universe)
 	        });
 	dateTimeLayout->addWidget(dtEdit);
 
-	timeLabel = make_qt_unique<QLabel>(*this);
 	dateTimeLayout->addWidget(timeLabel);
 
 	w = make_qt_unique<QWidget>(*this);
 	mainLayout->addWidget(w);
-	auto buttonsLayout = make_qt_unique<QHBoxLayout>(*w);
+	auto* buttonsLayout = make_qt_unique<QHBoxLayout>(*w);
 
-	auto button = make_qt_unique<QPushButton>(*this);
+	auto* button = make_qt_unique<QPushButton>(*this);
 	button->setText(tr("Flip time flow"));
 	connect(button, &QPushButton::pressed,
 	        [this]() { setTimeCoeffFromUI(-1.f * this->getTimeCoeffForUI()); });

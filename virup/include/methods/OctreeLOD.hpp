@@ -20,7 +20,7 @@ class OctreeLOD : public Octree
 {
   public:
 	OctreeLOD(GLShaderProgram const& shaderProgram);
-	OctreeLOD(OctreeLOD&&) = default;
+	OctreeLOD(OctreeLOD const&) = delete;
 	bool isReady() const;
 	unsigned int getLevel() const { return lvl; };
 	virtual void init(std::vector<float>& data,
@@ -68,7 +68,7 @@ class OctreeLOD : public Octree
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,
 	          Octree::CommonData& commonData, unsigned int lvl = 0);
-	virtual Octree* newChild() const override;
+	virtual std::unique_ptr<Octree> newChild() const override;
 
 	// in Octree space
 	virtual void closestChanged(Vector3 /*closest*/){};

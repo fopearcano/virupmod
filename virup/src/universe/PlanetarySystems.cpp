@@ -24,8 +24,8 @@
 PlanetarySystems::PlanetarySystems()
     : shader("default")
 {
-	QString rootdir(QSettings().value("data/rootdir").toString());
-	auto planetsystemdir
+	const QString rootdir(QSettings().value("data/rootdir").toString());
+	const auto planetsystemdir
 	    = rootdir + QSettings().value("simulation/planetsystemdir").toString();
 
 	QStringList files;
@@ -43,8 +43,9 @@ PlanetarySystems::PlanetarySystems()
 		if(jsonFile.exists())
 		{
 			jsonFile.open(QIODevice::ReadOnly);
-			QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll());
-			QString name(QFileInfo(jsonFile).dir().dirName());
+			const QJsonDocument jsonDoc
+			    = QJsonDocument::fromJson(jsonFile.readAll());
+			const QString name(QFileInfo(jsonFile).dir().dirName());
 
 			auto orbitalSystem = std::make_unique<OrbitalSystem>(
 			    name.toStdString(), jsonDoc.object());
@@ -54,9 +55,9 @@ PlanetarySystems::PlanetarySystems()
 				           << " is invalid... ";
 				continue;
 			}
-			double dist(orbitalSystem->getDistanceToEarth());
-			double ra(orbitalSystem->getRightAscension());
-			double dec(orbitalSystem->getDeclination());
+			const double dist(orbitalSystem->getDistanceToEarth());
+			const double ra(orbitalSystem->getRightAscension());
+			const double dec(orbitalSystem->getDeclination());
 			Vector3 position(dist * cos(ra) * cos(dec),
 			                 dist * sin(ra) * cos(dec), dist * sin(dec));
 			vertices.push_back(position[0]);
@@ -82,17 +83,18 @@ PlanetarySystems::PlanetarySystems()
 		    = sqrt(pow(bbox.maxx - bbox.minx, 2) + pow(bbox.maxy - bbox.miny, 2)
 		           + pow(bbox.maxz - bbox.minz, 2));
 	}
-	QString solarsystemjson(
+	const QString solarsystemjson(
 	    rootdir + QSettings().value("simulation/solarsystemdir").toString()
 	    + "/definition.json");
 	QFile jsonFile(solarsystemjson);
 	if(jsonFile.exists())
 	{
 		jsonFile.open(QIODevice::ReadOnly);
-		QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonFile.readAll());
-		QString name(QFileInfo(jsonFile).dir().dirName());
+		const QJsonDocument jsonDoc
+		    = QJsonDocument::fromJson(jsonFile.readAll());
+		const QString name(QFileInfo(jsonFile).dir().dirName());
 
-		QString dir(QFileInfo(jsonFile).absoluteDir().path());
+		const QString dir(QFileInfo(jsonFile).absoluteDir().path());
 		PlanetRenderer::currentSystemDir() = dir;
 		CSVOrbit::currentSystemDir()       = dir;
 
@@ -147,17 +149,17 @@ void PlanetarySystems::update(Camera const& camera)
 {
 	getModelAndCampos(camera, model, campos);
 
-	QVector3D pos
+	const QVector3D pos
 	    = useVRCamposForClosest
 	          ? campos
 	          : utils::transformPosition(getRelToAbsTransform().inverted(),
 	                                     Utils::toQt(camera.position));
 
 	double dist(DBL_MAX);
-	unsigned int oldClosestId(closestId);
+	const unsigned int oldClosestId(closestId);
 	for(unsigned int i(0); i < positions.size(); ++i)
 	{
-		double d((positions[i] - Utils::fromQt(pos)).length());
+		const double d((positions[i] - Utils::fromQt(pos)).length());
 		if(d < dist)
 		{
 			dist      = d;
@@ -167,7 +169,7 @@ void PlanetarySystems::update(Camera const& camera)
 	double neighborDist(DBL_MAX);
 	for(unsigned int i(0); i < positions.size(); ++i)
 	{
-		double d((positions[i] - positions[closestId]).length());
+		const double d((positions[i] - positions[closestId]).length());
 		if(d < neighborDist && i != closestId)
 		{
 			neighborDist = d;
@@ -192,7 +194,7 @@ void PlanetarySystems::update(Camera const& camera)
 void PlanetarySystems::render(Camera const& /*camera*/,
                               ToneMappingModel const& tmm)
 {
-	GLBlendSet glBlend(GLBlendSet::BlendState{});
+	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	shader.setUniform("alpha", getVisibility());
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);

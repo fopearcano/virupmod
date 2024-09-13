@@ -48,19 +48,19 @@ class TreeMethodLOD : public Method
 
   protected:
 	std::unique_ptr<VolumetricModel> dustModel;
-	std::vector<OctreeLOD> gasTrees;
-	std::vector<OctreeLOD> starsTrees;
-	std::vector<OctreeLOD> darkMatterTrees;
+	std::vector<std::unique_ptr<OctreeLOD>> gasTrees;
+	std::vector<std::unique_ptr<OctreeLOD>> starsTrees;
+	std::vector<std::unique_ptr<OctreeLOD>> darkMatterTrees;
 	std::unique_ptr<VolumetricModel> hiiModel;
 
 	// ugly fix for pointSize problems
 	bool setPointSize = true;
 
-	static void loadOctreeFromFile(std::string const& path,
-	                               std::vector<OctreeLOD>& container,
-	                               std::string const& name,
-	                               GLShaderProgram const& shaderProgram,
-	                               bool silent);
+	static void
+	    loadOctreeFromFile(std::string const& path,
+	                       std::vector<std::unique_ptr<OctreeLOD>>& container,
+	                       std::string const& name,
+	                       GLShaderProgram const& shaderProgram, bool silent);
 	static void initOctree(OctreeLOD* octree,
 	                       std::shared_ptr<std::istream> const& in);
 	void setShaderColor(QColor const& color);

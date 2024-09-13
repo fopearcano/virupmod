@@ -30,7 +30,7 @@ UniverseElementSelector::UniverseElementSelector(Universe& universe,
 	setFixedSize(250, 600);
 	setWindowTitle(tr("Cosmological Elements List"));
 
-	auto layout = make_qt_unique<QVBoxLayout>(*this);
+	auto* layout = make_qt_unique<QVBoxLayout>(*this);
 
 	connect(&listWidget, &QListWidget::itemActivated, this,
 	        &UniverseElementSelector::selectElement);
@@ -40,7 +40,7 @@ UniverseElementSelector::UniverseElementSelector(Universe& universe,
 	{
 		listWidget.addItem(elementName);
 	}
-	auto b = make_qt_unique<QPushButton>(*this);
+	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
 	connect(b, &QPushButton::pressed,
 	        [this]() { selectElement(listWidget.currentItem()); });
@@ -56,8 +56,8 @@ UniverseElementSelector::UniverseElementSelector(Universe& universe,
 
 void UniverseElementSelector::selectElement(QListWidgetItem* item)
 {
-	auto elem = universe.getElement(item->text());
-	auto diameter
+	auto const* elem = universe.getElement(item->text());
+	const auto diameter
 	    = elem->getBoundingBox().diameter * elem->unit / universe.mtokpc;
 
 	if(diameter == 0.f)
@@ -67,8 +67,8 @@ void UniverseElementSelector::selectElement(QListWidgetItem* item)
 	}
 
 	auto scene = animator.getCurrentScene();
-	SceneSpatialData sd(universe, 0.2f * diameter,
-	                    elem->getAbsoluteBBoxCenter());
+	const SceneSpatialData sd(universe, 0.2f * diameter,
+	                          elem->getAbsoluteBBoxCenter());
 	SceneUI ui(scene.getUI());
 	ui.setVisibility(item->text(), 1.f);
 	animator.executeTransition(Transition(
@@ -86,12 +86,12 @@ class UniverseElementEditor : public QDialog
 	    : QDialog(parent, f)
 	    , json(universeElement->getJson())
 	{
-		auto form = make_qt_unique<QFormLayout>(*this);
+		auto* form = make_qt_unique<QFormLayout>(*this);
 		for(auto const& pair : UniverseElement::getLauncherFields(*this, json))
 		{
 			form->addRow(pair.first, pair.second);
 		}
-		auto type = json["type"].toString();
+		const auto type = json["type"].toString();
 
 		QList<QPair<QString, QWidget*>> fields;
 		if(type == "cosmolabels")
@@ -123,7 +123,7 @@ class UniverseElementEditor : public QDialog
 			form->addRow(pair.first, pair.second);
 		}
 
-		auto b = make_qt_unique<QPushButton>(*this);
+		auto* b = make_qt_unique<QPushButton>(*this);
 		b->setText(tr("Apply"));
 		form->addRow(b);
 		connect(b, &QPushButton::pressed, this, [this, universeElement]()
@@ -137,7 +137,7 @@ class UniverseElementEditor : public QDialog
 void UniverseElementSelector::editElement(QListWidgetItem* item)
 {
 	UniverseElement* elem(universe.getElement(item->text()));
-	auto editor
+	auto* editor
 	    = make_qt_unique<UniverseElementEditor>(*this, elem, Qt::WindowFlags{});
 	editor->show();
 }

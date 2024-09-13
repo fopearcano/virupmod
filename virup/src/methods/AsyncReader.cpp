@@ -30,11 +30,11 @@ class Thread : public QThread
   public:
 	void run() override;
 
+  private:
+	friend AsyncReader;
 	std::deque<std::queue<OctreeLOD*>> queues;
-
 	bool doRun = true;
 
-  private:
 	static std::mutex& lock();
 	static void updateOctree(OctreeLOD* octree);
 };

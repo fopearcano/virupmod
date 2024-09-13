@@ -26,27 +26,29 @@
 ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
     : VIRUPDialog3D({0.3f, 0.5f})
     , tmm(tmm)
+    , autoCb(make_qt_unique<QCheckBox>(*this))
+    , bmCb(make_qt_unique<QCheckBox>(*this))
+    , prkCb(make_qt_unique<QCheckBox>(*this))
+    , exposureLabel(make_qt_unique<QLabel>(*this))
 {
 	setWindowTitle(tr("Tone Mapping Controller"));
 
-	auto mainLayout = make_qt_unique<QVBoxLayout>(*this);
+	auto* mainLayout = make_qt_unique<QVBoxLayout>(*this);
 
-	auto w = make_qt_unique<QWidget>(*this);
+	auto* w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	auto hl = make_qt_unique<QHBoxLayout>(*w);
-	autoCb  = make_qt_unique<QCheckBox>(*this);
+	auto* hl = make_qt_unique<QHBoxLayout>(*w);
 	autoCb->setChecked(tmm.autoexposure);
 	connect(autoCb, &QCheckBox::stateChanged,
 	        [this]() { this->tmm.autoexposure = this->autoCb->isChecked(); });
 	hl->QLayout::addWidget(autoCb);
-	auto l = make_qt_unique<QLabel>(*this);
+	auto* l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Automatic exposure"));
 	hl->addWidget(l);
 
 	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl   = make_qt_unique<QHBoxLayout>(*w);
-	bmCb = make_qt_unique<QCheckBox>(*this);
+	hl = make_qt_unique<QHBoxLayout>(*w);
 	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
 	connect(bmCb, &QCheckBox::stateChanged,
 	        [this]() {
@@ -60,8 +62,7 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 
 	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl    = make_qt_unique<QHBoxLayout>(*w);
-	prkCb = make_qt_unique<QCheckBox>(*this);
+	hl = make_qt_unique<QHBoxLayout>(*w);
 	prkCb->setChecked(tmm.purkinje);
 	connect(prkCb, &QCheckBox::stateChanged,
 	        [this]() { this->tmm.purkinje = this->prkCb->isChecked(); });
@@ -72,11 +73,10 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 
 	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
-	hl            = make_qt_unique<QHBoxLayout>(*w);
-	exposureLabel = make_qt_unique<QLabel>(*this);
+	hl = make_qt_unique<QHBoxLayout>(*w);
 	exposureLabel->setText(tr("Exposure :"));
 	hl->addWidget(exposureLabel);
-	auto b = make_qt_unique<QPushButton>(*this);
+	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("-"));
 	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure /= 1.5f; });
 	hl->addWidget(b);

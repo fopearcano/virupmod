@@ -15,7 +15,7 @@ Checks:          "abseil-cleanup-ctad, \
     abseil-redundant-strcat-calls, \
     abseil-str-cat-append, \
     abseil-string-find-startswith, \
-    abseil-string-find-str-contains, \
+    -abseil-string-find-str-contains, \ # we don't use abseil
     abseil-time-comparison, \
     abseil-time-subtraction, \
     abseil-upgrade-duration-conversions, \

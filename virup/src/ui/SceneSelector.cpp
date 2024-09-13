@@ -21,7 +21,11 @@
 SceneSelector::SceneSelector(Animator& animator)
     : VIRUPDialog3D({0.f, 0.f})
     , animator(animator)
+    , transitionsButton(make_qt_unique<QPushButton>(
+          *this, "Toggle transitions (only if user is sick, can introduce "
+                 "problems !)"))
     , animationTimeSlider(Qt::Horizontal, this)
+
 {
 	show();
 	setWindowTitle(tr("VIRUP Scenes"));
@@ -85,7 +89,7 @@ SceneSelector::SceneSelector(Animator& animator)
 	connect(&animator, &Animator::personHeightChanged,
 	        [sb](float v)
 	        {
-		        QSignalBlocker blocker{sb};
+		        const QSignalBlocker blocker{sb};
 		        sb->setValue(v);
 	        });
 	hl->addWidget(sb);
@@ -109,9 +113,6 @@ SceneSelector::SceneSelector(Animator& animator)
 	        &SceneSelector::updateButtons);
 
 	// layout->addWidget(make_qt_unique<QLabel>(*this, "Options :"));
-	transitionsButton = make_qt_unique<QPushButton>(
-	    *this,
-	    "Toggle transitions (only if user is sick, can introduce problems !)");
 	connect(transitionsButton, &QPushButton::clicked, this,
 	        [&animator]() { animator.toggleAnimations(); });
 	transitionsButton->setFocusPolicy(Qt::NoFocus);

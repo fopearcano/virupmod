@@ -28,8 +28,8 @@ CosmologicalSimulation::CosmologicalSimulation(QJsonObject const& json)
 /*: gradient(json["gradient"].toObject())
 , gradientSelector(gradient)*/
 {
-	QString rootdir(QSettings().value("data/rootdir").toString() + '/'),
-	    gasPath(json["gasfile"].toString()),
+	const QString rootdir(QSettings().value("data/rootdir").toString() + '/');
+	QString gasPath(json["gasfile"].toString()),
 	    starsPath(json["starsfile"].toString()),
 	    dmPath(json["darkmatterfile"].toString());
 	if(!gasPath.isEmpty())
@@ -74,16 +74,16 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
                                   QColor const& starsColor,
                                   QColor const& darkMatterColor)
 {
-	QRegularExpression rxNumber("[0-9]+");
-	QString dirPathGas = gasOctreePath.c_str();
-	QDir gasDir(dirPathGas);
+	const QRegularExpression rxNumber("[0-9]+");
+	const QString dirPathGas = gasOctreePath.c_str();
+	const QDir gasDir(dirPathGas);
 	if(!gasOctreePath.empty())
 	{
 		for(auto const& path :
 		    gasDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
 		{
-			auto it = rxNumber.globalMatch(path);
-			unsigned int index;
+			auto it            = rxNumber.globalMatch(path);
+			unsigned int index = 0;
 			while(it.hasNext())
 			{
 				index = it.next().captured(0).toInt();
@@ -92,13 +92,13 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 		}
 	}
 
-	QString dirPathStars = starsOctreePath.c_str();
-	QDir starsDir(dirPathStars);
+	const QString dirPathStars = starsOctreePath.c_str();
+	const QDir starsDir(dirPathStars);
 	for(auto const& path :
 	    starsDir.entryList({"*.octree"}, QDir::Files, QDir::Name))
 	{
-		auto it = rxNumber.globalMatch(path);
-		unsigned int index;
+		auto it            = rxNumber.globalMatch(path);
+		unsigned int index = 0;
 		while(it.hasNext())
 		{
 			index = it.next().captured(0).toInt();
@@ -106,15 +106,15 @@ void CosmologicalSimulation::init(std::string const& gasOctreePath,
 		cosmoFilesStars[index] = dirPathStars + "/" + path;
 	}
 
-	QString dirPathDM = darkMatterOctreePath.c_str();
-	QDir dmDir(dirPathDM);
+	const QString dirPathDM = darkMatterOctreePath.c_str();
+	const QDir dmDir(dirPathDM);
 	if(!darkMatterOctreePath.empty())
 	{
 		for(auto const& path :
 		    dmDir.entryList({"*.dat", "*.octree"}, QDir::Files, QDir::Name))
 		{
-			auto it = rxNumber.globalMatch(path);
-			unsigned int index;
+			auto it            = rxNumber.globalMatch(path);
+			unsigned int index = 0;
 			while(it.hasNext())
 			{
 				index = it.next().captured(0).toInt();
@@ -184,12 +184,12 @@ unsigned int CosmologicalSimulation::getClosestId(
     std::map<unsigned int, QString> const& m, unsigned index)
 // NOLINTEND(misc-unused-parameters)
 {
-	if(m.count(index) > 0)
+	if(m.contains(index))
 	{
 		return index;
 	}
-	unsigned int l(m.lower_bound(index)->first);
-	unsigned int u(m.upper_bound(index)->first);
+	const unsigned int l(m.lower_bound(index)->first);
+	const unsigned int u(m.upper_bound(index)->first);
 	if(index - l < u - index)
 	{
 		return l;
@@ -220,7 +220,7 @@ void CosmologicalSimulation::update(Camera const& camera)
 	if(cosmoFilesGas.size() > 1 || cosmoFilesStars.size() > 1
 	   || cosmoFilesDM.size() > 1)
 	{
-		float animTime
+		const float animTime
 		    = localAnimationTime < 0.f ? animationTime() : localAnimationTime;
 		auto oldCurrent(currentIndex);
 		currentIndex = static_cast<unsigned int>(animTime * (maxIndex - 1));
@@ -252,7 +252,7 @@ void CosmologicalSimulation::render(Camera const& camera,
 		vis *= brightnessMultiplier;
 	}
 	trees.setAlpha(vis);
-	GLStateSet glState({{GL_CLIP_DISTANCE0, true}});
+	const GLStateSet glState({{GL_CLIP_DISTANCE0, true}});
 	trees.render(camera, model, campos, unit);
 }
 
@@ -262,7 +262,7 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto pathSelector
+	auto* pathSelector
 	    = make_qt_unique<PathSelector>(parent, QObject::tr("Gas path"));
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)
@@ -289,7 +289,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Dark Matter Path:"), pathSelector});
 
-	auto cbox = make_qt_unique<QCheckBox>(parent);
+	auto* cbox = make_qt_unique<QCheckBox>(parent);
 	QObject::connect(cbox, &QCheckBox::stateChanged, [&jsonObj](int state)
 	                 { jsonObj["loaddarkmatter"] = (state == Qt::Checked); });
 	cbox->setCheckState(jsonObj["loaddarkmatter"].toBool() ? Qt::Checked
@@ -305,7 +305,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Temporal Series:"), cbox});
 
-	auto colorSelector
+	auto* colorSelector
 	    = make_qt_unique<ColorSelector>(parent, QObject::tr("Gas color"));
 	QObject::connect(colorSelector, &ColorSelector::colorChanged,
 	                 [&jsonObj](QColor const& color)
@@ -332,10 +332,10 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Dark Matter Color:"), colorSelector});
 
-	auto gradient    = std::make_unique<grd::Gradient>();
-	auto gradientPtr = gradient.get();
+	auto gradient           = std::make_unique<grd::Gradient>();
+	auto const* gradientPtr = gradient.get();
 	gradient->setJson(jsonObj["gradient"].toObject());
-	auto gradientSelector
+	auto* gradientSelector
 	    = make_qt_unique<GradientSelector>(parent, std::move(gradient));
 	connect(gradientSelector, &GradientSelector::gradientChanged,
 	        [jsonObj, gradientPtr]()

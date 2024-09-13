@@ -7,7 +7,7 @@ void PIDController::update(uint64_t dt)
 		return;
 	}
 
-	float err(setPoint - *targetMeasure);
+	const float err(setPoint - *targetMeasure);
 
 	if(fabsf(err) < tol && !fixing)
 	{

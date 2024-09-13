@@ -26,14 +26,14 @@ SceneCameraData::SceneCameraData(float pitch, float yaw)
 
 float SceneCameraData::getPitch() const
 {
-	float res, foo, bar;
+	float res = NAN, foo = NAN, bar = NAN;
 	q.getEulerAngles(&res, &foo, &bar);
 	return res * constant::pi / 180.f;
 }
 
 float SceneCameraData::getYaw() const
 {
-	float res, foo, bar;
+	float res = NAN, foo = NAN, bar = NAN;
 	q.getEulerAngles(&foo, &res, &bar);
 	return res * constant::pi / 180.f;
 }
@@ -45,7 +45,7 @@ SceneCameraData SceneCameraData::getCurrentState(Universe const& universe)
 
 void SceneCameraData::setAsUniverseState(Universe& universe) const
 {
-	float pitch, yaw, foo;
+	float pitch = NAN, yaw = NAN, foo = NAN;
 	q.getEulerAngles(&pitch, &yaw, &foo);
 	universe.setCamPitch(pitch * constant::pi / 180.f);
 	universe.setCamYaw(yaw * constant::pi / 180.f);
@@ -62,7 +62,7 @@ SceneCameraData SceneCameraData::interpolate(SceneCameraData const& cd0,
 
 QString SceneCameraData::getPythonRepresentation() const
 {
-	float pitch, yaw, foo;
+	float pitch = NAN, yaw = NAN, foo = NAN;
 	q.getEulerAngles(&pitch, &yaw, &foo);
 	QString result("SceneCameraData(");
 

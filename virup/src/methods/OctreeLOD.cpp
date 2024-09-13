@@ -106,7 +106,7 @@ void OctreeLOD::readOwnData(std::istream& in)
 	}
 	else
 	{
-		double localScale;
+		double localScale = NAN;
 		if((bbox.maxx - bbox.minx >= bbox.maxy - bbox.miny)
 		   && (bbox.maxx - bbox.minx >= bbox.maxz - bbox.minz))
 		{
@@ -157,11 +157,11 @@ void OctreeLOD::unload()
 		state = AsyncReader::State::IDLE;
 		data.asVector().resize(0);
 		data.asVector().shrink_to_fit();
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->unload();
+				dynamic_cast<OctreeLOD*>(oct.get())->unload();
 			}
 		}
 		isLoaded = false;
@@ -169,11 +169,11 @@ void OctreeLOD::unload()
 	if(state == AsyncReader::State::WAIT)
 	{
 		state = AsyncReader::State::CANCEL;
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->unload();
+				dynamic_cast<OctreeLOD*>(oct.get())->unload();
 			}
 		}
 		isLoaded = false;
@@ -182,11 +182,11 @@ void OctreeLOD::unload()
 	{
 		data.asVector().resize(0);
 		data.asVector().shrink_to_fit();
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->unload();
+				dynamic_cast<OctreeLOD*>(oct.get())->unload();
 			}
 		}
 		state    = AsyncReader::State::IDLE;
@@ -197,11 +197,11 @@ void OctreeLOD::unload()
 		usedMem() -= dataSize * sizeof(float);
 		dataSize = 0;
 		mesh.reset();
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->unload();
+				dynamic_cast<OctreeLOD*>(oct.get())->unload();
 			}
 		}
 		isLoaded = false;
@@ -210,9 +210,9 @@ void OctreeLOD::unload()
 
 void OctreeLOD::waitOnAsyncLoader()
 {
-	for(auto child : children)
+	for(auto const& child : children)
 	{
-		auto c(dynamic_cast<OctreeLOD*>(child));
+		auto* c(dynamic_cast<OctreeLOD*>(child.get()));
 		if(child != nullptr)
 		{
 			c->waitOnAsyncLoader();
@@ -228,11 +228,11 @@ void OctreeLOD::waitOnAsyncLoader()
 void OctreeLOD::setFile(std::shared_ptr<std::istream> const& file)
 {
 	this->file = file;
-	for(Octree* oct : children)
+	for(auto const& oct : children)
 	{
 		if(oct != nullptr)
 		{
-			dynamic_cast<OctreeLOD*>(oct)->setFile(file);
+			dynamic_cast<OctreeLOD*>(oct.get())->setFile(file);
 		}
 	}
 }
@@ -250,11 +250,12 @@ bool OctreeLOD::preloadLevel(unsigned int lvlToLoad)
 	}
 	else
 	{
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				if(!dynamic_cast<OctreeLOD*>(oct)->preloadLevel(lvlToLoad - 1))
+				if(!dynamic_cast<OctreeLOD*>(oct.get())->preloadLevel(lvlToLoad
+				                                                      - 1))
 				{
 					return false;
 				}
@@ -332,17 +333,18 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 	if(recurse)
 	{
 		// UPDATE SUBTREES
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->update(camera, globalModel,
-				                                      globalCampos, alpha);
+				dynamic_cast<OctreeLOD*>(oct.get())->update(
+				    camera, globalModel, globalCampos, alpha);
 			}
 		}
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
-			if(oct != nullptr && !dynamic_cast<OctreeLOD*>(oct)->isReady())
+			if(oct != nullptr
+			   && !dynamic_cast<OctreeLOD*>(oct.get())->isReady())
 			{
 				recurse = false;
 				return;
@@ -354,11 +356,11 @@ void OctreeLOD::update(Camera const& camera, QMatrix4x4 const& globalModel,
 	if(!isLeaf() && usedMem() > (memLimit() * 80) / 100)
 	{
 		// unload children
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->unload();
+				dynamic_cast<OctreeLOD*>(oct.get())->unload();
 			}
 		}
 	}
@@ -465,11 +467,11 @@ void OctreeLOD::render(Camera const& camera, QMatrix4x4 const& globalModel,
 	if(recurse)
 	{
 		// RENDER SUBTREES
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
-				dynamic_cast<OctreeLOD*>(oct)->render(
+				dynamic_cast<OctreeLOD*>(oct.get())->render(
 				    camera, globalModel, globalCampos, alpha, globalDustModel);
 			}
 		}
@@ -528,12 +530,13 @@ unsigned int OctreeLOD::dumpRenderedPos(QTextStream& stream)
 	{
 		unsigned int totalDumped(0);
 		// RENDER SUBTREES
-		for(Octree* oct : children)
+		for(auto const& oct : children)
 		{
 			if(oct != nullptr)
 			{
 				totalDumped
-				    += dynamic_cast<OctreeLOD*>(oct)->dumpRenderedPos(stream);
+				    += dynamic_cast<OctreeLOD*>(oct.get())->dumpRenderedPos(
+				        stream);
 			}
 		}
 		return totalDumped;
@@ -630,9 +633,10 @@ void OctreeLOD::ramToVideo()
 	isLoaded = true;
 }
 
-Octree* OctreeLOD::newChild() const
+std::unique_ptr<Octree> OctreeLOD::newChild() const
 {
-	return new OctreeLOD(*shaderProgram, commonData, lvl + 1);
+	return std::unique_ptr<OctreeLOD>(
+	    new OctreeLOD(*shaderProgram, commonData, lvl + 1));
 }
 
 OctreeLOD::~OctreeLOD()
@@ -675,7 +679,7 @@ void OctreeLOD::updateTanAngleLimit(Camera const& camera)
 
 	float dtf = dt;
 	if(camera.currentFrameTiming != 0)*/
-	float dtf = camera.currentFrameTiming * 1000000.f;
+	const float dtf = camera.currentFrameTiming * 1000000.f;
 	/*ctrl.targetMeasure = &dtf;
 	ctrl.setPoint          = 1000000.0f / camera.targetFPS;
 	ctrl.update(dt);
