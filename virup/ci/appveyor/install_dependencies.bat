@@ -7,7 +7,7 @@ set URL="https://gitlab.com/api/v4/projects/9621748/packages/generic/releases/1.
 appveyor DownloadFile %URL% -FileName octree.zip
 7z x octree.zip > nul
 move liboctree* liboctree
-set OCTREE_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%/deps/octree/
+set OCTREE_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%/deps/octree/liboctree
 set OCTREE_LIBRARY=%APPVEYOR_BUILD_FOLDER%/deps/octree/liboctree/octree.lib
 set OCTREE_SHARED=%APPVEYOR_BUILD_FOLDER%\deps\octree\liboctree\octree.dll
 cd ..
