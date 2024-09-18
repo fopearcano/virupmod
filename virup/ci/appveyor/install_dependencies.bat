@@ -3,7 +3,7 @@
 ::############################################################################
 mkdir octree
 cd octree
-set URL="https://github.com/Dexter9313/octree-file-format-mirror/releases/download/1.16.0/liboctree-1.16.0-windows-%BUILD_TYPE%.zip"
+set URL="https://gitlab.com/api/v4/projects/9621748/packages/generic/releases/1.17.2/liboctree-1.17.2-windows-%BUILD_TYPE%.zip"
 appveyor DownloadFile %URL% -FileName octree.zip
 7z x octree.zip > nul
 move liboctree* liboctree
