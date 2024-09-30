@@ -100,7 +100,7 @@ class CalibrationCompass
 
 	void renderCircle(QMatrix4x4 const& angleShiftMat, float latitude);
 	void renderCompassTicks(QMatrix4x4 const& angleShiftMat,
-	                        float heightMultiplier, double deltaDeg,
+	                        double heightMultiplier, double deltaDeg,
 	                        bool labels = false);
 };
 

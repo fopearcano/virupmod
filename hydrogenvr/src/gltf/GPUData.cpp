@@ -335,7 +335,7 @@ GLMesh::VertexAttrib
 
 	// works only for TRIANGLES
 	// iterate through triangles
-	const unsigned int oldSize(newBuffer.size());
+	const size_t oldSize(newBuffer.size());
 	newBuffer.resize(oldSize + positionAccessor.count * 3);
 
 	const int offset = positionAccessor.byteOffset / sizeof(float);
@@ -358,9 +358,9 @@ GLMesh::VertexAttrib
 
 		QVector3D normal = QVector3D::crossProduct(pos1 - pos0, pos2 - pos0);
 		// assign normal three times ; face normal
-		const int idxn0      = oldSize + indices[i] * stride;
-		const int idxn1      = oldSize + indices[i + 1] * stride;
-		const int idxn2      = oldSize + indices[i + 2] * stride;
+		const size_t idxn0   = oldSize + indices[i] * stride;
+		const size_t idxn1   = oldSize + indices[i + 1] * stride;
+		const size_t idxn2   = oldSize + indices[i + 2] * stride;
 		newBuffer[idxn0]     = normal[0];
 		newBuffer[idxn1]     = normal[0];
 		newBuffer[idxn2]     = normal[0];

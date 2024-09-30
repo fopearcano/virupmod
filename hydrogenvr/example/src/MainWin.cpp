@@ -405,10 +405,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& /*pathId*/)
 		modelModel.translate(t);
 		modelModel.rotate(180.f, QVector3D(0.f, 0.f, 1.f));
 		modelModel.rotate(120.f, QVector3D(1.f, 1.f, 1.f).normalized());
-		modelModel.scale(0.3);
+		modelModel.scale(0.3f);
 		// light->direction = QVector3D(sin(secs), cos(secs), 0.f);
-		light0->setBoundingSphereRadius(1.5 * 0.3);
-		light1->setBoundingSphereRadius(1.5 * 0.3);
+		light0->setBoundingSphereRadius(1.5f * 0.3f);
+		light1->setBoundingSphereRadius(1.5f * 0.3f);
 		light0->setCenter(t * 1.5 / model->getBoundingSphere().radius);
 		light1->setCenter(t * 1.5 / model->getBoundingSphere().radius);
 	}

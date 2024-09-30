@@ -42,8 +42,8 @@ struct Buffer
 {
 	// default buffer
 	Buffer() = default;
-	// ! might std::move glbBinBufferChunk
-	Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk);
+	Buffer(QJsonObject const& json);
+	Buffer(QJsonObject const& json, std::vector<char>&& glbBinBufferChunk);
 	QString name;
 	std::vector<char> data;
 };

@@ -140,11 +140,12 @@ void GamepadHandler::updateGamepad()
 #ifdef QT_GAMEPAD
 	const bool previouslyEnabled = isEnabled();
 	gamepad.reset();
-	// NOLINTNEXTLINE(misc-const-correctness)
-	bool noEmptyName = false;
+	const bool noEmptyName =
 #ifdef Q_OS_WIN
-	// usually names never get recovered on Windows
-	noEmptyName = true;
+	    // usually names never get recovered on Windows
+	    true;
+#else
+	    false;
 #endif
 	for(auto const& pair : getConnectedGamepads(noEmptyName))
 	{

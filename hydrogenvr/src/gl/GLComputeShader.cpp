@@ -17,6 +17,7 @@
 */
 
 #include "gl/GLHandler.hpp"
+#include <algorithm>
 
 #include "gl/GLComputeShader.hpp"
 
@@ -43,16 +44,13 @@ void GLComputeShader::exec(std::vector<TextureBinding> const& textureBindings,
 		}
 		binding.texture.useAsImage(i, binding.level, binding.accessMode);
 	}
-	std::array<unsigned int, 3> dispatchSize{};
-	for(unsigned int i(0); i < 3; ++i)
-	{
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-		dispatchSize[i]
-		    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-		    = globalGroupSize[i] / workGroupSize[i]
-		      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-		      + (globalGroupSize[i] % workGroupSize[i] == 0 ? 0 : 1);
-	}
+	std::array<GLint, 3> dispatchSize{};
+	std::ranges::transform(globalGroupSize, workGroupSize, dispatchSize.begin(),
+	                       [](int globGrSize, int workGrSize) {
+		                       return globGrSize / workGrSize
+		                              + ((globGrSize % workGrSize == 0) ? 0
+		                                                                : 1);
+	                       });
 
 	GLHandler::glf().glDispatchCompute(dispatchSize[0], dispatchSize[1],
 	                                   dispatchSize[2]);

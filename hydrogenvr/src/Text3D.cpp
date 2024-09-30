@@ -116,6 +116,18 @@ void Text3D::updateTex()
 		                               superSampling * originalSize.height()));
 	}
 
+	QString dbgText;
+	if(text.size() < 25)
+	{
+		dbgText = text.replace('\n', "\\n");
+	}
+	else
+	{
+		dbgText = text.left(22).replace('\n', "\\n") + "...";
+	}
+	fbo->setName("Text3D - " + dbgText);
+	fbo->setColorAttachmentName("Text3D - " + dbgText);
+
 	bool sizeInPixels(true);
 	int fontSize(font.pixelSize());
 	if(fontSize == -1)

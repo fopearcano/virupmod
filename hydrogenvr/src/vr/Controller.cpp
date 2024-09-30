@@ -31,7 +31,6 @@ int getAxisId(vr::IVRSystem* vr_pointer, unsigned int deviceId, int axis)
 	for(int i = 0; i < static_cast<int>(vr::k_unControllerStateAxisCount); i++)
 	{
 		const int prop = vr_pointer->GetInt32TrackedDeviceProperty(
-		    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
 		    deviceId, static_cast<vr::ETrackedDeviceProperty>(
 		                  vr::Prop_Axis0Type_Int32 + i));
 
@@ -195,12 +194,12 @@ void Controller::update(QMatrix4x4 const& model, unsigned int nDevice)
 	{
 		return;
 	}
-	// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-	triggerValue = controllerState.rAxis[triggerid].x;
-	// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-	padCoords[0] = controllerState.rAxis[padid].x;
-	// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
-	padCoords[1] = controllerState.rAxis[padid].y;
+	auto rAxis
+	    = std::span<vr::VRControllerAxis_t, vr::k_unControllerStateAxisCount>(
+	        controllerState.rAxis);
+	triggerValue = rAxis[triggerid].x;
+	padCoords[0] = rAxis[padid].x;
+	padCoords[1] = rAxis[padid].y;
 }
 
 void Controller::render(ToneMappingModel const& tmm) const

@@ -57,11 +57,7 @@ std::pair<float, std::vector<AssetLoader::MeshDescriptor>>
 	              | aiProcess_OptimizeMeshes | aiProcess_GenSmoothNormals
 	              | aiProcess_CalcTangentSpace);
 
-	if(scene == nullptr
-	   // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-	   || static_cast<unsigned int>(scene->mFlags)
-	          // NOLINTNEXTLINE(readability-implicit-bool-conversion)
-	          & static_cast<unsigned int>(AI_SCENE_FLAGS_INCOMPLETE)
+	if(scene == nullptr || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) != 0
 	   || scene->mRootNode == nullptr || scene->mNumMeshes <= 0)
 	{
 		std::cerr << "ERROR::ASSIMP::" << importer.GetErrorString()
@@ -303,7 +299,7 @@ float AssetLoader::parseMesh(aiMesh const& mesh, aiScene const& scene,
 		{
 			material->GetTexture(assimpTextureTypes()[j], k, &str);
 			std::string texpath(str.C_Str());
-			int pos(texpath.size() - 1);
+			size_t pos(texpath.size() - 1);
 			while(pos > 0 && texpath[pos] != '\\' && texpath[pos] != '/')
 			{
 				pos--;

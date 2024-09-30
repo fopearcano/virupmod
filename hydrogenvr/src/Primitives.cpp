@@ -18,6 +18,8 @@
 
 #include "Primitives.hpp"
 
+#include <numbers>
+
 void Primitives::setAsQuad(GLMesh& mesh, GLShaderProgram const& shader,
                            PrimitiveType primitiveType)
 {
@@ -257,14 +259,15 @@ void Primitives::setAsUnitSphere(GLMesh& mesh, GLShaderProgram const& shader,
 
 	for(unsigned int i(0); i < latDivisions; ++i)
 	{
-		const float lat
-		    = (static_cast<float>(i + 1) / (latDivisions + 1)) * M_PI;
+		const float lat = (static_cast<float>(i + 1) / (latDivisions + 1))
+		                  * std::numbers::pi_v<float>;
 
 		const float cosLat(std::cos(lat)), sinLat(std::sin(lat));
 
 		for(unsigned int j(0); j < lonDivisions; ++j)
 		{
-			const float lon = 2 * M_PI * static_cast<float>(j) / lonDivisions;
+			const float lon = 2 * std::numbers::pi_v<float>
+			                  * static_cast<float>(j) / lonDivisions;
 			vertices.push_back(sinLat * std::cos(lon));
 			vertices.push_back(sinLat * std::sin(lon));
 			vertices.push_back(cosLat);
@@ -358,6 +361,7 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
                                    unsigned int radialDivisions,
                                    PrimitiveType primitiveType)
 {
+	assert(radialDivisions > 1);
 	std::vector<float> vertices;
 	std::vector<unsigned int> elements;
 
@@ -381,8 +385,8 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
 	{
 		for(unsigned int r = 0; r < radialDivisions; ++r)
 		{
-			const float angle
-			    = 2.0f * M_PI * static_cast<float>(r) / radialDivisions;
+			const float angle = 2.0f * std::numbers::pi_v<float>
+			                    * static_cast<float>(r) / radialDivisions;
 			const float x = std::cos(angle);
 			const float y = std::sin(angle);
 			const auto z  = static_cast<float>(h);
@@ -396,7 +400,6 @@ void Primitives::setAsUnitCylinder(GLMesh& mesh, GLShaderProgram const& shader,
 	// Generate elements for side and caps
 	for(unsigned int r = 0; r <= radialDivisions; ++r)
 	{
-		// NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
 		const unsigned int idx           = r % radialDivisions;
 		const unsigned int sideIndex     = 2 + idx;
 		const unsigned int next_r        = (r + 1) % radialDivisions;

@@ -18,6 +18,8 @@
 
 #include "Renderer.hpp"
 
+#include <numbers>
+
 #include "AbstractMainWin.hpp"
 
 Renderer::Renderer(AbstractMainWin& window, VRHandler& vrHandler)
@@ -89,7 +91,8 @@ float Renderer::getRenderTargetAspectRatio() const
 
 float Renderer::getAspectRatioFromFOV() const
 {
-	return tan(M_PI * hFOV / 360.f) / tan(M_PI * vFOV / 360.f);
+	return tan(std::numbers::pi * hFOV / 360.f)
+	       / tan(std::numbers::pi * vFOV / 360.f);
 }
 
 BasicCamera const& Renderer::getCamera(QString const& pathId) const
@@ -210,13 +213,15 @@ void Renderer::updateFOV()
 		else
 		{
 			const float a(getRenderTargetAspectRatio());
-			vFOV = 360.f * atan(tan(hFOV * M_PI / 360.f) / a) / M_PI;
+			vFOV = 360.f * atan(tan(hFOV * std::numbers::pi / 360.f) / a)
+			       / std::numbers::pi;
 		}
 	}
 	if(hFOV == 0.0)
 	{
 		const float a(getRenderTargetAspectRatio());
-		hFOV = 360.f * atan(tan(vFOV * M_PI / 360.f) * a) / M_PI;
+		hFOV = 360.f * atan(tan(vFOV * std::numbers::pi / 360.f) * a)
+		       / std::numbers::pi;
 	}
 
 	for(auto const& pair : sceneRenderPipeline_)
@@ -513,7 +518,7 @@ void Renderer::renderFrame(QMatrix4x4 angleShiftMat)
 			    tgtHeight(mainRenderTarget->postProcessingTargets[0]
 			                  .getSize()
 			                  .height());
-			const QVector3D shift(0.065, 0.0, 0.0);
+			const QVector3D shift(0.065f, 0.0f, 0.0f);
 
 			GLHandler::generateEnvironmentMap(mainRenderTarget->sceneTarget,
 			                                  renderFunc, -shift);

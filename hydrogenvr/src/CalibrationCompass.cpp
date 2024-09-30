@@ -18,6 +18,8 @@
 
 #include "CalibrationCompass.hpp"
 
+#include <numbers>
+
 double& CalibrationCompass::forcedTickResolution()
 {
 	static double forcedTickResolution = 0.0;
@@ -54,7 +56,7 @@ double CalibrationCompass::getDoubleFarRightPixelSubtendedAngle(
 	//// compute angle of furthest left and right pixels
 	//// screen size := 1 := sum(dw)
 	// distance of camera to screen
-	const double D(0.5 / tan(horizontalFOV * M_PI / 360.0));
+	const double D(0.5 / tan(horizontalFOV * std::numbers::pi / 360.0));
 	// length of a pixel on screen
 	const double dw(1.0 / renderTargetWidth);
 	// length from far right of screen to camera
@@ -63,7 +65,7 @@ double CalibrationCompass::getDoubleFarRightPixelSubtendedAngle(
 	const double E(sqrt(D * D + (0.5 - dw) * (0.5 - dw)));
 	// Al-Kashi
 	const double cosAngle((C * C + E * E - dw * dw) / (2.0 * C * E));
-	return acos(cosAngle) * 360.0 / M_PI;
+	return acos(cosAngle) * 360.0 / std::numbers::pi;
 }
 
 double CalibrationCompass::getCurrentTickResolution()
@@ -92,9 +94,9 @@ CalibrationCompass::CalibrationCompass()
 	std::vector<float> circleVertices;
 	for(int i(0); i < 360; i += 1)
 	{
-		circleVertices.push_back(sin(i * M_PI / 180.0));
+		circleVertices.push_back(sin(i * std::numbers::pi / 180.0));
 		circleVertices.push_back(0.0);
-		circleVertices.push_back(-cos(i * M_PI / 180.0));
+		circleVertices.push_back(-cos(i * std::numbers::pi / 180.0));
 	}
 	circle.setVertexShaderMapping(shader, {{"position", 3}});
 	circle.setVertices(circleVertices);
@@ -102,11 +104,11 @@ CalibrationCompass::CalibrationCompass()
 	// precompute billboards textures
 	for(unsigned int i(0); i < 100; ++i)
 	{
-		billboards.emplace_back(256, 256);
+		billboards.emplace_back(128, 128);
 		billboards[i].setText(QString::number(i));
 		billboards[i].setColor(QColor(255, 0, 0));
 		auto font(billboards[i].getFont());
-		font.setPixelSize(128);
+		font.setPixelSize(64);
 		billboards[i].setFont(font);
 		billboards[i].setFlags(Qt::AlignCenter);
 	}
@@ -122,10 +124,10 @@ void CalibrationCompass::render(QMatrix4x4 const& angleShiftMat)
 	shader.setUniform("exposure", exposure);
 	shader.setUniform("dynamicrange", dynamicrange);
 
-	// NOLINTNEXTLINE(cert-flp30-c, clang-analyzer-security.FloatLoopCounter)
-	for(float lat(-M_PI_2); lat < M_PI_2; lat += 10.0 * M_PI / 180.0)
+	for(unsigned int latDeg(-90); latDeg < 90; latDeg += 10)
 	{
-		renderCircle(angleShiftMat * tiltMat, lat);
+		renderCircle(angleShiftMat * tiltMat,
+		             latDeg * std::numbers::pi_v<float> / 180.f);
 	}
 
 	const double doubleAngle(getCurrentTickResolution());
@@ -147,36 +149,39 @@ void CalibrationCompass::renderCircle(QMatrix4x4 const& angleShiftMat,
 }
 
 void CalibrationCompass::renderCompassTicks(QMatrix4x4 const& angleShiftMat,
-                                            float heightMultiplier,
+                                            double heightMultiplier,
                                             double deltaDeg, bool labels)
 {
 	GLMesh mesh;
+	const int numSteps = static_cast<int>(std::ceil(360.0 / deltaDeg));
 	std::vector<float> vertices;
-	unsigned int j(0);
-	// NOLINTNEXTLINE(cert-flp30-c, clang-analyzer-security.FloatLoopCounter)
-	for(double i(0); i < 360; i += deltaDeg)
+	vertices.reserve(6 * numSteps);
+	for(int step = 0; step < numSteps; ++step)
 	{
-		vertices.push_back(sin(i * M_PI / 180.0));
+		const double angleDeg = step * deltaDeg;
+		const double angleRad = angleDeg * std::numbers::pi / 180.0;
+		const float xTop(sin(angleRad)),
+		    yTop(step == 0 ? 0.07 : heightMultiplier * 0.05),
+		    zTop(-cos(angleRad));
+
+		vertices.push_back(sin(angleRad));
 		vertices.push_back(0.0);
-		vertices.push_back(-cos(i * M_PI / 180.0));
-		const float xTop(sin(i * M_PI / 180.0)),
-		    yTop(i == 0 ? 0.07 : heightMultiplier * 0.05),
-		    zTop(-cos(i * M_PI / 180.0));
+		vertices.push_back(-cos(angleRad));
 		vertices.push_back(xTop);
 		vertices.push_back(yTop);
 		vertices.push_back(zTop);
-		if(labels && j < 100)
+		if(labels && step < 100)
 		{
 			QMatrix4x4 model;
 			model.translate(xTop, yTop + 0.04, zTop);
-			model.scale(0.1);
-			model.rotate(i, QVector3D(0.f, -1.f, 0.f));
-			billboards[j].getModel() = angleShiftMat * model;
-			billboards[j].getShader().setUniform("exposure", exposure);
-			billboards[j].getShader().setUniform("dynamicrange", dynamicrange);
-			billboards[j].render(GLHandler::GeometricSpace::EYE);
+			model.scale(0.1f);
+			model.rotate(angleDeg, QVector3D(0.f, -1.f, 0.f));
+			billboards[step].getModel() = angleShiftMat * model;
+			/*billboards[step].getShader().setUniform("exposure", exposure);
+			billboards[step].getShader().setUniform("dynamicrange",
+			                                        dynamicrange);*/
+			billboards[step].render(GLHandler::GeometricSpace::EYE);
 		}
-		++j;
 	}
 	mesh.setVertexShaderMapping(shader, {{"position", 3}});
 	mesh.setVertices(vertices);

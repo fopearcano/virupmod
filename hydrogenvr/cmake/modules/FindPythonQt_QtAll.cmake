@@ -3,13 +3,16 @@
 # Sets PythonQt_QtAll_FOUND, PYTHONQT_QTALL_INCLUDE_DIRS, PYTHONQT_QTALL_LIBRARY, PYTHONQT_QTALL_LIBRARIES
 #
 
+#uncomment to debug
+#set(DEBUG_PYTHONQT_QTALL "1")
+
 if(USE_QT6)
 	set(PYTHONQT_QTALL_INSTALL_DIR "/usr/local")
 	find_path(PYTHONQT_QTALL_INCLUDE_DIR PythonQt_QtAll.h PATHS  "${PYTHONQT_QTALL_INSTALL_DIR}/include" DOC "Path to the PythonQt_QtAll include directory" NO_DEFAULT_PATH)
 	find_library(PYTHONQT_QTALL_LIBRARY NAMES PythonQt_QtAll-Qt6-Python3.10 PATHS "${PYTHONQT_QTALL_INSTALL_DIR}/lib" DOC "The PythonQt_QtAll library.")
 else()
-	find_path(PYTHONQT_QTALL_INSTALL_DIR NAMES PythonQt/PythonQt_QtAll.h include/PythonQt/PythonQt_QtAll.h include/PythonQt/extensions/PythonQt_QtAll include/Qt5Python38/PythonQt/PythonQt_QtAll.h include/Qt5Python31/PythonQt/PythonQt_QtAll.h include/PythonQt5/PythonQt_QtAll.h DOC "Directory where PythonQt_QtAll.h was installed.")
-	find_path(PYTHONQT_QTALL_INCLUDE_DIR PythonQt_QtAll.h PATHS "${PYTHONQT_QTALL_INSTALL_DIR}/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt/extensions/PythonQt_QtAll" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt5" "${PYTHONQT_QTALL_INSTALL_DIR}/include/Qt5Python38/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/Qt5Python31/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/PythonQt/extensions/PythonQt_QtAll/" DOC "Path to the PythonQt_QtAll include directory" NO_DEFAULT_PATH)
+	find_path(PYTHONQT_QTALL_INSTALL_DIR NAMES PythonQt_QtAll.h PythonQt/PythonQt_QtAll.h include/PythonQt/PythonQt_QtAll.h include/PythonQt/extensions/PythonQt_QtAll include/Qt5Python38/PythonQt/PythonQt_QtAll.h include/Qt5Python31/PythonQt/PythonQt_QtAll.h include/PythonQt5/PythonQt_QtAll.h DOC "Directory where PythonQt_QtAll.h was installed.")
+	find_path(PYTHONQT_QTALL_INCLUDE_DIR PythonQt_QtAll.h PATHS "${PYTHONQT_QTALL_INSTALL_DIR}" "${PYTHONQT_QTALL_INSTALL_DIR}/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt/extensions/PythonQt_QtAll" "${PYTHONQT_QTALL_INSTALL_DIR}/include/PythonQt5" "${PYTHONQT_QTALL_INSTALL_DIR}/include/Qt5Python38/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/include/Qt5Python31/PythonQt" "${PYTHONQT_QTALL_INSTALL_DIR}/PythonQt/extensions/PythonQt_QtAll/" DOC "Path to the PythonQt_QtAll include directory" NO_DEFAULT_PATH)
 	find_library(PYTHONQT_QTALL_LIBRARY NAMES PythonQt_QtAll QtPython_QtAll Qt5Python38_QtAll Qt5Python31_QtAll PythonQt_QtAll-Qt5-Python3.6 PythonQt_QtAll-Qt5-Python3.11 PythonQt_QtAll-Qt5-Python3.12 PATHS "${PYTHONQT_QTALL_INSTALL_DIR}/extensions/PythonQt_QtAll" DOC "The PythonQt_QtAll library.")
 endif()
 
@@ -27,3 +30,8 @@ if(PYTHONQT_QTALL_INCLUDE_DIR AND PYTHONQT_QTALL_LIBRARY)
   set(PYTHONQT_QTALL_LIBRARIES ${PYTHONQT_QTALL_LIBRARY} ${PYTHONQT_QTALL_LIBUTIL})
 endif()
 
+if(DEFINED DEBUG_PYTHONQT_QTALL)
+	message(STATUS "PYTHONQT_QTALL_INSTALL_DIR ${PYTHONQT_QTALL_INSTALL_DIR}")
+	message(STATUS "PYTHONQT_QTALL_INCLUDE_DIR ${PYTHONQT_QTALL_INCLUDE_DIR}")
+	message(STATUS "PYTHONQT_QTALL_LIBRARY ${PYTHONQT_QTALL_LIBRARY}")
+endif()

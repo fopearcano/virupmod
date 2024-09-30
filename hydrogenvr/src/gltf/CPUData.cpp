@@ -24,7 +24,7 @@
 namespace gltf
 {
 
-Buffer::Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk)
+Buffer::Buffer(QJsonObject const& json)
 {
 	for(auto const& key : json.keys())
 	{
@@ -35,20 +35,29 @@ Buffer::Buffer(QJsonObject const& json, std::vector<char>& glbBinBufferChunk)
 			           << json[key];
 		}
 	}
-	const QString uri    = json["uri"].toString();
-	const int byteLength = json["byteLength"].toInt();
-	data.resize(byteLength);
 	name = json["name"].toString();
 
-	if(uri == "")
-	{
-		data = std::move(glbBinBufferChunk);
-		return;
-	}
-
+	const int byteLength = json["byteLength"].toInt();
+	data.resize(byteLength);
+	const QString uri = json["uri"].toString();
 	QFile file(uri); // TODO(florian): solve when this is over network
 	file.open(QIODevice::ReadOnly);
 	file.read(data.data(), byteLength);
+}
+
+Buffer::Buffer(QJsonObject const& json, std::vector<char>&& glbBinBufferChunk)
+    : data(std::move(glbBinBufferChunk))
+{
+	for(auto const& key : json.keys())
+	{
+		if(key != "uri" && key != "byteLength" && key != "name")
+		{
+			qWarning() << "gltf::Buffer key" << key
+			           << "parsing not implemented. In this case contains:"
+			           << json[key];
+		}
+	}
+	name = json["name"].toString();
 }
 
 BufferView::BufferView(QJsonObject const& json,
@@ -681,9 +690,39 @@ bool CPUData::load(QJsonObject const& json,
 		return false;
 	}
 
-	for(auto const& bufferJSON : json["buffers"].toArray())
+	// enforce this part of the spec before making assumptions :
+	// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#glb-stored-buffer
+	bool emptyFound  = false;
+	auto buffersJSON = json["buffers"].toArray();
+	for(auto const& bufferJSON : buffersJSON)
 	{
-		buffers.emplace_back(bufferJSON.toObject(), glbBinBufferChunk);
+		if(bufferJSON.toObject()["uri"].toString().isEmpty())
+		{
+			if(emptyFound)
+			{
+				qWarning() << "GLTF file contains multiple buffers with empty "
+				              "URI (only one should in a GLB)";
+				return false;
+			}
+			emptyFound = true;
+		}
+	}
+	if(emptyFound)
+	{
+		if(!buffersJSON.at(0).toObject()["uri"].toString().isEmpty())
+		{
+			qWarning() << "Malformed GLB file: embedded binary buffer should "
+			              "be the first buffer.";
+			return false;
+		}
+		buffers.emplace_back(buffersJSON.at(0).toObject(),
+		                     std::move(glbBinBufferChunk));
+		buffersJSON.pop_front();
+	}
+
+	for(auto const& bufferJSON : buffersJSON)
+	{
+		buffers.emplace_back(bufferJSON.toObject());
 	}
 	// add default empty buffer for undefined indices
 	buffers.emplace_back();

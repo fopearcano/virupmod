@@ -26,7 +26,6 @@ namespace hvr
 Scene::Scene()
     : envmap(GLTexture::TexCubemapProperties(512, GL_RGBA32F))
     , brdfLUT(GLTexture::Tex2DProperties(512, 512, GL_RGBA32F))
-    // NOLINTNEXTLINE(cert-msc32-c,cert-msc51-cpp)
     , generator(static_cast<unsigned int>(std::time(nullptr)))
     , distribution(0.0, 1.0)
 {
@@ -108,7 +107,7 @@ void Scene::render(BasicCamera const& cam, bool environment)
 	{
 		for(auto const& light : lights)
 		{
-			light->render(0.542f * M_PI / 180.f);
+			light->render(0.542f * std::numbers::pi_v<float> / 180.f);
 		}
 	}
 

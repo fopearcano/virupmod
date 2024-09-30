@@ -18,6 +18,8 @@
 
 #include "ToneMappingModel.hpp"
 
+#include <numbers>
+
 ToneMappingModel::ToneMappingModel(VRHandler const& vrHandler)
     : vrHandler(vrHandler)
 {
@@ -148,7 +150,7 @@ double ToneMappingModel::dConeThreshold(double t) const
 {
 	const double a = startLogLuminance;
 	const double b = minConeVisibleLogLuminance;
-	return (a - b) * (-1.0 / 60.0) * exp(-t / 60.0) * log(10)
+	return (a - b) * (-1.0 / 60.0) * exp(-t / 60.0) * std::numbers::ln10
 	       * coneThreshold(t);
 }
 
@@ -176,7 +178,7 @@ double ToneMappingModel::dRodThreshold(double t) const
 	const double b = minVisibleLogLuminance;
 	const double c = tInterMinutes;
 	const double d = -0.14;
-	return (a - b) * (d / 60.0) * exp(d * (t / 60.0 - c)) * log(10)
+	return (a - b) * (d / 60.0) * exp(d * (t / 60.0 - c)) * std::numbers::ln10
 	       * rodThreshold(t);
 }
 
@@ -307,7 +309,7 @@ double ToneMappingModel::LAthreshold(double t)
 double ToneMappingModel::dLAthreshold(double t)
 {
 	return (39.6419 + 0.14681 * exp(5.44 * t / 60.0)) / exp(5.42 * t / 60.0)
-	       * LAthreshold(t) * log(10.0) / 60.0;
+	       * LAthreshold(t) * std::numbers::ln10 / 60.0;
 }
 
 double ToneMappingModel::invLAthreshold(double lum)

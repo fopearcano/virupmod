@@ -22,6 +22,8 @@
 #include "Primitives.hpp"
 #include "gl/GLHandler.hpp"
 
+#include <numbers>
+
 // for now directional only
 class Light
 {
@@ -40,7 +42,8 @@ class Light
 	void generateShadowMap(std::vector<GLMesh const*> const& meshes,
 	                       std::vector<QMatrix4x4> const& models) const;
 	// renders a bright sphere at infinity, default is angular size of the sun
-	void render(float angularSizeRad = 0.542f * M_PI / 180.f);
+	void render(float angularSizeRad
+	            = 0.542f * std::numbers::pi_v<float> / 180.f);
 
 	QVector3D color; // linear RGB in luminance units
 	float ambiantFactor;

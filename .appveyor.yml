@@ -57,6 +57,7 @@ cache:
     - '%APPVEYOR_BUILD_FOLDER%\deps\pythonqt -> **\install_scripts\pythonqt.bat'
     - '%APPVEYOR_BUILD_FOLDER%\deps\assimp -> **\install_scripts\assimp.bat'
     - '%APPVEYOR_BUILD_FOLDER%\deps\KTX-Software -> **\install_scripts\libktx.bat'
+    - '%APPVEYOR_BUILD_FOLDER%\deps\zstd -> **\install_scripts\zstd.bat'
 
 before_build:
     #- IF %APPVEYOR_REPO_TAG% == true (set VERSION=%APPVEYOR_REPO_TAG_NAME%) ELSE (set VERSION=snapshot-%APPVEYOR_BUILD_NUMBER%)
@@ -76,54 +77,8 @@ after_build:
     - cd %BINDIR%
     - set RELEASE_DIR_NAME=%PROJECT_NAME%-%VERSION%-windows-%BUILD_TYPE%
     - set RELEASE_DIR=%BINDIR%\%RELEASE_DIR_NAME%
-    - mkdir %RELEASE_DIR_NAME%
-    - cd %RELEASE_DIR_NAME%
-    - mkdir platforms
-    - mkdir imageformats
-    - mkdir audio
-    - mkdir mediaservice
-    - mkdir gamepads
-    - cd ..
-    - copy %PROJECT_NAME%.exe %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Core.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Gui.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Widgets.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Svg.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5OpenGL.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5PrintSupport.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5MultimediaWidgets.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5QuickWidgets.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Multimedia.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Quick.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Sql.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Test.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5XmlPatterns.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Qml.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Network.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Xml.dll %RELEASE_DIR%
-    - copy %QTPATH%\bin\Qt5Gamepad.dll %RELEASE_DIR%
-    - copy %QTPATH%\plugins\platforms\qwindows.dll %RELEASE_DIR%\platforms
-    - copy %QTPATH%\plugins\imageformats\*.dll %RELEASE_DIR%\imageformats
-    - copy %QTPATH%\plugins\audio\*.dll %RELEASE_DIR%\audio
-    - copy %QTPATH%\plugins\mediaservice\*.dll %RELEASE_DIR%\mediaservice
-    - copy %QTPATH%\plugins\gamepads\*.dll %RELEASE_DIR%\gamepads
-    - copy %OPENVR_SHARED% %RELEASE_DIR%
-    - copy %ASSIMP_SHARED% %RELEASE_DIR%
-    - copy %LIBKTX_SHARED% %RELEASE_DIR%
-    # - copy %LEAPMOTION_SHARED% %RELEASE_DIR%
-    - copy %PYTHON_PATH%\python312.dll %RELEASE_DIR%
-    - copy %PYTHONQT_SHARED% %RELEASE_DIR%
-    - copy %PYTHONQT_QTALL_SHARED% %RELEASE_DIR%
-    - appveyor DownloadFile %PYTHON_URL% -FileName python.zip
-    - 7z x python.zip -o.\python > nul
-    - 7z x python\python312.zip -o%RELEASE_DIR%\python > nul
-    - move python\*.pyd %RELEASE_DIR%\python
-    - move data %RELEASE_DIR%
-    - set USER_BEFORE_ARCHIVING=..\..\%PROJECT_DIRECTORY%\ci\appveyor\before_archiving.bat
-    - IF EXIST %USER_BEFORE_ARCHIVING% (%USER_BEFORE_ARCHIVING%)
-    - 7z a -tzip %RELEASE_DIR_NAME%.zip %RELEASE_DIR%
+    - ../hydrogenvr/ci/appveyor/pack.bat
     - IF "%BUILD_TYPE%" == "64bit" (set ARCH=/DX64) ELSE (set ARCH=/DX86)
-
     - set VCREDIST13_URL="https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/%VCREDIST13%"
     - set VCREDIST15_URL="https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/%VCREDIST15%"
     - appveyor DownloadFile %VCREDIST13_URL% -FileName vcredist13.exe

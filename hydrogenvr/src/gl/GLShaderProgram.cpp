@@ -353,7 +353,7 @@ QString GLShaderProgram::getFullPreprocessedSource(
     QString const& path, QMap<QString, QString> const& defines,
     std::vector<QString>& debugFiles)
 {
-	const unsigned int id(debugFiles.size());
+	const size_t id(debugFiles.size());
 	debugFiles.push_back(path);
 	// Read source
 	QFile f(utils::getAbsoluteDataPath(path));

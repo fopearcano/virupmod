@@ -146,10 +146,10 @@ Checks:          "abseil-cleanup-ctad, \
     cert-mem57-cpp, \
     cert-msc24-c, \
     cert-msc30-c, \
-    cert-msc32-c, \
+    -cert-msc32-c, \ # we don't do cryptography
     cert-msc33-c, \
     cert-msc50-cpp, \
-    cert-msc51-cpp, \
+    -cert-msc51-cpp, \ # we don't do cryptography
     cert-msc54-cpp, \
     cert-oop11-cpp, \
     cert-oop54-cpp, \
@@ -315,7 +315,7 @@ Checks:          "abseil-cleanup-ctad, \
     cppcoreguidelines-pro-type-static-cast-downcast, \
     cppcoreguidelines-pro-type-union-access, \
     cppcoreguidelines-pro-type-vararg, \
-    -cppcoreguidelines-rvalue-reference-param-not-moved, \ # temporary remove
+    cppcoreguidelines-rvalue-reference-param-not-moved, \
     cppcoreguidelines-slicing, \
     cppcoreguidelines-special-member-functions, \
     cppcoreguidelines-use-default-member-init, \
@@ -446,7 +446,7 @@ Checks:          "abseil-cleanup-ctad, \
     modernize-use-nullptr, \
     modernize-use-override, \
     modernize-use-starts-ends-with, \
-    -modernize-use-std-numbers, \ # temporary disable
+    modernize-use-std-numbers, \ # temporary disable
     modernize-use-std-print, \
     -modernize-use-trailing-return-type, \ # useless
     modernize-use-transparent-functors, \

@@ -335,17 +335,11 @@ void GLFramebufferObject::showOnWindow(QWindow const& window, float xf0,
 
 QImage GLFramebufferObject::copyColorBufferToQImage() const
 {
-	// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-	auto* data(new uchar[width * height * 4]);
-
+	QImage result(width, height, QImage::Format::Format_RGBA8888);
 	GLHandler::glf().glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	GLHandler::glf().glReadPixels(0, 0, width, height, GL_RGBA,
-	                              GL_UNSIGNED_BYTE, static_cast<GLvoid*>(data));
-
-	return {data, static_cast<int>(width), static_cast<int>(height),
-	        static_cast<int>(width * 4), QImage::Format::Format_RGBA8888,
-	        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-	        [](void* data) { delete static_cast<uchar*>(data); }, data};
+	                              GL_UNSIGNED_BYTE, result.bits());
+	return result;
 }
 
 void GLFramebufferObject::cleanUp()

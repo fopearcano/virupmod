@@ -3,6 +3,9 @@
 # Sets PythonQt_FOUND, PYTHONQT_INCLUDE_DIRS, PYTHONQT_LIBRARY, PYTHONQT_LIBRARIES
 #
 
+#uncomment to debug
+#set(DEBUG_PYTHONQT "1")
+
 # Python is required
 find_package(PythonLibs)
 if(NOT PYTHONLIBS_FOUND)
@@ -17,8 +20,8 @@ if(USE_QT6)
 	find_path(PYTHONQT_INCLUDE_DIR PythonQt.h PATHS  "${PYTHONQT_INSTALL_DIR}/include" DOC "Path to the PythonQt include directory" NO_DEFAULT_PATH)
 	find_library(PYTHONQT_LIBRARY NAMES PythonQt-Qt6-Python3.10 PATHS "${PYTHONQT_INSTALL_DIR}/lib" DOC "The PythonQt library.")
 else()
-	find_path(PYTHONQT_INSTALL_DIR NAMES PythonQt/PythonQt.h include/PythonQt/PythonQt.h include/PythonQt5/PythonQt.h include/Qt5Python38/PythonQt/PythonQt.h include/Qt5Python31/PythonQt/PythonQt.h DOC "Directory where PythonQt was installed.")
-	find_path(PYTHONQT_INCLUDE_DIR PythonQt.h PATHS  "${PYTHONQT_INSTALL_DIR}/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/PythonQt5" "${PYTHONQT_INSTALL_DIR}/include/Qt5Python38/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/Qt5Python31/PythonQt" DOC "Path to the PythonQt include directory" NO_DEFAULT_PATH)
+	find_path(PYTHONQT_INSTALL_DIR NAMES PythonQt.h PythonQt/PythonQt.h include/PythonQt/PythonQt.h include/PythonQt5/PythonQt.h include/Qt5Python38/PythonQt/PythonQt.h include/Qt5Python31/PythonQt/PythonQt.h DOC "Directory where PythonQt was installed.")
+	find_path(PYTHONQT_INCLUDE_DIR PythonQt.h PATHS  "${PYTHONQT_INSTALL_DIR}" "${PYTHONQT_INSTALL_DIR}/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/PythonQt5" "${PYTHONQT_INSTALL_DIR}/include/Qt5Python38/PythonQt" "${PYTHONQT_INSTALL_DIR}/include/Qt5Python31/PythonQt" DOC "Path to the PythonQt include directory" NO_DEFAULT_PATH)
 	find_library(PYTHONQT_LIBRARY NAMES PythonQt QtPython Qt5Python38 Qt5Python31 PythonQt-Qt5-Python3.6 PythonQt-Qt5-Python3.11 PythonQt-Qt5-Python3.12 PATHS "${PYTHONQT_INSTALL_DIR}/lib" DOC "The PythonQt library.")
 endif()
 
@@ -44,3 +47,9 @@ if(PYTHONQT_INCLUDE_DIR AND PYTHONQT_LIBRARY)
 endif()
 
 endif() ####
+
+if(DEFINED DEBUG_PYTHONQT)
+	message(STATUS "PYTHONQT_INSTALL_DIR ${PYTHONQT_INSTALL_DIR}")
+	message(STATUS "PYTHONQT_INCLUDE_DIR ${PYTHONQT_INCLUDE_DIR}")
+	message(STATUS "PYTHONQT_LIBRARY ${PYTHONQT_LIBRARY}")
+endif()

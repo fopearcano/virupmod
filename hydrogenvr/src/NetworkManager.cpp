@@ -18,6 +18,8 @@
 
 #include "NetworkManager.hpp"
 
+#include <cmath>
+
 NetworkManager::NetworkManager(std::unique_ptr<AbstractState> networkedState)
     : networkedState(std::move(networkedState))
 {
