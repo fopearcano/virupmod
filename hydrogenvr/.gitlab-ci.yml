@@ -1,0 +1,17 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME != "draft"
+
+stages:
+    - dockerbuild
+    - check
+    - build
+    - test
+    - deploy
+
+include:
+    - '**/ci/gitlab-ci/archlinux/gitlab-ci.yml'
+    - '**ci/gitlab-ci/ubuntu/22.04/gitlab-ci.yml'
+    - '**ci/gitlab-ci/ubuntu/24.04/gitlab-ci.yml'
+    - '**ci/gitlab-ci/appimage.yml'
+    - '**ci/gitlab-ci/maintainance.yml'

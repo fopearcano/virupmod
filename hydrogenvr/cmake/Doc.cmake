@@ -8,7 +8,7 @@ if(DOXYGEN_FOUND)
 		set(DOC_INPUT "${DOC_INPUT} ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/include/ ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/src/")
 	endif()
 	if(PROJECT_DOC_ENGINE)
-		set(DOC_INPUT "${DOC_INPUT} ${PROJECT_SOURCE_DIR}/hydrogenvr/include/ ${PROJECT_SOURCE_DIR}/hydrogenvr/src/")
+		set(DOC_INPUT "${DOC_INPUT} ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/include/ ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/src/")
 	endif()
 	if(PROJECT_DOC_THIRDPARTY)
 		set(DOC_INPUT "${DOC_INPUT} ${LIBRARIES_DIRS}")
@@ -16,13 +16,13 @@ if(DOXYGEN_FOUND)
 
 	message("Generate documentation for: ${DOC_INPUT}")
 
-	set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/hydrogenvr/doc/Doxyfile.in)
+	set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/${HVR_DIRECTORY}/doc/Doxyfile.in)
 	set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
 	configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 
 	add_custom_target(doc
-		COMMAND ${PROJECT_SOURCE_DIR}/hydrogenvr/ci/doc-report.sh ${DOXYGEN_EXECUTABLE} ${doxyfile}
+		COMMAND ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/ci/doc-report.sh ${DOXYGEN_EXECUTABLE} ${doxyfile}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Generating API documentation with Doxygen"
 		VERBATIM)

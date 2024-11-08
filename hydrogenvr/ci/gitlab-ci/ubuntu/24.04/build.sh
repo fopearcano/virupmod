@@ -1,5 +1,6 @@
 #!/bin/bash
 
-./hydrogenvr/ci/gitlab-ci/commons/main_build.sh
+if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=example ; HVR_DIRECTORY=. ; fi
+./$HVR_DIRECTORY/ci/gitlab-ci/commons/main_build.sh
 cd build
 make validate-glsl

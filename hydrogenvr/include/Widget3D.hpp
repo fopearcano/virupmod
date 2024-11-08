@@ -23,7 +23,6 @@
 #include <QPainter>
 #include <QWidget>
 
-#include "Primitives.hpp"
 #include "ToneMappingModel.hpp"
 #include "gl/GLHandler.hpp"
 
@@ -54,7 +53,7 @@ class Widget3D
 
 	GLShaderProgram shader;
 	GLMesh quad;
-	std::unique_ptr<GLTexture> tex;
+	GLTexture tex;
 
 	QMatrix4x4 model;
 

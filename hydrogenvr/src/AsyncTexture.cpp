@@ -36,7 +36,7 @@ std::list<std::pair<std::unique_ptr<at::WorkerThread>,
 
 AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
                            bool sRGB)
-    : defaultTex(GLTexture::Tex2DProperties(1, 1, sRGB))
+    : tex(GLTexture::Tex2DProperties(1, 1, sRGB))
     , sRGB(sRGB)
     , averageColor(defaultColor)
 {
@@ -45,7 +45,7 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
 	color[1] = defaultColor.green();
 	color[2] = defaultColor.blue();
 	color[3] = defaultColor.alpha();
-	defaultTex.setData({color.data()});
+	tex.setData({color.data()});
 
 	if(path.isEmpty())
 	{
@@ -66,7 +66,7 @@ AsyncTexture::AsyncTexture(QString const& path, QColor const& defaultColor,
 AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
                            unsigned int height, QColor const& defaultColor,
                            bool sRGB, bool forbidUpSample)
-    : defaultTex(GLTexture::Tex2DProperties(1, 1, sRGB))
+    : tex(GLTexture::Tex2DProperties(1, 1, sRGB))
     , sRGB(sRGB)
     , averageColor(defaultColor)
 {
@@ -75,7 +75,7 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
 	color[1] = defaultColor.green();
 	color[2] = defaultColor.blue();
 	color[3] = defaultColor.alpha();
-	defaultTex.setData(color.data());
+	tex.setData(color.data());
 
 	if(path.isEmpty())
 	{
@@ -108,14 +108,9 @@ AsyncTexture::AsyncTexture(QString const& path, unsigned int width,
 
 GLTexture const& AsyncTexture::getTexture()
 {
-	if(emptyPath)
+	if(emptyPath || loaded)
 	{
-		return defaultTex;
-	}
-
-	if(loaded)
-	{
-		return *tex;
+		return tex;
 	}
 
 	if(!thread->isFinished())
@@ -126,19 +121,19 @@ GLTexture const& AsyncTexture::getTexture()
 		}
 		else
 		{
-			return defaultTex;
+			return tex;
 		}
 	}
 
 	tex = pbo->copyContentToNewTex(sRGB);
 	pbo.reset();
-	tex->generateMipmap();
-	const unsigned int lastMipmap(tex->getHighestMipmapLevel());
-	averageColor = tex->getContentAsImage(lastMipmap).pixelColor(0, 0);
+	tex.generateMipmap();
+	const unsigned int lastMipmap(tex.getHighestMipmapLevel());
+	averageColor = tex.getContentAsImage(lastMipmap).pixelColor(0, 0);
 	thread.reset();
 	loaded = true;
 
-	return *tex;
+	return tex;
 }
 
 AsyncTexture::~AsyncTexture()

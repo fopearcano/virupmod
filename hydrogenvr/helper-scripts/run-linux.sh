@@ -8,11 +8,10 @@ else
 fi
 . ./${PROJECT_DIRECTORY}/build.conf
 
-mkdir build ; cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DWERROR=true
-export VERSION=$(cat PROJECT_VERSION)
-make -j $(nproc)
-make package
-./$PROJECT_NAME --version
-./tests
-
+./build-linux.sh
+if [ $? -ne 0 ]; then
+	exit
+fi
+cd build
+./$PROJECT_NAME
+cd ..

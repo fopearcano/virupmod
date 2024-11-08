@@ -1,6 +1,7 @@
 #!/bin/bash
 
-./hydrogenvr/ci/gitlab-ci/ubuntu/install_dependencies.sh
+if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=example ; HVR_DIRECTORY=. ; fi
+./$HVR_DIRECTORY/ci/gitlab-ci/ubuntu/install_dependencies.sh
 cd deps;
 git clone https://github.com/Orochimarufan/PythonQt ;
 cd PythonQt ;

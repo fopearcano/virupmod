@@ -103,17 +103,17 @@ void Text3D::render(GLHandler::GeometricSpace geometricSpace)
 
 	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
-	GLHandler::useTextures({&fbo->getColorAttachmentTexture()});
+	GLHandler::useTextures({&fbo.getColorAttachmentTexture()});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
 void Text3D::updateTex()
 {
-	if(fbo == nullptr || superSampling * originalSize != fbo->getSize())
+	if(superSampling * originalSize != fbo.getSize())
 	{
-		fbo = std::make_unique<GLFramebufferObject>(
+		fbo = GLFramebufferObject{
 		    GLTexture::Tex2DProperties(superSampling * originalSize.width(),
-		                               superSampling * originalSize.height()));
+		                               superSampling * originalSize.height())};
 	}
 
 	QString dbgText;
@@ -125,8 +125,8 @@ void Text3D::updateTex()
 	{
 		dbgText = text.left(22).replace('\n', "\\n") + "...";
 	}
-	fbo->setName("Text3D - " + dbgText);
-	fbo->setColorAttachmentName("Text3D - " + dbgText);
+	fbo.setName("Text3D - " + dbgText);
+	fbo.setColorAttachmentName("Text3D - " + dbgText);
 
 	bool sizeInPixels(true);
 	int fontSize(font.pixelSize());
@@ -151,7 +151,7 @@ void Text3D::updateTex()
 	    static_cast<int>(superSampling * rectangle.width()),
 	    static_cast<int>(superSampling * rectangle.height()));
 
-	paintText(*fbo, text, color, font, backgroundColor, adjustedRect, flags);
+	paintText(fbo, text, color, font, backgroundColor, adjustedRect, flags);
 
 	if(sizeInPixels)
 	{

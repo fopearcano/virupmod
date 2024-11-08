@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install -yq build-essential wget cmake git qtbase5-dev libassimp-dev libqt5opengl5-dev qtdeclarative5-dev libqt5svg5-dev qttools5-dev libqt5webkit5-dev qtmultimedia5-dev libqt5xmlpatterns5-dev libpython3-dev libzstd-dev
+DEBIAN_FRONTEND=noninteractive apt-get install -yq build-essential wget cmake git qtbase5-dev libassimp-dev libqt5opengl5-dev qtdeclarative5-dev libqt5svg5-dev qttools5-dev libqt5webkit5-dev qtmultimedia5-dev libqt5xmlpatterns5-dev libpython3-dev libzstd-dev libgit2-dev
 
 mkdir deps ; cd deps
 # install leap motion sdk

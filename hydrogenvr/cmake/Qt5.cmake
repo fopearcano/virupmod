@@ -19,7 +19,7 @@ endif()
 set(LD_LIBS ${LD_LIBS} Qt5::Widgets Qt5::Concurrent Qt5::Test Qt5::Network ${QT5_OPTIONAL_LIBS})
 
 function(copy_Qt_deps target_dir)
-    include(hydrogenvr/cmake/WindowsCopyFiles.cmake)
+	include(${HVR_DIRECTORY}/cmake/WindowsCopyFiles.cmake)
 
     set(DLL_DEST "$<TARGET_FILE_DIR:${target_dir}>/")
     set(Qt5_DLL_DIR "${Qt5_DIR}/../../../bin")

@@ -21,8 +21,6 @@
 
 #include <list>
 
-#include "memory.hpp"
-
 /**@brief A template to create pools object, useful for reusing GPU resources
  * for the whole runtime instead of constantly allocate/deallocate them.
  */
@@ -38,11 +36,11 @@ class ObjectPool
 	ObjectPool& operator=(ObjectPool&&)      = delete;
 	virtual ~ObjectPool()                    = default;
 
-	virtual std::unique_ptr<T> createObject() const = 0;
+	virtual T createObject() const = 0;
 
 	std::size_t getSize() { return objects.size(); };
 
-	std::unique_ptr<T> acquire()
+	T acquire()
 	{
 		if(objects.empty())
 		{
@@ -54,10 +52,7 @@ class ObjectPool
 		return obj;
 	}
 
-	void release(std::unique_ptr<T> object)
-	{
-		objects.emplace_back(std::move(object));
-	}
+	void release(T&& object) { objects.emplace_back(std::move(object)); }
 
 	void reserve(std::size_t size)
 	{
@@ -67,8 +62,8 @@ class ObjectPool
 		}
 	}
 
-  protected:
-	std::list<std::unique_ptr<T>> objects;
+  private:
+	std::list<T> objects;
 };
 
 #endif // OBJECTPOOL_HPP

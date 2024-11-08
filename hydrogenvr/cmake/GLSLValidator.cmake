@@ -13,7 +13,7 @@ if (GLSLANG_VALIDATOR)
 
 	file(GLOB THIRDPARTY_DATA_DIRS ${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/thirdparty/**/data LIST_DIRECTORIES true)
 	set(GLSL_PATH_LIST "${PROJECT_SOURCE_DIR}/${PROJECT_DIRECTORY}/data/shaders")
-	list(APPEND GLSL_PATH_LIST "${PROJECT_SOURCE_DIR}/hydrogenvr/data/core/shaders")
+	list(APPEND GLSL_PATH_LIST "${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/data/core/shaders")
 	foreach(THIRDPARTY_DATA_DIR ${THIRDPARTY_DATA_DIRS})
 		list(APPEND GLSL_PATH_LIST "${THIRDPARTY_DATA_DIR}/shaders")
 	endforeach()
@@ -27,7 +27,7 @@ if (GLSLANG_VALIDATOR)
 
 	add_custom_command(
 		TARGET validate-glsl
-		COMMAND ${PROJECT_SOURCE_DIR}/hydrogenvr/ci/validate-glsl.sh
+		COMMAND ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/ci/validate-glsl.sh
 		${GLSLANG_VALIDATOR} ${GLSL_PATH} ${GLSL_SOURCE_FILES}
 		COMMENT "Validating glsl files..."
 		VERBATIM

@@ -2,7 +2,7 @@
 
 pacman -Suy --noconfirm
 
-pacman -S --noconfirm git base-devel cmake assimp openvr qt5-base qt5-gamepad
+pacman -S --noconfirm git base-devel cmake assimp openvr libgit2 qt5-base #qt5-gamepad
 
 # AUR
 mkdir deps

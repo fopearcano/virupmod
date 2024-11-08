@@ -57,7 +57,7 @@ class GLPixelBufferObject
 	size_t getBufferSize() const { return buff.getSize(); };
 	template <typename T>
 	std::span<T> getMappedData() const;
-	std::unique_ptr<GLTexture> copyContentToNewTex(bool sRGB = true) const;
+	GLTexture copyContentToNewTex(bool sRGB = true) const;
 	void copyContentToTex(GLTexture const& texture) const;
 
 	virtual ~GLPixelBufferObject() { cleanUp(); };

@@ -60,6 +60,12 @@ int main(int argc, char* argv[])
 #else
 	versionOss << "OFF" << std::endl;
 #endif
+	versionOss << "\tlibgit2 support : ";
+#ifdef GIT
+	versionOss << "ON" << std::endl;
+#else
+	versionOss << "OFF" << std::endl;
+#endif
 	if(argc == 2 && std::string(argv[1]) == "--version")
 	{
 		std::cout << versionOss.str();

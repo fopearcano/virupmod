@@ -30,6 +30,7 @@ GLPixelBufferObject::GLPixelBufferObject(GLPixelBufferObject&& other) noexcept
     : buff(std::move(other.buff))
     , size(other.size)
     , bytesPerPixel(other.bytesPerPixel)
+    , dataFormat(other.dataFormat)
     , mappedData(other.mappedData)
     , doClean(other.doClean)
 {
@@ -70,8 +71,7 @@ GLPixelBufferObject::GLPixelBufferObject(QSize const& size,
 	this->dataFormat.ptr = nullptr;
 }
 
-std::unique_ptr<GLTexture>
-    GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
+GLTexture GLPixelBufferObject::copyContentToNewTex(bool sRGB) const
 {
 	unmap();
 
@@ -79,10 +79,11 @@ std::unique_ptr<GLTexture>
 	padding              = (padding == 0 ? 4 : (padding == 3 ? 1 : padding));
 	GLHandler::glf().glPixelStorei(GL_UNPACK_ALIGNMENT, padding);
 	buff.bind(); // be sure it is bound before the call to glTexImage2D
-	std::unique_ptr<GLTexture> result = std::make_unique<GLTexture>(
+
+	GLTexture result{
 	    GLTexture::Tex2DProperties(size.width(), size.height(), sRGB),
-	    GLTexture::Sampler{}, dataFormat);
-	result->setData(dataFormat);
+	    GLTexture::Sampler{}, dataFormat};
+	result.setData(dataFormat);
 	buff.unbind();
 
 	return result;

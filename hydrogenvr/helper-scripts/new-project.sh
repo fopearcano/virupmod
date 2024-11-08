@@ -24,7 +24,7 @@ convert_git_url_to_front_page() {
 
     if [[ $git_url == git@* ]]; then
         # Convert SSH URL to HTTPS URL
-        front_page_url=$(echo "$git_url" | sed -e 's/^git@/https:\/\//' -e 's/:/\//g')
+        front_page_url=$(echo "$git_url" | sed -e 's/:/\//g' -e 's/^git@/https:\/\//')
     elif [[ $git_url == https://* ]]; then
         front_page_url=$git_url
     fi
@@ -50,6 +50,12 @@ PROJECT_MAINTAINER_EMAIL=$(prompt_string "Enter maintainer email" "")
 PROJECT_MAINTAINER="$PROJECT_MAINTAINER_NAME <$PROJECT_MAINTAINER_EMAIL>"
 
 # Prompt for boolean values
+if [[ -f LICENSE ]]
+then
+	PROJECT_USE_GPL3="false"
+else
+	PROJECT_USE_GPL3=$(prompt_boolean "Use GPL3? (Don't forget to set a license yourself if 'no'.)" "true")
+fi
 PROJECT_CHECK_FORMAT=$(prompt_boolean "Check format?" "true")
 PROJECT_CHECK_TIDY=$(prompt_boolean "Check tidy?" "true")
 PROJECT_CHECK_FORMAT_THIRDPARTY=$(prompt_boolean "Check format for third party?" "true")
@@ -63,7 +69,7 @@ PROJECT_TRANSLATE_THIRDPARTY=$(prompt_boolean "Enable translation for third part
 
 # Prompt for integer values
 OPENGL_MAJOR_VERSION=$(prompt_string "OpenGL major version" "4")
-OPENGL_MINOR_VERSION=$(prompt_string "OpenGL minor version" "2")
+OPENGL_MINOR_VERSION=$(prompt_string "OpenGL minor version" "5")
 
 # Prompt for OpenGL profile
 OPENGL_PROFILE=$(prompt_string "OpenGL profile (Core/Compatibility)" "Core")
@@ -78,6 +84,7 @@ echo "PROJECT_ICON=\"$PROJECT_ICON\""
 echo "PROJECT_URL=\"$PROJECT_URL\""
 echo "PROJECT_DESCRIPTION=\"$PROJECT_DESCRIPTION\""
 echo "PROJECT_MAINTAINER=\"$PROJECT_MAINTAINER\""
+echo "PROJECT_USE_GPL3=\"$PROJECT_USE_GPL3\""
 echo "PROJECT_CHECK_FORMAT=$PROJECT_CHECK_FORMAT"
 echo "PROJECT_CHECK_TIDY=$PROJECT_CHECK_TIDY"
 echo "PROJECT_CHECK_FORMAT_THIRDPARTY=$PROJECT_CHECK_FORMAT_THIRDPARTY"
@@ -100,6 +107,7 @@ fi
 
 echo "Generating new project..."
 echo "PROJECT_DIRECTORY=\"$PROJECT_DIRECTORY\"" > project_directory.conf
+echo "HVR_DIRECTORY=\"hydrogenvr\"" >> project_directory.conf
 mkdir -p $PROJECT_DIRECTORY
 cp -r hydrogenvr/blank/* $PROJECT_DIRECTORY/
 BUILD_CONF=$(echo $PROJECT_DIRECTORY/build.conf)
@@ -132,6 +140,35 @@ echo "OPENGL_MAJOR_VERSION=$OPENGL_MAJOR_VERSION" >> $BUILD_CONF
 echo "OPENGL_MINOR_VERSION=$OPENGL_MINOR_VERSION" >> $BUILD_CONF
 echo "OPENGL_PROFILE=\"$OPENGL_PROFILE\"" >> $BUILD_CONF
 
+# copy additional files
 
+if [[ ! -f CMakeLists.txt ]]
+then
+	echo 'cmake_minimum_required(VERSION 3.10.0)
+include("hydrogenvr/CMakeLists.txt")' > CMakeLists.txt
+fi
+if [[ ! -f .gitlab-ci.yml ]]
+then
+	echo "include: 'hydrogenvr/.gitlab-ci.yml'" > .gitlab-ci.yml
+fi
+if [[ ! -f .gitignore ]]
+	cp hydrogenvr/.gitignore .gitignore
+fi
+if [[ "$PROJECT_USE_GPL3" == "true" ]]
+then
+	cp hydrogenvr/LICENSE LICENSE
+fi
+if [[ "$PROJECT_CHECK_FORMAT" == "true" || "$PROJECT_CHECK_FORMAT_THIRDPARTY" == "true" ]]
+then
+	cp hydrogenvr/.clang-format $PROJECT_DIRECTORY/.clang-format
+fi
+if [[ "$PROJECT_CHECK_TIDY" == "true" || "$PROJECT_CHECK_TIDY_THIRDPARTY" == "true" ]]
+then
+	cp hydrogenvr/.clang-tidy $PROJECT_DIRECTORY/.clang-tidy
+fi
+
+
+echo "Done..."
+echo "If you want to setup CI/CD, please refer to: https://gitlab.com/Dexter9313/hydrogenvr/-/wikis/tutorials/1-general-topics/9-continuous-integration"
 
 rm -rf build

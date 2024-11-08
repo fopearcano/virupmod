@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./project_directory.conf || PROJECT_DIRECTORY=hydrogenvr/example
+if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=example ; HVR_DIRECTORY=. ; fi
 . ./${PROJECT_DIRECTORY}/build.conf
 
 cd build

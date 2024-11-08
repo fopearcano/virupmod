@@ -90,7 +90,6 @@ class AsyncTexture
 	             QColor const& defaultColor, bool sRGB = true,
 	             bool forbidUpsample = true);
 	bool isLoaded() const { return loaded; };
-	GLTexture const& getDefaultTexture() const { return defaultTex; };
 	GLTexture const& getTexture();
 	QColor getAverageColor() const { return averageColor; };
 	~AsyncTexture();
@@ -99,8 +98,7 @@ class AsyncTexture
 	static void garbageCollect(bool force = false);
 
   private:
-	GLTexture defaultTex;
-	std::unique_ptr<GLTexture> tex = nullptr;
+	GLTexture tex;
 
 	std::unique_ptr<GLPixelBufferObject> pbo;
 	std::unique_ptr<at::WorkerThread> thread;

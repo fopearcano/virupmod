@@ -306,6 +306,12 @@ void GLFramebufferObject::blitColorBufferTo(GLFramebufferObject const& to,
                                             int srcY1, int dstX0, int dstY0,
                                             int dstX1, int dstY1) const
 {
+	// Bind the default framebuffer explicitly if it's the destination; NVIDIA
+	// is ok not to do that, but not mesa
+	if(to.fbo == 0)
+	{
+		GLHandler::glf().glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
 	GLHandler::glf().glBlitNamedFramebuffer(fbo, to.fbo, srcX0, srcY0, srcX1,
 	                                        srcY1, dstX0, dstY0, dstX1, dstY1,
 	                                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -313,6 +319,12 @@ void GLFramebufferObject::blitColorBufferTo(GLFramebufferObject const& to,
 
 void GLFramebufferObject::blitDepthBufferTo(GLFramebufferObject const& to) const
 {
+	// Bind the default framebuffer explicitly if it's the destination; NVIDIA
+	// is ok not to do that, but not mesa
+	if(to.fbo == 0)
+	{
+		GLHandler::glf().glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
 	GLHandler::glf().glBlitNamedFramebuffer(fbo, to.fbo, 0, 0, width, height, 0,
 	                                        0, to.width, to.height,
 	                                        GL_DEPTH_BUFFER_BIT, GL_NEAREST);

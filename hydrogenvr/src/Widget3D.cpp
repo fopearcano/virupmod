@@ -18,10 +18,11 @@
 
 #include "Widget3D.hpp"
 
-#include "memory.hpp"
+#include "Primitives.hpp"
 
 Widget3D::Widget3D(QWidget& widget)
     : shader("billboard")
+    , tex(GLTexture::Tex1DProperties{1})
     , widget(widget)
 {
 	Primitives::setAsQuad(quad, shader);
@@ -59,7 +60,7 @@ void Widget3D::render(ToneMappingModel const& tmm,
 	shader.setUniform("exposure", tmm.exposure);
 	shader.setUniform("dynamicrange", tmm.dynamicrange);
 	GLHandler::setUpRender(shader, model * aspectratio, geometricSpace);
-	GLHandler::useTextures({tex.get()});
+	GLHandler::useTextures({&tex});
 	quad.render(PrimitiveType::TRIANGLE_STRIP);
 }
 
@@ -77,18 +78,16 @@ void Widget3D::updateTex()
 
 	paintWidget(image, widget);
 
-	tex = std::make_unique<GLTexture>(image);
+	tex = GLTexture{image};
 }
 
 void Widget3D::paintWidget(QImage& image, QWidget& widget)
 {
 	// The QPainter doesn't like its QImage to be changed, hence the block
 	{
-		auto painter = std::make_unique<QPainter>(&image);
-		painter->setRenderHint(QPainter::Antialiasing);
-
-		// image.fill(QColor(0, 0, 0, 0));
-		widget.render(painter.get());
+		QPainter painter(&image);
+		painter.setRenderHint(QPainter::Antialiasing);
+		widget.render(&painter);
 	}
 	image = image.mirrored(false, true);
 }

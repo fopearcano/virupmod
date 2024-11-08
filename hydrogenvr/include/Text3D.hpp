@@ -66,7 +66,7 @@ class Text3D
 
 	GLShaderProgram shader;
 	GLMesh quad;
-	std::unique_ptr<GLFramebufferObject> fbo;
+	GLFramebufferObject fbo;
 
 	QMatrix4x4 model;
 

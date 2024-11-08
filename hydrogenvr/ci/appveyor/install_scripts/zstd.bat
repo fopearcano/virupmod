@@ -3,7 +3,7 @@
 ::############################################################################
 IF NOT EXIST zstd\ (
 	git clone https://github.com/facebook/zstd.git --branch=v1.5.6
-	copy %APPVEYOR_BUILD_FOLDER%\hydrogenvr\misc\libzstd-dll.rc zstd\build\VS2010\libzstd-dll\libzstd-dll.rc
+	copy %APPVEYOR_BUILD_FOLDER%\%HVR_DIRECTORY%\misc\libzstd-dll.rc zstd\build\VS2010\libzstd-dll\libzstd-dll.rc
 
 	cd zstd\build\cmake
 	mkdir build

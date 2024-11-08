@@ -9,16 +9,16 @@ dockerbuild:archlinux:
         refs:
             - pushes
         changes:
-            - hydrogenvr/ci/gitlab-ci/archlinux/install_dependencies.sh
-            - hydrogenvr/ci/gitlab-ci/archlinux/Dockerfile
-            - hydrogenvr/ci/gitlab-ci/archlinux/gitlab-ci.yml
+            - '**/ci/gitlab-ci/archlinux/install_dependencies.sh'
+            - '**/ci/gitlab-ci/archlinux/Dockerfile'
+            - '**/ci/gitlab-ci/archlinux/gitlab-ci.yml'
             - '**/ci/gitlab-ci/archlinux/install_dependencies.sh'
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=hydrogenvr/example ; fi
+        - if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=example ; HVR_DIRECTORY=. ; fi
         - PROJ_INST_DEP=./$PROJECT_DIRECTORY/ci/gitlab-ci/archlinux/install_dependencies.sh
-        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./hydrogenvr/example/ci/gitlab-ci/archlinux/install_dependencies.sh; fi
-        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP -t $CI_REGISTRY_IMAGE:archlinux -f ./hydrogenvr/ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
+        - if [ ! -f $PROJ_INST_DEP ]; then PROJ_INST_DEP=./$HVR_DIRECTORY/example/ci/gitlab-ci/archlinux/install_dependencies.sh; fi
+        - docker build --pull --build-arg PROJECT_INSTALL_DEPS=$PROJ_INST_DEP --build-arg HVR_DIRECTORY=$HVR_DIRECTORY -t $CI_REGISTRY_IMAGE:archlinux -f ./$HVR_DIRECTORY/ci/gitlab-ci/archlinux/Dockerfile --no-cache --pull .
         - docker push $CI_REGISTRY_IMAGE:archlinux
 
 build:archlinux:
@@ -27,5 +27,6 @@ build:archlinux:
     only:
         - pushes
     script:
-        - ./hydrogenvr/ci/gitlab-ci/archlinux/build.sh
+        - if [[ -f ./project_directory.conf ]]; then . ./project_directory.conf ; else PROJECT_DIRECTORY=example ; HVR_DIRECTORY=. ; fi
+        - ./$HVR_DIRECTORY/ci/gitlab-ci/archlinux/build.sh
 

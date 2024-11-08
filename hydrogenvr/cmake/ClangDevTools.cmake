@@ -40,13 +40,13 @@ if(CLANG_FORMAT_FOUND)
 	message("clang-format version: ${CLANG_FORMAT_VERSION}")
 	add_custom_target(
 		clang-format
-		COMMAND ${PROJECT_SOURCE_DIR}/hydrogenvr/ci/clang-format-report.sh
+		COMMAND ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/ci/clang-format-report.sh
 		${CLANG_FORMAT}
 		${ALL_FILES}
 	)
 	add_custom_target(
 		clang-format-inplace
-		COMMAND ${PROJECT_SOURCE_DIR}/hydrogenvr/ci/clang-format-inplace.sh
+		COMMAND ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/ci/clang-format-inplace.sh
 		${CLANG_FORMAT}
 		${ALL_FILES}
 	)
@@ -74,7 +74,7 @@ if(CLANG_TIDY_FOUND)
 	message("clang-tidy version: ${CLANG_TIDY_VERSION}")
 	add_custom_target(
 		clang-tidy
-		COMMAND ${PROJECT_SOURCE_DIR}/hydrogenvr/ci/clang-tidy-report.sh
+		COMMAND ${PROJECT_SOURCE_DIR}/${HVR_DIRECTORY}/ci/clang-tidy-report.sh
 		${CLANG_TIDY}
 		${ALL_SOURCE_FILES}
 		-p .
