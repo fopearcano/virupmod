@@ -22,8 +22,115 @@
 #include <QStorageInfo>
 #include <QtConcurrent>
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+
 #include "LibPlanet.hpp"
 #include "LibTerrain.hpp"
+
+// Function to decode URL and return domain, directory, and file
+std::tuple<QString, QString, QString> decodeHttpUrl(QUrl const& url)
+{
+	if(!url.isValid() || (url.scheme() != "http" && url.scheme() != "https"))
+	{
+		throw std::runtime_error("URL doesn't start with http:// or https://");
+	}
+
+	QString domain    = url.host();
+	QString path      = url.path();
+	QString directory = QFileInfo(path).path();
+	QString file      = QFileInfo(path).fileName();
+
+	return {domain, directory, file};
+}
+
+// Function to get file size using HEAD request
+qint64 getFileSize(QUrl const& url)
+{
+	QNetworkAccessManager manager;
+	QNetworkRequest request(url);
+	QNetworkReply* reply = manager.head(request);
+
+	while(!reply->isFinished())
+	{
+		QCoreApplication::processEvents();
+	}
+
+	if(reply->error() != QNetworkReply::NoError)
+	{
+		throw std::runtime_error(
+		    QString("Failed to fetch file size for %1. Error: %2")
+		        .arg(url.toString(), reply->errorString())
+		        .toStdString());
+	}
+
+	qint64 size
+	    = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
+	reply->deleteLater();
+	return size;
+}
+
+// Function to download the file with resume support
+void downloadHttp(QUrl const& url, const QString& destFile, bool resume = true)
+{
+	QNetworkAccessManager manager;
+	QNetworkRequest request(url);
+
+	QFile file(destFile);
+	qint64 downloadedSize = 0;
+
+	if(resume && file.exists())
+	{
+		downloadedSize = file.size();
+		request.setRawHeader("Range", QByteArray("bytes=")
+		                                  + QByteArray::number(downloadedSize)
+		                                  + "-");
+	}
+	else
+	{
+		if(!file.open(QIODevice::WriteOnly))
+		{
+			throw std::runtime_error(
+			    QString("Failed to open file %1 for writing")
+			        .arg(destFile)
+			        .toStdString());
+		}
+		file.close(); // Will open in append mode later
+	}
+
+	QNetworkReply* reply = manager.get(request);
+	QObject::connect(reply, &QNetworkReply::readyRead,
+	                 [&]()
+	                 {
+		                 if(!file.isOpen() && !file.open(QIODevice::Append))
+		                 {
+			                 throw std::runtime_error(
+			                     QString("Failed to open file %1 for appending")
+			                         .arg(destFile)
+			                         .toStdString());
+		                 }
+		                 file.write(reply->readAll());
+	                 });
+
+	QObject::connect(
+	    reply, &QNetworkReply::finished,
+	    [&]()
+	    {
+		    if(reply->error() != QNetworkReply::NoError)
+		    {
+			    throw std::runtime_error(
+			        QString("Failed to download file %1. Error: %2")
+			            .arg(url.toString(), reply->errorString())
+			            .toStdString());
+		    }
+	    });
+
+	while(!reply->isFinished())
+	{
+		QCoreApplication::processEvents();
+	}
+}
 
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
@@ -162,21 +269,12 @@ void DataListWidget::downloadDefaultData()
 
 	auto downloadedFilePath = downloadDir + "/VIRUP-DATA.zip";
 
-	QUrl url("ftp://obsftp.unige.ch/pub/cabot/VIRUP-DATA.zip");
+	QUrl url("https://www.astro.unige.ch/~cabot/VIRUP-DATA.zip");
 
-	PythonQtHandler::init();
-	PythonQtHandler::evalFile(utils::getAbsoluteDataPath("downloaddata.py"));
-	PythonQtHandler::evalScript(QString("getfilesize(\"") + url.toString()
-	                            + "\")");
-	auto totsize = PythonQtHandler::getVariable("totsize").toLongLong();
+	auto totsize = getFileSize(url);
 
-	auto future = QtConcurrent::run(
-	    [&url, &downloadedFilePath]
-	    {
-		    PythonQtHandler::evalScript(QString("downloadFtp(\"")
-		                                + url.toString() + "\", \""
-		                                + downloadedFilePath + "\")");
-	    });
+	auto future = QtConcurrent::run([&url, &downloadedFilePath]
+	                                { downloadHttp(url, downloadedFilePath); });
 
 	QProgressDialog progress(this);
 	progress.setWindowTitle(tr("Downloading..."));
@@ -237,6 +335,8 @@ void DataListWidget::downloadDefaultData()
 		return;
 	}
 
+	PythonQtHandler::init();
+	PythonQtHandler::evalFile(utils::getAbsoluteDataPath("downloaddata.py"));
 	PythonQtHandler::evalScript("resetextraction()");
 
 	PythonQtHandler::evalScript(QString("getzipfilesize(\"")
