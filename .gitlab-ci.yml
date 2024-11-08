@@ -1,1 +1,4 @@
-include: 'hydrogenvr/.gitlab-ci.yml'
+include:
+  - project: 'Dexter9313/hydrogenvr'
+    ref: master
+    file: 'ci/gitlab-ci/main.yml'

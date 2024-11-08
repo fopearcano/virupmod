@@ -7,3 +7,6 @@
 [submodule "virup/thirdparty/libterrain"]
 	path = virup/thirdparty/libterrain
 	url = https://gitlab.com/Dexter9313/libterrain.git
+[submodule "hydrogenvr"]
+	path = hydrogenvr
+	url = https://gitlab.com/Dexter9313/hydrogenvr.git
