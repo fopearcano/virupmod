@@ -1,9 +1,0 @@
-*~
-*.swp
-__pycache__/
-*.pyc
-build/
-.cache/
-CMakePresets.json
-/build-linux.sh
-/run-linux.sh
