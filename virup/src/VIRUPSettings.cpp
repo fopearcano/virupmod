@@ -37,10 +37,10 @@ std::tuple<QString, QString, QString> decodeHttpUrl(QUrl const& url)
 		throw std::runtime_error("URL doesn't start with http:// or https://");
 	}
 
-	QString domain    = url.host();
-	QString path      = url.path();
-	QString directory = QFileInfo(path).path();
-	QString file      = QFileInfo(path).fileName();
+	const QString domain    = url.host();
+	const QString path      = url.path();
+	const QString directory = QFileInfo(path).path();
+	const QString file      = QFileInfo(path).fileName();
 
 	return {domain, directory, file};
 }
@@ -49,7 +49,7 @@ std::tuple<QString, QString, QString> decodeHttpUrl(QUrl const& url)
 qint64 getFileSize(QUrl const& url)
 {
 	QNetworkAccessManager manager;
-	QNetworkRequest request(url);
+	const QNetworkRequest request(url);
 	QNetworkReply* reply = manager.head(request);
 
 	while(!reply->isFinished())
@@ -65,7 +65,7 @@ qint64 getFileSize(QUrl const& url)
 		        .toStdString());
 	}
 
-	qint64 size
+	const qint64 size
 	    = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
 	reply->deleteLater();
 	return size;
