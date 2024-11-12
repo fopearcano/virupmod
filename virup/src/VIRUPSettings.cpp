@@ -27,6 +27,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+#include "DownloadManager.hpp"
 #include "gui/PathSelector.hpp"
 #include "universe/CSVObjects.hpp"
 #include "universe/CosmologicalLabels.hpp"
@@ -36,109 +37,6 @@
 
 #include "LibPlanet.hpp"
 #include "LibTerrain.hpp"
-
-// Function to decode URL and return domain, directory, and file
-std::tuple<QString, QString, QString> decodeHttpUrl(QUrl const& url)
-{
-	if(!url.isValid() || (url.scheme() != "http" && url.scheme() != "https"))
-	{
-		throw std::runtime_error("URL doesn't start with http:// or https://");
-	}
-
-	const QString domain    = url.host();
-	const QString path      = url.path();
-	const QString directory = QFileInfo(path).path();
-	const QString file      = QFileInfo(path).fileName();
-
-	return {domain, directory, file};
-}
-
-// Function to get file size using HEAD request
-qint64 getFileSize(QUrl const& url)
-{
-	QNetworkAccessManager manager;
-	const QNetworkRequest request(url);
-	QNetworkReply* reply = manager.head(request);
-
-	while(!reply->isFinished())
-	{
-		QCoreApplication::processEvents();
-	}
-
-	if(reply->error() != QNetworkReply::NoError)
-	{
-		throw std::runtime_error(
-		    QString("Failed to fetch file size for %1. Error: %2")
-		        .arg(url.toString(), reply->errorString())
-		        .toStdString());
-	}
-
-	const qint64 size
-	    = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
-	reply->deleteLater();
-	return size;
-}
-
-// Function to download the file with resume support
-void downloadHttp(QUrl const& url, const QString& destFile, bool resume = true)
-{
-	QNetworkAccessManager manager;
-	QNetworkRequest request(url);
-
-	QFile file(destFile);
-	qint64 downloadedSize = 0;
-
-	if(resume && file.exists())
-	{
-		downloadedSize = file.size();
-		request.setRawHeader("Range", QByteArray("bytes=")
-		                                  + QByteArray::number(downloadedSize)
-		                                  + "-");
-	}
-	else
-	{
-		if(!file.open(QIODevice::WriteOnly))
-		{
-			throw std::runtime_error(
-			    QString("Failed to open file %1 for writing")
-			        .arg(destFile)
-			        .toStdString());
-		}
-		file.close(); // Will open in append mode later
-	}
-
-	QNetworkReply* reply = manager.get(request);
-	QObject::connect(reply, &QNetworkReply::readyRead,
-	                 [&]()
-	                 {
-		                 if(!file.isOpen() && !file.open(QIODevice::Append))
-		                 {
-			                 throw std::runtime_error(
-			                     QString("Failed to open file %1 for appending")
-			                         .arg(destFile)
-			                         .toStdString());
-		                 }
-		                 file.write(reply->readAll());
-	                 });
-
-	QObject::connect(
-	    reply, &QNetworkReply::finished,
-	    [&]()
-	    {
-		    if(reply->error() != QNetworkReply::NoError)
-		    {
-			    throw std::runtime_error(
-			        QString("Failed to download file %1. Error: %2")
-			            .arg(url.toString(), reply->errorString())
-			            .toStdString());
-		    }
-	    });
-
-	while(!reply->isFinished())
-	{
-		QCoreApplication::processEvents();
-	}
-}
 
 VIRUPSettings::VIRUPSettings(QWidget* parent)
     : SettingsWidget(parent)
@@ -279,57 +177,12 @@ void DataListWidget::downloadDefaultData()
 
 	QUrl url("https://www.astro.unige.ch/~cabot/VIRUP-DATA.zip");
 
-	auto totsize = getFileSize(url);
-
-	auto future = QtConcurrent::run([&url, &downloadedFilePath]
-	                                { downloadHttp(url, downloadedFilePath); });
-
-	QProgressDialog progress(this);
-	progress.setWindowTitle(tr("Downloading..."));
-	progress.show();
-
-	QElapsedTimer timer;
-	timer.start();
-
-	qint64 sizeBack(0);
-
-	bool keepDownloading = true;
-	connect(&progress, &QProgressDialog::canceled,
-	        [&keepDownloading]() { keepDownloading = false; });
-
-	while(!future.isFinished() && keepDownloading)
-	{
-		const QFile downloadedFile(downloadedFilePath);
-		const auto fileSize(downloadedFile.size());
-
-		progress.setMaximum(totsize / 1024 / 1024);
-		progress.setValue(fileSize / 1024 / 1024);
-		auto dt               = timer.restart() / 1000.0;
-		auto speedInMiBPerSec = (fileSize - sizeBack) / dt / (1024 * 1024);
-		sizeBack              = fileSize;
-		const int remaining   = static_cast<int>(
-            round((totsize - fileSize) / (speedInMiBPerSec * 1024 * 1024)));
-		progress.setLabelText(
-		    QString::number(fileSize / 1024.0 / 1024 / 1024, 'g', 2) + "GiB/"
-		    + QString::number(totsize / 1024.0 / 1024 / 1024, 'g', 2) + "GiB "
-		    + QString::number(speedInMiBPerSec, 'g', 3) + " MiB/s ETA: "
-		    + QTime(0, 0).addSecs(remaining).toString("hh:mm:ss") + " secs");
-		QCoreApplication::processEvents();
-		QThread::msleep(50);
-	}
-
-	if(!keepDownloading)
-	{
-		qDebug() << "Canceled";
-		QFile downloadedFile(downloadedFilePath);
-		downloadedFile.remove();
-		// forces QtConcurrent to stop, else we need to wait for the end of the
-		// download...
-		// NOLINTNEXTLINE(concurrency-mt-unsafe)
-		exit(0);
-	}
+	auto totsize = DownloadManager::getFileSize(url);
 
 	QFile downloadedFile(downloadedFilePath);
+	DownloadManager::downloadFileSync(url, downloadedFile,
+	                                  {.showProgress = true}, this);
+
 	auto fileSize(downloadedFile.size());
 	//  if download has somewhat failed
 	if(fileSize != totsize)
@@ -356,6 +209,7 @@ void DataListWidget::downloadDefaultData()
 	auto total_files_number
 	    = PythonQtHandler::getVariable("total_files_number").toLongLong();
 
+	QProgressDialog progress(this);
 	progress.setWindowTitle(tr("Extracting..."));
 	progress.setLabelText(tr("Waiting for data archive to be extracted..."));
 	progress.setMaximum(totsize / 1024 / 1024);
