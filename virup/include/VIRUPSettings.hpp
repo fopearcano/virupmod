@@ -29,23 +29,19 @@
 #include <QVBoxLayout>
 
 #include "SettingsWidget.hpp"
-#include "universe/CSVObjects.hpp"
-#include "universe/CosmologicalLabels.hpp"
-#include "universe/CosmologicalSimulation.hpp"
-#include "universe/Credits.hpp"
-#include "universe/TexturedSphere.hpp"
-#include "universe/UniverseElement.hpp"
+
+class PathSelector;
 
 class VIRUPSettings : public SettingsWidget
 {
   public:
-	VIRUPSettings(QWidget* parent);
+	explicit VIRUPSettings(QWidget* parent);
 };
 
 class DataListWidget : public QScrollArea
 {
   public:
-	DataListWidget(QWidget* parent = nullptr);
+	explicit DataListWidget(QWidget* parent = nullptr);
 	void importJsonFromPath(QString const& path);
 	void downloadDefaultData();
 

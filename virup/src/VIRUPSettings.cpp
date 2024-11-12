@@ -18,6 +18,7 @@
 
 #include "VIRUPSettings.hpp"
 
+#include <QProgressDialog>
 #include <QStandardPaths>
 #include <QStorageInfo>
 #include <QtConcurrent>
@@ -25,6 +26,13 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+
+#include "gui/PathSelector.hpp"
+#include "universe/CSVObjects.hpp"
+#include "universe/CosmologicalLabels.hpp"
+#include "universe/CosmologicalSimulation.hpp"
+#include "universe/Credits.hpp"
+#include "universe/TexturedSphere.hpp"
 
 #include "LibPlanet.hpp"
 #include "LibTerrain.hpp"
