@@ -181,7 +181,7 @@ void DataListWidget::downloadDefaultData()
 
 	auto downloadedFilePath = downloadDir + "/VIRUP-DATA.zip";
 
-	QUrl url("https://www.astro.unige.ch/~cabot/VIRUP-DATA.zip");
+	const QUrl url("https://www.astro.unige.ch/~cabot/VIRUP-DATA.zip");
 
 	auto totsize = DownloadManager::getFileSize(url);
 
