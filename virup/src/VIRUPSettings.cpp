@@ -160,7 +160,13 @@ void DataListWidget::downloadDefaultData()
 			return;
 		}
 		const QStorageInfo info(downloadDir);
-		if(info.bytesAvailable() / 1024.0 <= 27.1 * 1024 * 1024) // 27.1GiB
+		qint64 alreadyDownloaded = 0;
+		if(QFile(downloadDir + "/VIRUP-DATA.zip").exists())
+		{
+			alreadyDownloaded = QFile(downloadDir + "/VIRUP-DATA.zip").size();
+		}
+		if(info.bytesAvailable() / 1024.0
+		   <= 27.1 * 1024 * 1024 - (alreadyDownloaded / 1024.0)) // 27.1GiB
 		{
 			const QString avail
 			    = QString::number(info.bytesAvailable() / 1024.0 / 1024 / 1024);
