@@ -28,6 +28,7 @@
 #include <QNetworkRequest>
 
 #include "DownloadManager.hpp"
+#include "Zip.hpp"
 #include "gui/PathSelector.hpp"
 #include "universe/CSVObjects.hpp"
 #include "universe/CosmologicalLabels.hpp"
@@ -180,11 +181,8 @@ void DataListWidget::downloadDefaultData()
 	} while(!ok);
 
 	auto downloadedFilePath = downloadDir + "/VIRUP-DATA.zip";
-
 	const QUrl url("https://www.astro.unige.ch/~cabot/VIRUP-DATA.zip");
-
 	auto totsize = DownloadManager::getFileSize(url);
-
 	QFile downloadedFile(downloadedFilePath);
 	DownloadManager::downloadFileSync(url, downloadedFile,
 	                                  {.showProgress = true}, this);
@@ -198,89 +196,12 @@ void DataListWidget::downloadDefaultData()
 		    tr("Download failed: You can retry later by launching VIRUP again. "
 		       "Download will resume to where it was (if you "
 		       "choose the same directory)."));
-		QCoreApplication::quit();
 		return;
 	}
 
-	PythonQtHandler::init();
-	PythonQtHandler::evalFile(utils::getAbsoluteDataPath("downloaddata.py"));
-	PythonQtHandler::evalScript("resetextraction()");
-
-	PythonQtHandler::evalScript(QString("getzipfilesize(\"")
-	                            + downloadedFilePath + "\")");
-	totsize = PythonQtHandler::getVariable("totsize").toLongLong();
-
-	PythonQtHandler::evalScript(QString("getzipfilesnumber(\"")
-	                            + downloadedFilePath + "\")");
-	auto total_files_number
-	    = PythonQtHandler::getVariable("total_files_number").toLongLong();
-
-	QProgressDialog progress(this);
-	progress.setWindowTitle(tr("Extracting..."));
-	progress.setLabelText(tr("Waiting for data archive to be extracted..."));
-	progress.setMaximum(totsize / 1024 / 1024);
-	progress.show();
-
-	qlonglong alreadyExtracted = 0;
-
-	bool keepExtracting(true);
-	for(unsigned int i(0); i < total_files_number && keepExtracting; ++i)
-	{
-		PythonQtHandler::evalScript(QString("preparenextextraction(\"")
-		                            + downloadedFilePath + "\")");
-		auto currentpath
-		    = PythonQtHandler::getVariable("currentfilepath").toString();
-		if(currentpath[currentpath.size() - 1] == '/')
-		{
-			continue;
-		}
-		auto currenttotsize
-		    = PythonQtHandler::getVariable("currentfiletotsize").toLongLong();
-
-		auto future = QtConcurrent::run(
-		    [&downloadedFilePath]
-		    {
-			    PythonQtHandler::evalScript(QString("extract(\"")
-			                                + downloadedFilePath + "\")");
-		    });
-
-		connect(&progress, &QProgressDialog::canceled,
-		        [&keepExtracting]() { keepExtracting = false; });
-
-		while(!future.isFinished() && keepExtracting)
-		{
-			const QFile extractedFile(downloadDir + "/" + currentpath);
-			const auto extractedSize(extractedFile.size());
-
-			progress.setValue((alreadyExtracted + extractedSize) / 1024 / 1024);
-			progress.setLabelText(
-			    QString("File ") + QString::number(i) + "/"
-			    + QString::number(total_files_number) + "\nTotal:"
-			    + QString::number((alreadyExtracted + extractedSize) / 1024.0
-			                          / 1024 / 1024,
-			                      'g', 2)
-			    + "GiB/"
-			    + QString::number(totsize / 1024.0 / 1024 / 1024, 'g', 2)
-			    + "GiB\n" + currentpath + "\n"
-			    + QString::number(extractedSize / 1024.0 / 1024, 'g', 4)
-			    + "MiB/"
-			    + QString::number(currenttotsize / 1024.0 / 1024, 'g', 4)
-			    + "MiB");
-			QCoreApplication::processEvents();
-			QThread::msleep(50);
-		}
-
-		alreadyExtracted += currenttotsize;
-		progress.setValue(alreadyExtracted / 1024 / 1024);
-
-		QCoreApplication::processEvents();
-	}
-
-	if(!keepExtracting)
+	if(!Zip::decompress(downloadedFilePath, downloadDir, true, this))
 	{
 		qDebug() << "Cancelled";
-		// NOLINTNEXTLINE(concurrency-mt-unsafe)
-		exit(0);
 	}
 
 	downloadedFile.remove();
