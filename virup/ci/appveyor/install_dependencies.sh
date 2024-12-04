@@ -12,7 +12,7 @@ then
 	cd ../../..
 fi
 
-cd cd octree-file-format/liboctree/build
+cd octree-file-format/liboctree/build
 make install -j $(nproc)
 echo "export OCTREE_INCLUDE_DIRS=/ucrt64/include" >> ../../../DEPENDENCIES_ENV
 echo "export OCTREE_LIBRARIES=octree" >> ../../../DEPENDENCIES_ENV
