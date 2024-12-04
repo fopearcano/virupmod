@@ -4,20 +4,16 @@ pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64
 
 cd deps
 
-if [[ ! -d octree ]]
+if [[ ! -d octree-file-format ]]
 then
-	mkdir octree
-	cd octree
-	curl "https://gitlab.com/api/v4/projects/9621748/packages/generic/releases/1.17.3/liboctree-1.17.3-windows-${BUILD_TYPE}.zip" > octree.zip
-	unzip octree.zip
-	mv liboctree* liboctree
-	cd ..
+	git clone --branch 1.17.3 https://gitlab.com/Dexter9313/octree-file-format.git
+	mkdir octree-file-format/liboctree/build ; cd octree-file-format/liboctree/build
+	cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/ucrt64
+	cd ../../..
 fi
 
-cd octree/liboctree
-cp -r liboctree /ucrt64/include
-cp octree.dll /ucrt64/bin/liboctree.dll
-cp octree.lib /ucrt64/lib/liboctree.lib
+cd cd octree-file-format/liboctree/build
+make install -j $(nproc)
 echo "export OCTREE_INCLUDE_DIRS=/ucrt64/include" >> ../../../DEPENDENCIES_ENV
 echo "export OCTREE_LIBRARIES=octree" >> ../../../DEPENDENCIES_ENV
-cd ../..
+cd ../../..
