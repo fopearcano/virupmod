@@ -27,9 +27,9 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include "DownloadManager.hpp"
 #include "Zip.hpp"
 #include "gui/PathSelector.hpp"
+#include "network/DownloadManager.hpp"
 #include "universe/CSVObjects.hpp"
 #include "universe/CosmologicalLabels.hpp"
 #include "universe/CosmologicalSimulation.hpp"
