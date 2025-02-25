@@ -51,7 +51,8 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	hl = make_qt_unique<QHBoxLayout>(*w);
 	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
 	connect(bmCb, &QCheckBox::stateChanged,
-	        [this]() {
+	        [this]()
+	        {
 		        UniverseElement::useBrightnessMultiplier()
 		            = !this->bmCb->isChecked();
 	        });

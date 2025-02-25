@@ -179,11 +179,10 @@ QList<QPair<QString, QWidget*>>
 	{
 		cbox->addItem(entry);
 	}
-	QObject::connect(cbox, &QComboBox::currentTextChanged,
-	                 [jsonObj, entries, entriesIds](QString const& text) {
-		                 jsonObj["referenceframe"]
-		                     = entriesIds[entries.indexOf(text)];
-	                 });
+	QObject::connect(
+	    cbox, &QComboBox::currentTextChanged,
+	    [jsonObj, entries, entriesIds](QString const& text)
+	    { jsonObj["referenceframe"] = entriesIds[entries.indexOf(text)]; });
 	if(jsonObj.keys().indexOf("referenceframe") >= 0)
 	{
 		cbox->setCurrentText(

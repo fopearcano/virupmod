@@ -32,7 +32,7 @@ class SceneToneMappingData
 {
   public:
 	SceneToneMappingData()
-	    : SceneToneMappingData(0.3f){};
+	    : SceneToneMappingData(0.3f) {};
 	SceneToneMappingData(SceneToneMappingData const& other) = default;
 	SceneToneMappingData(SceneToneMappingData&& other)      = default;
 	SceneToneMappingData(float exposure, float contrast = 1.f,

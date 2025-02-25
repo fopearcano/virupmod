@@ -34,7 +34,7 @@ class SceneCameraData
 {
   public:
 	SceneCameraData()
-	    : SceneCameraData(0.05f, 0.f){};
+	    : SceneCameraData(0.05f, 0.f) {};
 	SceneCameraData(SceneCameraData const& other) = default;
 	SceneCameraData(SceneCameraData&& other)      = default;
 	SceneCameraData(float pitch, float yaw); // rad

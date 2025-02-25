@@ -7,7 +7,7 @@
 class PIDController
 {
   public:
-	PIDController(){};
+	PIDController() {};
 	void update(uint64_t dt); // dt in µsec
 
 	float setPoint;
