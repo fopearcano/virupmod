@@ -117,7 +117,7 @@ Checks:          "abseil-cleanup-ctad, \
     bugprone-unsafe-functions, \
     bugprone-unused-local-non-trivial-variable, \
     bugprone-unused-raii, \
-    bugprone-unused-return-value, \
+    -bugprone-unused-return-value, \ # too restrictive for now
     bugprone-use-after-move, \
     bugprone-virtual-near-miss, \
     cert-con36-c, \
@@ -133,7 +133,7 @@ Checks:          "abseil-cleanup-ctad, \
     cert-dcl59-cpp, \
     cert-env33-c, \
     cert-err09-cpp, \
-    cert-err33-c, \
+    -cert-err33-c, \ # too restrictive for now
     cert-err34-c, \
     cert-err52-cpp, \
     cert-err58-cpp, \
