@@ -6,7 +6,7 @@ cd deps
 
 if [[ ! -d octree-file-format ]]
 then
-	git clone --branch 1.18.0 https://gitlab.com/Dexter9313/octree-file-format.git
+	git clone --branch 1.18.1 https://gitlab.com/Dexter9313/octree-file-format.git
 	mkdir octree-file-format/liboctree/build ; cd octree-file-format/liboctree/build
 	cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/ucrt64
 	cd ../../..
