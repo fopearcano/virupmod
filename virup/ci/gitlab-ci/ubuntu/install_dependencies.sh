@@ -10,5 +10,5 @@ cmake ..
 make package -j
 dpkg -i ./*.deb ;
 cd ../../.. ;
-apt-get install -y libboost-dev ;
+apt-get install -y libboost-dev qt6-multimedia-dev;
 cd ..

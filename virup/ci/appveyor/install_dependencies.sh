@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-qt5-multimedia
+pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-qt6-multimedia
 
 cd deps
 
