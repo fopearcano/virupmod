@@ -438,10 +438,12 @@ void TreeMethodLOD::initOctree(OctreeLOD* octree,
 
 void TreeMethodLOD::setShaderColor(QColor const& color)
 {
-	shaderProgram.setUnusedAttributesValues(
-	    {{"color",
-	      {static_cast<float>(color.redF()), static_cast<float>(color.greenF()),
-	       static_cast<float>(color.blueF())}}});
+	std::vector<float> colorVec;
+	colorVec.reserve(3);
+	colorVec.push_back(color.redF());
+	colorVec.push_back(color.greenF());
+	colorVec.push_back(color.blueF());
+	shaderProgram.setUnusedAttributesValues({{"color", colorVec}});
 }
 
 TreeMethodLOD::~TreeMethodLOD()
