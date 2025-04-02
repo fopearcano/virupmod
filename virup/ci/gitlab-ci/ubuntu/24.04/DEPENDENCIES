@@ -1,1 +1,1 @@
-libassimp5:amd64, libopenvr-api1:amd64, libpython3.12:amd64, libqt5multimediawidgets5:amd64, libqt5printsupport5:amd64, libqt5quickwidgets5:amd64, libqt5sql5:amd64, libqt5xml5:amd64, libqt5xmlpatterns5:amd64, libqt5test5:amd64, libquadmath0:amd64, libqt5gamepad5:amd64, libqt5opengl5:amd64, libgit2-1.7:amd64, libquazip1-qt5-1t64:amd64
+libqt6multimediawidgets6:amd64, libquadmath0:amd64
