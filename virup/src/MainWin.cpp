@@ -4,7 +4,8 @@
 
 #include "LibTerrain.hpp"
 
-void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
+void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed,
+                          bool autorepeated)
 {
 	if(loaded)
 	{
@@ -77,7 +78,7 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed)
 		}
 		movementControls->actionEvent(a, pressed);
 	}
-	AbstractMainWin::actionEvent(a, pressed);
+	AbstractMainWin::actionEvent(a, pressed, autorepeated);
 }
 
 bool MainWin::event(QEvent* e)
