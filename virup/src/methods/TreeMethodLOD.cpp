@@ -1,5 +1,37 @@
 #include "methods/TreeMethodLOD.hpp"
 
+std::vector<std::pair<QString, std::unique_ptr<VolumetricModel>>>&
+    TreeMethodLOD::volModels()
+{
+	static std::vector<std::pair<QString, std::unique_ptr<VolumetricModel>>>
+	    volModels;
+	return volModels;
+}
+
+bool TreeMethodLOD::modelExists(QString const& path)
+{
+	for(auto const& pair : volModels())
+	{
+		if(pair.first == path)
+		{
+			return pair.second != nullptr;
+		}
+	}
+	return false;
+}
+
+VolumetricModel* TreeMethodLOD::getModel(QString const& path)
+{
+	for(auto const& pair : volModels())
+	{
+		if(pair.first == path)
+		{
+			return pair.second.get();
+		}
+	}
+	return nullptr;
+}
+
 TreeMethodLOD::TreeMethodLOD()
     : TreeMethodLOD("invsq")
 {
@@ -53,7 +85,13 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		}
 		else
 		{
-			dustModel = std::make_unique<VolumetricModel>(gasPath.c_str());
+			dustModelPath = gasPath.c_str();
+			if(!modelExists(dustModelPath))
+			{
+				volModels().emplace_back(dustModelPath,
+				                         std::make_unique<VolumetricModel>(
+				                             dustModelPath, "dustModel"));
+			}
 		}
 	}
 	if(!starsPath.empty() && starsTrees.empty())
@@ -71,8 +109,8 @@ void TreeMethodLOD::init(std::string const& gasPath,
 		}
 		else
 		{
-			hiiModel
-			    = std::make_unique<VolumetricModel>(darkMatterPath.c_str());
+			hiiModel = std::make_unique<VolumetricModel>(darkMatterPath.c_str(),
+			                                             "hiiModel");
 			hiiModel->initMesh();
 			hiiModel->setColor(darkMatterColor);
 		}
@@ -221,7 +259,7 @@ void TreeMethodLOD::update(Camera const& camera, QMatrix4x4 const& model,
 	}
 	if(hiiModel != nullptr)
 	{
-		hiiModel->render(camera, model, campos, dustModel.get());
+		hiiModel->render(camera, model, campos, getModel(dustModelPath));
 	}
 }
 
@@ -238,18 +276,18 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	const GLBlendSet glBlend({GL_ONE, GL_ONE});
 	shaderProgram.setUnusedAttributesValues(
 	    {{"color", std::vector<float>{1.0f, 1.0f, 1.0f}}});
-	shaderProgram.setUniform("useDust", dustModel == nullptr ? 0.f : 1.f);
-	if(dustModel != nullptr)
+	shaderProgram.setUniform("useDust", dustModelPath.isEmpty() ? 0.f : 1.f);
+	if(getModel(dustModelPath) != nullptr)
 	{
-		GLHandler::useTextures({&dustModel->getTexture()});
+		GLHandler::useTextures({&getModel(dustModelPath)->getTexture()});
 	}
 	GLHandler::setUpRender(shaderProgram, model);
 	shaderProgram.setUniform("pixelSolidAngle", camera.pixelSolidAngle());
 	shaderProgram.setUniform("unitInKpc", unitInKpc);
 	QMatrix4x4 dustTransform;
-	if(dustModel != nullptr)
+	if(getModel(dustModelPath) != nullptr)
 	{
-		dustTransform = dustModel->getPosToTexCoord();
+		dustTransform = getModel(dustModelPath)->getPosToTexCoord();
 	}
 
 	for(auto& gasTree : gasTrees)
@@ -285,7 +323,7 @@ void TreeMethodLOD::render(Camera const& camera, QMatrix4x4 const& model,
 	}
 	if(hiiModel != nullptr)
 	{
-		hiiModel->render(camera, model, campos, dustModel.get());
+		hiiModel->render(camera, model, campos, getModel(dustModelPath));
 	}
 }
 
@@ -328,7 +366,7 @@ void TreeMethodLOD::unload()
 
 void TreeMethodLOD::cleanUp()
 {
-	dustModel.reset();
+	// dustModel.reset(); !!!!
 	hiiModel.reset();
 	for(auto& gasTree : gasTrees)
 	{

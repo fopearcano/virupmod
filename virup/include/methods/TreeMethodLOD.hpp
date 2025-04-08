@@ -47,11 +47,16 @@ class TreeMethodLOD : public Method
 	bool silent = false;
 
   protected:
-	std::unique_ptr<VolumetricModel> dustModel;
+	QString dustModelPath;
 	std::vector<std::unique_ptr<OctreeLOD>> gasTrees;
 	std::vector<std::unique_ptr<OctreeLOD>> starsTrees;
 	std::vector<std::unique_ptr<OctreeLOD>> darkMatterTrees;
 	std::unique_ptr<VolumetricModel> hiiModel;
+
+	static std::vector<std::pair<QString, std::unique_ptr<VolumetricModel>>>&
+	    volModels();
+	static bool modelExists(QString const& path);
+	static VolumetricModel* getModel(QString const& path);
 
 	// ugly fix for pointSize problems
 	bool setPointSize = true;

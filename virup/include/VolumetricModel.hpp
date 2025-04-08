@@ -30,7 +30,8 @@
 class VolumetricModel
 {
   public:
-	VolumetricModel(QString const& datFile);
+	explicit VolumetricModel(QString const& datFile,
+	                         QString const& textureName = "");
 	void setColor(QColor const& color) { this->color = color; };
 	void initMesh();
 	Vector3 getMinPos() const { return minPos; };

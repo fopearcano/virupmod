@@ -18,7 +18,8 @@
 
 #include "VolumetricModel.hpp"
 
-VolumetricModel::VolumetricModel(QString const& datFile)
+VolumetricModel::VolumetricModel(QString const& datFile,
+                                 QString const& textureName)
     : shader("volume")
 {
 	std::ifstream file(datFile.toStdString(), std::ios::binary);
@@ -75,6 +76,7 @@ VolumetricModel::VolumetricModel(QString const& datFile)
 	    GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER},
 	    GLTexture::Data{data.data(), GL_FLOAT, GL_RED});
 	tex->generateMipmap();
+	tex->setName(textureName);
 }
 
 void VolumetricModel::initMesh()
