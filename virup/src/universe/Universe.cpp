@@ -609,6 +609,18 @@ void Universe::renderPlanetarySystemTransparent()
 	// systemRenderer->renderTransparent(camPlanet);
 }
 
+void Universe::renderGui(QSize const& targetSize, AdvancedPainter& painter)
+{
+	for(auto const& pair : elements)
+	{
+		if(pair.second->getVisibility() < 0.0001)
+		{
+			continue;
+		}
+		pair.second->renderGui(targetSize, painter);
+	}
+}
+
 void Universe::updateBoundingBox(BBox const& elementBoundingbox)
 {
 	boundingBox.minx = fmin(boundingBox.minx, elementBoundingbox.minx);

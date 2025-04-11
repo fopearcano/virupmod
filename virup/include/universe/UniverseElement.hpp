@@ -29,6 +29,8 @@
 #include "gui/SciDoubleSpinBox.hpp"
 #include "math/Vector3.hpp"
 
+class AdvancedPainter;
+
 /*! @brief Represents a graphical element of the Universe, usually the
  * visualization of a specific dataset or cosmological simulation.
  *
@@ -110,7 +112,18 @@ class UniverseElement : public QObject
 	 * @param tmm The current @ref ToneMappingModel used for rendering (can be
 	 * ignored for physical-based rendering, it will be applied by the engine).
 	 */
-	virtual void render(Camera const& camera, ToneMappingModel const& tmm) = 0;
+	virtual void render(Camera const& /*camera*/,
+	                    ToneMappingModel const& /*tmm*/) {};
+
+	/*! @brief Implement this method to render this element.
+	 *
+	 * @param camera The current @ref Camera used for rendering.
+	 * @param tmm The current @ref ToneMappingModel used for rendering (can be
+	 * ignored for physical-based rendering, it will be applied by the engine).
+	 */
+	virtual void renderGui(QSize const& /*targetSize*/,
+	                       AdvancedPainter& /*painter*/) {};
+
 	/*! @brief Default destructor.
 	 */
 	virtual ~UniverseElement() = default;

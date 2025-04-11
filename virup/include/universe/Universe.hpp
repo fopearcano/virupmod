@@ -34,6 +34,8 @@
 #include "graphics/renderers/planet/DebrisRenderer.hpp"
 #include "physics/SimulationTime.hpp"
 
+class AdvancedPainter;
+
 /** @ingroup pycall
  *
  * Callable in Python as the "Universe" object.
@@ -341,6 +343,7 @@ class Universe : public QObject
 	void renderCosmo(ToneMappingModel const& toneMappingModel);
 	void renderPlanetarySystem();
 	void renderPlanetarySystemTransparent();
+	void renderGui(QSize const& targetSize, AdvancedPainter& painter);
 	~Universe();
 
   public slots:

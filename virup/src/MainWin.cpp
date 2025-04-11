@@ -760,6 +760,8 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 
 void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 {
+	universe->renderGui(targetSize, painter);
+
 	AbstractMainWin::renderGui(targetSize, painter);
 	// will get disabled by QOpenGLPaintDevice anyway
 	const GLStateSet glState({{GL_DEPTH_TEST, false}});
