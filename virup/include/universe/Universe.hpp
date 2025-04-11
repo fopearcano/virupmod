@@ -128,6 +128,21 @@ class Universe : public QObject
 	 * @accessors getDebrisSize(), setDebrisSize()
 	 */
 	Q_PROPERTY(unsigned int debrisSize READ getDebrisSize WRITE setDebrisSize)
+
+	/**
+	 * @brief All images names from all ImageCatalogs
+	 *
+	 * @accessors getImages()
+	 */
+	Q_PROPERTY(QStringList images READ getImages)
+
+	/**
+	 * @brief Current image displayed by ImageCatalogs
+	 *
+	 * @accessors getImages()
+	 */
+	Q_PROPERTY(QString currentimage READ getCurrentImage WRITE setCurrentImage)
+
   public:
 	// SPACE
 
@@ -247,6 +262,20 @@ class Universe : public QObject
 	 * @setter{debrisSize}
 	 */
 	void setDebrisSize(unsigned int size) const { DebrisRenderer::size = size; }
+
+	/**
+	 * @getter{images}
+	 */
+	QStringList getImages() const;
+
+	/**
+	 * @getter{currentimage}
+	 */
+	QString getCurrentImage() const;
+	/**
+	 * @setter{currentimage}
+	 */
+	void setCurrentImage(QString const& image);
 
 	class State : public AbstractState
 	{

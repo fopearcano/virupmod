@@ -33,13 +33,20 @@ class ImageCatalog : public UniverseElement
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);
 
+	QStringList const& getFiles() const { return files; };
+	QString getImage() const { return currentImage; };
+	void setImage(QString const& image);
+
   private:
 	GLShaderProgram shader;
 	GLMesh quad;
 	std::unique_ptr<GLTexture> tex;
 	float texAspectRatio = 0.f;
 
-	QString file;
+	QString dir;
+	QString currentImage;
+
+	QStringList files;
 };
 
 #endif // IMAGECATALOG_HPP

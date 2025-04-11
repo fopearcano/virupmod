@@ -195,6 +195,33 @@ void Universe::setCamYaw(float yaw)
 	camPlanet.yaw = yaw;
 }
 
+QStringList Universe::getImages() const
+{
+	QStringList result;
+	for(auto const* imcat : imgCatalogs)
+	{
+		result << imcat->getFiles();
+	}
+	return result;
+}
+
+QString Universe::getCurrentImage() const
+{
+	if(imgCatalogs.isEmpty())
+	{
+		return "";
+	}
+	return imgCatalogs.first()->getImage();
+}
+
+void Universe::setCurrentImage(QString const& image)
+{
+	for(auto* imgcat : imgCatalogs)
+	{
+		imgcat->setImage(image);
+	}
+}
+
 Vector3 Universe::getSystemAbsolutePosition(QString const& systemName)
 {
 	return planetSystems->getAbsolutePosition(systemName);

@@ -31,23 +31,31 @@ QJsonObject ImageCatalog::getJson() const
 {
 	auto result(UniverseElement::getJson());
 	result["type"] = "imgcatalog";
-	result["file"] = file;
+	result["dir"]  = dir;
 	return result;
 }
 
 void ImageCatalog::setJson(QJsonObject const& json)
 {
+	files.clear();
+
 	UniverseElement::setJson(json);
-	file = json["file"].toString();
+	dir = json["dir"].toString() + '/';
 
-	tex = std::make_unique<GLTexture>(
-	    (QSettings().value("data/rootdir").toString() + file)
-	        .toLatin1()
-	        .data());
-	tex->setSampler(GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER});
-	tex->setBorderColor(Qt::black); // forces alpha = 1.0
+	const QString rootdir(QSettings().value("data/rootdir").toString());
+	const QDir directory(rootdir + '/' + dir + '/');
+	QStringList nameFilters;
+	nameFilters << "*.png" << "*.jpg" << "*.jpeg" << "*.bmp" << "*.gif"
+	            << "*.tiff" << "*.webp";
 
-	texAspectRatio = static_cast<float>(tex->getSize()[0]) / tex->getSize()[1];
+	auto fileInfos = directory.entryInfoList(nameFilters, QDir::Files);
+
+	for(const QFileInfo& fileInfo : fileInfos)
+	{
+		files << fileInfo.fileName();
+	}
+
+	setImage(files.first());
 }
 
 void ImageCatalog::renderGui(QSize const& targetSize,
@@ -55,8 +63,8 @@ void ImageCatalog::renderGui(QSize const& targetSize,
 {
 	QVector2D scale(1.f, 1.f);
 
-	float targetAspectRatio(static_cast<float>(targetSize.width())
-	                        / targetSize.height());
+	const float targetAspectRatio(static_cast<float>(targetSize.width())
+	                              / targetSize.height());
 
 	if(targetAspectRatio > texAspectRatio)
 	{
@@ -83,14 +91,28 @@ QList<QPair<QString, QWidget*>>
 {
 	QList<QPair<QString, QWidget*>> result;
 
-	auto* pathSelector
-	    = make_qt_unique<PathSelector>(parent, QObject::tr("Textures path"));
+	auto* pathSelector = make_qt_unique<PathSelector>(
+	    parent, QObject::tr("Textures directory"),
+	    PathSelector::Type::DIRECTORY);
 	QObject::connect(pathSelector, &PathSelector::pathChanged,
 	                 [&jsonObj](QString const& path)
-	                 { jsonObj["file"] = path; });
-	pathSelector->setPath(jsonObj["file"].toString());
+	                 { jsonObj["dir"] = path; });
+	pathSelector->setPath(jsonObj["dir"].toString());
 
-	result.append({QObject::tr("Textures Path:"), pathSelector});
+	result.append({QObject::tr("Textures Directory:"), pathSelector});
 
 	return result;
+}
+
+void ImageCatalog::setImage(QString const& image)
+{
+	currentImage = image;
+
+	const QString rootdir(QSettings().value("data/rootdir").toString());
+	tex = std::make_unique<GLTexture>(
+	    (rootdir + '/' + dir + image).toLatin1().data());
+	tex->setSampler(GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER});
+	tex->setBorderColor(Qt::black); // forces alpha = 1.0
+
+	texAspectRatio = static_cast<float>(tex->getSize()[0]) / tex->getSize()[1];
 }
