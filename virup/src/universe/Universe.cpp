@@ -66,6 +66,12 @@ Universe::Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet)
 		{
 			newElem = std::make_unique<Credits>();
 		}
+		else if(entryObj["type"] == "imgcatalog")
+		{
+			auto imgcat = std::make_unique<ImageCatalog>();
+			imgCatalogs.append(imgcat.get());
+			newElem = std::move(imgcat);
+		}
 		else
 		{
 			qWarning()

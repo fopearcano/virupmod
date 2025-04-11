@@ -27,6 +27,7 @@
 #include "universe/CosmologicalLabels.hpp"
 #include "universe/CosmologicalSimulation.hpp"
 #include "universe/Credits.hpp"
+#include "universe/ImageCatalog.hpp"
 #include "universe/PlanetarySystems.hpp"
 #include "universe/TexturedSphere.hpp"
 
@@ -421,6 +422,7 @@ class Universe : public QObject
 	std::map<UniverseElement*, QString> elementsRev              = {};
 	QList<CosmologicalSimulation*> cosmoSims;
 	QList<CSVObjects*> csvObjs;
+	QList<ImageCatalog*> imgCatalogs;
 
   public:
 	PlanetarySystems* planetSystems;

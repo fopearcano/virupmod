@@ -34,6 +34,7 @@
 #include "universe/CosmologicalLabels.hpp"
 #include "universe/CosmologicalSimulation.hpp"
 #include "universe/Credits.hpp"
+#include "universe/ImageCatalog.hpp"
 #include "universe/TexturedSphere.hpp"
 
 #include "LibPlanet.hpp"
@@ -113,9 +114,9 @@ DataListWidget::DataListWidget(QWidget* parent)
 	    parent); // messes up layout if put in QScrollArea constructor
 	entries << tr("Cosmological Labels") << tr("CSV Stars")
 	        << tr("CSV Galaxies") << tr("Cosmological Simulation")
-	        << tr("Textured Sphere") << tr("Credits");
+	        << tr("Textured Sphere") << tr("Credits") << tr("Image Catalog");
 	entriesIds << "cosmolabels" << "csvstars" << "csvgalaxies" << "cosmosim"
-	           << "texsphere" << "credits";
+	           << "texsphere" << "credits" << "imgcatalog";
 
 	loadMainLayout();
 }
@@ -526,6 +527,10 @@ void DataDialog::setType(QString const& type)
 	if(type == "credits")
 	{
 		fields = Credits::getLauncherFields(*specialized, result);
+	}
+	if(type == "imgcatalog")
+	{
+		fields = ImageCatalog::getLauncherFields(*specialized, result);
 	}
 	for(auto const& pair : fields)
 	{

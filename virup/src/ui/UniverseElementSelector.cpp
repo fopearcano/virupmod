@@ -118,6 +118,10 @@ class UniverseElementEditor : public QDialog
 		{
 			fields = Credits::getLauncherFields(*this, json);
 		}
+		if(type == "imgcatalog")
+		{
+			fields = ImageCatalog::getLauncherFields(*this, json);
+		}
 		for(auto const& pair : fields)
 		{
 			form->addRow(pair.first, pair.second);
