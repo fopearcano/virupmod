@@ -300,14 +300,21 @@ void DataListWidget::addData()
 
 void DataListWidget::addPushButtons(QJsonObject const& entry)
 {
+	const QString name(entry["name"].toString());
+	QString type(entry["type"].toString());
+	if(entriesIds.indexOf(type) == -1)
+	{
+		qWarning() << "Can't add object" << name << "of type" << type
+		           << "Inknown type.";
+		return;
+	}
+
 	auto* w  = make_qt_unique<QWidget>(*this);
 	auto* hl = make_qt_unique<QHBoxLayout>(*w);
 	w->setLayout(hl);
 
 	auto* b0 = make_qt_unique<QPushButton>(*w);
-	const QString name(entry["name"].toString());
-	QString type(entry["type"].toString());
-	type = entries[entriesIds.indexOf(type)];
+	type     = entries[entriesIds.indexOf(type)];
 	b0->setText(name + "|" + type);
 	hl->addWidget(b0);
 
