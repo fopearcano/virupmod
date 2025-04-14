@@ -240,7 +240,7 @@ void ImageCatalog::setImage(QString const& image)
 
 	const QString rootdir(QSettings().value("data/rootdir").toString());
 	tex = std::make_unique<GLTexture>(
-	    (rootdir + '/' + dir + image).toLatin1().data());
+	    (rootdir + '/' + dir + image).toLatin1().data(), false);
 	tex->setSampler(GLTexture::Sampler{GL_LINEAR, GL_CLAMP_TO_BORDER});
 	tex->setBorderColor(Qt::black); // forces alpha = 1.0
 
