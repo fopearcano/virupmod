@@ -58,8 +58,7 @@ void ImageCatalog::setJson(QJsonObject const& json)
 	setImage(files.first());
 }
 
-void ImageCatalog::renderGui(QSize const& targetSize,
-                             AdvancedPainter& /*painter*/)
+void ImageCatalog::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 {
 	QVector2D scale(1.f, 1.f);
 
@@ -84,6 +83,15 @@ void ImageCatalog::renderGui(QSize const& targetSize,
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader);
 	quad.render();
+
+	const QPen pen(Qt::red);
+	QFont font = painter.font();
+	font.setPointSizeF(24.f * targetSize.height() / 1080);
+
+	painter.setPen(pen);
+	painter.setFont(font);
+	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
+	                 Qt::AlignHCenter | Qt::AlignTop, currentImage);
 }
 
 QList<QPair<QString, QWidget*>>
