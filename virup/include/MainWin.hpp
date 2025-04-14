@@ -18,6 +18,7 @@
 #include "MovementControls.hpp"
 #include "scenes/Animator.hpp"
 #include "ui/AnimationTimeSelector.hpp"
+#include "ui/ImageCatalogSelector.hpp"
 #include "ui/PlanetarySystemSelector.hpp"
 #include "ui/PresenterHelp.hpp"
 #include "ui/SceneSelector.hpp"
@@ -327,6 +328,7 @@ class MainWin : public AbstractMainWin
 	std::unique_ptr<Visibilities> visibilities;
 	std::unique_ptr<PlanetarySystemSelector> planetSysSelect;
 	std::unique_ptr<UniverseElementSelector> univElemSelect;
+	std::unique_ptr<ImageCatalogSelector> imgCatalogSelect;
 	std::unique_ptr<TimeController> timeController;
 	std::unique_ptr<AnimationTimeSelector> animTimeSelect;
 	std::unique_ptr<ToneMappingController> tmController;

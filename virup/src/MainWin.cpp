@@ -109,6 +109,10 @@ bool MainWin::event(QEvent* e)
 		{
 			univElemSelect->close();
 		}
+		if(imgCatalogSelect != nullptr)
+		{
+			imgCatalogSelect->close();
+		}
 		if(scenes != nullptr)
 		{
 			scenes->close();
@@ -459,8 +463,9 @@ void MainWin::initScene()
 		    = std::make_unique<PlanetarySystemSelector>(*universe, *animator);
 		univElemSelect
 		    = std::make_unique<UniverseElementSelector>(*universe, *animator);
-		timeController = std::make_unique<TimeController>(*universe);
-		animTimeSelect = std::make_unique<AnimationTimeSelector>(*universe);
+		imgCatalogSelect = std::make_unique<ImageCatalogSelector>(*universe);
+		timeController   = std::make_unique<TimeController>(*universe);
+		animTimeSelect   = std::make_unique<AnimationTimeSelector>(*universe);
 		tmController
 		    = std::make_unique<ToneMappingController>(*toneMappingModel);
 		scenes        = std::make_unique<SceneSelector>(*animator);
@@ -468,6 +473,7 @@ void MainWin::initScene()
 
 		/*dialog3dWheel->addDialog3D(tr("Scenes"), *scenes);
 		dialog3dWheel->addDialog3D(tr("Universe Elements"), *univElemSelect);
+		dialog3dWheel->addDialog3D(tr("Image Catalogs"), *imgCatalogSelect);
 		dialog3dWheel->addDialog3D(tr("Planetary Systems"), *planetSysSelect);
 		dialog3dWheel->addDialog3D(tr("Time Controller"), *timeController);
 		dialog3dWheel->addDialog3D(tr("Animation Time Controller"),
@@ -480,6 +486,8 @@ void MainWin::initScene()
 		                 [this]() { this->scenes->show(); });
 		tools->addAction(tr("Universe Elements"), this,
 		                 [this]() { this->univElemSelect->show(); });
+		tools->addAction(tr("Image Catalogs"), this,
+		                 [this]() { this->imgCatalogSelect->show(); });
 		tools->addAction(tr("Planetary Systems"), this,
 		                 [this]() { this->planetSysSelect->show(); });
 		tools->addAction(tr("Time Controller"), this,
@@ -496,6 +504,7 @@ void MainWin::initScene()
 		visibilities->show();
 		planetSysSelect->show();
 		univElemSelect->show();
+		imgCatalogSelect->show();
 		timeController->show();
 		animTimeSelect->show();
 		tmController->show();
