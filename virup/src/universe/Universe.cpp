@@ -535,6 +535,18 @@ void Universe::setCosmoLocalAnimationTime(QString const& name, float animTime)
 	cosmoSim->localAnimationTime = animTime;
 }
 
+QString Universe::getImageTitle(QString const& file) const
+{
+	for(auto const* cat : imgCatalogs)
+	{
+		if(!cat->getTitleDescription(file).first.isEmpty())
+		{
+			return cat->getTitleDescription(file).first;
+		}
+	}
+	return "";
+}
+
 void Universe::dumpOctreesStates()
 {
 	for(auto* cosmoSim : cosmoSims)

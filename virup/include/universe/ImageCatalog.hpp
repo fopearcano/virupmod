@@ -37,16 +37,29 @@ class ImageCatalog : public UniverseElement
 	QString getImage() const { return currentImage; };
 	void setImage(QString const& image);
 
+	QPair<QString, QString> getTitleDescription(QString const& file) const;
+
   private:
 	GLShaderProgram shader;
 	GLMesh quad;
 	std::unique_ptr<GLTexture> tex;
 	float texAspectRatio = 0.f;
 
+	QString metadata;
 	QString dir;
+
+	QStringList metadataHeader;
+	QList<QStringList> metadataContent;
+	int idColumn          = -1;
+	int titleColumn       = -1;
+	int descriptionColumn = -1;
+
 	QString currentImage;
 
 	QStringList files;
+
+	// maps fileName to metadataContent entry
+	QMap<QString, int> map;
 };
 
 #endif // IMAGECATALOG_HPP

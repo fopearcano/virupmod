@@ -21,6 +21,51 @@
 #include "Primitives.hpp"
 #include "paint/AdvancedPainter.hpp"
 
+// UTILS
+QByteArray escapeInQuotes(const QByteArray& input)
+{
+	QByteArray result;
+	bool inQuotes = false;
+
+	for(int i = 0; i < input.size(); ++i)
+	{
+		const char c = input[i];
+
+		if(c == '"')
+		{
+			// Toggle quote state unless escaped
+			const bool escaped = (i > 0 && input[i - 1] == '\\');
+			if(!escaped)
+			{
+				inQuotes = !inQuotes;
+			}
+			result.append(c);
+		}
+		else if(inQuotes)
+		{
+			if(c == '\n')
+			{
+				result.append("\\n");
+			}
+			else if(c == ',')
+			{
+				result.append("&#44;");
+			}
+			else
+			{
+				result.append(c);
+			}
+		}
+		else
+		{
+			result.append(c);
+		}
+	}
+
+	return result;
+}
+// END UTILS
+
 ImageCatalog::ImageCatalog()
     : shader("imgcatalog")
 {
@@ -30,19 +75,75 @@ ImageCatalog::ImageCatalog()
 QJsonObject ImageCatalog::getJson() const
 {
 	auto result(UniverseElement::getJson());
-	result["type"] = "imgcatalog";
-	result["dir"]  = dir;
+	result["type"]     = "imgcatalog";
+	result["metadata"] = metadata;
+	result["dir"]      = dir;
 	return result;
 }
 
 void ImageCatalog::setJson(QJsonObject const& json)
 {
+	metadataHeader.clear();
+	metadataContent.clear();
+	idColumn = -1;
 	files.clear();
 
 	UniverseElement::setJson(json);
-	dir = json["dir"].toString() + '/';
 
 	const QString rootdir(QSettings().value("data/rootdir").toString());
+
+	// load metadta
+	metadata = json["metadata"].toString();
+
+	{
+		QFile metadataFile(rootdir + '/' + metadata);
+		metadataFile.open(QIODevice::ReadOnly);
+		metadataHeader = QString{metadataFile.readLine()}.trimmed().split(',');
+
+		auto wholeDoc = metadataFile.readAll();
+		wholeDoc      = escapeInQuotes(wholeDoc);
+		for(auto const& line : QString{wholeDoc}.split('\n'))
+		{
+			metadataContent.append(line.trimmed().split(','));
+		}
+		// look for "id" column
+		int i = 0;
+		for(auto const& columnHeader : metadataHeader)
+		{
+			if(columnHeader.toLower() == "id")
+			{
+				idColumn = i;
+			}
+			if(columnHeader.toLower() == "title")
+			{
+				titleColumn = i;
+			}
+			if(columnHeader.toLower() == "description")
+			{
+				descriptionColumn = i;
+			}
+			++i;
+		}
+		if(idColumn == -1)
+		{
+			qWarning() << "Image Catalog metadata" << json["name"].toString()
+			           << "doesn't have an id column.";
+		}
+		if(titleColumn == -1)
+		{
+			qWarning() << "Image Catalog metadata" << json["name"].toString()
+			           << "doesn't have a title column.";
+		}
+		if(descriptionColumn == -1)
+		{
+			qWarning() << "Image Catalog metadata" << json["name"].toString()
+			           << "doesn't have a description column.";
+		}
+	}
+
+	// load images
+	dir = json["dir"].toString() + '/';
+
 	const QDir directory(rootdir + '/' + dir + '/');
 	QStringList nameFilters;
 	nameFilters << "*.png" << "*.jpg" << "*.jpeg" << "*.bmp" << "*.gif"
@@ -53,6 +154,18 @@ void ImageCatalog::setJson(QJsonObject const& json)
 	for(const QFileInfo& fileInfo : fileInfos)
 	{
 		files << fileInfo.fileName();
+	}
+
+	for(auto const& file : files)
+	{
+		auto id = file.split('.').first();
+		for(int i(0); i < metadataContent.size(); ++i)
+		{
+			if(metadataContent[i].at(idColumn) == id)
+			{
+				map[file] = i;
+			}
+		}
 	}
 
 	setImage(files.first());
@@ -91,13 +204,21 @@ void ImageCatalog::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 	painter.setPen(pen);
 	painter.setFont(font);
 	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
-	                 Qt::AlignHCenter | Qt::AlignTop, currentImage);
+	                 Qt::AlignHCenter | Qt::AlignTop,
+	                 getTitleDescription(currentImage).first);
 }
 
 QList<QPair<QString, QWidget*>>
     ImageCatalog::getLauncherFields(QWidget& parent, QJsonObject& jsonObj)
 {
 	QList<QPair<QString, QWidget*>> result;
+
+	auto* metadataPathSelector
+	    = make_qt_unique<PathSelector>(parent, QObject::tr("Metadata file"));
+	QObject::connect(metadataPathSelector, &PathSelector::pathChanged,
+	                 [&jsonObj](QString const& path)
+	                 { jsonObj["metadata"] = path; });
+	metadataPathSelector->setPath(jsonObj["metadata"].toString());
 
 	auto* pathSelector = make_qt_unique<PathSelector>(
 	    parent, QObject::tr("Textures directory"),
@@ -107,6 +228,7 @@ QList<QPair<QString, QWidget*>>
 	                 { jsonObj["dir"] = path; });
 	pathSelector->setPath(jsonObj["dir"].toString());
 
+	result.append({QObject::tr("Metadata File:"), metadataPathSelector});
 	result.append({QObject::tr("Textures Directory:"), pathSelector});
 
 	return result;
@@ -123,4 +245,21 @@ void ImageCatalog::setImage(QString const& image)
 	tex->setBorderColor(Qt::black); // forces alpha = 1.0
 
 	texAspectRatio = static_cast<float>(tex->getSize()[0]) / tex->getSize()[1];
+}
+
+QPair<QString, QString>
+    ImageCatalog::getTitleDescription(QString const& file) const
+{
+	if(map.contains(file))
+	{
+		auto title = metadataContent[map[file]].at(titleColumn);
+		title.replace("&#44;", ",");
+		title.replace("\\n", "\n");
+		auto description = metadataContent[map[file]].at(descriptionColumn);
+		description.replace("&#44;", ",");
+		description.replace("\\n", "\n");
+		return {title, description};
+	}
+
+	return {file, ""};
 }

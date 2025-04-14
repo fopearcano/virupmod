@@ -36,7 +36,10 @@ ImageCatalogSelector::ImageCatalogSelector(Universe& universe)
 
 	for(auto const& elementName : universe.getImages())
 	{
-		listWidget.addItem(elementName);
+		auto item = std::make_unique<QListWidgetItem>(
+		    universe.getImageTitle(elementName));
+		item->setData(Qt::UserRole, elementName);
+		listWidget.addItem(item.release());
 	}
 	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("Go !"));
@@ -49,5 +52,5 @@ ImageCatalogSelector::ImageCatalogSelector(Universe& universe)
 
 void ImageCatalogSelector::selectElement(QListWidgetItem* item)
 {
-	universe.setCurrentImage(item->text());
+	universe.setCurrentImage(item->data(Qt::UserRole).toString());
 }
