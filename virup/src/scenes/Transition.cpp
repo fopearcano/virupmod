@@ -25,6 +25,20 @@ Transition::Transition(Scene toScene, float duration, QString name,
     , duration(duration)
     , name(std::move(name))
     , customPythonFunction(std::move(customPythonFunction))
+    , customFunction([](float, float) {})
+    , v0(v0)
+    , v1(v1)
+{
+}
+
+Transition::Transition(Scene toScene, float duration, QString name,
+                       std::function<void(float, float)> const& customFunction,
+                       float v0, float v1)
+    : toScene(std::move(toScene))
+    , duration(duration)
+    , name(std::move(name))
+    , customPythonFunction("")
+    , customFunction(customFunction)
     , v0(v0)
     , v1(v1)
 {
@@ -32,12 +46,13 @@ Transition::Transition(Scene toScene, float duration, QString name,
 
 void Transition::custom(float t, float t_harsh) const
 {
-	if(customPythonFunction == "")
+	customFunction(t, t_harsh);
+	if(!customPythonFunction.isEmpty())
 	{
-		return;
+		PythonQtHandler::evalScript(customPythonFunction + '('
+		                            + QString::number(t) + ','
+		                            + QString::number(t_harsh) + ')');
 	}
-	PythonQtHandler::evalScript(customPythonFunction + '(' + QString::number(t)
-	                            + ',' + QString::number(t_harsh) + ')');
 }
 
 bool Transition::updateUniverse(

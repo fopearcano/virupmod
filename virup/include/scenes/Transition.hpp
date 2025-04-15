@@ -31,10 +31,17 @@
 class Transition
 {
   public:
-	Transition() = default;
+	Transition()                        = default;
+	Transition(Transition const& other) = default;
+	Transition(Transition&& other)      = default;
 	explicit Transition(Scene toScene, float duration = 10.f, QString name = "",
 	                    QString customPythonFunction = "", float v0 = 0.f,
 	                    float v1 = 0.f);
+	Transition(Scene toScene, float duration, QString name,
+	           std::function<void(float, float)> const& customFunction,
+	           float v0 = 0.f, float v1 = 0.f);
+	Transition& operator=(Transition const& other) = default;
+	Transition& operator=(Transition&& other)      = default;
 
 	Scene getDestination() const { return toScene; };
 	float getDuration() const { return duration; };
@@ -65,6 +72,7 @@ class Transition
 	float duration = 10.f;
 	QString name;
 	QString customPythonFunction;
+	std::function<void(float, float)> customFunction;
 	float v0 = 0.f;
 	float v1 = 0.f;
 
