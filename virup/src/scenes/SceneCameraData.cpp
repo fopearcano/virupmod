@@ -38,6 +38,18 @@ float SceneCameraData::getYaw() const
 	return res * constant::pi / 180.f;
 }
 
+void SceneCameraData::setPitch(float pitch)
+{
+	q = QQuaternion::fromEulerAngles(pitch * 180.f / constant::pi,
+	                                 getYaw() * 180.f / constant::pi, 0.f);
+}
+
+void SceneCameraData::setYaw(float yaw)
+{
+	q = QQuaternion::fromEulerAngles(getPitch() * 180.f / constant::pi,
+	                                 yaw * 180.f / constant::pi, 0.f);
+}
+
 SceneCameraData SceneCameraData::getCurrentState(Universe const& universe)
 {
 	return {universe.getCamPitch(), universe.getCamYaw()};
