@@ -700,7 +700,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 				{
 					helperBillboard->render(camera);
 				}
-				debugText->render();
+				// debugText->render();
 			}
 		}
 		else
@@ -714,7 +714,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 				{
 					helperBillboard->render(camera);
 				}
-				debugText->render();
+				// debugText->render();
 			}
 		}
 		if(showGrid)
@@ -787,10 +787,23 @@ void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 	str += tr("Scale (real meter / sim meter) : ")
 	       + QString::number(universe->getScale(), 'g', 5) + '\n';
 
-	const QPen pen(Qt::red);
-	painter.setPen(pen);
-	painter.drawText(0, 0, targetSize.width(), targetSize.height(),
-	                 Qt::AlignLeft | Qt::AlignTop, str);
+	str += "UT: "
+	       + QString::number(static_cast<long int>(
+	           floor(universe->getClock().getCurrentUt() * 10) / 10))
+	       + " (x" + QString::number(universe->getClock().getTimeCoeff())
+	       + ")\n";
+	str += "Readable UT: " + universe->getSimulationTime().toString() + '\n';
+
+	// get the text rect
+	const QFontMetrics metrics(painter.font());
+	const QRect textRect = QRect(0, 0, targetSize.width(), targetSize.height());
+	const QRect actualTextRect
+	    = metrics.boundingRect(textRect, Qt::AlignLeft | Qt::AlignTop, str);
+
+	painter.setPen(Qt::black);
+	painter.fillRect(actualTextRect);
+	painter.setPen(Qt::red);
+	painter.drawText(actualTextRect, Qt::AlignLeft | Qt::AlignTop, str);
 }
 
 void MainWin::applyPostProcShaderParams(
