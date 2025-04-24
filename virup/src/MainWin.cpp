@@ -398,12 +398,9 @@ void MainWin::initScene()
 	movementControls = std::make_unique<MovementControls>(
 	    *vrHandler, universe->getBoundingBox(), *cam, *camPlanet);
 
-	inSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/thruster/in.wav")));
-	thrustSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/thruster/thrust.wav")));
-	outSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/thruster/out.wav")));
+	initSoundEffect(inSound, "sounds/thruster/in.wav");
+	initSoundEffect(thrustSound, "sounds/thruster/thrust.wav");
+	initSoundEffect(outSound, "sounds/thruster/out.wav");
 	thrustSound.setLoopCount(QSoundEffect::Infinite);
 	connect(&inSound, &QSoundEffect::playingChanged,
 	        [this]()
@@ -426,14 +423,10 @@ void MainWin::initScene()
 			        outSound.play();
 		        }
 	        });
-	recenterSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/buttons/recenter.wav")));
-	nextSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/buttons/next.wav")));
-	previousSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/buttons/previous.wav")));
-	homeSound.setSource(QUrl::fromLocalFile(
-	    utils::getAbsoluteDataPath("sounds/buttons/home.wav")));
+	initSoundEffect(recenterSound, "sounds/buttons/recenter.wav");
+	initSoundEffect(nextSound, "sounds/buttons/next.wav");
+	initSoundEffect(previousSound, "sounds/buttons/previous.wav");
+	initSoundEffect(homeSound, "sounds/buttons/home.wav");
 
 	renderer.removeSceneRenderPath("default");
 
@@ -515,8 +508,7 @@ void MainWin::initScene()
 
 	// AMBIANCE
 
-	ambiance.setSource(
-	    QUrl::fromLocalFile(utils::getAbsoluteDataPath("sounds/music/00.wav")));
+	initSoundEffect(ambiance, "sounds/music/00.wav");
 	ambiance.setVolume(QSettings().value("sound/ambiancevolume").toDouble());
 	ambiance.setLoopCount(QSoundEffect::Infinite);
 	ambiance.play();
@@ -882,4 +874,13 @@ void MainWin::printPositionInDataSpace(Side controller) const
 	msgBox->setText(posstr);
 	msgBox->setModal(false);
 	msgBox->show();
+}
+
+void MainWin::initSoundEffect(QSoundEffect& soundEffect,
+                              QString const& localDataPath)
+{
+	soundEffect.setSource(
+	    QUrl::fromLocalFile(utils::getAbsoluteDataPath(localDataPath)));
+	soundEffect.setVolume(
+	    QSettings().value("sound/controllervolume").toDouble());
 }

@@ -346,6 +346,9 @@ class MainWin : public AbstractMainWin
 	QSoundEffect nextSound;
 	QSoundEffect previousSound;
 	QSoundEffect homeSound;
+	static void initSoundEffect(QSoundEffect& soundEffect,
+	                            QString const& localDataPath);
+
 	// idle
 	QElapsedTimer idleTimer;
 	void stopIdle()
