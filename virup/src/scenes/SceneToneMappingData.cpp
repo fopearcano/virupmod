@@ -31,7 +31,7 @@ SceneToneMappingData::SceneToneMappingData(float exposure, float contrast,
 SceneToneMappingData
     SceneToneMappingData::getCurrentState(ToneMappingModel const& tmm)
 {
-	return {tmm.exposure, tmm.contrast, tmm.dynamicrange};
+	return SceneToneMappingData{tmm.exposure, tmm.contrast, tmm.dynamicrange};
 }
 
 void SceneToneMappingData::setAsState(ToneMappingModel& tmm) const
@@ -49,7 +49,7 @@ SceneToneMappingData
 	auto c = Interpolation::interpolateLinear(tmd0.contrast, tmd1.contrast, t);
 	auto d = Interpolation::interpolateLinear(tmd0.dynamicrange,
 	                                          tmd1.dynamicrange, t);
-	return {e, c, d};
+	return SceneToneMappingData{e, c, d};
 }
 
 QString SceneToneMappingData::getPythonRepresentation() const

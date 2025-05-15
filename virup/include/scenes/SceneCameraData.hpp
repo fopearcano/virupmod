@@ -35,12 +35,9 @@ class SceneCameraData
   public:
 	SceneCameraData()
 	    : SceneCameraData(0.05f, 0.f) {};
-	SceneCameraData(SceneCameraData const& other) = default;
-	SceneCameraData(SceneCameraData&& other)      = default;
 	SceneCameraData(float pitch, float yaw); // rad
-	SceneCameraData& operator=(SceneCameraData const& other) = default;
-	float getPitch() const; // rad
-	float getYaw() const;   // rad
+	float getPitch() const;                  // rad
+	float getYaw() const;                    // rad
 	static SceneCameraData getCurrentState(Universe const& universe);
 	void setAsUniverseState(Universe& universe) const;
 
@@ -61,39 +58,39 @@ class SceneCameraDataWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override
-	{
-		return "SceneCameraData";
-	}
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassName() const override { return "SceneCameraData"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	SceneCameraData* new_SceneCameraData() { return new SceneCameraData; }
-	SceneCameraData* new_SceneCameraData(SceneCameraData const& td)
+	static SceneCameraData* new_SceneCameraData()
+	{
+		return new SceneCameraData;
+	}
+	static SceneCameraData* new_SceneCameraData(SceneCameraData const& td)
 	{
 		return new SceneCameraData(td);
 	}
-	SceneCameraData* new_SceneCameraData(float pitch, float yaw)
+	static SceneCameraData* new_SceneCameraData(float pitch, float yaw)
 	{
 		return new SceneCameraData(pitch, yaw);
 	}
 
-	void delete_SceneCameraData(SceneCameraData* f) { delete f; }
+	static void delete_SceneCameraData(SceneCameraData* f) { delete f; }
 
 	// access methods
-	float getPitch(SceneCameraData* cd) { return cd->getPitch(); };
-	float getYaw(SceneCameraData* cd) { return cd->getYaw(); };
+	static float getPitch(SceneCameraData* cd) { return cd->getPitch(); };
+	static float getYaw(SceneCameraData* cd) { return cd->getYaw(); };
 
-	SceneCameraData
+	static SceneCameraData
 	    static_SceneCameraData_getCurrentState(Universe const& universe)
 	{
 		return SceneCameraData::getCurrentState(universe);
 	};
-	void setAsUniverseState(SceneCameraData* td, Universe& universe) const
+	static void setAsUniverseState(SceneCameraData* td, Universe& universe)
 	{
 		td->setAsUniverseState(universe);
 	};
-	SceneCameraData
+	static SceneCameraData
 	    static_SceneCameraData_interpolate(SceneCameraData const& td0,
 	                                       SceneCameraData const& td1, float t)
 	{

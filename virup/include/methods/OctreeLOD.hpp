@@ -19,18 +19,20 @@
 class OctreeLOD : public Octree
 {
   public:
-	OctreeLOD(GLShaderProgram const& shaderProgram);
-	OctreeLOD(OctreeLOD const&) = delete;
+	explicit OctreeLOD(GLShaderProgram const& shaderProgram);
+	OctreeLOD(OctreeLOD const&)            = delete;
+	OctreeLOD(OctreeLOD&&)                 = delete;
+	OctreeLOD& operator=(OctreeLOD const&) = delete;
+	OctreeLOD& operator=(OctreeLOD&&)      = delete;
 	bool isReady() const;
 	unsigned int getLevel() const { return lvl; };
-	virtual void init(std::vector<float>& data,
-	                  unsigned int maxLeafSize) override;
-	virtual void init(std::istream& in) override;
-	virtual void init(int64_t file_addr, std::istream& in) override;
+	void init(std::vector<float>& data, unsigned int maxLeafSize) override;
+	void init(std::istream& in) override;
+	void init(int64_t file_addr, std::istream& in) override;
 	BBox getBoundingBox() const { return bbox; };
-	virtual void readOwnData(std::istream& in) override;
-	virtual void readBBox(std::istream& in) override;
-	virtual std::vector<float> getOwnData() const override;
+	void readOwnData(std::istream& in) override;
+	void readBBox(std::istream& in) override;
+	std::vector<float> getOwnData() const override;
 	void unload();
 	void waitOnAsyncLoader();
 	void setFile(std::shared_ptr<std::istream> const& file);
@@ -42,7 +44,7 @@ class OctreeLOD : public Octree
 	            QVector3D const& globalCampos, float alpha,
 	            QMatrix4x4 const& globalDustModel);
 	void dumpState(QString const& filePath);
-	~OctreeLOD();
+	~OctreeLOD() override;
 
 	static void updateTanAngleLimit(Camera const& camera);
 
@@ -68,7 +70,7 @@ class OctreeLOD : public Octree
   protected:
 	OctreeLOD(GLShaderProgram const& shaderProgram,
 	          Octree::CommonData& commonData, unsigned int lvl = 0);
-	virtual std::unique_ptr<Octree> newChild() const override;
+	std::unique_ptr<Octree> newChild() const override;
 
 	// in Octree space
 	virtual void closestChanged(Vector3 /*closest*/){};
@@ -100,9 +102,9 @@ class OctreeLOD : public Octree
 	void ramToVideo();
 
 	/* PRECISION ENHANCEMENT */
-	std::vector<float> absoluteData = {}; // backup data from file
-	double neighborDist             = 0.0;
-	Vector3 localTranslation        = Vector3(0.f, 0.f, 0.f);
+	std::vector<float> absoluteData; // backup data from file
+	double neighborDist      = 0.0;
+	Vector3 localTranslation = Vector3(0.f, 0.f, 0.f);
 
 	/* PERFORMANCE */
 	Vector3 closestBackup = Vector3(DBL_MAX, DBL_MAX, DBL_MAX);

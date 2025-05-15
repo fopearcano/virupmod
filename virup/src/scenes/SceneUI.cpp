@@ -54,7 +54,7 @@ SceneUI SceneUI::getCurrentState(Universe const& universe)
 		vis[name] = universe.getVisibility(name);
 	}
 
-	return {vis};
+	return SceneUI{vis};
 }
 
 void SceneUI::setAsUniverseState(Universe& universe) const
@@ -96,7 +96,7 @@ SceneUI SceneUI::interpolate(SceneUI const& ui0, SceneUI const& ui1, float t)
 		    = ui0.getVisibility(name) * (1.f - t) + ui1.getVisibility(name) * t;
 	}
 
-	return {vis};
+	return SceneUI{vis};
 }
 
 QString SceneUI::getPythonRepresentation() const

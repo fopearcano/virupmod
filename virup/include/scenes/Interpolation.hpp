@@ -24,9 +24,8 @@
 
 class Interpolation
 {
-	Interpolation() = delete;
-
   public:
+	Interpolation() = delete;
 	template <typename T>
 	static T interpolateBool(T const& x0, T const& x1, float t);
 	template <typename T>
@@ -38,7 +37,7 @@ class Interpolation
 		{
 			return {};
 		}
-		qint64 msecs
+		const qint64 msecs
 		    = static_cast<double>(t) * dt1.toMSecsSinceEpoch()
 		      + (1.0 - static_cast<double>(t)) * dt0.toMSecsSinceEpoch();
 		return QDateTime::fromMSecsSinceEpoch(msecs);

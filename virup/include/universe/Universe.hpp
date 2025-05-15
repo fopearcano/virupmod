@@ -221,14 +221,14 @@ class Universe : public QObject
 	/**
 	 * @getter{tanAngleLimit}
 	 */
-	float getTanAngleLimit() const
+	static float getTanAngleLimit()
 	{
 		return OctreeLOD::getCurrentTanAngleLimit();
 	};
 	/**
 	 * @setter{tanAngleLimit, tanAngleLimit}
 	 */
-	void setTanAngleLimit(float tanAngleLimit)
+	static void setTanAngleLimit(float tanAngleLimit)
 	{
 		OctreeLOD::setCurrentTanAngleLimit(tanAngleLimit);
 	};
@@ -257,11 +257,14 @@ class Universe : public QObject
 	/**
 	 * @getter{debrisSize}
 	 */
-	unsigned int getDebrisSize() const { return DebrisRenderer::size; }
+	static unsigned int getDebrisSize() { return DebrisRenderer::size; }
 	/**
 	 * @setter{debrisSize}
 	 */
-	void setDebrisSize(unsigned int size) const { DebrisRenderer::size = size; }
+	static void setDebrisSize(unsigned int size)
+	{
+		DebrisRenderer::size = size;
+	}
 
 	/**
 	 * @getter{images}
@@ -280,32 +283,29 @@ class Universe : public QObject
 	class State : public AbstractState
 	{
 	  public:
-		State()                   = default;
-		State(State const& other) = default;
-		State(State&& other)      = default;
-		virtual void readFromDataStream(QDataStream& stream) override
+		void readFromDataStream(QDataStream& stream) override
 		{
 			visibilities.clear();
-			double foo;
+			double foo{};
 			for(unsigned int i(0); i < elementsSize + 3; ++i)
 			{
 				stream >> foo;
 				visibilities.push_back(foo);
 			}
-			double dut;
+			double dut{};
 			stream >> dut;
 			ut = dut;
 			QStringList l;
 			stream >> l;
 			renderLabelsOrbitsOnly = l;
 		};
-		virtual void writeInDataStream(QDataStream& stream) override
+		void writeInDataStream(QDataStream& stream) override
 		{
-			for(unsigned int i(0); i < visibilities.size(); ++i)
+			for(auto const& visibility : visibilities)
 			{
-				stream << visibilities[i];
+				stream << visibility;
 			}
-			double dut(ut);
+			const double dut(ut);
 			stream << dut;
 			stream << renderLabelsOrbitsOnly;
 		};
@@ -340,7 +340,7 @@ class Universe : public QObject
 	{
 		auto& state = dynamic_cast<State&>(s);
 		state.visibilities.clear();
-		for(auto& pair : elements)
+		for(auto const& pair : elements)
 		{
 			state.visibilities.push_back(pair.second->getVisibility());
 		}
@@ -353,6 +353,10 @@ class Universe : public QObject
 	};
 
 	Universe(Camera& camCosmo, OrbitalSystemCamera& camPlanet);
+	Universe(Universe const&)            = delete;
+	Universe(Universe&&)                 = delete;
+	Universe& operator=(Universe const&) = delete;
+	Universe& operator=(Universe&&)      = delete;
 	BBox getBoundingBox() const { return boundingBox; };
 	UniverseElement const* getElement(QString const& name) const
 	{
@@ -374,7 +378,7 @@ class Universe : public QObject
 	void renderPlanetarySystem();
 	void renderPlanetarySystemTransparent();
 	void renderGui(QSize const& targetSize, AdvancedPainter& painter);
-	~Universe();
+	~Universe() override;
 
   public slots:
 	/**
@@ -403,11 +407,11 @@ class Universe : public QObject
 	                               QString const& celestialBodyName1,
 	                               float t) const;
 	Vector3 getCameraCurrentRelPosToBody(QString const& bodyName) const;
-	float getAnimationTime() const
+	static float getAnimationTime()
 	{
 		return CosmologicalSimulation::animationTime();
 	}
-	void setAnimationTime(float t)
+	static void setAnimationTime(float t)
 	{
 		CosmologicalSimulation::animationTime() = t;
 	}
@@ -429,7 +433,7 @@ class Universe : public QObject
 	void setCosmoSimForcedQuality(QString const& name, int forcedQuality);
 	float getCosmoLocalAnimationTime(QString const& name) const;
 	void setCosmoLocalAnimationTime(QString const& name, float animTime);
-	void unlockTanAngleLimit() const
+	static void unlockTanAngleLimit()
 	{
 		OctreeLOD::unsetCurrentTanAngleLimit();
 	};
@@ -448,8 +452,8 @@ class Universe : public QObject
 	BBox boundingBox
 	    = {FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, FLT_MAX, FLT_MIN, 0.f, {}};
 
-	std::map<QString, std::unique_ptr<UniverseElement>> elements = {};
-	std::map<UniverseElement*, QString> elementsRev              = {};
+	std::map<QString, std::unique_ptr<UniverseElement>> elements;
+	std::map<UniverseElement*, QString> elementsRev;
 	QList<CosmologicalSimulation*> cosmoSims;
 	QList<CSVObjects*> csvObjs;
 	QList<ImageCatalog*> imgCatalogs;

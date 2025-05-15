@@ -41,13 +41,15 @@ class Scene
 	Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui,
 	      SceneCameraData cd = {}, SceneToneMappingData tm = {});
 	Scene& operator=(Scene const& other) = default;
+	Scene& operator=(Scene&& other)      = default;
+	~Scene()                             = default;
 
 	SceneSpatialData const& getSpatialData() const { return sd; };
-	void setSpatialData(SceneSpatialData sd) { this->sd = sd; };
+	void setSpatialData(SceneSpatialData sd) { this->sd = std::move(sd); };
 	SceneTemporalData const& getTemporalData() const { return td; };
-	void setTemporalData(SceneTemporalData td) { this->td = td; };
+	void setTemporalData(SceneTemporalData td) { this->td = std::move(td); };
 	SceneUI const& getUI() const { return ui; };
-	void setUI(SceneUI ui) { this->ui = ui; };
+	void setUI(SceneUI ui) { this->ui = std::move(ui); };
 	SceneCameraData const& getCameraData() const { return cd; };
 	void setCameraData(SceneCameraData cd) { this->cd = cd; };
 	SceneToneMappingData const& getToneMappingData() const { return tmd; };
@@ -77,75 +79,82 @@ class SceneWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override { return "Scene"; }
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassName() const override { return "Scene"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	Scene* new_Scene() { return new Scene; }
-	Scene* new_Scene(Scene const& s) { return new Scene(s); }
-	Scene* new_Scene(SceneSpatialData sd, SceneTemporalData td, SceneUI ui)
+	static Scene* new_Scene() { return new Scene; }
+	static Scene* new_Scene(Scene const& s) { return new Scene(s); }
+	static Scene* new_Scene(SceneSpatialData sd, SceneTemporalData td,
+	                        SceneUI ui)
 	{
-		return new Scene(sd, td, ui);
+		return new Scene(std::move(sd), std::move(td), std::move(ui));
 	}
-	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
-	                 SceneUI const& ui, SceneCameraData const& cd)
+	static Scene* new_Scene(SceneSpatialData const& sd,
+	                        SceneTemporalData const& td, SceneUI const& ui,
+	                        SceneCameraData const& cd)
 	{
 		return new Scene(sd, td, ui, cd);
 	}
-	Scene* new_Scene(SceneSpatialData const& sd, SceneTemporalData const& td,
-	                 SceneUI const& ui, SceneCameraData const& cd,
-	                 SceneToneMappingData const& tm)
+	static Scene* new_Scene(SceneSpatialData const& sd,
+	                        SceneTemporalData const& td, SceneUI const& ui,
+	                        SceneCameraData const& cd,
+	                        SceneToneMappingData const& tm)
 	{
 		return new Scene(sd, td, ui, cd, tm);
 	}
 
-	void delete_Scene(Scene* s) { delete s; }
+	static void delete_Scene(Scene* s) { delete s; }
 
 	// access methods
 
-	SceneSpatialData getSpatialData(Scene* s) const
+	static SceneSpatialData getSpatialData(Scene* s)
 	{
 		return s->getSpatialData();
 	};
-	void setSpatialData(Scene* s, SceneSpatialData sd)
+	static void setSpatialData(Scene* s, SceneSpatialData sd)
 	{
-		s->setSpatialData(sd);
+		s->setSpatialData(std::move(sd));
 	};
-	SceneTemporalData getTemporalData(Scene* s) const
+	static SceneTemporalData getTemporalData(Scene* s)
 	{
 		return s->getTemporalData();
 	};
-	void setTemporalData(Scene* s, SceneTemporalData td)
+	static void setTemporalData(Scene* s, SceneTemporalData td)
 	{
-		s->setTemporalData(td);
+		s->setTemporalData(std::move(td));
 	};
-	SceneUI getUI(Scene* s) const { return s->getUI(); };
-	void setUI(Scene* s, SceneUI ui) { s->setUI(ui); };
-	SceneCameraData getCameraData(Scene* s) const
+	static SceneUI getUI(Scene* s) { return s->getUI(); };
+	static void setUI(Scene* s, SceneUI ui) { s->setUI(std::move(ui)); };
+	static SceneCameraData getCameraData(Scene* s)
 	{
 		return s->getCameraData();
 	};
-	void setCameraData(Scene* s, SceneCameraData cd) { s->setCameraData(cd); };
-	SceneToneMappingData getToneMappingData(Scene* s) const
+	static void setCameraData(Scene* s, SceneCameraData cd)
+	{
+		s->setCameraData(cd);
+	};
+	static SceneToneMappingData getToneMappingData(Scene* s)
 	{
 		return s->getToneMappingData();
 	};
-	void setToneMappingData(Scene* s, SceneToneMappingData tm)
+	static void setToneMappingData(Scene* s, SceneToneMappingData tm)
 	{
 		s->setToneMappingData(tm);
 	};
 
-	Scene static_Scene_getCurrentState(Universe const& universe,
-	                                   ToneMappingModel const& tmm)
+	static Scene static_Scene_getCurrentState(Universe const& universe,
+	                                          ToneMappingModel const& tmm)
 	{
 		return Scene::getCurrentState(universe, tmm);
 	};
-	void setAsUniverseState(Scene* s, Universe& universe,
-	                        ToneMappingModel& tmm) const
+	static void setAsUniverseState(Scene* s, Universe& universe,
+	                               ToneMappingModel& tmm)
 	{
 		s->setAsUniverseState(universe, tmm);
 	};
-	Scene static_Scene_interpolate(Scene const& s0, Scene const& s1, float t)
+	static Scene static_Scene_interpolate(Scene const& s0, Scene const& s1,
+	                                      float t)
 	{
 		return Scene::interpolate(s0, s1, t);
 	}

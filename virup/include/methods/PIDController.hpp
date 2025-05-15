@@ -1,22 +1,22 @@
 #ifndef PIDCONTROLLER_H
 #define PIDCONTROLLER_H
 
+#include <cfloat>
 #include <cmath>
 #include <cstdint>
 
 class PIDController
 {
   public:
-	PIDController() {};
 	void update(uint64_t dt); // dt in µsec
 
-	float setPoint;
-	float const* targetMeasure;
-	float* controlVariable;
+	float setPoint             = FLT_MIN;
+	float const* targetMeasure = nullptr;
+	float* controlVariable     = nullptr;
 
-	float Kp;
-	float Ki;
-	float Kd;
+	float Kp = FLT_MIN;
+	float Ki = FLT_MIN;
+	float Kd = FLT_MIN;
 
 	float tol = 0;
 

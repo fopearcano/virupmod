@@ -32,11 +32,11 @@ AnimationTimeSelector::AnimationTimeSelector(Universe& universe)
 	slider->setMaximum(100);
 	slider->setTickInterval(1);
 	connect(slider, &QSlider::valueChanged,
-	        [this](int v) { this->universe.setAnimationTime(v / 100.f); });
+	        [](int v) { Universe::setAnimationTime(v / 100.f); });
 	mainLayout->addWidget(slider);
 }
 
 void AnimationTimeSelector::update()
 {
-	slider->setValue(100 * universe.getAnimationTime());
+	slider->setValue(100 * Universe::getAnimationTime());
 }

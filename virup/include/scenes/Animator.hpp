@@ -71,10 +71,7 @@ class Animator : public QObject
 			{
 				return el;
 			}
-			else
-			{
-				return qtTimer.elapsed() * 0.001f;
-			}
+			return qtTimer.elapsed() * 0.001f;
 		};
 		float restart()
 		{

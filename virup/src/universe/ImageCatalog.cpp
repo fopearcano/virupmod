@@ -161,6 +161,12 @@ void ImageCatalog::setJson(QJsonObject const& json)
 		auto id = file.split('.').first();
 		for(int i(0); i < metadataContent.size(); ++i)
 		{
+			if(metadataContent[i].size() <= idColumn)
+			{
+				qWarning() << "Invalid metadata content" << metadataContent[i];
+				continue;
+			}
+
 			if(metadataContent[i].at(idColumn) == id)
 			{
 				map[file] = i;

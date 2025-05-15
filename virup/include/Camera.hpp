@@ -19,6 +19,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <cfloat>
 #include <cmath>
 
 #include "AbstractState.hpp"
@@ -29,30 +30,26 @@
 
 struct BBox
 {
-	float minx;
-	float maxx;
+	float minx = FLT_MAX;
+	float maxx = FLT_MIN;
 
-	float miny;
-	float maxy;
+	float miny = FLT_MAX;
+	float maxy = FLT_MIN;
 
-	float minz;
-	float maxz;
+	float minz = FLT_MAX;
+	float maxz = FLT_MIN;
 
-	float diameter;
-	QVector3D mid;
+	float diameter = -1.f;
+	QVector3D mid  = {FLT_MAX, FLT_MAX, FLT_MAX};
 };
 
 class Camera : public BasicCamera
 {
 	Q_OBJECT
   public:
-	class State : public AbstractState
+	struct State : public AbstractState
 	{
-	  public:
-		State()                   = default;
-		State(State const& other) = default;
-		State(State&& other)      = default;
-		virtual void readFromDataStream(QDataStream& stream) override
+		void readFromDataStream(QDataStream& stream) override
 		{
 			stream >> position[0];
 			stream >> position[1];
@@ -61,7 +58,7 @@ class Camera : public BasicCamera
 			stream >> pitch;
 			stream >> yaw;
 		};
-		virtual void writeInDataStream(QDataStream& stream) override
+		void writeInDataStream(QDataStream& stream) override
 		{
 			stream << position[0];
 			stream << position[1];
@@ -77,7 +74,7 @@ class Camera : public BasicCamera
 		float yaw    = 0.f;
 	};
 
-	Camera(VRHandler const& vrHandler);
+	explicit Camera(VRHandler const& vrHandler);
 	Vector3 dataToWorldPosition(Vector3 const& data) const;
 	QMatrix4x4 dataToWorldTransform() const;
 	Vector3 worldToDataPosition(Vector3 const& world) const;

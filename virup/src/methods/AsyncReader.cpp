@@ -21,6 +21,7 @@
 #include "methods/OctreeLOD.hpp"
 
 #include <QThreadPool>
+#include <queue>
 
 namespace AR
 {

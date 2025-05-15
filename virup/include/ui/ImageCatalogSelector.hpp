@@ -28,7 +28,7 @@ class Universe;
 class ImageCatalogSelector : public VIRUPDialog3D
 {
   public:
-	ImageCatalogSelector(Universe& universe);
+	explicit ImageCatalogSelector(Universe& universe);
 
   private:
 	void selectElement(QListWidgetItem* item);

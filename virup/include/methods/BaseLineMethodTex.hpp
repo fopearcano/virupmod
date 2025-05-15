@@ -8,13 +8,10 @@ class BaseLineMethodTex : public BaseLineMethod
 	Q_OBJECT
   public:
 	BaseLineMethodTex();
-	virtual void render(Camera const& camera) override;
+	void render(Camera const& camera) override;
 
   public slots:
-	virtual std::string getName() const override
-	{
-		return "Base Line Texture";
-	};
+	std::string getName() const override { return "Base Line Texture"; };
 
   private:
 	GLTexture tex;

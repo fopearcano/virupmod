@@ -59,11 +59,14 @@ class CSVObjects : public UniverseElement
 		std::vector<StarName> names;
 	};
 
-	CSVObjects(QJsonObject const& json, bool galaxies = false);
-	virtual BBox getBoundingBox() const override;
-	virtual void render(Camera const& camera,
-	                    ToneMappingModel const& tmm) override;
-	virtual ~CSVObjects();
+	explicit CSVObjects(QJsonObject const& json, bool galaxies = false);
+	CSVObjects(CSVObjects const&)            = delete;
+	CSVObjects(CSVObjects&&)                 = delete;
+	CSVObjects& operator=(CSVObjects const&) = delete;
+	CSVObjects& operator=(CSVObjects&&)      = delete;
+	BBox getBoundingBox() const override;
+	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	~CSVObjects() override;
 
 	float colormix = 0.0f;
 

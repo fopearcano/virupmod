@@ -96,7 +96,7 @@ void VolumetricModel::render(Camera const& /*camera*/, QMatrix4x4 const& model,
                              VolumetricModel const* occlusionModel)
 {
 	const GLBlendSet glBlend({GL_ONE, GL_ONE});
-	const GLCullFaceSet glCullFace(GL_FRONT);
+	const GLCullFaceSet glCullFace(GLCullFaceSet::CullFaceState{GL_FRONT});
 	shader.setUniform("color", color);
 	shader.setUniform("campos",
 	                  utils::transformPosition(dataModel.inverted(), campos));

@@ -44,6 +44,8 @@ class SceneSpatialData
 	                 QString bodyName, double invScale,
 	                 Vector3 position = Vector3());
 	SceneSpatialData& operator=(SceneSpatialData const& other) = default;
+	SceneSpatialData& operator=(SceneSpatialData&& other)      = default;
+	~SceneSpatialData()                                        = default;
 
 	Universe const& getUniverse() const { return *universe; };
 
@@ -52,7 +54,10 @@ class SceneSpatialData
 	double getScale() const { return scale; };
 	void setScale(double scale) { this->scale = scale; };
 	QString getSystemName() const { return systemName; };
-	void setSystemName(QString systemName) { this->systemName = systemName; };
+	void setSystemName(QString systemName)
+	{
+		this->systemName = std::move(systemName);
+	};
 	QString getBodyName() const { return bodyName; };
 	void setBodyName(QString const& bodyName) { this->bodyName = bodyName; };
 
@@ -90,84 +95,88 @@ class SceneSpatialDataWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override
-	{
-		return "SceneSpatialData";
-	}
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassName() const override { return "SceneSpatialData"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	SceneSpatialData* new_SceneSpatialData() { return new SceneSpatialData(); }
-	SceneSpatialData* new_SceneSpatialData(SceneSpatialData const& sd)
+	static SceneSpatialData* new_SceneSpatialData()
+	{
+		return new SceneSpatialData();
+	}
+	static SceneSpatialData* new_SceneSpatialData(SceneSpatialData const& sd)
 	{
 		return new SceneSpatialData(sd);
 	}
-	SceneSpatialData* new_SceneSpatialData(Universe const& u, double s,
-	                                       Vector3 p)
+	static SceneSpatialData* new_SceneSpatialData(Universe const& u, double s,
+	                                              Vector3 p)
 	{
 		return new SceneSpatialData(u, s, p);
 	}
-	SceneSpatialData* new_SceneSpatialData(Universe const& u, double s)
+	static SceneSpatialData* new_SceneSpatialData(Universe const& u, double s)
 	{
 		return new SceneSpatialData(u, s);
 	}
-	SceneSpatialData* new_SceneSpatialData(Universe const& u, QString sn,
-	                                       QString bn, double s, Vector3 p)
+	static SceneSpatialData* new_SceneSpatialData(Universe const& u, QString sn,
+	                                              QString bn, double s,
+	                                              Vector3 p)
 	{
-		return new SceneSpatialData(u, sn, bn, s, p);
+		return new SceneSpatialData(u, std::move(sn), std::move(bn), s, p);
 	}
-	SceneSpatialData* new_SceneSpatialData(Universe const& u, QString sn,
-	                                       QString bn, double s)
+	static SceneSpatialData* new_SceneSpatialData(Universe const& u, QString sn,
+	                                              QString bn, double s)
 	{
-		return new SceneSpatialData(u, sn, bn, s);
+		return new SceneSpatialData(u, std::move(sn), std::move(bn), s);
 	}
 
-	void delete_SceneSpatialData(SceneSpatialData* s) { delete s; }
+	static void delete_SceneSpatialData(SceneSpatialData* s) { delete s; }
 
 	// access methods
-	Vector3 getPosition(SceneSpatialData* sd) const
+	static Vector3 getPosition(SceneSpatialData* sd)
 	{
 		return sd->getPosition();
 	};
-	void setPosition(SceneSpatialData* sd, Vector3 position)
+	static void setPosition(SceneSpatialData* sd, Vector3 position)
 	{
 		sd->setPosition(position);
 	};
-	double getScale(SceneSpatialData* sd) const { return sd->getScale(); };
-	void setScale(SceneSpatialData* sd, double scale) { sd->setScale(scale); };
-	QString getSystemName(SceneSpatialData* sd) const
+	static double getScale(SceneSpatialData* sd) { return sd->getScale(); };
+	static void setScale(SceneSpatialData* sd, double scale)
+	{
+		sd->setScale(scale);
+	};
+	static QString getSystemName(SceneSpatialData* sd)
 	{
 		return sd->getSystemName();
 	};
-	void setSystemName(SceneSpatialData* sd, QString systemName)
+	static void setSystemName(SceneSpatialData* sd, QString systemName)
 	{
-		sd->setSystemName(systemName);
+		sd->setSystemName(std::move(systemName));
 	};
-	QString getBodyName(SceneSpatialData* sd) const
+	static QString getBodyName(SceneSpatialData* sd)
 	{
 		return sd->getBodyName();
 	};
-	void setBodyName(SceneSpatialData* sd, QString const& bodyName)
+	static void setBodyName(SceneSpatialData* sd, QString const& bodyName)
 	{
 		sd->setBodyName(bodyName);
 	};
 
-	SceneSpatialData
+	static SceneSpatialData
 	    static_SceneSpatialData_getCurrentState(Universe const& universe)
 	{
 		return SceneSpatialData::getCurrentState(universe);
 	};
-	void setAsUniverseState(SceneSpatialData* sd, Universe& universe) const
+	static void setAsUniverseState(SceneSpatialData* sd, Universe& universe)
 	{
 		sd->setAsUniverseState(universe);
 	};
 
-	SceneSpatialData static_SceneSpatialData_interpolate(
+	static SceneSpatialData static_SceneSpatialData_interpolate(
 	    SceneSpatialData const& sd0, SceneSpatialData const& sd1, float t)
 	{
 		return SceneSpatialData::interpolate(sd0, sd1, t);
 	}
-	void static_SceneSpatialData_setForceDirectInterpolation(bool forced)
+	static void static_SceneSpatialData_setForceDirectInterpolation(bool forced)
 	{
 		SceneSpatialData::setForceDirectInterpolation(forced);
 	}

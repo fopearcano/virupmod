@@ -87,22 +87,22 @@ class MovementControls : public QObject
 	Camera& cosmoCam;
 
 	// scaling/translation controls variables
-	bool leftGripPressedCube        = false;
-	bool rightGripPressedCube       = false;
-	Vector3 initControllerPosInCube = Vector3();
-	Vector3 scaleCenterCube         = Vector3();
-	double initScaleCube            = 1.0;
+	bool leftGripPressedCube  = false;
+	bool rightGripPressedCube = false;
+	Vector3 initControllerPosInCube;
+	Vector3 scaleCenterCube;
+	double initScaleCube = 1.0;
 
 	/* ORBITAL SYSTEM */
 
 	OrbitalSystemCamera& planetCam;
 
 	// scaling/translation controls variables
-	bool leftGripPressedOrb      = false;
-	bool rightGripPressedOrb     = false;
-	Vector3 initControllerRelPos = Vector3();
-	Vector3 scaleCenterOrb       = Vector3();
-	double initScaleOrb          = 0.0;
+	bool leftGripPressedOrb  = false;
+	bool rightGripPressedOrb = false;
+	Vector3 initControllerRelPos;
+	Vector3 scaleCenterOrb;
+	double initScaleOrb = 0.0;
 
 	/* GUIDES */
 	GLShaderProgram guideShader;

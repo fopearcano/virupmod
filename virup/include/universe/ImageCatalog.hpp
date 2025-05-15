@@ -25,9 +25,9 @@ class ImageCatalog : public UniverseElement
 {
   public:
 	ImageCatalog();
-	virtual QJsonObject getJson() const override;
-	virtual void setJson(QJsonObject const& json) override;
-	virtual BBox getBoundingBox() const override { return {}; };
+	QJsonObject getJson() const override;
+	void setJson(QJsonObject const& json) override;
+	BBox getBoundingBox() const override { return {}; };
 	void renderGui(QSize const& targetSize, AdvancedPainter& painter) override;
 
 	static QList<QPair<QString, QWidget*>>

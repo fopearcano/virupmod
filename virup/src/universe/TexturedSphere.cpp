@@ -67,7 +67,7 @@ void TexturedSphere::render(Camera const& camera,
 
 	const GLStateSet glState({{GL_CULL_FACE, cullFrontFaces}});
 	const GLBlendSet glBlend({GL_ONE, GL_ONE});
-	const GLCullFaceSet glCullFace(GL_FRONT);
+	const GLCullFaceSet glCullFace(GLCullFaceSet::CullFaceState{GL_FRONT});
 	GLHandler::useTextures({tex.get()});
 	GLHandler::setUpRender(shader, model);
 	mesh.render();

@@ -30,7 +30,7 @@ class PlanetarySystems : public UniverseElement
 {
   public:
 	PlanetarySystems();
-	virtual BBox getBoundingBox() const override { return bbox; };
+	BBox getBoundingBox() const override { return bbox; };
 	bool renderSystem() const { return doRender; };
 	QStringList getSystemsNames() const;
 	OrbitalSystem const* getSystem(QString const& name)
@@ -44,9 +44,8 @@ class PlanetarySystems : public UniverseElement
 	};
 	OrbitalSystem* getClosestSystem() { return systems[closestId].get(); };
 	Vector3 getAbsolutePosition(QString const& systemName) const;
-	virtual void update(Camera const& camera) override;
-	virtual void render(Camera const& camera,
-	                    ToneMappingModel const& tmm) override;
+	void update(Camera const& camera) override;
+	void render(Camera const& camera, ToneMappingModel const& tmm) override;
 
 	bool useVRCamposForClosest = true;
 

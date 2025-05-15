@@ -40,7 +40,7 @@ class Grid : public QObject
 	Q_PROPERTY(QColor color READ getColor WRITE setColor)
   public:
 	Grid();
-	QColor getColor() const
+	static QColor getColor()
 	{
 		return QSettings().value("misc/gridcolor").value<QColor>();
 	}

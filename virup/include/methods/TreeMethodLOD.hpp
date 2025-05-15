@@ -17,32 +17,36 @@ class TreeMethodLOD : public Method
 	Q_OBJECT
   public:
 	TreeMethodLOD();
-	TreeMethodLOD(std::string const& shadersCommonName);
+	TreeMethodLOD(TreeMethodLOD const&)            = delete;
+	TreeMethodLOD(TreeMethodLOD&&)                 = delete;
+	TreeMethodLOD& operator=(TreeMethodLOD const&) = delete;
+	TreeMethodLOD& operator=(TreeMethodLOD&&)      = delete;
+	explicit TreeMethodLOD(std::string const& shadersCommonName);
 	TreeMethodLOD(std::string const& vertexShaderPath,
 	              std::string const& fragmentShaderPath);
-	virtual std::string getName() const override { return "Tree LOD"; };
-	virtual void init(std::vector<float>& gasVertices,
-	                  std::vector<float>& starsVertices,
-	                  std::vector<float>& darkMatterVertices) override;
-	virtual void init(std::string const& gasPath, std::string const& starsPath,
-	                  std::string const& darkMatterPath) override;
+	std::string getName() const override { return "Tree LOD"; };
+	void init(std::vector<float>& gasVertices,
+	          std::vector<float>& starsVertices,
+	          std::vector<float>& darkMatterVertices) override;
+	void init(std::string const& gasPath, std::string const& starsPath,
+	          std::string const& darkMatterPath) override;
 	void init(QStringList const& gasFiles, QStringList const& starsFiles,
 	          QStringList const& dmFiles);
-	virtual BBox getDataBoundingBox() const override;
+	BBox getDataBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
 	bool preloadOctreesLevel(unsigned int level,
 	                         QProgressDialog* progress = nullptr);
 	void update(Camera const& camera);
 	void update(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos);
-	virtual void render(Camera const& camera) override;
+	void render(Camera const& camera) override;
 	void render(Camera const& camera, QMatrix4x4 const& model,
 	            QVector3D const& campos, float unitInKpc);
 	void dumpOctreesStates(QString const& dirPath,
 	                       QString const& filePathPrefix);
 	void unload();
 	void cleanUp();
-	virtual ~TreeMethodLOD();
+	~TreeMethodLOD() override;
 
 	bool silent = false;
 

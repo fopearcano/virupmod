@@ -72,7 +72,7 @@ bool Transition::updateUniverse(
 
 	scene.setAsUniverseState(universe, tmm);
 
-	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
+	Universe::setAnimationTime(ui.getVisibility("AnimationTime"));
 
 	SceneSpatialData::setForceDirectInterpolation(false);
 	// apply custom function
@@ -114,7 +114,7 @@ void Transition::applyDestination(
 
 	scene.setAsUniverseState(universe, tmm);
 
-	universe.setAnimationTime(ui.getVisibility("AnimationTime"));
+	Universe::setAnimationTime(ui.getVisibility("AnimationTime"));
 
 	// apply custom function
 	custom(1.f, 1.f);

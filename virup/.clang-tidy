@@ -22,7 +22,7 @@ Checks:          "abseil-cleanup-ctad, \
     -altera-id-dependent-backward-branch, \ # useless, too low level
     altera-kernel-name-restriction, \
     altera-single-work-item-barrier, \
-    altera-struct-pack-align, \
+    -altera-struct-pack-align, \  # useless, too low level
     -altera-unroll-loops, \ # useless, too low level
     android-cloexec-accept, \
     android-cloexec-accept4, \
@@ -302,7 +302,7 @@ Checks:          "abseil-cleanup-ctad, \
     cppcoreguidelines-noexcept-destructor, \
     cppcoreguidelines-noexcept-move-operations, \
     cppcoreguidelines-noexcept-swap, \
-    cppcoreguidelines-non-private-member-variables-in-classes, \
+    -cppcoreguidelines-non-private-member-variables-in-classes, \ # re-enable later
     cppcoreguidelines-owning-memory, \
     cppcoreguidelines-prefer-member-initializer, \
     cppcoreguidelines-pro-bounds-array-to-pointer-decay, \
@@ -382,7 +382,7 @@ Checks:          "abseil-cleanup-ctad, \
     hicpp-vararg, \
     linuxkernel-must-check-errs, \
     llvm-else-after-return, \
-    llvm-header-guard, \
+    -llvm-header-guard, \ # useless
     llvm-include-order, \
     llvm-namespace-comment, \
     llvm-prefer-isa-or-dyn-cast-in-conditionals, \
@@ -405,7 +405,7 @@ Checks:          "abseil-cleanup-ctad, \
     misc-new-delete-overloads, \
     -misc-no-recursion, \ # useless in our case
     misc-non-copyable-objects, \
-    misc-non-private-member-variables-in-classes, \
+    -misc-non-private-member-variables-in-classes, \ # re-enable later
     misc-redundant-expression, \
     misc-static-assert, \
     misc-throw-by-value-catch-by-reference, \
@@ -515,7 +515,7 @@ Checks:          "abseil-cleanup-ctad, \
     readability-non-const-parameter, \
     readability-operators-representation, \
     readability-qualified-auto, \
-    readability-redundant-access-specifiers, \
+    -readability-redundant-access-specifiers, \ # unusable with Qt
     readability-redundant-casting, \
     readability-redundant-control-flow, \
     readability-redundant-declaration, \

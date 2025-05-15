@@ -33,12 +33,8 @@ class SceneToneMappingData
   public:
 	SceneToneMappingData()
 	    : SceneToneMappingData(0.3f) {};
-	SceneToneMappingData(SceneToneMappingData const& other) = default;
-	SceneToneMappingData(SceneToneMappingData&& other)      = default;
-	SceneToneMappingData(float exposure, float contrast = 1.f,
-	                     float dynamicrange = 10000.f);
-	SceneToneMappingData& operator=(SceneToneMappingData const& other)
-	    = default;
+	explicit SceneToneMappingData(float exposure, float contrast = 1.f,
+	                              float dynamicrange = 10000.f);
 	float getExposure() const { return exposure; };
 	float getContrast() const { return contrast; };
 	float getDynamicRange() const { return dynamicrange; };
@@ -65,58 +61,67 @@ class SceneToneMappingDataWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override
+	const char* wrappedClassName() const override
 	{
 		return "SceneToneMappingData";
 	}
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	SceneToneMappingData* new_SceneToneMappingData()
+	static SceneToneMappingData* new_SceneToneMappingData()
 	{
 		return new SceneToneMappingData;
 	}
-	SceneToneMappingData*
+	static SceneToneMappingData*
 	    new_SceneToneMappingData(SceneToneMappingData const& td)
 	{
 		return new SceneToneMappingData(td);
 	}
-	SceneToneMappingData* new_SceneToneMappingData(float exposure,
-	                                               float dynamicrange,
-	                                               float contrast)
+	static SceneToneMappingData* new_SceneToneMappingData(float exposure,
+	                                                      float dynamicrange,
+	                                                      float contrast)
 	{
 		return new SceneToneMappingData(exposure, dynamicrange, contrast);
 	}
-	SceneToneMappingData* new_SceneToneMappingData(float exposure)
+	static SceneToneMappingData* new_SceneToneMappingData(float exposure)
 	{
 		return new SceneToneMappingData(exposure);
 	}
-	SceneToneMappingData* new_SceneToneMappingData(float exposure,
-	                                               float dynamicrange)
+	static SceneToneMappingData* new_SceneToneMappingData(float exposure,
+	                                                      float dynamicrange)
 	{
 		return new SceneToneMappingData(exposure, dynamicrange);
 	}
 
-	void delete_SceneToneMappingData(SceneToneMappingData* f) { delete f; }
+	static void delete_SceneToneMappingData(SceneToneMappingData* f)
+	{
+		delete f;
+	}
 
 	// access methods
-	float getExposure(SceneToneMappingData* tmd) { return tmd->getExposure(); };
-	float getContrast(SceneToneMappingData* tmd) { return tmd->getContrast(); };
-	float getDynamicRange(SceneToneMappingData* tmd)
+	static float getExposure(SceneToneMappingData* tmd)
+	{
+		return tmd->getExposure();
+	};
+	static float getContrast(SceneToneMappingData* tmd)
+	{
+		return tmd->getContrast();
+	};
+	static float getDynamicRange(SceneToneMappingData* tmd)
 	{
 		return tmd->getDynamicRange();
 	};
 
-	SceneToneMappingData
+	static SceneToneMappingData
 	    static_SceneToneMappingData_getCurrentState(ToneMappingModel const& tmm)
 	{
 		return SceneToneMappingData::getCurrentState(tmm);
 	};
-	void setAsState(SceneToneMappingData* td, ToneMappingModel& tmm) const
+	static void setAsState(SceneToneMappingData* td, ToneMappingModel& tmm)
 	{
 		td->setAsState(tmm);
 	};
-	SceneToneMappingData static_SceneToneMappingData_interpolate(
+	static SceneToneMappingData static_SceneToneMappingData_interpolate(
 	    SceneToneMappingData const& tmd0, SceneToneMappingData const& tmd1,
 	    float t)
 	{

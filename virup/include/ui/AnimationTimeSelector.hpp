@@ -27,7 +27,7 @@
 class AnimationTimeSelector : public VIRUPDialog3D
 {
   public:
-	AnimationTimeSelector(Universe& universe);
+	explicit AnimationTimeSelector(Universe& universe);
 	void update();
 
   private:

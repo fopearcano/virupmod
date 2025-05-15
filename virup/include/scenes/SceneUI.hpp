@@ -34,9 +34,11 @@ class SceneUI
 	SceneUI()                     = default;
 	SceneUI(SceneUI const& other) = default;
 	SceneUI(SceneUI&& other)      = default;
-	SceneUI(std::map<QString, float> visibilities);
-	SceneUI(QVariantMap const& visibilities);
+	explicit SceneUI(std::map<QString, float> visibilities);
+	explicit SceneUI(QVariantMap const& visibilities);
 	SceneUI& operator=(SceneUI const& ui) = default;
+	SceneUI& operator=(SceneUI&& ui)      = default;
+	~SceneUI()                            = default;
 
 	float getVisibility(QString const& name) const;
 	void setVisibility(QString const& name, float vis);
@@ -48,7 +50,7 @@ class SceneUI
 	QString getPythonRepresentation() const;
 
   private:
-	std::map<QString, float> visibilities = {};
+	std::map<QString, float> visibilities;
 
 	static std::map<QString, float> fromQt(QVariantMap const& map);
 };
@@ -61,36 +63,39 @@ class SceneUIWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override { return "SceneUI"; }
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassName() const override { return "SceneUI"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	SceneUI* new_SceneUI() { return new SceneUI; }
-	SceneUI* new_SceneUI(SceneUI const& ui) { return new SceneUI(ui); }
-	SceneUI* new_SceneUI(QVariantMap const& map) { return new SceneUI(map); }
+	static SceneUI* new_SceneUI() { return new SceneUI; }
+	static SceneUI* new_SceneUI(SceneUI const& ui) { return new SceneUI(ui); }
+	static SceneUI* new_SceneUI(QVariantMap const& map)
+	{
+		return new SceneUI(map);
+	}
 
-	void delete_SceneUI(SceneUI* f) { delete f; }
+	static void delete_SceneUI(SceneUI* f) { delete f; }
 
 	// access methods
-	float getVisibility(SceneUI* u, QString const& name)
+	static float getVisibility(SceneUI* u, QString const& name)
 	{
 		return u->getVisibility(name);
 	};
-	void setVisibility(SceneUI* u, QString const& name, float vis)
+	static void setVisibility(SceneUI* u, QString const& name, float vis)
 	{
 		u->setVisibility(name, vis);
 	};
 
-	SceneUI static_SceneUI_getCurrentState(Universe const& universe)
+	static SceneUI static_SceneUI_getCurrentState(Universe const& universe)
 	{
 		return SceneUI::getCurrentState(universe);
 	};
-	void setAsUniverseState(SceneUI* ui, Universe& universe) const
+	static void setAsUniverseState(SceneUI* ui, Universe& universe)
 	{
 		ui->setAsUniverseState(universe);
 	};
-	SceneUI static_SceneUI_interpolate(SceneUI const& ui0, SceneUI const& ui1,
-	                                   float t)
+	static SceneUI static_SceneUI_interpolate(SceneUI const& ui0,
+	                                          SceneUI const& ui1, float t)
 	{
 		return SceneUI::interpolate(ui0, ui1, t);
 	}

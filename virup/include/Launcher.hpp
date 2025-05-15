@@ -28,7 +28,7 @@ class Launcher : public BaseLauncher
 	Launcher() = default;
 
   protected:
-	virtual std::unique_ptr<SettingsWidget> newSettingsWidget() override;
+	std::unique_ptr<SettingsWidget> newSettingsWidget() override;
 };
 
 #endif // LAUNCHER_H

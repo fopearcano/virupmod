@@ -21,9 +21,6 @@
 
 #include <QRunnable>
 #include <QThread>
-#include <deque>
-#include <mutex>
-#include <queue>
 
 class OctreeLOD;
 

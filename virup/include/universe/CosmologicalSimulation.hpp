@@ -30,14 +30,14 @@
 class CosmologicalSimulation : public UniverseElement
 {
   public:
-	CosmologicalSimulation(QJsonObject const& json);
+	explicit CosmologicalSimulation(QJsonObject const& json);
 	CosmologicalSimulation(std::string const& gasOctreePath,
 	                       std::string const& starsOctreePath,
 	                       std::string const& darkMatterOctreePath,
 	                       bool loadDarkMatter, QColor const& gasColor,
 	                       QColor const& starsColor,
 	                       QColor const& darkMatterColor);
-	virtual BBox getBoundingBox() const override;
+	BBox getBoundingBox() const override;
 	uint64_t getOctreesTotalDataSize() const;
 	bool preloadOctreesLevel(unsigned int level,
 	                         QProgressDialog* progress = nullptr);
@@ -46,12 +46,10 @@ class CosmologicalSimulation : public UniverseElement
 	{
 		this->forcedQuality = forcedQuality;
 	};
-	virtual void update(Camera const& camera) override;
-	virtual void render(Camera const& camera,
-	                    ToneMappingModel const& tmm) override;
+	void update(Camera const& camera) override;
+	void render(Camera const& camera, ToneMappingModel const& tmm) override;
 	void dumpOctreesStates(QString const& dirPath,
 	                       QString const& filePathPrefix);
-	~CosmologicalSimulation() = default;
 
 	// normalized from 0 to 1
 	static float& animationTime();

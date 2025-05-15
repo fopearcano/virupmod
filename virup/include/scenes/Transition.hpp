@@ -31,14 +31,10 @@
 class Transition
 {
   public:
-	Transition()                        = default;
-	Transition(Transition const& other) = default;
-	Transition(Transition&& other)      = default;
-	Transition(Scene toScene, float duration = 10.f, QString name = "",
-	           QString customPythonFunction = "", float v0 = 0.f,
-	           float v1 = 0.f);
-	Transition& operator=(Transition const& other) = default;
-	Transition& operator=(Transition&& other)      = default;
+	Transition() = default;
+	explicit Transition(Scene toScene, float duration = 10.f, QString name = "",
+	                    QString customPythonFunction = "", float v0 = 0.f,
+	                    float v1 = 0.f);
 
 	Scene getDestination() const { return toScene; };
 	float getDuration() const { return duration; };
@@ -83,54 +79,55 @@ class TransitionWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override
-	{
-		return "Transition";
-	}
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassName() const override { return "Transition"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	Transition* new_Transition() { return new Transition; }
-	Transition* new_Transition(Transition const& t)
+	static Transition* new_Transition() { return new Transition; }
+	static Transition* new_Transition(Transition const& t)
 	{
 		return new Transition(t);
 	}
-	Transition* new_Transition(Scene s) { return new Transition(std::move(s)); }
-	Transition* new_Transition(Scene s, float d)
+	static Transition* new_Transition(Scene s)
+	{
+		return new Transition(std::move(s));
+	}
+	static Transition* new_Transition(Scene s, float d)
 	{
 		return new Transition(std::move(s), d);
 	}
-	Transition* new_Transition(Scene s, float d, QString n)
+	static Transition* new_Transition(Scene s, float d, QString n)
 	{
-		return new Transition(std::move(s), d, n);
+		return new Transition(std::move(s), d, std::move(n));
 	}
-	Transition* new_Transition(Scene s, float d, QString n, QString c)
+	static Transition* new_Transition(Scene s, float d, QString n, QString c)
 	{
 		return new Transition(std::move(s), d, std::move(n), std::move(c));
 	}
-	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0)
+	static Transition* new_Transition(Scene s, float d, QString n, QString c,
+	                                  float v0)
 	{
 		return new Transition(std::move(s), d, std::move(n), std::move(c), v0);
 	}
-	Transition* new_Transition(Scene s, float d, QString n, QString c, float v0,
-	                           float v1)
+	static Transition* new_Transition(Scene s, float d, QString n, QString c,
+	                                  float v0, float v1)
 	{
 		return new Transition(std::move(s), d, std::move(n), std::move(c), v0,
 		                      v1);
 	}
 
-	void delete_Transition(Transition* t) { delete t; }
+	static void delete_Transition(Transition* t) { delete t; }
 
 	// access methods
 
-	Scene getDestination(Transition* t) const { return t->getDestination(); };
-	float getDuration(Transition* t) const { return t->getDuration(); };
-	QString getName(Transition* t) const { return t->getName(); };
-	QString getCustomPythonFunction(Transition* t) const
+	static Scene getDestination(Transition* t) { return t->getDestination(); };
+	static float getDuration(Transition* t) { return t->getDuration(); };
+	static QString getName(Transition* t) { return t->getName(); };
+	static QString getCustomPythonFunction(Transition* t)
 	{
 		return t->getCustomPythonFunction();
 	};
-	void custom(Transition* t, float t_, float t_harsh) const
+	static void custom(Transition* t, float t_, float t_harsh)
 	{
 		t->custom(t_, t_harsh);
 	};

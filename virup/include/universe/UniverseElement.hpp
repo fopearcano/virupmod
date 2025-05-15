@@ -67,9 +67,6 @@ class UniverseElement : public QObject
 		GALACTIC,
 	};
 
-	/*! @brief Default constructor. See members for default values.
-	 */
-	UniverseElement() = default;
 	/*! @brief Get the element Json representation.
 	 */
 	virtual QJsonObject getJson() const;
@@ -123,10 +120,6 @@ class UniverseElement : public QObject
 	 */
 	virtual void renderGui(QSize const& /*targetSize*/,
 	                       AdvancedPainter& /*painter*/) {};
-
-	/*! @brief Default destructor.
-	 */
-	virtual ~UniverseElement() = default;
 
 	/*! @brief Adjusts the physical brightness of an element.
 	 *

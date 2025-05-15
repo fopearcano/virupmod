@@ -10,20 +10,19 @@ class BaseLineMethod : public Method
 	Q_OBJECT
   public:
 	BaseLineMethod();
-	BaseLineMethod(std::string const& shadersCommonName);
+	explicit BaseLineMethod(std::string const& shadersCommonName);
 	BaseLineMethod(std::string const& vertexShaderPath,
 	               std::string const& fragmentShaderPath);
-	virtual BBox getDataBoundingBox() const override { return dataBBox; };
-	virtual void render(Camera const& camera) override;
-	~BaseLineMethod() = default;
+	BBox getDataBoundingBox() const override { return dataBBox; };
+	void render(Camera const& camera) override;
 
   public slots:
-	virtual std::string getName() const override { return "Base Line"; };
-	virtual void init(std::vector<float>& gazVertices,
-	                  std::vector<float>& starsVertices,
-	                  std::vector<float>& darkMatterVertices) override;
-	virtual void init(std::string const& gazPath, std::string const& starsPath,
-	                  std::string const& darkMatterPath) override;
+	std::string getName() const override { return "Base Line"; };
+	void init(std::vector<float>& gazVertices,
+	          std::vector<float>& starsVertices,
+	          std::vector<float>& darkMatterVertices) override;
+	void init(std::string const& gazPath, std::string const& starsPath,
+	          std::string const& darkMatterPath) override;
 
   private:
 	GLMesh gazMesh;

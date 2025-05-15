@@ -27,7 +27,7 @@
 class TimeController : public VIRUPDialog3D
 {
   public:
-	TimeController(Universe& universe);
+	explicit TimeController(Universe& universe);
 	void update();
 
   private:

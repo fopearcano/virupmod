@@ -37,9 +37,11 @@ class SceneTemporalData
 	SceneTemporalData()                               = default;
 	SceneTemporalData(SceneTemporalData const& other) = default;
 	SceneTemporalData(SceneTemporalData&& other)      = default;
-	SceneTemporalData(float timeCoeff);
+	explicit SceneTemporalData(float timeCoeff);
 	SceneTemporalData(float timeCoeff, QDateTime simulationTime);
 	SceneTemporalData& operator=(SceneTemporalData const& other) = default;
+	SceneTemporalData& operator=(SceneTemporalData&& other)      = default;
+	~SceneTemporalData()                                         = default;
 	float getTimeCoeff() const { return timeCoeff; };
 	QDateTime getSimulationTime() const { return simulationTime; };
 	static SceneTemporalData getCurrentState(Universe const& universe);
@@ -63,46 +65,52 @@ class SceneTemporalDataWrapper : public PythonQtWrapper
 {
 	Q_OBJECT
   public:
-	virtual const char* wrappedClassName() const override
+	const char* wrappedClassName() const override
 	{
 		return "SceneTemporalData";
 	}
-	virtual const char* wrappedClassPackage() const override { return "virup"; }
+	const char* wrappedClassPackage() const override { return "virup"; }
 
   public Q_SLOTS:
-	SceneTemporalData* new_SceneTemporalData() { return new SceneTemporalData; }
-	SceneTemporalData* new_SceneTemporalData(SceneTemporalData const& td)
+	static SceneTemporalData* new_SceneTemporalData()
+	{
+		return new SceneTemporalData;
+	}
+	static SceneTemporalData* new_SceneTemporalData(SceneTemporalData const& td)
 	{
 		return new SceneTemporalData(td);
 	}
-	SceneTemporalData* new_SceneTemporalData(float t)
+	static SceneTemporalData* new_SceneTemporalData(float t)
 	{
 		return new SceneTemporalData(t);
 	}
-	SceneTemporalData* new_SceneTemporalData(float t, QDateTime s)
+	static SceneTemporalData* new_SceneTemporalData(float t, QDateTime s)
 	{
-		return new SceneTemporalData(t, s);
+		return new SceneTemporalData(t, std::move(s));
 	}
 
-	void delete_SceneTemporalData(SceneTemporalData* f) { delete f; }
+	static void delete_SceneTemporalData(SceneTemporalData* f) { delete f; }
 
 	// access methods
-	float getTimeCoeff(SceneTemporalData* td) { return td->getTimeCoeff(); };
-	QDateTime getSimulationTime(SceneTemporalData* td)
+	static float getTimeCoeff(SceneTemporalData* td)
+	{
+		return td->getTimeCoeff();
+	};
+	static QDateTime getSimulationTime(SceneTemporalData* td)
 	{
 		return td->getSimulationTime();
 	};
 
-	SceneTemporalData
+	static SceneTemporalData
 	    static_SceneTemporalData_getCurrentState(Universe const& universe)
 	{
 		return SceneTemporalData::getCurrentState(universe);
 	};
-	void setAsUniverseState(SceneTemporalData* td, Universe& universe) const
+	static void setAsUniverseState(SceneTemporalData* td, Universe& universe)
 	{
 		td->setAsUniverseState(universe);
 	};
-	SceneTemporalData static_SceneTemporalData_interpolate(
+	static SceneTemporalData static_SceneTemporalData_interpolate(
 	    SceneTemporalData const& td0, SceneTemporalData const& td1, float t)
 	{
 		return SceneTemporalData::interpolate(td0, td1, t);

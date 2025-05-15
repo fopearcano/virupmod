@@ -27,7 +27,7 @@
 class ToneMappingController : public VIRUPDialog3D
 {
   public:
-	ToneMappingController(ToneMappingModel& tmm);
+	explicit ToneMappingController(ToneMappingModel& tmm);
 	void update();
 
   private:

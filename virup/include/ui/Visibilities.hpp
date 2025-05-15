@@ -29,7 +29,7 @@ class Visibilities : public VIRUPDialog3D
 {
 	Q_OBJECT
   public:
-	Visibilities(Universe& universe);
+	explicit Visibilities(Universe& universe);
 
   private:
 	Universe& universe;

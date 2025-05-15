@@ -26,12 +26,11 @@ class CosmologicalLabels : public UniverseElement
 {
   public:
 	CosmologicalLabels();
-	virtual QJsonObject getJson() const override;
-	virtual void setJson(QJsonObject const& json) override;
-	virtual BBox getBoundingBox() const override { return bbox; };
-	virtual void update(Camera const& camera) override;
-	virtual void render(Camera const& camera,
-	                    ToneMappingModel const& tmm) override;
+	QJsonObject getJson() const override;
+	void setJson(QJsonObject const& json) override;
+	BBox getBoundingBox() const override { return bbox; };
+	void update(Camera const& camera) override;
+	void render(Camera const& camera, ToneMappingModel const& tmm) override;
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);

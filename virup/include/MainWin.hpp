@@ -75,10 +75,7 @@ class MainWin : public AbstractMainWin
 	class State : public AbstractState
 	{
 	  public:
-		State()                   = default;
-		State(State const& other) = default;
-		State(State&& other)      = default;
-		virtual void readFromDataStream(QDataStream& stream) override
+		void readFromDataStream(QDataStream& stream) override
 		{
 			toneMappingState.readFromDataStream(stream);
 			cosmoCamState.readFromDataStream(stream);
@@ -90,7 +87,7 @@ class MainWin : public AbstractMainWin
 			stream >> stereoMultiplier;
 			universeState.readFromDataStream(stream);
 		};
-		virtual void writeInDataStream(QDataStream& stream) override
+		void writeInDataStream(QDataStream& stream) override
 		{
 			toneMappingState.writeInDataStream(stream);
 			cosmoCamState.writeInDataStream(stream);
@@ -106,9 +103,9 @@ class MainWin : public AbstractMainWin
 		ToneMappingModel::State toneMappingState;
 		Camera::State cosmoCamState;
 		OrbitalSystemCamera::State planetCamState;
-		float renderLabels;
-		float renderOrbits;
-		bool compass = false;
+		float renderLabels = 0.f;
+		float renderOrbits = 0.f;
+		bool compass       = false;
 		CalibrationCompass::State compassState;
 		double stereoMultiplier = 1.0;
 		Universe::State universeState;
@@ -121,39 +118,39 @@ class MainWin : public AbstractMainWin
 	/**
 	 * @getter{renderOrbits}
 	 */
-	float renderOrbits() const
+	static float renderOrbits()
 	{
 		return CelestialBodyRenderer::renderOrbits();
 	};
 	/**
 	 * @setter{renderOrbits, renderOrbits}
 	 */
-	void setRenderOrbits(float render)
+	static void setRenderOrbits(float render)
 	{
 		CelestialBodyRenderer::renderOrbits() = render;
 	};
 	/**
 	 * @getter{renderLabels}
 	 */
-	float renderLabels() const
+	static float renderLabels()
 	{
 		return CelestialBodyRenderer::renderLabels();
 	};
 	/**
 	 * @setter{renderLabels, renderLabels}
 	 */
-	void setRenderLabels(float render)
+	static void setRenderLabels(float render)
 	{
 		CelestialBodyRenderer::renderLabels() = render;
 	};
 	/**
 	 * @getter{darkmatterEnabled}
 	 */
-	bool darkmatterEnabled() const { return Method::isDarkMatterEnabled(); };
+	static bool darkmatterEnabled() { return Method::isDarkMatterEnabled(); };
 	/**
 	 * @setter{darkmatterEnabled, darkmatterEnabled}
 	 */
-	void setDarkmatterEnabled(bool enabled)
+	static void setDarkmatterEnabled(bool enabled)
 	{
 		Method::setDarkMatterEnabled(enabled);
 	};
@@ -203,48 +200,45 @@ class MainWin : public AbstractMainWin
 	};
 
   protected:
-	virtual void actionEvent(BaseInputManager::Action const& a, bool pressed,
-	                         bool autorepeated) override;
-	virtual bool event(QEvent* e) override;
-	virtual void mousePressEvent(QMouseEvent* e) override;
-	virtual void mouseReleaseEvent(QMouseEvent* e) override;
-	virtual void mouseMoveEvent(QMouseEvent* e) override;
-	virtual void wheelEvent(QWheelEvent* e) override;
-	virtual void vrEvent(VRHandler::Event const& e) override;
-	virtual void gamepadEvent(GamepadHandler::Event const& e) override;
+	void actionEvent(BaseInputManager::Action const& a, bool pressed,
+	                 bool autorepeated) override;
+	bool event(QEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	void mouseReleaseEvent(QMouseEvent* e) override;
+	void mouseMoveEvent(QMouseEvent* e) override;
+	void wheelEvent(QWheelEvent* e) override;
+	void vrEvent(VRHandler::Event const& e) override;
+	void gamepadEvent(GamepadHandler::Event const& e) override;
 
-	virtual void setupPythonAPI() override;
-	virtual void initLibraries() override;
+	void setupPythonAPI() override;
+	void initLibraries() override;
 
 	// declare drawn resources
-	virtual void initScene() override;
+	void initScene() override;
 
 	// update physics/controls/meshes, etc...
 	// prepare for rendering
-	virtual void updateScene(BasicCamera& camera,
-	                         QString const& pathId) override;
+	void updateScene(BasicCamera& camera, QString const& pathId) override;
 
 	// render user scene on camera
 	// (no controllers or hands)
-	virtual void renderScene(BasicCamera const& camera,
-	                         QString const& pathId) override;
-	virtual void renderGui(QSize const& targetSize,
-	                       AdvancedPainter& painter) override;
+	void renderScene(BasicCamera const& camera, QString const& pathId) override;
+	void renderGui(QSize const& targetSize, AdvancedPainter& painter) override;
 
-	virtual void applyPostProcShaderParams(
+	void applyPostProcShaderParams(
 	    QString const& id, GLShaderProgram const& shader,
 	    GLFramebufferObject const& currentTarget) const override;
 
-	virtual std::vector<GLComputeShader::TextureBinding>
+	std::vector<GLComputeShader::TextureBinding>
 	    getPostProcessingUniformTextures(
 	        QString const& id, GLShaderProgram const& shader,
 	        GLFramebufferObject const& currentTarget) const override;
 
-	virtual std::unique_ptr<AbstractState> constructNewState() const override
+	std::unique_ptr<AbstractState> constructNewState() const override
 	{
 		return std::make_unique<MainWin::State>();
 	};
-	virtual void readState(AbstractState const& s) override
+	void readState(AbstractState const& s) override
 	{
 		auto const& state = dynamic_cast<State const&>(s);
 		toneMappingModel->readState(state.toneMappingState);
@@ -269,7 +263,7 @@ class MainWin : public AbstractMainWin
 		vrHandler->setStereoMultiplier(state.stereoMultiplier);
 		universe->readState(state.universeState);
 	};
-	virtual void writeState(AbstractState& s) const override
+	void writeState(AbstractState& s) const override
 	{
 		auto& state = dynamic_cast<State&>(s);
 		toneMappingModel->writeState(state.toneMappingState);

@@ -26,7 +26,7 @@ class MainWin;
 class PresenterHelp : public VIRUPDialog3D
 {
   public:
-	PresenterHelp(MainWin& mainwin);
+	explicit PresenterHelp(MainWin& mainwin);
 
   private:
 	MainWin& mainwin;
