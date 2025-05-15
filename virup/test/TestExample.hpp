@@ -25,7 +25,7 @@ class TestExample : public QObject
 {
 	Q_OBJECT
   private slots:
-	void ExTest() { QVERIFY(1 == 1); }
+	static void ExTest() { QVERIFY(1 == 1); }
 };
 
 #endif // TESTEXAMPLE_H
