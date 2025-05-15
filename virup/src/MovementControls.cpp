@@ -27,7 +27,7 @@ MovementControls::MovementControls(VRHandler const& vrHandler, BBox dataBBox,
     , dataBBox(dataBBox)
     , cosmoCam(cosmoCam)
     , planetCam(planetCam)
-    , guideShader("default")
+    , guideShader(ShaderDescriptor{"default"})
 {
 	if((dataBBox.maxx - dataBBox.minx >= dataBBox.maxy - dataBBox.miny)
 	   && (dataBBox.maxx - dataBBox.minx >= dataBBox.maxz - dataBBox.minz))

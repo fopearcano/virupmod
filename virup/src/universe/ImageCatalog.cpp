@@ -67,7 +67,7 @@ QByteArray escapeInQuotes(const QByteArray& input)
 // END UTILS
 
 ImageCatalog::ImageCatalog()
-    : shader("imgcatalog")
+    : shader(ShaderDescriptor{"imgcatalog"})
 {
 	Primitives::setAsQuad(quad, shader);
 }

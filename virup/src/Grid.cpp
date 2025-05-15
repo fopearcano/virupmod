@@ -19,7 +19,7 @@
 #include "Grid.hpp"
 
 Grid::Grid()
-    : shader("default")
+    : shader(ShaderDescriptor{"default"})
     , scaleText3D(1024, 256)
 {
 	shader.setUniform("alpha", 0.5f);

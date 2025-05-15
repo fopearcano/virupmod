@@ -34,9 +34,9 @@ std::unique_ptr<GLTexture>& CSVObjects::galTex()
 }
 
 CSVObjects::CSVObjects(QJsonObject const& json, bool galaxies)
-    : shader(galaxies ? "galaxies" : "stars")
+    : shader(ShaderDescriptor{galaxies ? "galaxies" : "stars"})
     , galaxies(galaxies)
-    , conShader("constellations")
+    , conShader(ShaderDescriptor{"constellations"})
 {
 	if(!galaxies
 	   && QFile::exists(QSettings().value("data/rootdir").toString()

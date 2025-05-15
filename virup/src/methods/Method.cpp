@@ -13,7 +13,8 @@ Method::Method(std::string const& shadersCommonName)
 
 Method::Method(std::string const& vertexShaderPath,
                std::string const& fragmentShaderPath)
-    : shaderProgram(vertexShaderPath.c_str(), fragmentShaderPath.c_str())
+    : shaderProgram(ShaderDescriptor{vertexShaderPath.c_str(),
+                                     fragmentShaderPath.c_str()})
 {
 	resetAlpha();
 }

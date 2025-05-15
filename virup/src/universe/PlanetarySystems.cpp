@@ -22,7 +22,7 @@
 #include "physics/CSVOrbit.hpp"
 
 PlanetarySystems::PlanetarySystems()
-    : shader("default")
+    : shader(ShaderDescriptor{"default"})
 {
 	const QString rootdir(QSettings().value("data/rootdir").toString());
 	const auto planetsystemdir

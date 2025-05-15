@@ -20,7 +20,7 @@
 
 VolumetricModel::VolumetricModel(QString const& datFile,
                                  QString const& textureName)
-    : shader("volume")
+    : shader(ShaderDescriptor{"volume"})
 {
 	std::ifstream file(datFile.toStdString(), std::ios::binary);
 	int64_t Nx = 0, Ny = 0, Nz = 0;

@@ -19,7 +19,7 @@
 #include "universe/Credits.hpp"
 
 Credits::Credits()
-    : shader("credits")
+    : shader(ShaderDescriptor{"credits"})
 {
 	Primitives::setAsUnitCube(mesh, shader);
 }

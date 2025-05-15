@@ -19,7 +19,7 @@
 #include "universe/TexturedSphere.hpp"
 
 TexturedSphere::TexturedSphere()
-    : shader("texturedsphere")
+    : shader(ShaderDescriptor{"texturedsphere"})
 {
 	Primitives::setAsUnitSphere(mesh, shader, 50, 50);
 }
