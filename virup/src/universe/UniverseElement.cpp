@@ -228,7 +228,7 @@ QList<QPair<QString, QWidget*>>
 
 	result.append({QObject::tr("Solar System local position:"), w});
 
-	stored          = jsonObj["customzaxis"].toObject();
+	stored          = Vector3{jsonObj["customzaxis"].toObject()};
 	w               = make_qt_unique<QWidget>(parent);
 	layout          = make_qt_unique<QHBoxLayout>(*w);
 	sboxes          = {{nullptr, nullptr, nullptr}};
