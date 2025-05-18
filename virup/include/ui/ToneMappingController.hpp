@@ -24,6 +24,8 @@
 
 #include "VIRUPDialog3D.hpp"
 
+class ToneMappingModel;
+
 class ToneMappingController : public VIRUPDialog3D
 {
   public:

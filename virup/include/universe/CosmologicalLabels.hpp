@@ -30,7 +30,7 @@ class CosmologicalLabels : public UniverseElement
 	void setJson(QJsonObject const& json) override;
 	BBox getBoundingBox() const override { return bbox; };
 	void update(Camera const& camera) override;
-	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	void render(Camera const& camera) override;
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);

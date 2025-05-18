@@ -1,11 +1,11 @@
-#version 150 core
+#version 450 core
+
+#include <hvr/hvr.glsl>
 
 in vec3 f_position;
 uniform sampler2D creditsTex;
 uniform vec3 color;
 uniform float alpha        = 1.0;
-uniform float exposure     = 1.0;
-uniform float dynamicrange = 1.0;
 uniform float aspectratio = 1.0;
 out vec4 outColor;
 
@@ -20,5 +20,5 @@ void main()
 	{
 		outColor = texture(creditsTex, pos + vec2(0.5, 0.5));
 	}
-	outColor.rgb *= dynamicrange / exposure;
+	outColor.rgb *= tmm.dynamicrange / tmm.exposure;
 }

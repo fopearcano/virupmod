@@ -45,7 +45,7 @@ class PlanetarySystems : public UniverseElement
 	OrbitalSystem* getClosestSystem() { return systems[closestId].get(); };
 	Vector3 getAbsolutePosition(QString const& systemName) const;
 	void update(Camera const& camera) override;
-	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	void render(Camera const& camera) override;
 
 	bool useVRCamposForClosest = true;
 

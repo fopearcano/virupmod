@@ -23,7 +23,6 @@
 #include <QLabel>
 
 #include "Camera.hpp"
-#include "ToneMappingModel.hpp"
 #include "gui/ColorSelector.hpp"
 #include "gui/PathSelector.hpp"
 #include "gui/SciDoubleSpinBox.hpp"
@@ -106,16 +105,13 @@ class UniverseElement : public QObject
 	/*! @brief Implement this method to render this element.
 	 *
 	 * @param camera The current @ref Camera used for rendering.
-	 * @param tmm The current @ref ToneMappingModel used for rendering (can be
 	 * ignored for physical-based rendering, it will be applied by the engine).
 	 */
-	virtual void render(Camera const& /*camera*/,
-	                    ToneMappingModel const& /*tmm*/) {};
+	virtual void render(Camera const& /*camera*/) {};
 
 	/*! @brief Implement this method to render this element.
 	 *
 	 * @param camera The current @ref Camera used for rendering.
-	 * @param tmm The current @ref ToneMappingModel used for rendering (can be
 	 * ignored for physical-based rendering, it will be applied by the engine).
 	 */
 	virtual void renderGui(QSize const& /*targetSize*/,

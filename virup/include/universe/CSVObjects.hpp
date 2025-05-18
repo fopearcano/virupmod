@@ -65,7 +65,7 @@ class CSVObjects : public UniverseElement
 	CSVObjects& operator=(CSVObjects const&) = delete;
 	CSVObjects& operator=(CSVObjects&&)      = delete;
 	BBox getBoundingBox() const override;
-	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	void render(Camera const& camera) override;
 	~CSVObjects() override;
 
 	float colormix = 0.0f;

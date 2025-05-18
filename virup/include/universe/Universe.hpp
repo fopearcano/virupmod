@@ -374,7 +374,7 @@ class Universe : public QObject
 	void updateCosmo();
 	void updatePlanetarySystem();
 	void updateClock(bool videomode, float frameTiming);
-	void renderCosmo(ToneMappingModel const& toneMappingModel);
+	void renderCosmo();
 	void renderPlanetarySystem();
 	void renderPlanetarySystemTransparent();
 	void renderGui(QSize const& targetSize, AdvancedPainter& painter);

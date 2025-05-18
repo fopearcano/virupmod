@@ -51,8 +51,7 @@ BBox TexturedSphere::getBoundingBox() const
 	return {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 2.0, {0.0, 0.0, 0.0}};
 }
 
-void TexturedSphere::render(Camera const& camera,
-                            ToneMappingModel const& /*tmm*/)
+void TexturedSphere::render(Camera const& camera)
 {
 	QMatrix4x4 model;
 	QVector3D campos;

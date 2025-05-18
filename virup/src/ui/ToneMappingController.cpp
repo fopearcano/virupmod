@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "ToneMappingModel.hpp"
 #include "universe/UniverseElement.hpp"
 
 ToneMappingController::ToneMappingController(ToneMappingModel& tmm)

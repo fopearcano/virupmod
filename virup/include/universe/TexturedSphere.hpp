@@ -31,7 +31,7 @@ class TexturedSphere : public UniverseElement
 	QJsonObject getJson() const override;
 	void setJson(QJsonObject const& json) override;
 	BBox getBoundingBox() const override;
-	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	void render(Camera const& camera) override;
 
 	static QList<QPair<QString, QWidget*>>
 	    getLauncherFields(QWidget& parent, QJsonObject& jsonObj);

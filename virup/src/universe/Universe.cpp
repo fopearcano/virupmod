@@ -625,7 +625,7 @@ void Universe::updatePlanetarySystem()
 	systemRenderer->update(camPlanet);
 }
 
-void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
+void Universe::renderCosmo()
 {
 	GLHandler::glf().glDepthFunc(GL_LEQUAL);
 	const GLStateSet glState(
@@ -638,10 +638,10 @@ void Universe::renderCosmo(ToneMappingModel const& toneMappingModel)
 		{
 			continue;
 		}
-		pair.second->render(camCosmo, toneMappingModel);
+		pair.second->render(camCosmo);
 	}
 
-	planetSystems->render(camCosmo, toneMappingModel);
+	planetSystems->render(camCosmo);
 }
 
 void Universe::renderPlanetarySystem()

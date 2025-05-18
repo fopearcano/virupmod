@@ -21,7 +21,6 @@
 
 #include <QCheckBox>
 #include <map>
-#include <set>
 
 #include "gradient/GradientSelector.hpp"
 #include "methods/TreeMethodLOD.hpp"
@@ -47,7 +46,7 @@ class CosmologicalSimulation : public UniverseElement
 		this->forcedQuality = forcedQuality;
 	};
 	void update(Camera const& camera) override;
-	void render(Camera const& camera, ToneMappingModel const& tmm) override;
+	void render(Camera const& camera) override;
 	void dumpOctreesStates(QString const& dirPath,
 	                       QString const& filePathPrefix);
 

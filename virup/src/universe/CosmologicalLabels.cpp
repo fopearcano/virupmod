@@ -109,15 +109,14 @@ void CosmologicalLabels::update(Camera const& camera)
 	}
 }
 
-void CosmologicalLabels::render(Camera const& /*camera*/,
-                                ToneMappingModel const& tmm)
+void CosmologicalLabels::render(Camera const& /*camera*/)
 {
 	if(getVisibility() > 0.f)
 	{
 		for(auto& cosmoLabel : cosmoLabels)
 		{
 			cosmoLabel.second.setAlpha(getVisibility());
-			cosmoLabel.second.render(tmm.exposure(), tmm.dynamicrange());
+			cosmoLabel.second.render();
 		}
 	}
 }

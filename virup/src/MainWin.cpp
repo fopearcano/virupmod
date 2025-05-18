@@ -751,7 +751,7 @@ void MainWin::renderScene(BasicCamera const& camera, QString const& pathId)
 	}
 	auto const& cam(dynamic_cast<Camera const&>(camera));
 
-	universe->renderCosmo(*toneMappingModel);
+	universe->renderCosmo();
 
 	// update here because depends on eye
 	const QVector3D pos(

@@ -43,10 +43,8 @@ void Credits::setJson(QJsonObject const& json)
 	        .data());
 }
 
-void Credits::render(Camera const& camera, ToneMappingModel const& tmm)
+void Credits::render(Camera const& camera)
 {
-	shader.setUniform("exposure", tmm.exposure());
-	shader.setUniform("dynamicrange", tmm.dynamicrange());
 	shader.setUniform("alpha", 1.f); // visibility * brightnessMultiplier);
 	shader.setUniform("color", QVector3D(10000.0, 0.0, 0.0));
 

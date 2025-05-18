@@ -1,4 +1,6 @@
-#version 420 core
+#version 450 core
+
+#include <hvr/hvr.glsl>
 
 in vec3 position;
 in float absmag;
@@ -8,9 +10,6 @@ uniform mat4 camera;
 uniform float pixelSolidAngle      = 1.0;
 uniform float brightnessMultiplier = 1.0;
 uniform vec3 campos;
-
-uniform float camexp;
-uniform float camdynrange;
 
 out vec4 f_finalcolor;
 out float f_pointsize;
@@ -59,7 +58,7 @@ void main()
 	vec3 col = color * luminance;
 
 	// m := factor of how much star is over-exposed
-	float m     = max3(col) * camexp / camdynrange;
+	float m     = max3(col) * tmm.exposure / tmm.dynamicrange;
 	f_pointsize = sqrt(m);
 	if(m > 1.0)
 	{

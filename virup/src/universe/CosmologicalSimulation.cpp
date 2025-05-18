@@ -243,8 +243,7 @@ void CosmologicalSimulation::update(Camera const& camera)
 	OctreeLOD::forceQuality() = -1;
 }
 
-void CosmologicalSimulation::render(Camera const& camera,
-                                    ToneMappingModel const& /*tmm*/)
+void CosmologicalSimulation::render(Camera const& camera)
 {
 	auto vis = getVisibility();
 	if(useBrightnessMultiplier())
