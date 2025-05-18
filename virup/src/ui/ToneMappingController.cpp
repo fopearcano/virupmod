@@ -38,9 +38,9 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	auto* w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
 	auto* hl = make_qt_unique<QHBoxLayout>(*w);
-	autoCb->setChecked(tmm.autoexposure);
+	autoCb->setChecked(tmm.autoexposure());
 	connect(autoCb, &QCheckBox::stateChanged,
-	        [this]() { this->tmm.autoexposure = this->autoCb->isChecked(); });
+	        [this]() { this->tmm.setAutoexposure(this->autoCb->isChecked()); });
 	hl->QLayout::addWidget(autoCb);
 	auto* l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Automatic exposure"));
@@ -64,9 +64,9 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	w = make_qt_unique<QWidget>(*this);
 	mainLayout->QLayout::addWidget(w);
 	hl = make_qt_unique<QHBoxLayout>(*w);
-	prkCb->setChecked(tmm.purkinje);
+	prkCb->setChecked(tmm.purkinje());
 	connect(prkCb, &QCheckBox::stateChanged,
-	        [this]() { this->tmm.purkinje = this->prkCb->isChecked(); });
+	        [this]() { this->tmm.setPurkinje(this->prkCb->isChecked()); });
 	hl->QLayout::addWidget(prkCb);
 	l = make_qt_unique<QLabel>(*this);
 	l->setText(tr("Purkinje Effect"));
@@ -79,11 +79,13 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	hl->addWidget(exposureLabel);
 	auto* b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("-"));
-	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure /= 1.5f; });
+	connect(b, &QPushButton::pressed,
+	        [this]() { this->tmm.setExposure(this->tmm.exposure() / 1.5f); });
 	hl->addWidget(b);
 	b = make_qt_unique<QPushButton>(*this);
 	b->setText(tr("+"));
-	connect(b, &QPushButton::pressed, [this]() { this->tmm.exposure *= 1.5f; });
+	connect(b, &QPushButton::pressed,
+	        [this]() { this->tmm.setExposure(this->tmm.exposure() / 1.5f); });
 	hl->addWidget(b);
 
 	b = make_qt_unique<QPushButton>(*this);
@@ -91,10 +93,10 @@ ToneMappingController::ToneMappingController(ToneMappingModel& tmm)
 	connect(b, &QPushButton::pressed,
 	        [this]()
 	        {
-		        this->tmm.exposure                         = 0.3f;
-		        this->tmm.dynamicrange                     = 10000.f;
-		        this->tmm.autoexposure                     = false;
-		        this->tmm.purkinje                         = false;
+		        this->tmm.setExposure(0.3f);
+		        this->tmm.setDynamicrange(10000.f);
+		        this->tmm.setAutoexposure(false);
+		        this->tmm.setPurkinje(false);
 		        UniverseElement::useBrightnessMultiplier() = true;
 	        });
 	hl->addWidget(b);
@@ -107,9 +109,9 @@ void ToneMappingController::update()
 		setFixedSize(size());
 		fixedSize = true;
 	}
-	autoCb->setChecked(tmm.autoexposure);
+	autoCb->setChecked(tmm.autoexposure());
 	bmCb->setChecked(!UniverseElement::useBrightnessMultiplier());
-	prkCb->setChecked(tmm.purkinje);
+	prkCb->setChecked(tmm.purkinje());
 
-	exposureLabel->setText(tr("Exposure : ") + QString::number(tmm.exposure));
+	exposureLabel->setText(tr("Exposure : ") + QString::number(tmm.exposure()));
 }

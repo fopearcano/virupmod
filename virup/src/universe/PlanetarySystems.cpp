@@ -196,8 +196,8 @@ void PlanetarySystems::render(Camera const& /*camera*/,
 {
 	const GLBlendSet glBlend(GLBlendSet::BlendState{});
 	shader.setUniform("alpha", getVisibility());
-	shader.setUniform("exposure", tmm.exposure);
-	shader.setUniform("dynamicrange", tmm.dynamicrange);
+	shader.setUniform("exposure", tmm.exposure());
+	shader.setUniform("dynamicrange", tmm.dynamicrange());
 	GLHandler::setUpRender(shader, model);
 	mesh.render();
 }

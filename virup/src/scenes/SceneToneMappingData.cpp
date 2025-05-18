@@ -31,14 +31,15 @@ SceneToneMappingData::SceneToneMappingData(float exposure, float contrast,
 SceneToneMappingData
     SceneToneMappingData::getCurrentState(ToneMappingModel const& tmm)
 {
-	return SceneToneMappingData{tmm.exposure, tmm.contrast, tmm.dynamicrange};
+	return SceneToneMappingData{tmm.exposure(), tmm.contrast(),
+	                            tmm.dynamicrange()};
 }
 
 void SceneToneMappingData::setAsState(ToneMappingModel& tmm) const
 {
-	tmm.exposure     = exposure;
-	tmm.contrast     = contrast;
-	tmm.dynamicrange = dynamicrange;
+	tmm.setExposure(exposure);
+	tmm.setContrast(contrast);
+	tmm.setDynamicrange(dynamicrange);
 }
 
 SceneToneMappingData

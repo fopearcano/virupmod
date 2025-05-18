@@ -117,7 +117,7 @@ void CosmologicalLabels::render(Camera const& /*camera*/,
 		for(auto& cosmoLabel : cosmoLabels)
 		{
 			cosmoLabel.second.setAlpha(getVisibility());
-			cosmoLabel.second.render(tmm.exposure, tmm.dynamicrange);
+			cosmoLabel.second.render(tmm.exposure(), tmm.dynamicrange());
 		}
 	}
 }

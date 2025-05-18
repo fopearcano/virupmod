@@ -310,6 +310,8 @@ class MainWin : public AbstractMainWin
 	// TEMP
 	const int textWidth  = 225;
 	const int textHeight = 145;
+	float exposure       = 1.f;
+	float dynamicrange   = 1.f;
 
 	std::string lastTargetName = std::string("");
 

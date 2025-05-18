@@ -215,11 +215,15 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 							{
 								if(padCoords[0] < 0.0f) // LEFT
 								{
-									toneMappingModel->exposure *= 8.0 / 10.0;
+									toneMappingModel->setExposure(
+									    toneMappingModel->exposure() * 8.0
+									    / 10.0);
 								}
 								else // RIGHT
 								{
-									toneMappingModel->exposure *= 10.0 / 8.0;
+									toneMappingModel->setExposure(
+									    toneMappingModel->exposure() * 10.0
+									    / 8.0);
 								}
 							}
 							else // UP OR DOWN
@@ -349,9 +353,9 @@ void MainWin::initScene()
 	QImageReader::setAllocationLimit(0);
 #endif
 
-	toneMappingModel->exposure     = 0.3f;
-	toneMappingModel->dynamicrange = 10000.f;
-	grid                           = std::make_unique<Grid>();
+	toneMappingModel->setExposure(0.3f);
+	toneMappingModel->setDynamicrange(10000.f);
+	grid = std::make_unique<Grid>();
 
 	std::unique_ptr<Camera> cam = std::make_unique<Camera>(*vrHandler);
 	cam->seatedVROrigin         = false;
@@ -359,9 +363,8 @@ void MainWin::initScene()
 	                        renderer.getAspectRatioFromFOV());
 
 	std::unique_ptr<OrbitalSystemCamera> camPlanet
-	    = std::make_unique<OrbitalSystemCamera>(*vrHandler,
-	                                            toneMappingModel->exposure,
-	                                            toneMappingModel->dynamicrange);
+	    = std::make_unique<OrbitalSystemCamera>(*vrHandler, exposure,
+	                                            dynamicrange);
 	camPlanet->seatedVROrigin = false;
 	camPlanet->setPerspectiveProj(renderer.getVerticalFOV(),
 	                              renderer.getAspectRatioFromFOV());
@@ -619,8 +622,10 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 	}
 	if(pathId == "planet")
 	{
-		auto& cam = dynamic_cast<OrbitalSystemCamera&>(camera);
-		auto pos  = QSettings()
+		exposure     = toneMappingModel->exposure();
+		dynamicrange = toneMappingModel->dynamicrange();
+		auto& cam    = dynamic_cast<OrbitalSystemCamera&>(camera);
+		auto pos     = QSettings()
 		               .value("misc/uilabelspos")
 		               .value<QVector3D>(); //(-0.3f, 0.25f, -0.4f);
 		pos *= QSettings().value("misc/uilabelsdistmul").toDouble();
@@ -654,13 +659,13 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		    scaleFactor * static_cast<float>(textWidth) / height());
 
 		helperBillboard->getShader().setUniform("exposure",
-		                                        toneMappingModel->exposure);
-		helperBillboard->getShader().setUniform("dynamicrange",
-		                                        toneMappingModel->dynamicrange);
+		                                        toneMappingModel->exposure());
+		helperBillboard->getShader().setUniform(
+		    "dynamicrange", toneMappingModel->dynamicrange());
 		debugText->getShader().setUniform("exposure",
-		                                  toneMappingModel->exposure);
+		                                  toneMappingModel->exposure());
 		debugText->getShader().setUniform("dynamicrange",
-		                                  toneMappingModel->dynamicrange);
+		                                  toneMappingModel->dynamicrange());
 
 		universe->updateClock(videomode, frameTiming);
 

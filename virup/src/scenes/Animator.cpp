@@ -164,9 +164,9 @@ void Animator::update(float frameTiming, bool videomode)
 
 	if(playCustom)
 	{
-		tmm.exposure = 0.3;
-		fadeFactor   = 1.0;
-		float d      = customTransition.getDuration();
+		tmm.setExposure(0.3);
+		fadeFactor = 1.0;
+		float d    = customTransition.getDuration();
 		if(idleMode)
 		{
 			d *= 5.f;
@@ -178,7 +178,7 @@ void Animator::update(float frameTiming, bool videomode)
 		{
 			stop();
 		}
-		tmm.exposure *= fadeFactor;
+		tmm.setExposure(tmm.exposure() * fadeFactor);
 	}
 	else if(!transitions.empty())
 	{
@@ -195,8 +195,8 @@ void Animator::update(float frameTiming, bool videomode)
 		}
 		if(t_secs <= currentTransition->getDuration() + durationSum)
 		{
-			tmm.exposure = 0.3;
-			fadeFactor   = 1.0;
+			tmm.setExposure(0.3);
+			fadeFactor = 1.0;
 			const float t_harsh((t_secs - durationSum)
 			                    / currentTransition->getDuration());
 			if(currentTransition == transitions.data())
@@ -235,7 +235,7 @@ void Animator::update(float frameTiming, bool videomode)
 					    << planetdPos.length() / dt << cosmodPos.length() / dt;
 				}
 			}
-			tmm.exposure *= fadeFactor;
+			tmm.setExposure(tmm.exposure() * fadeFactor);
 		}
 		else
 		{
