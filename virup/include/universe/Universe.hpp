@@ -438,6 +438,7 @@ class Universe : public QObject
 		OctreeLOD::unsetCurrentTanAngleLimit();
 	};
 	QString getImageTitle(QString const& imageFile) const;
+	QString getImageDescription(QString const& imageFile) const;
 	void dumpOctreesStates();
 
   signals:

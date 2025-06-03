@@ -547,6 +547,18 @@ QString Universe::getImageTitle(QString const& file) const
 	return "";
 }
 
+QString Universe::getImageDescription(QString const& file) const
+{
+	for(auto const* cat : imgCatalogs)
+	{
+		if(!cat->getTitleDescription(file).first.isEmpty())
+		{
+			return cat->getTitleDescription(file).second;
+		}
+	}
+	return "";
+}
+
 void Universe::dumpOctreesStates()
 {
 	for(auto* cosmoSim : cosmoSims)
