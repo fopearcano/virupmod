@@ -54,6 +54,7 @@ MovementControls::MovementControls(VRHandler const& vrHandler, BBox dataBBox,
 void MovementControls::actionEvent(BaseInputManager::Action const& a,
                                    bool pressed)
 {
+	const float scaleFactor = 5.f;
 	if(pressed)
 	{
 		if(a.id == "centercam")
@@ -87,6 +88,14 @@ void MovementControls::actionEvent(BaseInputManager::Action const& a,
 		{
 			posVel.setX(1);
 		}
+		else if(a.id == "scaledown")
+		{
+			scaleDecreaseFactor = scaleFactor;
+		}
+		else if(a.id == "scaleup")
+		{
+			scaleIncreaseFactor = scaleFactor;
+		}
 	}
 
 	else
@@ -110,6 +119,14 @@ void MovementControls::actionEvent(BaseInputManager::Action const& a,
 		else if(a.id == "right")
 		{
 			posVel.setX(0);
+		}
+		else if(a.id == "scaledown")
+		{
+			scaleDecreaseFactor = 1.f;
+		}
+		else if(a.id == "scaleup")
+		{
+			scaleIncreaseFactor = 1.f;
 		}
 	}
 }
@@ -349,41 +366,6 @@ void MovementControls::vrEventOrbitalSystem(VRHandler::Event const& e)
 	}
 }
 
-void MovementControls::gamepadEvent(GamepadHandler::Event const& e)
-{
-	const float factor = 5.f;
-	switch(e.type)
-	{
-		case GamepadHandler::EventType::BUTTON_PRESSED:
-			switch(e.button)
-			{
-				case GamepadHandler::Button::L1:
-					scaleDecreaseFactor = factor;
-					break;
-				case GamepadHandler::Button::R1:
-					scaleIncreaseFactor = factor;
-					break;
-				default:
-					break;
-			}
-			break;
-		case GamepadHandler::EventType::BUTTON_UNPRESSED:
-			switch(e.button)
-			{
-				case GamepadHandler::Button::L1:
-					scaleDecreaseFactor = 1.f;
-					break;
-				case GamepadHandler::Button::R1:
-					scaleIncreaseFactor = 1.f;
-					break;
-				default:
-					break;
-			}
-			break;
-		default:
-			break;
-	}
-}
 void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
                               GamepadHandler const& gamepadHandler)
 {

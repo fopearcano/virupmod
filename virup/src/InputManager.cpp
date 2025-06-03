@@ -20,18 +20,32 @@
 
 InputManager::InputManager()
 {
-	addAction(Qt::Key_Home, {"resetvrpos", "Reset VR origin"});
-	addAction(Qt::Key_Space, {"toggleinfotext", "Toggle Info Text"});
-	addAction(Qt::Key_M, {"toggledm", "Toggle Dark Matter"});
-	addAction(Qt::Key_L, {"togglelabels", "Toggle Labels"});
-	addAction(Qt::Key_O, {"toggleorbits", "Toggle Orbits"});
-	addAction(Qt::Key_G, {"togglegrid", "Toggle Grid"});
-	addAction(Qt::Key_P, {"showposition", "Show Current Position"});
-	addAction(Qt::Key_R, {"timecoeffdown", "Lower Time Coeff"});
-	addAction(Qt::Key_T, {"timecoeffup", "Raise Time Coeff"});
-	addAction(Qt::Key_C, {"centercam", "Center Camera On Target"});
-	addAction(Qt::Key_W, {"forward", "Move Forward"});
-	addAction(Qt::Key_A, {"left", "Move Left"});
-	addAction(Qt::Key_S, {"backward", "Move Backward"});
-	addAction(Qt::Key_D, {"right", "Move Right"});
+	addAction(Input{Qt::Key_Home}, {"resetvrpos", tr("Reset VR origin")});
+	addAction(Input{Qt::Key_Space}, {"toggleinfotext", tr("Toggle Info Text")});
+	addAction(Input{Qt::Key_M}, {"toggledm", tr("Toggle Dark Matter")});
+	addAction(Input{Qt::Key_L}, {"togglelabels", tr("Toggle Labels")});
+	addAction(Input{Qt::Key_O}, {"toggleorbits", tr("Toggle Orbits")});
+	addAction(Input{Qt::Key_G}, {"togglegrid", tr("Toggle Grid")});
+	addAction(Input{Qt::Key_P}, {"showposition", tr("Show Current Position")});
+	addAction(Input{Qt::Key_R}, {"timecoeffdown", tr("Lower Time Coeff")});
+	addAction(Input{Qt::Key_T}, {"timecoeffup", tr("Raise Time Coeff")});
+	addAction(Input{Qt::Key_C}, {"centercam", tr("Center Camera On Target")});
+
+	addAction(Input{Qt::Key_W}, {"forward", tr("Move Forward")});
+	addAction(Input{Qt::Key_A}, {"left", tr("Move Left")});
+	addAction(Input{Qt::Key_S}, {"backward", tr("Move Backward")});
+	addAction(Input{Qt::Key_D}, {"right", tr("Move Right")});
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::L1},
+	          {"scaledown", tr("Scale down")});
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::R1},
+	          {"scaleup", tr("Scale up")});
+
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::A},
+	          {"recenter", tr("Recenter scene")});
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::X},
+	          {"previous", tr("Previous scene")});
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::B},
+	          {"next", tr("Next scene")});
+	addAction(Input{Qt::Key_unknown, GamepadHandler::Button::Y},
+	          {"home", tr("Home scene")});
 }

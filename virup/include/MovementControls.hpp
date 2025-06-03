@@ -50,7 +50,6 @@ class MovementControls : public QObject
 	void vrEvent(VRHandler::Event const& e,
 	             QMatrix4x4 const& trackedSpaceToWorldTransform,
 	             bool renderPlanetarySystem);
-	void gamepadEvent(GamepadHandler::Event const& e);
 	QVector3D getGamepadVelocity() const { return gamepadVel; };
 	void update(double frameTiming, bool renderPlanetarySystem,
 	            GamepadHandler const& gamepadHandler);

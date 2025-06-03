@@ -11,6 +11,22 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed,
 	{
 		if(pressed)
 		{
+			auto onSceneChanged = [this]()
+			{
+				auto id(animator->getCurrentTransitionId());
+				if(id >= 0
+				   && static_cast<unsigned int>(id)
+				          < animator->getTransitions().size())
+				{
+					timeSinceTextUpdate = 0.0;
+					debugText->setText(
+					    animator
+					        ->getTransitions()[animator
+					                               ->getCurrentTransitionId()]
+					        .getName());
+				}
+			};
+
 			if(a.id == "resetvrpos")
 			{
 				// integralDt    = 0;
@@ -74,6 +90,30 @@ void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed,
 					        .c_str());
 					timeSinceTextUpdate = 0.f;
 				}
+			}
+			else if(a.id == "recenter")
+			{
+				animator->recenter();
+				recenterSound.play();
+				onSceneChanged();
+			}
+			else if(a.id == "next")
+			{
+				animator->next();
+				nextSound.play();
+				onSceneChanged();
+			}
+			else if(a.id == "previous")
+			{
+				animator->previous();
+				previousSound.play();
+				onSceneChanged();
+			}
+			else if(a.id == "home")
+			{
+				animator->home();
+				homeSound.play();
+				onSceneChanged();
 			}
 		}
 		movementControls->actionEvent(a, pressed);
@@ -280,50 +320,9 @@ void MainWin::vrEvent(VRHandler::Event const& e)
 
 void MainWin::gamepadEvent(GamepadHandler::Event const& e)
 {
-	if(loaded)
-	{
-		movementControls->gamepadEvent(e);
-	}
-	if(e.type == GamepadHandler::EventType::BUTTON_PRESSED)
+	if(e.type != GamepadHandler::EventType::NONE)
 	{
 		stopIdle();
-		bool sceneChanged = true;
-		switch(e.button)
-		{
-			case GamepadHandler::Button::A:
-				animator->recenter();
-				recenterSound.play();
-				break;
-			case GamepadHandler::Button::B:
-				animator->next();
-				nextSound.play();
-				break;
-			case GamepadHandler::Button::X:
-				animator->previous();
-				previousSound.play();
-				break;
-			case GamepadHandler::Button::Y:
-				animator->home();
-				homeSound.play();
-				break;
-			default:
-				sceneChanged = false;
-				break;
-		}
-		if(sceneChanged)
-		{
-			auto id(animator->getCurrentTransitionId());
-			if(id >= 0
-			   && static_cast<unsigned int>(id)
-			          < animator->getTransitions().size())
-			{
-				timeSinceTextUpdate = 0.0;
-				debugText->setText(
-				    animator
-				        ->getTransitions()[animator->getCurrentTransitionId()]
-				        .getName());
-			}
-		}
 	}
 	AbstractMainWin::gamepadEvent(e);
 }
