@@ -656,15 +656,6 @@ void MainWin::updateScene(BasicCamera& camera, QString const& pathId)
 		    scaleFactor * static_cast<float>(textWidth) / width(),
 		    scaleFactor * static_cast<float>(textWidth) / height());
 
-		helperBillboard->getShader().setUniform("exposure",
-		                                        toneMappingModel->exposure());
-		helperBillboard->getShader().setUniform(
-		    "dynamicrange", toneMappingModel->dynamicrange());
-		debugText->getShader().setUniform("exposure",
-		                                  toneMappingModel->exposure());
-		debugText->getShader().setUniform("dynamicrange",
-		                                  toneMappingModel->dynamicrange());
-
 		universe->updateClock(videomode, frameTiming);
 
 		universe->updatePlanetarySystem();
