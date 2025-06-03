@@ -34,16 +34,12 @@ class SceneCameraData
 {
   public:
 	SceneCameraData()
-	    : SceneCameraData(0.05f, 0.f){};
+	    : SceneCameraData(0.05f, 0.f) {};
 	SceneCameraData(float pitch, float yaw); // rad
-	SceneCameraData(SceneCameraData const&)            = default;
-	SceneCameraData(SceneCameraData&&)                 = default;
-	SceneCameraData& operator=(SceneCameraData const&) = default;
-	SceneCameraData& operator=(SceneCameraData&&)      = default;
-	float getPitch() const;     // rad
-	float getYaw() const;       // rad
-	void setPitch(float pitch); // rad
-	void setYaw(float yaw);     // rad
+	float getPitch() const;                  // rad
+	float getYaw() const;                    // rad
+	void setPitch(float pitch);              // rad
+	void setYaw(float yaw);                  // rad
 	static SceneCameraData getCurrentState(Universe const& universe);
 	void setAsUniverseState(Universe& universe) const;
 
