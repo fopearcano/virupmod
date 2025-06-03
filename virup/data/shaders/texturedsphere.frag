@@ -3,7 +3,7 @@
 in vec3 f_position;
 
 uniform sampler2D tex;
-uniform float exposure;
+uniform float brightness;
 
 uniform float PI = 3.14159265359;
 
@@ -23,7 +23,7 @@ void main()
 	}
 	outColor = texture(tex, vec2(1.0) - texCoord);
 
-	outColor.rgb *= exposure;
+	outColor.rgb *= brightness;
 	outColor.a = 1.0;
 }
 

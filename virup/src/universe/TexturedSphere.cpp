@@ -62,7 +62,7 @@ void TexturedSphere::render(Camera const& camera)
 	{
 		vis *= brightnessMultiplier;
 	}
-	shader.setUniform("exposure", vis);
+	shader.setUniform("brightness", vis);
 
 	const GLStateSet glState({{GL_CULL_FACE, cullFrontFaces}});
 	const GLBlendSet glBlend({GL_ONE, GL_ONE});
