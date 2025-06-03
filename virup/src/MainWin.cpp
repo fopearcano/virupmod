@@ -7,117 +7,118 @@
 void MainWin::actionEvent(BaseInputManager::Action const& a, bool pressed,
                           bool autorepeated)
 {
-	if(loaded)
+	if(!loaded)
 	{
-		if(pressed)
+		AbstractMainWin::actionEvent(a, pressed, autorepeated);
+		return;
+	}
+	if(pressed)
+	{
+		auto onSceneChanged = [this]()
 		{
-			auto onSceneChanged = [this]()
+			auto id(animator->getCurrentTransitionId());
+			if(id >= 0
+			   && static_cast<unsigned int>(id)
+			          < animator->getTransitions().size())
 			{
-				auto id(animator->getCurrentTransitionId());
-				if(id >= 0
-				   && static_cast<unsigned int>(id)
-				          < animator->getTransitions().size())
-				{
-					timeSinceTextUpdate = 0.0;
-					debugText->setText(
-					    animator
-					        ->getTransitions()[animator
-					                               ->getCurrentTransitionId()]
-					        .getName());
-				}
-			};
+				timeSinceTextUpdate = 0.0;
+				debugText->setText(
+				    animator
+				        ->getTransitions()[animator->getCurrentTransitionId()]
+				        .getName());
+			}
+		};
 
-			if(a.id == "resetvrpos")
+		if(a.id == "resetvrpos")
+		{
+			// integralDt    = 0;
+			if(vrHandler->isEnabled())
 			{
-				// integralDt    = 0;
-				if(vrHandler->isEnabled())
-				{
-					vrHandler->resetPos();
-				}
-			}
-			else if(a.id == "toggleinfotext")
-			{
-				showInfoText = !showInfoText;
-			}
-			else if(a.id == "toggleorbits")
-			{
-				CelestialBodyRenderer::renderOrbits()
-				    = CelestialBodyRenderer::renderOrbits() > 0.f ? 0.f : 1.f;
-			}
-			else if(a.id == "togglelabels")
-			{
-				CelestialBodyRenderer::renderLabels()
-				    = CelestialBodyRenderer::renderLabels() > 0.f ? 0.f : 1.f;
-			}
-			else if(a.id == "toggledm")
-			{
-				Method::toggleDarkMatter();
-			}
-			else if(a.id == "togglegrid")
-			{
-				setGridEnabled(!gridEnabled());
-			}
-			/*else if(e->key() == Qt::Key_H)
-			{
-			    setHDR(!getHDR());
-			}*/
-			else if(a.id == "showposition")
-			{
-				printPositionInDataSpace();
-			}
-			else if(a.id == "timecoeffdown")
-			{
-				const float tc(universe->getTimeCoeff());
-				if(tc > 1.f && !universe->getLockedRealTime())
-				{
-					universe->setTimeCoeff(tc / 10.f);
-					debugText->setText(
-					    ("Time coeff. : "
-					     + std::to_string(static_cast<int>(tc / 10.f)) + "x")
-					        .c_str());
-					timeSinceTextUpdate = 0.f;
-				}
-			}
-			else if(a.id == "timecoeffup")
-			{
-				const float tc(universe->getTimeCoeff());
-				if(tc < 1000000.f && !universe->getLockedRealTime())
-				{
-					universe->setTimeCoeff(tc * 10.f);
-					debugText->setText(
-					    ("Time coeff. : "
-					     + std::to_string(static_cast<int>(tc * 10.f)) + "x")
-					        .c_str());
-					timeSinceTextUpdate = 0.f;
-				}
-			}
-			else if(a.id == "recenter")
-			{
-				animator->recenter();
-				recenterSound.play();
-				onSceneChanged();
-			}
-			else if(a.id == "next")
-			{
-				animator->next();
-				nextSound.play();
-				onSceneChanged();
-			}
-			else if(a.id == "previous")
-			{
-				animator->previous();
-				previousSound.play();
-				onSceneChanged();
-			}
-			else if(a.id == "home")
-			{
-				animator->home();
-				homeSound.play();
-				onSceneChanged();
+				vrHandler->resetPos();
 			}
 		}
-		movementControls->actionEvent(a, pressed);
+		else if(a.id == "toggleinfotext")
+		{
+			showInfoText = !showInfoText;
+		}
+		else if(a.id == "toggleorbits")
+		{
+			CelestialBodyRenderer::renderOrbits()
+			    = CelestialBodyRenderer::renderOrbits() > 0.f ? 0.f : 1.f;
+		}
+		else if(a.id == "togglelabels")
+		{
+			CelestialBodyRenderer::renderLabels()
+			    = CelestialBodyRenderer::renderLabels() > 0.f ? 0.f : 1.f;
+		}
+		else if(a.id == "toggledm")
+		{
+			Method::toggleDarkMatter();
+		}
+		else if(a.id == "togglegrid")
+		{
+			setGridEnabled(!gridEnabled());
+		}
+		/*else if(e->key() == Qt::Key_H)
+		{
+		    setHDR(!getHDR());
+		}*/
+		else if(a.id == "showposition")
+		{
+			printPositionInDataSpace();
+		}
+		else if(a.id == "timecoeffdown")
+		{
+			const float tc(universe->getTimeCoeff());
+			if(tc > 1.f && !universe->getLockedRealTime())
+			{
+				universe->setTimeCoeff(tc / 10.f);
+				debugText->setText(
+				    ("Time coeff. : "
+				     + std::to_string(static_cast<int>(tc / 10.f)) + "x")
+				        .c_str());
+				timeSinceTextUpdate = 0.f;
+			}
+		}
+		else if(a.id == "timecoeffup")
+		{
+			const float tc(universe->getTimeCoeff());
+			if(tc < 1000000.f && !universe->getLockedRealTime())
+			{
+				universe->setTimeCoeff(tc * 10.f);
+				debugText->setText(
+				    ("Time coeff. : "
+				     + std::to_string(static_cast<int>(tc * 10.f)) + "x")
+				        .c_str());
+				timeSinceTextUpdate = 0.f;
+			}
+		}
+		else if(a.id == "recenter")
+		{
+			animator->recenter();
+			recenterSound.play();
+			onSceneChanged();
+		}
+		else if(a.id == "next")
+		{
+			animator->next();
+			nextSound.play();
+			onSceneChanged();
+		}
+		else if(a.id == "previous")
+		{
+			animator->previous();
+			previousSound.play();
+			onSceneChanged();
+		}
+		else if(a.id == "home")
+		{
+			animator->home();
+			homeSound.play();
+			onSceneChanged();
+		}
 	}
+	movementControls->actionEvent(a, pressed);
 	AbstractMainWin::actionEvent(a, pressed, autorepeated);
 }
 
@@ -236,85 +237,83 @@ void MainWin::wheelEvent(QWheelEvent* e)
 
 void MainWin::vrEvent(VRHandler::Event const& e)
 {
-	if(loaded)
+	if(!loaded)
 	{
-		switch(e.type)
-		{
-			case VRHandler::EventType::BUTTON_PRESSED:
-				switch(e.button)
+		AbstractMainWin::vrEvent(e);
+		return;
+	}
+	switch(e.type)
+	{
+		case VRHandler::EventType::BUTTON_PRESSED:
+			switch(e.button)
+			{
+				case VRHandler::Button::TOUCHPAD:
 				{
-					case VRHandler::Button::TOUCHPAD:
+					Controller const* ctrl(vrHandler->getController(e.side));
+					if(ctrl != nullptr)
 					{
-						Controller const* ctrl(
-						    vrHandler->getController(e.side));
-						if(ctrl != nullptr)
+						QVector2D padCoords(ctrl->getPadCoords());
+						if(fabsf(padCoords[0])
+						   > fabsf(padCoords[1])) // LEFT OR RIGHT
 						{
-							QVector2D padCoords(ctrl->getPadCoords());
-							if(fabsf(padCoords[0])
-							   > fabsf(padCoords[1])) // LEFT OR RIGHT
+							if(padCoords[0] < 0.0f) // LEFT
 							{
-								if(padCoords[0] < 0.0f) // LEFT
+								toneMappingModel->setExposure(
+								    toneMappingModel->exposure() * 8.0 / 10.0);
+							}
+							else // RIGHT
+							{
+								toneMappingModel->setExposure(
+								    toneMappingModel->exposure() * 10.0 / 8.0);
+							}
+						}
+						else // UP OR DOWN
+						{
+							const float tc(universe->getTimeCoeff());
+							if(padCoords[1] < 0.0f) // DOWN
+							{
+								if(tc > 1.f && !universe->getLockedRealTime())
 								{
-									toneMappingModel->setExposure(
-									    toneMappingModel->exposure() * 8.0
-									    / 10.0);
-								}
-								else // RIGHT
-								{
-									toneMappingModel->setExposure(
-									    toneMappingModel->exposure() * 10.0
-									    / 8.0);
+									universe->setTimeCoeff(tc / 10.f);
+									debugText->setText(
+									    ("Time coeff. : "
+									     + std::to_string(
+									         static_cast<int>(tc / 10.f))
+									     + "x")
+									        .c_str());
+									timeSinceTextUpdate = 0.f;
 								}
 							}
-							else // UP OR DOWN
+							else // UP
 							{
-								const float tc(universe->getTimeCoeff());
-								if(padCoords[1] < 0.0f) // DOWN
+								if(tc < 1000000.f
+								   && !universe->getLockedRealTime())
 								{
-									if(tc > 1.f
-									   && !universe->getLockedRealTime())
-									{
-										universe->setTimeCoeff(tc / 10.f);
-										debugText->setText(
-										    ("Time coeff. : "
-										     + std::to_string(
-										         static_cast<int>(tc / 10.f))
-										     + "x")
-										        .c_str());
-										timeSinceTextUpdate = 0.f;
-									}
-								}
-								else // UP
-								{
-									if(tc < 1000000.f
-									   && !universe->getLockedRealTime())
-									{
-										universe->setTimeCoeff(tc * 10.f);
-										debugText->setText(
-										    ("Time coeff. : "
-										     + std::to_string(
-										         static_cast<int>(tc * 10.f))
-										     + "x")
-										        .c_str());
-										timeSinceTextUpdate = 0.f;
-									}
+									universe->setTimeCoeff(tc * 10.f);
+									debugText->setText(
+									    ("Time coeff. : "
+									     + std::to_string(
+									         static_cast<int>(tc * 10.f))
+									     + "x")
+									        .c_str());
+									timeSinceTextUpdate = 0.f;
 								}
 							}
 						}
-						break;
 					}
-					default:
-						break;
+					break;
 				}
-				break;
-			default:
-				break;
-		}
-
-		movementControls->vrEvent(
-		    e, renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform(),
-		    universe->isPlanetarySystemRendered());
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
 	}
+
+	movementControls->vrEvent(
+	    e, renderer.getCamera("cosmo").seatedTrackedSpaceToWorldTransform(),
+	    universe->isPlanetarySystemRendered());
 	AbstractMainWin::vrEvent(e);
 }
 
