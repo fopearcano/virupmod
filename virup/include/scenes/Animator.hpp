@@ -134,6 +134,7 @@ class Animator : public QObject
 	void toggleAnimations() { animationsDisabled = !animationsDisabled; };
 	void appendTransition(Transition t);
 	void setTransition(int newid);
+	void setTransition(QString const& newname);
 	void update(float frameTiming, bool videomode);
 	void removeAllTransitions();
 	void executeTransition(Transition t);

@@ -116,6 +116,18 @@ void Animator::setTransition(int newid)
 	setId(newid);
 }
 
+void Animator::setTransition(QString const& newname)
+{
+	for(unsigned int i(0); i < transitions.size(); ++i)
+	{
+		if(transitions[i].getName() == newname)
+		{
+			setTransition(i);
+			return;
+		}
+	}
+}
+
 void Animator::update(float frameTiming, bool videomode)
 {
 	Timer::videomode() = videomode;
