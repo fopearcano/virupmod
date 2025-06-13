@@ -293,7 +293,7 @@ class MainWin : public AbstractMainWin
 	std::unique_ptr<Grid> grid;
 	bool showGrid = QSettings().value("misc/showgrid").toBool();
 
-	bool moveView = false;
+	bool moveView = QSettings().value("misc/alwayspan").toBool();
 	QPoint cursorPosBackup;
 	QElapsedTimer cursorTimer;
 	std::unique_ptr<MovementControls> movementControls;

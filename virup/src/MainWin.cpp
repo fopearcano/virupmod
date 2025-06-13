@@ -169,7 +169,7 @@ bool MainWin::event(QEvent* e)
 
 void MainWin::mousePressEvent(QMouseEvent* e)
 {
-	if(e->button() == Qt::MouseButton::LeftButton)
+	if(e->button() == Qt::MouseButton::LeftButton && !moveView)
 	{
 		moveView = true;
 		QCursor c(cursor());
@@ -184,7 +184,7 @@ void MainWin::mouseReleaseEvent(QMouseEvent* e)
 {
 	if(e->button() == Qt::MouseButton::LeftButton)
 	{
-		moveView = false;
+		moveView = QSettings().value("misc/alwayspan").toBool();
 		QCursor c(cursor());
 		c.setShape(Qt::CursorShape::ArrowCursor);
 		QCursor::setPos(cursorPosBackup);

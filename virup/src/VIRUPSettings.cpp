@@ -84,6 +84,8 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 	addDirPathSetting("octreestatesdir", QDir::homePath() + "/octree_states/",
 	                  tr("Octree states (OBJ) save directory"));
 	addScreenSetting("presenterscreen", "", tr("Presenter screen"));
+	addBoolSetting("alwayspan", false,
+	               tr("Always Pan (no left click required)"));
 
 	insertGroup("sound", tr("Sound"), 4);
 	addDoubleSetting("ambiancevolume", 0.0,
