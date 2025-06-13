@@ -1,6 +1,7 @@
 #include "MainWin.hpp"
 
 #include <QOpenGLPaintDevice>
+#include <config.hpp>
 
 #include "LibTerrain.hpp"
 
@@ -764,8 +765,7 @@ void MainWin::renderGui(QSize const& targetSize, AdvancedPainter& painter)
 	{
 		return;
 	}
-	QString str(QString(PROJECT_NAME) + " - " + QString(PROJECT_VERSION)
-	            + '\n');
+	QString str(config::projectName + " - " + config::projectVersion + '\n');
 	if(universe->isPlanetarySystemLoaded())
 	{
 		str += tr("Planetary system : ") + universe->getPlanetarySystemName()

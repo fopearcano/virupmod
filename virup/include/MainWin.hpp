@@ -16,6 +16,7 @@
 #include "Billboard.hpp"
 #include "Grid.hpp"
 #include "MovementControls.hpp"
+#include "config.hpp"
 #include "scenes/Animator.hpp"
 #include "ui/AnimationTimeSelector.hpp"
 #include "ui/ImageCatalogSelector.hpp"
@@ -174,7 +175,7 @@ class MainWin : public AbstractMainWin
 		if(isServer())
 		{
 			QString mainScriptRootDir(
-			    "./data/" + QString(PROJECT_DIRECTORY) + "/scripts/"
+			    "./data/" + config::projectDirectory + "/scripts/"
 			    + QSettings().value("scripting/rootdir").toString());
 
 			if(!QSettings().value("scripting/customdir").toString().isEmpty())
