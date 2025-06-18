@@ -98,7 +98,7 @@ VIRUPSettings::VIRUPSettings(QWidget* parent)
 
 	editGroup("controls");
 	addDoubleSetting("translationspeed", 1.0,
-	                 tr("Gamepad Translation Speed Multiplier"));
+	                 tr("Translation Speed Multiplier"));
 	addDoubleSetting("rotationspeed", 1.0,
 	                 tr("Gamepad Rotation Speed Multiplier"));
 

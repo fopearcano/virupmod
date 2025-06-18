@@ -408,9 +408,6 @@ void MovementControls::update(double frameTiming, bool renderPlanetarySystem,
 	{
 		gamepadVel = {};
 	}
-	const auto multiplier
-	    = QSettings().value("controls/translationspeed").toDouble();
-	gamepadVel *= multiplier;
 
 	updateCube(frameTiming);
 	if(renderPlanetarySystem)
@@ -487,7 +484,9 @@ void MovementControls::updateCube(double frameTiming)
 		cosmoCam.position
 		    += frameTiming
 		       * Utils::fromQt(utils::transformDirection(
-		           cosmoCam.getView().inverted(), posVel + negVel + gamepadVel))
+		           cosmoCam.getView().inverted(),
+		           QSettings().value("controls/translationspeed").toDouble()
+		               * (posVel + negVel + gamepadVel)))
 		       / cosmoCam.scale;
 	}
 }
@@ -537,8 +536,10 @@ void MovementControls::updateOrbitalSystem(double frameTiming)
 	{
 		planetCam.relativePosition[i]
 		    += frameTiming
-		       * utils::transformDirection(planetCam.getView().inverted(),
-		                                   (negVel + posVel + gamepadVel))[i]
+		       * utils::transformDirection(
+		           planetCam.getView().inverted(),
+		           QSettings().value("controls/translationspeed").toDouble()
+		               * (negVel + posVel + gamepadVel))[i]
 		       / CelestialBodyRenderer::overridenScale();
 	}
 }
